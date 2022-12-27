@@ -612,6 +612,9 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
     }
 
     private IEnumerator BigStarRespawn(bool wait = true) {
+        if (starRequirement < 0)
+            yield break;
+        
         if (wait)
             yield return new WaitForSeconds(10.4f - playerCount / 5f);
 

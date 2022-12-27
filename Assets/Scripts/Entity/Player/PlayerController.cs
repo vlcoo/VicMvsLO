@@ -1186,12 +1186,17 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         Instantiate(Resources.Load("Prefabs/Particle/CoinCollect"), position, Quaternion.identity);
 
         PlaySound(Enums.Sounds.World_Coin_Collect);
-        NumberParticle num = ((GameObject) Instantiate(Resources.Load("Prefabs/Particle/Number"), position, Quaternion.identity)).GetComponentInChildren<NumberParticle>();
-        num.text.text = Utils.GetSymbolString((coins + 1).ToString(), Utils.numberSymbols);
-        num.ApplyColor(AnimationController.GlowColor);
+        if (coins > 0)
+        {
+            NumberParticle num =
+                ((GameObject)Instantiate(Resources.Load("Prefabs/Particle/Number"), position, Quaternion.identity))
+                .GetComponentInChildren<NumberParticle>();
+            num.text.text = Utils.GetSymbolString((coins + 1).ToString(), Utils.numberSymbols);
+            num.ApplyColor(AnimationController.GlowColor);
+        }
 
         coins = newCount;
-        if (coins >= GameManager.Instance.coinRequirement) {
+        if (coins > -1 && coins >= GameManager.Instance.coinRequirement ) {
             SpawnCoinItem();
             coins = 0;
         }
@@ -1215,7 +1220,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
     }
 
     public void SpawnCoinItem() {
-        if (coins < GameManager.Instance.coinRequirement)
+        if (coins < GameManager.Instance.coinRequirement || GameManager.Instance.coinRequirement < 0)
             return;
 
         if (!PhotonNetwork.IsMasterClient)

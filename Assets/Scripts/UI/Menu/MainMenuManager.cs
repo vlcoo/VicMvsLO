@@ -30,7 +30,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     public TMP_Dropdown levelDropdown, characterDropdown;
     public RoomIcon selectedRoomIcon, privateJoinRoom;
     public Button joinRoomBtn, createRoomBtn, startGameBtn;
-    public Toggle ndsResolutionToggle, fullscreenToggle, livesEnabled, powerupsEnabled, timeEnabled, drawTimeupToggle, fireballToggle, vsyncToggle, privateToggle, privateToggleRoom, aspectToggle, spectateToggle, scoreboardToggle, filterToggle;
+    public Toggle ndsResolutionToggle, fullscreenToggle, livesEnabled, powerupsEnabled, timeEnabled, starsEnabled, coinsEnabled, drawTimeupToggle, fireballToggle, vsyncToggle, privateToggle, privateToggleRoom, aspectToggle, spectateToggle, scoreboardToggle, filterToggle;
     public GameObject playersContent, playersPrefab, chatContent, chatPrefab;
     public TMP_InputField nicknameField, starsText, coinsText, livesField, timeField, lobbyJoinField, chatTextField;
     public Slider musicSlider, sfxSlider, masterSlider, lobbyPlayersSlider, changePlayersSlider;
@@ -931,6 +931,8 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
         livesField.interactable = PhotonNetwork.IsMasterClient && livesEnabled.isOn;
         timeField.interactable = PhotonNetwork.IsMasterClient && timeEnabled.isOn;
+        starsText.interactable = PhotonNetwork.IsMasterClient && starsEnabled.isOn;
+        coinsText.interactable = PhotonNetwork.IsMasterClient && coinsEnabled.isOn;
         drawTimeupToggle.interactable = PhotonNetwork.IsMasterClient && timeEnabled.isOn;
 
         Utils.GetCustomProperty(Enums.NetRoomProperties.Debug, out bool debug);
@@ -1288,17 +1290,24 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     }
 
     public void ChangeStarRequirement(int stars) {
-        starsText.text = stars.ToString();
+        starsEnabled.SetIsOnWithoutNotify(stars != -1);
+        UpdateSettingEnableStates();
+        if (stars == -1)
+            return;
+
+        starsText.SetTextWithoutNotify(stars.ToString());
     }
     public void SetStarRequirement(TMP_InputField input) {
         if (!PhotonNetwork.IsMasterClient)
             return;
 
         int.TryParse(input.text, out int newValue);
-        if (newValue < 1) {
+        if (newValue == -1)
+            return;
+        
+        if (newValue < 1)
             newValue = 5;
-            input.text = newValue.ToString();
-        }
+        ChangeStarRequirement(newValue);
         if (newValue == (int) PhotonNetwork.CurrentRoom.CustomProperties[Enums.NetRoomProperties.StarRequirement])
             return;
 
@@ -1310,17 +1319,24 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     }
 
     public void ChangeCoinRequirement(int coins) {
-        coinsText.text = coins.ToString();
+        coinsEnabled.SetIsOnWithoutNotify(coins != -1);
+        UpdateSettingEnableStates();
+        if (coins == -1)
+            return;
+
+        coinsText.SetTextWithoutNotify(coins.ToString());
     }
     public void SetCoinRequirement(TMP_InputField input) {
         if (!PhotonNetwork.IsMasterClient)
             return;
 
         int.TryParse(input.text, out int newValue);
-        if (newValue < 1 || newValue > 99) {
+        if (newValue == -1)
+            return;
+        
+        if (newValue < 1 || newValue > 99)
             newValue = 8;
-            input.text = newValue.ToString();
-        }
+        ChangeCoinRequirement(newValue);
         if (newValue == (int) PhotonNetwork.CurrentRoom.CustomProperties[Enums.NetRoomProperties.CoinRequirement])
             return;
 
@@ -1412,7 +1428,19 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         };
         PhotonNetwork.CurrentRoom.SetCustomProperties(table);
     }
-
+    
+    public void EnableStars(Toggle toggle) {
+        Hashtable properties = new() {
+            [Enums.NetRoomProperties.StarRequirement] = toggle.isOn ? int.Parse(starsText.text) : -1
+        };
+        PhotonNetwork.CurrentRoom.SetCustomProperties(properties);
+    }
+    public void EnableCoins(Toggle toggle) {
+        Hashtable properties = new() {
+            [Enums.NetRoomProperties.CoinRequirement] = toggle.isOn ? int.Parse(coinsText.text) : -1
+        };
+        PhotonNetwork.CurrentRoom.SetCustomProperties(properties);
+    }
     public void EnableSpectator(Toggle toggle) {
         Hashtable properties = new() {
             [Enums.NetPlayerProperties.Spectator] = toggle.isOn,

@@ -92,10 +92,13 @@ public class UIUpdater : MonoBehaviour {
             stars = player.stars;
             uiStars.text = Utils.GetSymbolString("Sx" + stars + "/" + GameManager.Instance.starRequirement);
         }
+        else starsParent.SetActive(false);
+        
         if (player.coins != coins) {
             coins = player.coins;
             uiCoins.text = Utils.GetSymbolString("Cx" + coins + "/" + GameManager.Instance.coinRequirement);
         }
+        else coinsParent.SetActive(false);
 
         if (player.lives >= 0) {
             if (player.lives != lives) {

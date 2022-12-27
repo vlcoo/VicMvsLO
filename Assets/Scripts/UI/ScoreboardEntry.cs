@@ -57,7 +57,8 @@ public class ScoreboardEntry : MonoBehaviour {
         string txt = "";
         if (currentLives >= 0)
             txt += target.character.uistring + Utils.GetSymbolString(currentLives.ToString());
-        txt += Utils.GetSymbolString($"S{currentStars}");
+        if (GameManager.Instance.starRequirement > 0)
+            txt += Utils.GetSymbolString($"S{currentStars}");
 
         valuesText.text = txt;
     }
