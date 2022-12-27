@@ -87,18 +87,19 @@ public class UIUpdater : MonoBehaviour {
     private void UpdateTextUI() {
         if (!player || GameManager.Instance.gameover)
             return;
-
-        if (player.stars != stars) {
-            stars = player.stars;
-            uiStars.text = Utils.GetSymbolString("Sx" + stars + "/" + GameManager.Instance.starRequirement);
+        
+        if (GameManager.Instance.starRequirement > 0) {
+            if (player.stars != stars) {
+                stars = player.stars;
+                uiStars.text = Utils.GetSymbolString("Sx" + stars + "/" + GameManager.Instance.starRequirement);
+            }
         }
         else starsParent.SetActive(false);
         
         if (player.coins != coins) {
             coins = player.coins;
-            uiCoins.text = Utils.GetSymbolString("Cx" + coins + "/" + GameManager.Instance.coinRequirement);
+            uiCoins.text = Utils.GetSymbolString("Cx" + coins + (GameManager.Instance.coinRequirement > 0 ? "/" + GameManager.Instance.coinRequirement : ""));
         }
-        else coinsParent.SetActive(false);
 
         if (player.lives >= 0) {
             if (player.lives != lives) {

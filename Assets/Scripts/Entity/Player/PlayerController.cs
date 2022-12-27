@@ -1186,20 +1186,27 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         Instantiate(Resources.Load("Prefabs/Particle/CoinCollect"), position, Quaternion.identity);
 
         PlaySound(Enums.Sounds.World_Coin_Collect);
-        if (coins > 0)
-        {
-            NumberParticle num =
-                ((GameObject)Instantiate(Resources.Load("Prefabs/Particle/Number"), position, Quaternion.identity))
-                .GetComponentInChildren<NumberParticle>();
-            num.text.text = Utils.GetSymbolString((coins + 1).ToString(), Utils.numberSymbols);
-            num.ApplyColor(AnimationController.GlowColor);
-        }
-
         coins = newCount;
-        if (coins > -1 && coins >= GameManager.Instance.coinRequirement ) {
-            SpawnCoinItem();
-            coins = 0;
+
+        if (GameManager.Instance.coinRequirement >= 0)
+        {
+            if (coins > 0)
+            {
+                NumberParticle num =
+                    ((GameObject)Instantiate(Resources.Load("Prefabs/Particle/Number"), position, Quaternion.identity))
+                    .GetComponentInChildren<NumberParticle>();
+                num.text.text = Utils.GetSymbolString((coins).ToString(), Utils.numberSymbols);
+                num.ApplyColor(AnimationController.GlowColor);
+            }
+
+            if (coins >= GameManager.Instance.coinRequirement)
+            {
+                SpawnCoinItem();
+                coins = 0;
+            }
         }
+        
+        PhotonNetwork.RaiseEvent((byte) Enums.NetEventIds.EndGame, photonView.Owner, NetworkUtils.EventAll, SendOptions.SendReliable);
 
         UpdateGameState();
     }
@@ -1220,7 +1227,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
     }
 
     public void SpawnCoinItem() {
-        if (coins < GameManager.Instance.coinRequirement || GameManager.Instance.coinRequirement < 0)
+        if (coins < GameManager.Instance.coinRequirement)
             return;
 
         if (!PhotonNetwork.IsMasterClient)
