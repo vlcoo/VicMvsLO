@@ -1,12 +1,15 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using ExitGames.Client.Photon;
+using NSMB.Utils;
 using Photon.Pun;
 using Photon.Realtime;
 using UnityEngine;
 
 public class MatchConditioner : MonoBehaviour
 {
-    public string a = "";
+    
     
     // Start is called before the first frame update
     void Start()
@@ -22,6 +25,7 @@ public class MatchConditioner : MonoBehaviour
 
     public void ConditionActioned(int byWhomsID, string condition)
     {
+        if (byWhomsID < 0) return;
         PlayerController player = PhotonView.Find(byWhomsID).GetComponent<PlayerController>();
         ConditionActioned(player, condition);
     }
@@ -30,7 +34,11 @@ public class MatchConditioner : MonoBehaviour
     {
         switch (condition)
         {
+            case "Spawned":
+                break;
+            
             case "GotCoin":
+                ActionKnockbackPlayer(byWhom);
                 break;
             
             case "GotPowerup":
@@ -49,10 +57,10 @@ public class MatchConditioner : MonoBehaviour
                 break;
             
             case "Died":
+                ActionWinPlayer(byWhom);
                 break;
 
             case "Jumped":
-                byWhom.Death(false, false);
                 break;
 
             case "LookedRight":
@@ -70,5 +78,45 @@ public class MatchConditioner : MonoBehaviour
             case "Ran":
                 break;
         }
+    }
+
+    public void ActionKillPlayer(PlayerController whom)
+    {
+        whom.photonView.RPC(nameof(whom.Death), RpcTarget.All, false, false);
+    }
+
+    public void ActionWinPlayer(PlayerController whom)
+    {
+        PhotonNetwork.RaiseEvent((byte) Enums.NetEventIds.EndGame, whom.photonView.Owner, NetworkUtils.EventAll, SendOptions.SendReliable);
+    }
+
+    public void ActionDisqualifyPlayer(PlayerController whom)
+    {
+        whom.photonView.RPC(nameof(whom.Disqualify), RpcTarget.All);
+    }
+
+    public void ActionRespawnLevel()
+    {
+        GameManager.Instance.SendAndExecuteEvent(Enums.NetEventIds.ResetTiles, null, SendOptions.SendReliable);
+    }
+
+    public void ActionKnockbackPlayer(PlayerController whom)
+    {
+        whom.photonView.RPC(nameof(whom.Knockback), RpcTarget.All, whom.facingRight, 1, false, -1);
+    }
+
+    public void ActionHardKnockbackPlayer(PlayerController whom)
+    {
+        whom.photonView.RPC(nameof(whom.Knockback), RpcTarget.All, false, 3, false, -1);
+    }
+
+    public void ActionHarmPlayer(PlayerController whom)
+    {
+        whom.photonView.RPC(nameof(whom.Powerdown), RpcTarget.All, true);
+    }
+
+    public void ActionGiveStar(PlayerController whom)
+    {
+        whom.photonView.RPC(nameof(whom.CollectBigStarInstantly), RpcTarget.AllViaServer);
     }
 }

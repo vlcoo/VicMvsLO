@@ -752,8 +752,8 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         errorText.text = NetworkUtils.disconnectMessages.GetValueOrDefault(cause, cause.ToString());
         EventSystem.current.SetSelectedGameObject(errorButton);
 
-        dialog.rootVisualElement.Q<Label>("Label").text = NetworkUtils.disconnectMessages.GetValueOrDefault(cause, cause.ToString());
-        dialog.rootVisualElement.Q<VisualElement>("VisualElement").style.scale = new StyleScale(new Vector2(1, 1));
+        // dialog.rootVisualElement.Q<Label>("Label").text = NetworkUtils.disconnectMessages.GetValueOrDefault(cause, cause.ToString());
+        // dialog.rootVisualElement.Q<VisualElement>("VisualElement").style.scale = new StyleScale(new Vector2(1, 1));
     }
 
     public void OpenErrorBox(string text) {
@@ -764,8 +764,8 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         errorText.text = text;
         EventSystem.current.SetSelectedGameObject(errorButton);
 
-        dialog.rootVisualElement.Q<Label>("Label").text = text;
-        dialog.rootVisualElement.Q<VisualElement>("VisualElement").style.scale = new StyleScale(new Vector2(1, 1));
+        // dialog.rootVisualElement.Q<Label>("Label").text = text;
+        // dialog.rootVisualElement.Q<VisualElement>("VisualElement").style.scale = new StyleScale(new Vector2(1, 1));
     }
 
     public void BackSound() {

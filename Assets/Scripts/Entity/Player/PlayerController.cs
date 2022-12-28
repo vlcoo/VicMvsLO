@@ -734,9 +734,10 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
 
         jumpHeld = context.ReadValue<float>() >= 0.5f;
         if (jumpHeld)
+        {
             jumpBuffer = 0.15f;
-        
-        GameManager.Instance.MatchConditioner.ConditionActioned(this, "Jumped");
+            GameManager.Instance.MatchConditioner.ConditionActioned(this, "Jumped");
+        }
     }
 
     public void OnSprint(InputAction.CallbackContext context) {
@@ -1095,8 +1096,15 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
     #endregion
 
     #region -- COIN / STAR COLLECTION --
+
     [PunRPC]
-    protected void AttemptCollectBigStar(int starID, PhotonMessageInfo info) {
+    public void CollectBigStarInstantly()
+    {
+        photonView.RPC(nameof(CollectBigStar), RpcTarget.All, (Vector2) transform.position, -1, stars + 1);
+    }
+    
+    [PunRPC]
+    public void AttemptCollectBigStar(int starID, PhotonMessageInfo info) {
         //only the owner can request a big star, and only the master client can decide for us
         if (info.Sender != photonView.Owner || !PhotonNetwork.IsMasterClient)
             return;
@@ -1142,13 +1150,19 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         Instantiate(Resources.Load("Prefabs/Particle/StarCollect"), particle, Quaternion.identity);
 
         //destroy
-        PhotonView star = PhotonView.Find(starView);
-        if (star && star.IsMine) {
-            PhotonNetwork.Destroy(star);
-        } else {
-            Destroy(star.gameObject);
+        if (starView >= 0)
+        {
+            PhotonView star = PhotonView.Find(starView);
+            if (star && star.IsMine)
+            {
+                PhotonNetwork.Destroy(star);
+            }
+            else
+            {
+                Destroy(star.gameObject);
+            }
         }
-        
+
         GameManager.Instance.MatchConditioner.ConditionActioned(this, "GotStar");
     }
 
@@ -1277,6 +1291,14 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
     #endregion
 
     #region -- DEATH / RESPAWNING --
+
+    [PunRPC]
+    public void Disqualify()
+    {
+        lives = 1;
+        Death(false, false);
+    }
+    
     [PunRPC]
     public void Death(bool deathplane, bool fire) {
         if (dead)
@@ -1324,6 +1346,8 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
 
         if (photonView.IsMine)
             ScoreboardUpdater.instance.OnDeathToggle();
+        
+        GameManager.Instance.MatchConditioner.ConditionActioned(this, "Died");
     }
 
     [PunRPC]
@@ -1594,15 +1618,17 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         initialKnockbackFacingRight = facingRight;
 
         PhotonView attacker = PhotonNetwork.GetPhotonView(attackerView);
-        if (attackerView >= 0) {
+        if (attackerView >= 0)
+        {
             if (attacker)
                 SpawnParticle("Prefabs/Particle/PlayerBounce", attacker.transform.position);
+        }
 
-            if (fireballKnockback)
+        if (fireballKnockback)
                 PlaySound(Enums.Sounds.Player_Sound_Collision_Fireball, 0, 3);
             else
                 PlaySound(Enums.Sounds.Player_Sound_Collision, 0, 3);
-        }
+
         animator.SetBool("fireballKnockback", fireball);
         animator.SetBool("knockforwards", facingRight != fromRight);
 
