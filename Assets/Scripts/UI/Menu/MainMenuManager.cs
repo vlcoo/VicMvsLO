@@ -14,6 +14,12 @@ using Photon.Pun;
 using Photon.Realtime;
 using Hashtable = ExitGames.Client.Photon.Hashtable;
 using NSMB.Utils;
+using UnityEditor.Rendering;
+using UnityEngine.UIElements;
+using Button = UnityEngine.UI.Button;
+using Image = UnityEngine.UI.Image;
+using Slider = UnityEngine.UI.Slider;
+using Toggle = UnityEngine.UI.Toggle;
 
 public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks, IOnEventCallback, IConnectionCallbacks, IMatchmakingCallbacks {
 
@@ -43,6 +49,8 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     public string connectThroughSecret = "";
     public string selectedRoom;
     public bool askedToJoin;
+
+    public UIDocument dialog;
 
     public Image overallColor, shirtColor;
     public GameObject palette, paletteDisabled;
@@ -651,6 +659,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         inLobbyMenu.SetActive(false);
         creditsMenu.SetActive(false);
         privatePrompt.SetActive(false);
+        dialog.rootVisualElement.Q<VisualElement>("VisualElement").style.scale = new StyleScale(new Vector2(0, 0));
 
         foreach (RoomIcon room in currentRooms.Values)
             room.UpdateUI(room.room);
@@ -742,6 +751,9 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         errorBox.SetActive(true);
         errorText.text = NetworkUtils.disconnectMessages.GetValueOrDefault(cause, cause.ToString());
         EventSystem.current.SetSelectedGameObject(errorButton);
+
+        dialog.rootVisualElement.Q<Label>("Label").text = NetworkUtils.disconnectMessages.GetValueOrDefault(cause, cause.ToString());
+        dialog.rootVisualElement.Q<VisualElement>("VisualElement").style.scale = new StyleScale(new Vector2(1, 1));
     }
 
     public void OpenErrorBox(string text) {
@@ -751,6 +763,9 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         errorBox.SetActive(true);
         errorText.text = text;
         EventSystem.current.SetSelectedGameObject(errorButton);
+
+        dialog.rootVisualElement.Q<Label>("Label").text = text;
+        dialog.rootVisualElement.Q<VisualElement>("VisualElement").style.scale = new StyleScale(new Vector2(1, 1));
     }
 
     public void BackSound() {

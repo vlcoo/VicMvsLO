@@ -735,6 +735,8 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         jumpHeld = context.ReadValue<float>() >= 0.5f;
         if (jumpHeld)
             jumpBuffer = 0.15f;
+        
+        GameManager.Instance.MatchConditioner.ConditionActioned(this, "Jumped");
     }
 
     public void OnSprint(InputAction.CallbackContext context) {
@@ -984,6 +986,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
                 PlaySound(powerup.soundEffect);
         }
 
+        GameManager.Instance.MatchConditioner.ConditionActioned(this, "GotPowerup");
         UpdateGameState();
 
         if (view.IsMine)
@@ -1029,6 +1032,8 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         propellerTimer = 0;
         propellerSpinTimer = 0;
         usedPropellerThisJump = false;
+        
+        GameManager.Instance.MatchConditioner.ConditionActioned(this, "LostPowerup");
 
         if (!nowDead) {
             hitInvincibilityCounter = 3f;
@@ -1143,6 +1148,8 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         } else {
             Destroy(star.gameObject);
         }
+        
+        GameManager.Instance.MatchConditioner.ConditionActioned(this, "GotStar");
     }
 
     [PunRPC]
@@ -1206,8 +1213,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             }
         }
         
-        PhotonNetwork.RaiseEvent((byte) Enums.NetEventIds.EndGame, photonView.Owner, NetworkUtils.EventAll, SendOptions.SendReliable);
-
+        GameManager.Instance.MatchConditioner.ConditionActioned(this, "GotCoin");
         UpdateGameState();
     }
 
@@ -1272,7 +1278,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
 
     #region -- DEATH / RESPAWNING --
     [PunRPC]
-    protected void Death(bool deathplane, bool fire) {
+    public void Death(bool deathplane, bool fire) {
         if (dead)
             return;
 
@@ -1627,6 +1633,8 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         body.gravityScale = normalGravity;
         wallSlideLeft = wallSlideRight = false;
 
+        GameManager.Instance.MatchConditioner.ConditionActioned(this, "KnockedBack");
+        GameManager.Instance.MatchConditioner.ConditionActioned(attackerView, "Stomped");
         SpawnStars(starsToDrop, false);
         HandleLayerState();
     }

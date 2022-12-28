@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 using UnityEngine.Audio;
@@ -32,6 +33,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
     }
 
     public MusicData mainMusic, invincibleMusic, megaMushroomMusic;
+    public MatchConditioner MatchConditioner { get; private set; }
 
     public int levelMinTileX, levelMinTileY, levelWidthTile, levelHeightTile;
     public float cameraMinY, cameraHeightY, cameraMinX = -1000, cameraMaxX = 1000;
@@ -420,6 +422,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
 
     public void Start() {
         SpectationManager = GetComponent<SpectationManager>();
+        MatchConditioner = GetComponent<MatchConditioner>();
         loopMusic = GetComponent<LoopingMusic>();
         coins = GameObject.FindGameObjectsWithTag("coin");
         levelUIColor.a = .7f;
