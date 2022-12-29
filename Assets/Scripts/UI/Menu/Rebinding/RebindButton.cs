@@ -25,8 +25,13 @@ public class RebindButton : MonoBehaviour {
 
         targetAction.actionMap.Disable();
 
-        MainMenuManager.Instance.rebindPrompt.SetActive(true);
+        GameObject rebindPrompt = MainMenuManager.Instance.rebindPrompt;
+        Animator rebindPromptAnimator = MainMenuManager.Instance.rebindPromptAnimator;
+        rebindPrompt.SetActive(true);
         MainMenuManager.Instance.rebindText.text = $"Rebinding {targetAction.name} {targetBinding.name} ({targetBinding.groups})\nPress any button or key.";
+        
+        if (rebindPromptAnimator != null)
+            rebindPromptAnimator.SetBool("open", rebindPrompt.activeSelf);
 
         rebinding = targetAction
             .PerformInteractiveRebinding()

@@ -57,7 +57,7 @@ public class MatchConditioner : MonoBehaviour
                 break;
             
             case "Died":
-                ActionWinPlayer(byWhom);
+                ActionDraw();
                 break;
 
             case "Jumped":
@@ -88,6 +88,11 @@ public class MatchConditioner : MonoBehaviour
     public void ActionWinPlayer(PlayerController whom)
     {
         PhotonNetwork.RaiseEvent((byte) Enums.NetEventIds.EndGame, whom.photonView.Owner, NetworkUtils.EventAll, SendOptions.SendReliable);
+    }
+
+    public void ActionDraw()
+    {
+        PhotonNetwork.RaiseEvent((byte) Enums.NetEventIds.EndGame, null, NetworkUtils.EventAll, SendOptions.SendReliable);
     }
 
     public void ActionDisqualifyPlayer(PlayerController whom)

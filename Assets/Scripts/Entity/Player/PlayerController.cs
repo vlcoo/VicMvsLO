@@ -1285,6 +1285,8 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             stars--;
             amount--;
         }
+        
+        photonView.RPC(nameof(PlaySound), RpcTarget.All, Enums.Sounds.World_Star_Spawn);
         GameManager.Instance.CheckForWinner();
         UpdateGameState();
     }

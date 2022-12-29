@@ -588,7 +588,6 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         text.GetComponent<TMP_Text>().text = winner != null ? $"{ winner.GetUniqueNickname() } Wins!" : "It's a draw...";
 
         yield return new WaitForSecondsRealtime(1);
-        text.GetComponent<Animator>().SetTrigger("start");
 
         AudioMixer mixer = music.outputAudioMixerGroup.audioMixer;
         mixer.SetFloat("MusicSpeed", 1f);
@@ -599,12 +598,18 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         int secondsUntilMenu;
         secondsUntilMenu = draw ? 5 : 4;
 
-        if (draw)
+        if (draw) {
             music.PlayOneShot(Enums.Sounds.UI_Match_Draw.GetClip());
-        else if (win)
+            text.GetComponent<Animator>().SetTrigger("startNegative");
+        }
+        else if (win) {
             music.PlayOneShot(Enums.Sounds.UI_Match_Win.GetClip());
-        else
+            text.GetComponent<Animator>().SetTrigger("start");
+        }
+        else {
             music.PlayOneShot(Enums.Sounds.UI_Match_Lose.GetClip());
+            text.GetComponent<Animator>().SetTrigger("startNegative");
+        }
 
         //TOOD: make a results screen?
 

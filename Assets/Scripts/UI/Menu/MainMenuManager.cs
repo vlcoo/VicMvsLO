@@ -31,6 +31,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     bool quit, validName;
     public GameObject connecting;
     public GameObject title, bg, mainMenu, optionsMenu, lobbyMenu, createLobbyPrompt, inLobbyMenu, creditsMenu, controlsMenu, privatePrompt, updateBox;
+    public Animator createLobbyPromptAnimator, privatePromptAnimator, updateBoxAnimator, errorBoxAnimator, rebindPromptAnimator;
     public GameObject[] levelCameraPositions;
     public GameObject sliderText, lobbyText, currentMaxPlayers, settingsPanel;
     public TMP_Dropdown levelDropdown, characterDropdown;
@@ -437,6 +438,12 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         Camera.main.transform.position = levelCameraPositions[Random.Range(0, maps.Count)].transform.position;
         levelDropdown.AddOptions(maps);
         LoadSettings(!PhotonNetwork.InRoom);
+        
+        createLobbyPromptAnimator = createLobbyPrompt.transform.Find("Image").GetComponent<Animator>();
+        privatePromptAnimator = privatePrompt.transform.Find("Image").GetComponent<Animator>();
+        updateBoxAnimator = updateBox.transform.Find("Image").GetComponent<Animator>();
+        errorBoxAnimator = errorBox.transform.Find("Image").GetComponent<Animator>();
+        rebindPromptAnimator = rebindPrompt.transform.Find("Image").GetComponent<Animator>();
 
         //Photon stuff.
         if (!PhotonNetwork.IsConnected) {
@@ -617,6 +624,12 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         settingsScroll.verticalNormalizedPosition = 1;
     }
 
+    public void ClosePromptAnimator(GameObject which)
+    {
+        Animator anim = which.transform.Find("Image").GetComponent<Animator>();
+        if (anim != null)
+            anim.SetBool("open", false);
+    }
 
     public void OpenTitleScreen() {
         title.SetActive(true);
@@ -659,7 +672,6 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         inLobbyMenu.SetActive(false);
         creditsMenu.SetActive(false);
         privatePrompt.SetActive(false);
-        dialog.rootVisualElement.Q<VisualElement>("VisualElement").style.scale = new StyleScale(new Vector2(0, 0));
 
         foreach (RoomIcon room in currentRooms.Values)
             room.UpdateUI(room.room);
@@ -679,6 +691,9 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         privatePrompt.SetActive(false);
 
         privateToggle.isOn = false;
+
+        if (createLobbyPromptAnimator != null)
+            createLobbyPromptAnimator.SetBool("open", createLobbyPrompt.activeSelf);
 
         EventSystem.current.SetSelectedGameObject(createLobbySelected);
     }
@@ -741,6 +756,10 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     public void OpenPrivatePrompt() {
         privatePrompt.SetActive(true);
         lobbyJoinField.text = "";
+        
+        if (privatePromptAnimator != null)
+            privatePromptAnimator.SetBool("open", privatePrompt.activeSelf);
+        
         EventSystem.current.SetSelectedGameObject(privateSelected);
     }
 
@@ -750,10 +769,11 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
         errorBox.SetActive(true);
         errorText.text = NetworkUtils.disconnectMessages.GetValueOrDefault(cause, cause.ToString());
+        
+        if (errorBoxAnimator != null)
+            errorBoxAnimator.SetBool("open", errorBox.activeSelf);
+        
         EventSystem.current.SetSelectedGameObject(errorButton);
-
-        // dialog.rootVisualElement.Q<Label>("Label").text = NetworkUtils.disconnectMessages.GetValueOrDefault(cause, cause.ToString());
-        // dialog.rootVisualElement.Q<VisualElement>("VisualElement").style.scale = new StyleScale(new Vector2(1, 1));
     }
 
     public void OpenErrorBox(string text) {
@@ -762,10 +782,11 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
         errorBox.SetActive(true);
         errorText.text = text;
+        
+        if (errorBoxAnimator != null)
+            errorBoxAnimator.SetBool("open", errorBox.activeSelf);
+        
         EventSystem.current.SetSelectedGameObject(errorButton);
-
-        // dialog.rootVisualElement.Q<Label>("Label").text = text;
-        // dialog.rootVisualElement.Q<VisualElement>("VisualElement").style.scale = new StyleScale(new Vector2(1, 1));
     }
 
     public void BackSound() {
@@ -929,6 +950,9 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
             CustomRoomPropertiesForLobby = NetworkUtils.LobbyVisibleRoomProperties,
         };
         PhotonNetwork.CreateRoom(roomName, options, TypedLobby.Default);
+        
+        if (createLobbyPromptAnimator != null)
+            createLobbyPromptAnimator.SetBool("open", false);
         createLobbyPrompt.SetActive(false);
         ChangeMaxPlayers(players);
     }

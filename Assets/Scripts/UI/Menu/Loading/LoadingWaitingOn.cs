@@ -5,16 +5,21 @@ using TMPro;
 
 using Photon.Realtime;
 using NSMB.Utils;
+using Photon.Pun;
 
 public class LoadingWaitingOn : MonoBehaviour {
 
-    [SerializeField] private TMP_Text playerList;
+    [SerializeField] private TMP_Text playerList, highPingAlert;
     [SerializeField] private string emptyText = "Loading...", iveLoadedText = "Waiting for others...", readyToStartText = "Starting...", spectatorText = "Joining as Spectator...";
 
     private TMP_Text text;
 
     public void Start() {
         text = GetComponent<TMP_Text>();
+        if (PhotonNetwork.GetPing() < 180)
+        {
+            highPingAlert.fontSize = 0;
+        };
     }
 
     public void Update() {
@@ -41,6 +46,6 @@ public class LoadingWaitingOn : MonoBehaviour {
 
         HashSet<Player> waitingFor = new(GameManager.Instance.nonSpectatingPlayers);
         waitingFor.ExceptWith(GameManager.Instance.loadedPlayers);
-        playerList.text = (waitingFor.Count) == 0 ? "" : "Waiting for:\n\n- " + string.Join("\n- ", waitingFor.Select(pl => pl.GetUniqueNickname()));
+        playerList.text = (waitingFor.Count) == 0 ? "" : "- Waiting for -\n\n- " + string.Join("\n", waitingFor.Select(pl => pl.GetUniqueNickname()));
     }
 }

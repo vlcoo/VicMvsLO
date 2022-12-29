@@ -47,8 +47,21 @@ public class UIUpdater : MonoBehaviour {
         pingSample = Mathf.Lerp(pingSample, PhotonNetwork.GetPing(), Mathf.Clamp01(Time.unscaledDeltaTime * 0.5f));
         if (pingSample == float.NaN)
             pingSample = 0;
+        
+        string signalStrength;
+        if (pingSample < 0) {
+            signalStrength = "52";
+        } else if (pingSample < 80) {
+            signalStrength = "49";
+        } else if (pingSample < 120) {
+            signalStrength = "50";
+        } else if (pingSample < 180) {
+            signalStrength = "51";
+        } else {
+            signalStrength = "52";
+        }
 
-        uiDebug.text = "<mark=#000000b0 padding=\"20, 20, 20, 20\"><font=\"defaultFont\">Ping: " + (int) pingSample + "ms</font>";
+        uiDebug.text = "<mark=#000000b0 padding=\"20, 20, 20, 20\">" + (int) pingSample + " <sprite=" + signalStrength + ">";
 
         //Player stuff update.
         if (!player && GameManager.Instance.localPlayer)
