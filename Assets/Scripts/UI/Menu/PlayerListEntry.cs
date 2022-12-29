@@ -48,19 +48,21 @@ public class PlayerListEntry : MonoBehaviour {
         string characterSymbol = Utils.GetCharacterData(player).uistring;
         Utils.GetCustomProperty(Enums.NetPlayerProperties.Ping, out int ping, player.CustomProperties);
 
-        string pingColor;
+        string signalStrength;
         if (ping < 0) {
-            pingColor = "black";
+            signalStrength = "52";
         } else if (ping < 80) {
-            pingColor = "#00b900";
+            signalStrength = "49";
         } else if (ping < 120) {
-            pingColor = "orange";
+            signalStrength = "50";
+        } else if (ping < 180) {
+            signalStrength = "51";
         } else {
-            pingColor = "red";
+            signalStrength = "52";
         }
 
         nameText.text = permissionSymbol + characterSymbol + player.GetUniqueNickname();
-        pingText.text = $"<color={pingColor}>{ping}";
+        pingText.text = $"{ping} <sprite={signalStrength}>";
 
         Transform parent = transform.parent;
         int childIndex = 0;
