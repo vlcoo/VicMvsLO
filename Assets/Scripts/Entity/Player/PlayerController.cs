@@ -1261,6 +1261,9 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
     }
 
     private void SpawnStars(int amount, bool deathplane) {
+        if (stars > 0) 
+            photonView.RPC(nameof(PlaySound), RpcTarget.All, Enums.Sounds.World_Star_Spawn);
+        
         if (!PhotonNetwork.IsMasterClient) {
             stars = Mathf.Max(0, stars - amount);
             return;
@@ -1286,7 +1289,6 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             amount--;
         }
         
-        photonView.RPC(nameof(PlaySound), RpcTarget.All, Enums.Sounds.World_Star_Spawn);
         GameManager.Instance.CheckForWinner();
         UpdateGameState();
     }

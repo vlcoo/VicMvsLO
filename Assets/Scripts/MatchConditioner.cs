@@ -9,12 +9,21 @@ using UnityEngine;
 
 public class MatchConditioner : MonoBehaviour
 {
-    
-    
+    public string[] POSSIBLE_CONDITIONS = new[]
+    {
+        "Spawned", "GotCoin", "GotPowerup", "LostPowerup", "GotStar", "KnockedBack", "Stomped",
+        "Died", "Jumped", "LookedRight", "LookedLeft", "LookedUp", "LookedDown", "Ran"
+    };
+
+    public List<string> POSSIBLE_ACTIONS = new List<string>();
+    public Dictionary<string, Action<PlayerController>> currentMapping = new Dictionary<string, Action<PlayerController>>();
+
     // Start is called before the first frame update
     void Start()
     {
-        
+        foreach (var method in GetType().GetMethods())
+            if (method.Name.StartsWith("Action"))
+                POSSIBLE_ACTIONS.Add(method.Name);
     }
 
     // Update is called once per frame
@@ -32,7 +41,11 @@ public class MatchConditioner : MonoBehaviour
 
     public void ConditionActioned(PlayerController byWhom, string condition)
     {
-        switch (condition)
+        Action<PlayerController> action = currentMapping.GetValueOrDefault(condition, null);
+        if (action == null) return;
+        
+        action.Invoke(byWhom);
+        /*switch (condition)
         {
             case "Spawned":
                 break;
@@ -77,7 +90,7 @@ public class MatchConditioner : MonoBehaviour
 
             case "Ran":
                 break;
-        }
+        }*/
     }
 
     public void ActionKillPlayer(PlayerController whom)
@@ -90,7 +103,7 @@ public class MatchConditioner : MonoBehaviour
         PhotonNetwork.RaiseEvent((byte) Enums.NetEventIds.EndGame, whom.photonView.Owner, NetworkUtils.EventAll, SendOptions.SendReliable);
     }
 
-    public void ActionDraw()
+    public void ActionDraw(PlayerController whom)
     {
         PhotonNetwork.RaiseEvent((byte) Enums.NetEventIds.EndGame, null, NetworkUtils.EventAll, SendOptions.SendReliable);
     }
@@ -100,7 +113,7 @@ public class MatchConditioner : MonoBehaviour
         whom.photonView.RPC(nameof(whom.Disqualify), RpcTarget.All);
     }
 
-    public void ActionRespawnLevel()
+    public void ActionRespawnLevel(PlayerController whom)
     {
         GameManager.Instance.SendAndExecuteEvent(Enums.NetEventIds.ResetTiles, null, SendOptions.SendReliable);
     }
