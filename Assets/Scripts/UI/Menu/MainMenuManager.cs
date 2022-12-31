@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -18,6 +19,7 @@ using UnityEditor.Rendering;
 using UnityEngine.UIElements;
 using Button = UnityEngine.UI.Button;
 using Image = UnityEngine.UI.Image;
+using Random = UnityEngine.Random;
 using Slider = UnityEngine.UI.Slider;
 using Toggle = UnityEngine.UI.Toggle;
 
@@ -33,7 +35,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     public GameObject title, bg, mainMenu, optionsMenu, lobbyMenu, createLobbyPrompt, inLobbyMenu, creditsMenu, controlsMenu, privatePrompt, updateBox, newRulePrompt;
     public Animator createLobbyPromptAnimator, privatePromptAnimator, updateBoxAnimator, errorBoxAnimator, rebindPromptAnimator, newRulePromptAnimator;
     public GameObject[] levelCameraPositions;
-    public GameObject sliderText, lobbyText, currentMaxPlayers, settingsPanel;
+    public GameObject sliderText, lobbyText, currentMaxPlayers, settingsPanel, ruleTemplate, lblConditions;
     public TMP_Dropdown levelDropdown, characterDropdown;
     public RoomIcon selectedRoomIcon, privateJoinRoom;
     public Button joinRoomBtn, createRoomBtn, startGameBtn;
@@ -76,6 +78,14 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     Coroutine updatePingCoroutine;
 
     public ColorChooser colorManager;
+
+    public List<string> POSSIBLE_CONDITIONS = new List<string>
+    {
+        "Spawned", "GotCoin", "GotPowerup", "LostPowerup", "GotStar", "KnockedBack", "Stomped",
+        "Died", "Jumped", "LookedRight", "LookedLeft", "LookedUp", "LookedDown", "Ran"
+    };
+    public List<string> POSSIBLE_ACTIONS = new List<string>();
+    public List<MatchRuleListEntry> ruleList = new List<MatchRuleListEntry>();
 
     // LOBBY CALLBACKS
     public void OnJoinedLobby() {
@@ -500,6 +510,13 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         nicknameField.characterLimit = NICKNAME_MAX;
 
         rebindManager.Init();
+        
+        foreach (var method in Type.GetType("MatchConditioner").GetMethods())
+            if (method.Name.StartsWith("Action"))
+                POSSIBLE_ACTIONS.Add(method.Name);
+        
+        newRulePrompt.transform.Find("Image/LblCondition/ConditionDropdown").GetComponent<TMP_Dropdown>().AddOptions(POSSIBLE_CONDITIONS);
+        newRulePrompt.transform.Find("Image/LblAction/ActionDropdown").GetComponent<TMP_Dropdown>().AddOptions(POSSIBLE_ACTIONS);
 
         GlobalController.Instance.DiscordController.UpdateActivity();
         EventSystem.current.SetSelectedGameObject(title);
@@ -576,6 +593,39 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
                 });
             }
         }
+    }
+
+    public void CloseNewRule()
+    {
+        newRulePrompt.SetActive(false);
+    }
+
+    public void onAddMatchRule()
+    {
+        // ugh
+        string cond = newRulePrompt.transform.Find("Image/LblCondition/ConditionDropdown/LabelCond")
+            .GetComponent<TMP_Text>().text;
+        string act = newRulePrompt.transform.Find("Image/LblAction/ActionDropdown/LabelAct").GetComponent<TMP_Text>()
+            .text;
+
+        if (!cond.Equals("") && !act.Equals(""))
+        {
+            GameObject newEntry = Instantiate(ruleTemplate);
+            MatchRuleListEntry newEntryScript = newEntry.GetComponent<MatchRuleListEntry>();
+            newEntryScript.setRules(cond, act);
+            newEntry.transform.SetParent(settingsPanel.transform, false);
+            newEntry.transform.SetSiblingIndex(lblConditions.transform.GetSiblingIndex() - 1);
+            newEntry.SetActive(true);
+            ruleList.Add(newEntryScript);
+        }
+        CloseNewRule();
+    }
+
+    public void onRemoveMatchRule(MatchRuleListEntry which)
+    {
+        Destroy(which.gameObject);
+        which.onRemoveButtonPressed();
+        ruleList.Remove(which);
     }
 
     public void EnterRoom() {

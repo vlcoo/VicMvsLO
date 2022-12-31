@@ -9,21 +9,12 @@ using UnityEngine;
 
 public class MatchConditioner : MonoBehaviour
 {
-    public string[] POSSIBLE_CONDITIONS = new[]
-    {
-        "Spawned", "GotCoin", "GotPowerup", "LostPowerup", "GotStar", "KnockedBack", "Stomped",
-        "Died", "Jumped", "LookedRight", "LookedLeft", "LookedUp", "LookedDown", "Ran"
-    };
-
-    public List<string> POSSIBLE_ACTIONS = new List<string>();
     public Dictionary<string, Action<PlayerController>> currentMapping = new Dictionary<string, Action<PlayerController>>();
 
     // Start is called before the first frame update
     void Start()
     {
-        foreach (var method in GetType().GetMethods())
-            if (method.Name.StartsWith("Action"))
-                POSSIBLE_ACTIONS.Add(method.Name);
+        
     }
 
     // Update is called once per frame
