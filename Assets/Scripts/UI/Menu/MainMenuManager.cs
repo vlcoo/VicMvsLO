@@ -230,6 +230,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         AttemptToUpdateProperty<bool>(updatedProperties, Enums.NetRoomProperties.Debug, ChangeDebugState);
         AttemptToUpdateProperty<int>(updatedProperties, Enums.NetRoomProperties.Level, ChangeLevel);
         AttemptToUpdateProperty<int>(updatedProperties, Enums.NetRoomProperties.StarRequirement, ChangeStarRequirement);
+        AttemptToUpdateProperty<Dictionary<string, string>>(updatedProperties, Enums.NetRoomProperties.MatchRules, DictToMatchRules);
         AttemptToUpdateProperty<int>(updatedProperties, Enums.NetRoomProperties.CoinRequirement, ChangeCoinRequirement);
         AttemptToUpdateProperty<int>(updatedProperties, Enums.NetRoomProperties.Lives, ChangeLives);
         AttemptToUpdateProperty<bool>(updatedProperties, Enums.NetRoomProperties.NewPowerups, ChangeNewPowerups);
@@ -600,6 +601,29 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         newRulePrompt.SetActive(false);
     }
 
+    public void onAddMatchRuleExplicit(string cond, string act, bool updateNetRoom, bool updateUIList)
+    {
+        if (!cond.Equals("") && !act.Equals(""))
+        { 
+            GameObject newEntry = Instantiate(ruleTemplate);
+            MatchRuleListEntry newEntryScript = newEntry.GetComponent<MatchRuleListEntry>();
+            newEntryScript.setRules(cond, act);
+            newEntry.transform.SetParent(settingsPanel.transform, false);
+            newEntry.transform.SetSiblingIndex(lblConditions.transform.GetSiblingIndex() - 1);
+            newEntry.SetActive(true);
+            ruleList.Add(newEntryScript);
+
+            if (updateNetRoom)
+            {
+                Hashtable table = new()
+                {
+                    [Enums.NetRoomProperties.MatchRules] = MatchRulesToDict()
+                };
+                PhotonNetwork.CurrentRoom.SetCustomProperties(table);
+            }
+        }
+    }
+
     public void onAddMatchRule()
     {
         // ugh
@@ -608,16 +632,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         string act = newRulePrompt.transform.Find("Image/LblAction/ActionDropdown/LabelAct").GetComponent<TMP_Text>()
             .text;
 
-        if (!cond.Equals("") && !act.Equals(""))
-        {
-            GameObject newEntry = Instantiate(ruleTemplate);
-            MatchRuleListEntry newEntryScript = newEntry.GetComponent<MatchRuleListEntry>();
-            newEntryScript.setRules(cond, act);
-            newEntry.transform.SetParent(settingsPanel.transform, false);
-            newEntry.transform.SetSiblingIndex(lblConditions.transform.GetSiblingIndex() - 1);
-            newEntry.SetActive(true);
-            ruleList.Add(newEntryScript);
-        }
+        onAddMatchRuleExplicit(cond, act, true, false);
         CloseNewRule();
     }
 
@@ -626,6 +641,11 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         Destroy(which.gameObject);
         which.onRemoveButtonPressed();
         ruleList.Remove(which);
+        
+        Hashtable table = new() {
+            [Enums.NetRoomProperties.MatchRules] = MatchRulesToDict()
+        };
+        PhotonNetwork.CurrentRoom.SetCustomProperties(table);
     }
 
     public void EnterRoom() {
@@ -890,6 +910,17 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     }
     public void ChangeNewPowerups(bool value) {
         powerupsEnabled.SetIsOnWithoutNotify(value);
+    }
+
+    public Dictionary<string, string> MatchRulesToDict()
+    {
+        Dictionary<string, string> dict = new Dictionary<string, string>();
+        foreach (var rule in ruleList)
+        {
+            dict.Add(rule.Condition, rule.Action);
+        }
+
+        return dict;
     }
 
     public void ChangeLives(int lives) {
@@ -1386,6 +1417,15 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 #if UNITY_EDITOR
         UnityEditor.EditorApplication.isPlaying = false;
 #endif
+    }
+
+    public void DictToMatchRules(Dictionary<string, string> dict)
+    {
+        foreach(KeyValuePair<string, string> entry in dict)
+        {
+            onAddMatchRuleExplicit(entry.Key, entry.Value, false, true);
+        }
+
     }
 
     public void ChangeStarRequirement(int stars) {

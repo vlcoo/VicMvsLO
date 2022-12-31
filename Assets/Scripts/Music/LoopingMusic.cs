@@ -47,7 +47,7 @@ public class LoopingMusic : MonoBehaviour {
     }
 
     public void Update() {
-        if (!audioSource.isPlaying)
+        if (audioSource is not { isPlaying: true })
             return;
 
         if (currentSong.loopEndSample != -1) {

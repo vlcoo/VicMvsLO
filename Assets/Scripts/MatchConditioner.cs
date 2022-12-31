@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Reflection;
 using ExitGames.Client.Photon;
 using NSMB.Utils;
 using Photon.Pun;
@@ -9,12 +10,12 @@ using UnityEngine;
 
 public class MatchConditioner : MonoBehaviour
 {
-    public Dictionary<string, Action<PlayerController>> currentMapping = new Dictionary<string, Action<PlayerController>>();
+    public Dictionary<string, string> currentMapping = new Dictionary<string, string>();
 
     // Start is called before the first frame update
     void Start()
     {
-        
+        Utils.GetCustomProperty(Enums.NetRoomProperties.MatchRules, out currentMapping);
     }
 
     // Update is called once per frame
@@ -32,56 +33,10 @@ public class MatchConditioner : MonoBehaviour
 
     public void ConditionActioned(PlayerController byWhom, string condition)
     {
-        Action<PlayerController> action = currentMapping.GetValueOrDefault(condition, null);
-        if (action == null) return;
-        
-        action.Invoke(byWhom);
-        /*switch (condition)
-        {
-            case "Spawned":
-                break;
-            
-            case "GotCoin":
-                ActionKnockbackPlayer(byWhom);
-                break;
-            
-            case "GotPowerup":
-                break;
-            
-            case "LostPowerup":
-                break;
-            
-            case "GotStar":
-                break;
-
-            case "KnockedBack":
-                break;
-
-            case "Stomped":
-                break;
-            
-            case "Died":
-                ActionDraw();
-                break;
-
-            case "Jumped":
-                break;
-
-            case "LookedRight":
-                break;
-            
-            case "LookedLeft":
-                break;
-
-            case "LookedDown":
-                break;
-
-            case "LookedUp":
-                break;
-
-            case "Ran":
-                break;
-        }*/
+        if (ReferenceEquals(currentMapping, null) || !currentMapping.ContainsKey(condition)) return;
+        MethodInfo actionMethod = GetType().GetMethod(currentMapping[condition]);
+        if (actionMethod == null) return;
+        actionMethod.Invoke(this, new []{byWhom});
     }
 
     public void ActionKillPlayer(PlayerController whom)

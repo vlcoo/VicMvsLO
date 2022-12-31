@@ -736,7 +736,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         if (jumpHeld)
         {
             jumpBuffer = 0.15f;
-            GameManager.Instance.MatchConditioner.ConditionActioned(this, "Jumped");
+            //GameManager.Instance.MatchConditioner.ConditionActioned(this, "Jumped");
         }
     }
 
