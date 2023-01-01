@@ -60,7 +60,9 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
 
     public GameObject localPlayer;
     public bool paused, loaded, started;
-    public GameObject pauseUI, pausePanel, pauseButton, hostExitUI, hostExitButton;
+    public GameObject pauseUI, pausePanel, pauseButton;
+    public TMP_Text quitButtonLbl, rulesLbl;
+    public Animator pausePanel1Animator, pausePanel2Animator;
     public bool gameover = false, musicEnabled = false;
     public readonly HashSet<Player> loadedPlayers = new();
     public int starRequirement, timedGameDuration = -1, coinRequirement;
@@ -462,6 +464,15 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             SpectationManager.Spectating = true;
         }
 
+        if (PhotonNetwork.IsMasterClient)
+            quitButtonLbl.text = "End Match";
+        if (MatchConditioner.currentMapping.Count > 0) rulesLbl.text = "";
+        foreach (var entry in MatchConditioner.currentMapping)
+        {
+            rulesLbl.text += entry.Key + " .. " + entry.Value +
+                             (MatchConditioner.currentMapping.Last().Equals(entry) ? "" : "\n");
+        }
+
         brickBreak = ((GameObject) Instantiate(Resources.Load("Prefabs/Particle/BrickBreak"))).GetComponent<ParticleSystem>();
     }
 
@@ -509,7 +520,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             source.Stop();
             source.volume = 0;
             source.enabled = false;
-            Destroy(source);
+            Destroy(canvas.GetComponent<LoopingMusic>());
         }
 
         started = true;
@@ -810,7 +821,10 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         sfx.PlayOneShot(Enums.Sounds.UI_Pause.GetClip());
         pauseUI.SetActive(paused);
         pausePanel.SetActive(true);
-        hostExitUI.SetActive(false);
+        
+        pausePanel1Animator.SetBool("open", paused);
+        pausePanel2Animator.SetBool("open", paused);
+        
         EventSystem.current.SetSelectedGameObject(pauseButton);
     }
 
@@ -818,9 +832,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
 
         if (PhotonNetwork.IsMasterClient) {
             sfx.PlayOneShot(Enums.Sounds.UI_Decide.GetClip());
-            pausePanel.SetActive(false);
-            hostExitUI.SetActive(true);
-            EventSystem.current.SetSelectedGameObject(hostExitButton);
+            HostEndMatch();
             return;
         }
 
@@ -841,7 +853,6 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
 
     public void HostQuitCancel() {
         pausePanel.SetActive(true);
-        hostExitUI.SetActive(false);
         sfx.PlayOneShot(Enums.Sounds.UI_Back.GetClip());
         EventSystem.current.SetSelectedGameObject(pauseButton);
     }

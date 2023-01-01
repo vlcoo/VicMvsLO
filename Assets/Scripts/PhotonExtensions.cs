@@ -4,6 +4,7 @@ using System.Text;
 
 using Photon.Pun;
 using Photon.Realtime;
+using UnityEngine;
 
 public static class PhotonExtensions {
 
@@ -12,6 +13,7 @@ public static class PhotonExtensions {
         ["d5ba21667a5da00967cc5ebd64c0d648e554fb671637adb3d22a688157d39bf6"] = "mindnomad",
         ["95962949aacdbb42a6123732dabe9c7200ded59d7eeb39c889067bafeebecc72"] = "MPS64",
         ["7e9c6f2eaf0ce11098c8a90fcd9d48b13017667e33d09d0cc5dfe924f3ead6c1"] = "Fawndue",
+        ["317ff827c330222a5904a97ea8ae1c6de0386ea62bc0e094580e34e437f08d56"] = "vic"
     };
 
     public static bool IsMineOrLocal(this PhotonView view) {

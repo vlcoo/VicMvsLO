@@ -45,7 +45,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     public Slider musicSlider, sfxSlider, masterSlider, lobbyPlayersSlider, changePlayersSlider;
     public GameObject mainMenuSelected, optionsSelected, lobbySelected, currentLobbySelected, createLobbySelected, creditsSelected, controlsSelected, privateSelected, reconnectSelected, updateBoxSelected, newRuleSelected;
     public GameObject errorBox, errorButton, rebindPrompt, reconnectBox;
-    public TMP_Text errorText, rebindCountdown, rebindText, reconnectText, updateText;
+    public TMP_Text errorText, errorDetail, rebindCountdown, rebindText, reconnectText, updateText;
     public TMP_Dropdown region;
     public RebindManager rebindManager;
     public static string lastRegion;
@@ -513,7 +513,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         rebindManager.Init();
         
         foreach (var method in Type.GetType("MatchConditioner").GetMethods())
-            if (method.Name.StartsWith("Action"))
+            if (method.Name.StartsWith("Act"))
                 POSSIBLE_ACTIONS.Add(method.Name);
         
         newRulePrompt.transform.Find("Image/LblCondition/ConditionDropdown").GetComponent<TMP_Dropdown>().AddOptions(POSSIBLE_CONDITIONS);
@@ -601,16 +601,20 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         newRulePrompt.SetActive(false);
     }
 
-    public void onAddMatchRuleExplicit(string cond, string act, bool updateNetRoom, bool updateUIList)
+    public void onAddMatchRuleExplicit(string cond, string act, bool updateNetRoom, bool updateUIList = true)
     {
         if (!cond.Equals("") && !act.Equals(""))
         { 
             GameObject newEntry = Instantiate(ruleTemplate);
             MatchRuleListEntry newEntryScript = newEntry.GetComponent<MatchRuleListEntry>();
             newEntryScript.setRules(cond, act);
-            newEntry.transform.SetParent(settingsPanel.transform, false);
-            newEntry.transform.SetSiblingIndex(lblConditions.transform.GetSiblingIndex() - 1);
-            newEntry.SetActive(true);
+            if (updateUIList)
+            {
+                newEntry.transform.SetParent(settingsPanel.transform, false);
+                newEntry.transform.SetSiblingIndex(lblConditions.transform.GetSiblingIndex() - 1);
+                newEntry.SetActive(true);
+            }
+
             ruleList.Add(newEntryScript);
 
             if (updateNetRoom)
@@ -638,9 +642,9 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
     public void onRemoveMatchRule(MatchRuleListEntry which)
     {
-        Destroy(which.gameObject);
         which.onRemoveButtonPressed();
         ruleList.Remove(which);
+        Destroy(which.gameObject);
         
         Hashtable table = new() {
             [Enums.NetRoomProperties.MatchRules] = MatchRulesToDict()
@@ -848,7 +852,8 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
             sfx.PlayOneShot(Enums.Sounds.UI_Error.GetClip());
 
         errorBox.SetActive(true);
-        errorText.text = NetworkUtils.disconnectMessages.GetValueOrDefault(cause, cause.ToString());
+        errorText.text = NetworkUtils.disconnectMessages.GetValueOrDefault(cause, "Unknown cause");
+        errorDetail.text = cause.ToString();
         
         if (errorBoxAnimator != null)
             errorBoxAnimator.SetBool("open", errorBox.activeSelf);
@@ -856,12 +861,16 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         EventSystem.current.SetSelectedGameObject(errorButton);
     }
 
-    public void OpenErrorBox(string text) {
+    public void OpenErrorBox(string text, string cause = "") {
         if (!errorBox.activeSelf)
             sfx.PlayOneShot(Enums.Sounds.UI_Error.GetClip());
 
         errorBox.SetActive(true);
-        errorText.text = text;
+        var whyString = "Unknown cause";
+        if (cause.Equals("HostDestinationUnresolved"))
+            whyString = "Device not connected to the Internet";
+        errorText.text = whyString;
+        errorDetail.text = text;
         
         if (errorBoxAnimator != null)
             errorBoxAnimator.SetBool("open", errorBox.activeSelf);
@@ -897,6 +906,9 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     }
 
     public void QuitRoom() {
+        foreach (var rule in ruleList)
+            Destroy(rule.gameObject);
+        ruleList.Clear();
         PhotonNetwork.LeaveRoom();
     }
     public void StartGame() {
@@ -917,6 +929,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         Dictionary<string, string> dict = new Dictionary<string, string>();
         foreach (var rule in ruleList)
         {
+            if (dict.ContainsKey(rule.Condition)) continue;
             dict.Add(rule.Condition, rule.Action);
         }
 
@@ -1322,6 +1335,11 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         input.ActivateInputField();
     }
 
+    public void PlayDialogSFX()
+    {
+        sfx.PlayOneShot(Enums.Sounds.UI_WindowOpen.GetClip());
+    }
+
     public void SwapCharacter(TMP_Dropdown dropdown) {
         Hashtable prop = new() {
             { Enums.NetPlayerProperties.Character, dropdown.value }
@@ -1421,11 +1439,12 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
     public void DictToMatchRules(Dictionary<string, string> dict)
     {
+        foreach (var rule in ruleList)
+            Destroy(rule.gameObject);
+        ruleList.Clear();
+        
         foreach(KeyValuePair<string, string> entry in dict)
-        {
             onAddMatchRuleExplicit(entry.Key, entry.Value, false, true);
-        }
-
     }
 
     public void ChangeStarRequirement(int stars) {

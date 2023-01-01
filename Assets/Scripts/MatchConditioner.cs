@@ -39,47 +39,47 @@ public class MatchConditioner : MonoBehaviour
         actionMethod.Invoke(this, new []{byWhom});
     }
 
-    public void ActionKillPlayer(PlayerController whom)
+    public void ActKillPlayer(PlayerController whom)
     {
         whom.photonView.RPC(nameof(whom.Death), RpcTarget.All, false, false);
     }
 
-    public void ActionWinPlayer(PlayerController whom)
+    public void ActWinPlayer(PlayerController whom)
     {
         PhotonNetwork.RaiseEvent((byte) Enums.NetEventIds.EndGame, whom.photonView.Owner, NetworkUtils.EventAll, SendOptions.SendReliable);
     }
 
-    public void ActionDraw(PlayerController whom)
+    public void ActDraw(PlayerController whom)
     {
         PhotonNetwork.RaiseEvent((byte) Enums.NetEventIds.EndGame, null, NetworkUtils.EventAll, SendOptions.SendReliable);
     }
 
-    public void ActionDisqualifyPlayer(PlayerController whom)
+    public void ActDisqualifyPlayer(PlayerController whom)
     {
         whom.photonView.RPC(nameof(whom.Disqualify), RpcTarget.All);
     }
 
-    public void ActionRespawnLevel(PlayerController whom)
+    public void ActRespawnLevel(PlayerController whom)
     {
         GameManager.Instance.SendAndExecuteEvent(Enums.NetEventIds.ResetTiles, null, SendOptions.SendReliable);
     }
 
-    public void ActionKnockbackPlayer(PlayerController whom)
+    public void ActKnockbackPlayer(PlayerController whom)
     {
         whom.photonView.RPC(nameof(whom.Knockback), RpcTarget.All, whom.facingRight, 1, false, -1);
     }
 
-    public void ActionHardKnockbackPlayer(PlayerController whom)
+    public void ActHardKnockbackPlayer(PlayerController whom)
     {
         whom.photonView.RPC(nameof(whom.Knockback), RpcTarget.All, false, 3, false, -1);
     }
 
-    public void ActionHarmPlayer(PlayerController whom)
+    public void ActHarmPlayer(PlayerController whom)
     {
         whom.photonView.RPC(nameof(whom.Powerdown), RpcTarget.All, true);
     }
 
-    public void ActionGiveStar(PlayerController whom)
+    public void ActGiveStar(PlayerController whom)
     {
         whom.photonView.RPC(nameof(whom.CollectBigStarInstantly), RpcTarget.AllViaServer);
     }

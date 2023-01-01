@@ -12,10 +12,13 @@ namespace NSMB.Utils {
 
         public static Dictionary<DisconnectCause, string> disconnectMessages = new() {
 
-            [DisconnectCause.MaxCcuReached] = "Max player count reached in this region (100 players MAX)",
-            [DisconnectCause.CustomAuthenticationFailed] = "Failed to authenticate with the auth server",
-            //[DisconnectCause.DisconnectByServerLogic] = "",
-
+            [DisconnectCause.MaxCcuReached] = "This region is full",
+            [DisconnectCause.CustomAuthenticationFailed] = "Servers might be down at this moment",
+            [DisconnectCause.DisconnectByServerLogic] = "You've been disconnected",
+            [DisconnectCause.DisconnectByClientLogic] = "You've been disconnected",
+            [DisconnectCause.DisconnectByOperationLimit] = "Spam prevention kicked in",
+            [DisconnectCause.ClientTimeout] = "Internet connection is poor",
+            [DisconnectCause.ServerTimeout] = "Internet connection is poor or servers might be down",
         };
 
         public static RaiseEventOptions EventOthers { get; } = new() { Receivers = ReceiverGroup.Others };

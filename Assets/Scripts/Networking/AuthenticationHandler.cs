@@ -25,8 +25,10 @@ public class AuthenticationHandler {
         UnityWebRequestAsyncOperation resp = client.SendWebRequest();
         resp.completed += (a) => {
             if (client.result != UnityWebRequest.Result.Success) {
-                if (MainMenuManager.Instance) {
-                    MainMenuManager.Instance.OpenErrorBox(client.error + " - " + client.responseCode);
+                if (MainMenuManager.Instance)
+                {
+                    MainMenuManager.Instance.OpenErrorBox(client.error + " - " + client.responseCode,
+                        client.error.Contains("Cannot resolve") ? "HostDestinationUnresolved" : "");
                     MainMenuManager.Instance.OnDisconnected(DisconnectCause.CustomAuthenticationFailed);
                 }
                 return;

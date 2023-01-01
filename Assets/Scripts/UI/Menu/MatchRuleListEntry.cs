@@ -28,7 +28,8 @@ public class MatchRuleListEntry : MonoBehaviour, IEquatable<MatchRuleListEntry>
         
         Condition = cond;
         Action = act;
-        lbl.text = cond + " .. " + act;
+        if (lbl is not null)
+            lbl.text = cond + " .. " + act;
     }
 
     public void onRemoveButtonPressed()
