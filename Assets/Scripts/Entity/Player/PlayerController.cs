@@ -726,6 +726,15 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             return;
 
         joystick = context.ReadValue<Vector2>();
+        if (joystick.x > 0) 
+            GameManager.Instance.MatchConditioner.ConditionActioned(this, "LookedRight");
+        if (joystick.x < 0) 
+            GameManager.Instance.MatchConditioner.ConditionActioned(this, "LookedLeft");
+        if (joystick.y > 0) 
+            GameManager.Instance.MatchConditioner.ConditionActioned(this, "LookedUp");
+        if (joystick.y < 0) 
+            GameManager.Instance.MatchConditioner.ConditionActioned(this, "LookedDown");
+
     }
 
     public void OnJump(InputAction.CallbackContext context) {
@@ -736,7 +745,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         if (jumpHeld)
         {
             jumpBuffer = 0.15f;
-            //GameManager.Instance.MatchConditioner.ConditionActioned(this, "Jumped");
+            GameManager.Instance.MatchConditioner.ConditionActioned(this, "Jumped");
         }
     }
 
@@ -749,6 +758,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         if (Frozen)
             return;
 
+        GameManager.Instance.MatchConditioner.ConditionActioned(this, "Ran");
         if (running && (state == Enums.PowerupState.FireFlower || state == Enums.PowerupState.IceFlower) && GlobalController.Instance.settings.fireballFromSprint)
             ActivatePowerupAction();
     }
@@ -1435,6 +1445,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         if (photonView.IsMine)
             ScoreboardUpdater.instance.OnRespawnToggle();
 
+        GameManager.Instance.MatchConditioner.ConditionActioned(this, "Spawned");
         UpdateGameState();
     }
     #endregion
