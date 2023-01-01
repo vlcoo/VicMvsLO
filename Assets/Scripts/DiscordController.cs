@@ -16,7 +16,7 @@ public class DiscordController : MonoBehaviour {
         return;
 #endif
 
-        discord = new Discord.Discord(962073502469459999, (ulong) CreateFlags.NoRequireDiscord);
+        discord = new Discord.Discord(1059213852950143147, (ulong) CreateFlags.NoRequireDiscord);
         activityManager = discord.GetActivityManager();
         activityManager.OnActivityJoinRequest += AskToJoin;
         activityManager.OnActivityJoin += TryJoinGame;
@@ -88,10 +88,11 @@ public class DiscordController : MonoBehaviour {
             activity.Secrets = new() { Join = PhotonNetwork.CloudRegion + "-" + room.Name };
 
             ActivityAssets assets = new();
-            if (gm.richPresenceId != "")
+            /*if (gm.richPresenceId != "")
                 assets.LargeImage = $"level-{gm.richPresenceId}";
             else
-                assets.LargeImage = "mainmenu";
+                assets.LargeImage = "mainmenu";*/ // TODO: add app and images...
+            assets.LargeImage = "logo";
             assets.LargeText = gm.levelName;
 
             activity.Assets = assets;
@@ -111,13 +112,13 @@ public class DiscordController : MonoBehaviour {
             activity.State = room.IsVisible ? "In a Public Lobby" : "In a Private Lobby";
             activity.Secrets = new() { Join = PhotonNetwork.CloudRegion + "-" + room.Name };
 
-            activity.Assets = new() { LargeImage = "mainmenu" };
+            activity.Assets = new() { LargeImage = "logo" };
 
         } else {
             //in the main menu, not in a room
 
             activity.Details = "Browsing the Main Menu...";
-            activity.Assets = new() { LargeImage = "mainmenu" };
+            activity.Assets = new() { LargeImage = "logo" };
 
         }
 

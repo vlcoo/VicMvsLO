@@ -39,7 +39,7 @@ public class RoomIcon : MonoBehaviour {
         Utils.GetCustomProperty(Enums.NetRoomProperties.Lives, out int lives, newRoom.CustomProperties);
         Utils.GetCustomProperty(Enums.NetRoomProperties.MatchRules, out Dictionary<string, string> rulesList,
             newRoom.CustomProperties);
-        int nRules = rulesList.Count;
+        int nRules = rulesList?.Count ?? 0;
         bool powerups = (bool) prop[Enums.NetRoomProperties.NewPowerups];
         bool time = ((int) prop[Enums.NetRoomProperties.Time]) >= 1;
         //bool password = ((string) prop[Enums.NetRoomProperties.Password]) != "";
@@ -54,8 +54,8 @@ public class RoomIcon : MonoBehaviour {
 
         symbols += "<sprite=38>" + Utils.GetSymbolString(stars.ToString(), Utils.smallSymbols);
         symbols += "<sprite=37>" + Utils.GetSymbolString(coins.ToString(), Utils.smallSymbols);
-        if (nRules > 0)
-            symbols += "<sprite=7>" + Utils.GetSymbolString(nRules.ToString(), Utils.smallSymbols);
+        //if (nRules > 0)
+        //    symbols += "<sprite=7>" + Utils.GetSymbolString(nRules.ToString(), Utils.smallSymbols);
         //if (password)
         //    symbols += "<sprite=7>";
 

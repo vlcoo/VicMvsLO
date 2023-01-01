@@ -11,6 +11,7 @@ using UnityEngine;
 public class MatchConditioner : MonoBehaviour
 {
     public Dictionary<string, string> currentMapping = new Dictionary<string, string>();
+    public bool chainableActions = true;
 
     // Start is called before the first frame update
     void Start()
@@ -36,7 +37,31 @@ public class MatchConditioner : MonoBehaviour
         if (ReferenceEquals(currentMapping, null) || !currentMapping.ContainsKey(condition)) return;
         MethodInfo actionMethod = GetType().GetMethod(currentMapping[condition]);
         if (actionMethod == null) return;
-        actionMethod.Invoke(this, new []{byWhom});
+        if (byWhom is null)
+            DoToEveryone(actionMethod);
+        else
+            actionMethod.Invoke(this, new[] { byWhom });
+    }
+
+    public void DoToEveryone(MethodInfo actionFunc)
+    {
+        foreach (var player in GameManager.Instance.players)
+            actionFunc.Invoke(this, new[] { player });
+    }
+
+    public void ActGiveStar(PlayerController whom)
+    {
+        whom.CollectBigStarInstantly();
+    }
+
+    public void ActGiveCoin(PlayerController whom)
+    {
+        whom.CollectCoinInstantly();
+    }
+
+    public void ActGiveMega(PlayerController whom)
+    {
+        whom.photonView.RPC(nameof(whom.TransformToMega), RpcTarget.All);
     }
 
     public void ActKillPlayer(PlayerController whom)
@@ -58,12 +83,7 @@ public class MatchConditioner : MonoBehaviour
     {
         whom.photonView.RPC(nameof(whom.Disqualify), RpcTarget.All);
     }
-
-    public void ActRespawnLevel(PlayerController whom)
-    {
-        GameManager.Instance.SendAndExecuteEvent(Enums.NetEventIds.ResetTiles, null, SendOptions.SendReliable);
-    }
-
+    
     public void ActKnockbackPlayer(PlayerController whom)
     {
         whom.photonView.RPC(nameof(whom.Knockback), RpcTarget.All, whom.facingRight, 1, false, -1);
@@ -79,8 +99,8 @@ public class MatchConditioner : MonoBehaviour
         whom.photonView.RPC(nameof(whom.Powerdown), RpcTarget.All, true);
     }
 
-    public void ActGiveStar(PlayerController whom)
+    public void ActRespawnLevel(PlayerController whom)
     {
-        whom.photonView.RPC(nameof(whom.CollectBigStarInstantly), RpcTarget.AllViaServer);
+        GameManager.Instance.SendAndExecuteEvent(Enums.NetEventIds.ResetTiles, null, SendOptions.SendReliable);
     }
 }

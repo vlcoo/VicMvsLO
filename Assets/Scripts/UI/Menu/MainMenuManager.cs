@@ -81,8 +81,9 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
     public List<string> POSSIBLE_CONDITIONS = new List<string>
     {
-        "Spawned", "GotCoin", "GotPowerup", "LostPowerup", "GotStar", "KnockedBack", "Stomped",
-        "Died", "Jumped", "LookedRight", "LookedLeft", "LookedUp", "LookedDown", "Ran"
+        "Spawned", "GotCoin", "GotPowerup", "GotMega", "LostPowerup", "GotStar", "KnockedBack", "KnockedByFireball", "Frozen", "StompedSmn",
+        "FireballedSmn", "TriggeredPowerup", "Died", "Jumped", "LookedRight", "LookedLeft", "LookedUp", "LookedDown", "Ran", "ReachedCoinLimit",
+        "1MinRemaining"
     };
     public List<string> POSSIBLE_ACTIONS = new List<string>();
     public List<MatchRuleListEntry> ruleList = new List<MatchRuleListEntry>();
@@ -120,8 +121,8 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
             valid &= !room.RemovedFromList;
             valid &= room.MaxPlayers >= 2 && room.MaxPlayers <= 10;
             valid &= lives <= 99;
-            valid &= stars >= 1 && stars <= 99;
-            valid &= coins >= 1 && coins <= 99;
+            valid &= stars <= 99;
+            valid &= coins <= 99;
             //valid &= host.IsValidUsername();
 
             if (!valid) {
@@ -336,12 +337,12 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     }
     public void OnJoinRoomFailed(short reasonId, string reasonMessage) {
         Debug.LogError($"[PHOTON] Join room failed ({reasonId}, {reasonMessage})");
-        OpenErrorBox(reasonMessage);
+        OpenErrorBox(reasonMessage, "JoinFail");
         JoinMainLobby();
     }
     public void OnCreateRoomFailed(short reasonId, string reasonMessage) {
         Debug.LogError($"[PHOTON] Create room failed ({reasonId}, {reasonMessage})");
-        OpenErrorBox(reasonMessage);
+        OpenErrorBox(reasonMessage, "CreateFail");
 
         OnConnectedToMaster();
     }
@@ -866,9 +867,13 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
             sfx.PlayOneShot(Enums.Sounds.UI_Error.GetClip());
 
         errorBox.SetActive(true);
-        var whyString = "Unknown cause";
-        if (cause.Equals("HostDestinationUnresolved"))
-            whyString = "Device not connected to the Internet";
+        var whyString = cause switch
+        {
+            "HostDestinationUnresolved" => "Device not connected to the Internet",
+            "JoinFail" => "Can't join the room",
+            "CreateFail" => "Can't create a room",
+            _ => "Unknown cause"
+        };
         errorText.text = whyString;
         errorDetail.text = text;
         
@@ -1071,6 +1076,8 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     public void UpdateSettingEnableStates() {
         foreach (Selectable s in roomSettings)
             s.interactable = PhotonNetwork.IsMasterClient;
+        foreach (var s in ruleList)
+            s.removeButton.interactable = PhotonNetwork.IsMasterClient;
 
         livesField.interactable = PhotonNetwork.IsMasterClient && livesEnabled.isOn;
         timeField.interactable = PhotonNetwork.IsMasterClient && timeEnabled.isOn;

@@ -677,6 +677,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
                 if (!hurryup && (timeRemaining <= 60)) {
                     hurryup = true;
                     sfx.PlayOneShot(Enums.Sounds.UI_HurryUp.GetClip());
+                    MatchConditioner.ConditionActioned(null, "1MinRemaining");
                 }
                 if (!tenSecondCountdown && (timeRemaining <= 10)) {
                     sfx.PlayOneShot(Enums.Sounds.UI_Countdown_Long.GetClip());

@@ -826,6 +826,8 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             break;
         }
         }
+        
+        GameManager.Instance.MatchConditioner.ConditionActioned(this, "TriggeredPowerup");
     }
 
     [PunRPC]
@@ -900,6 +902,24 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         photonView.RPC(nameof(Powerup), RpcTarget.All, powerupID);
     }
 
+    public void TransformToMega()
+    {
+        giantStartTimer = giantStartTime;
+        knockback = false;
+        groundpound = false;
+        crouching = false;
+        propeller = false;
+        usedPropellerThisJump = false;
+        flying = false;
+        drill = false;
+        inShell = false;
+        giantTimer = 15f;
+        transform.localScale = Vector3.one;
+        Instantiate(Resources.Load("Prefabs/Particle/GiantPowerup"), transform.position, Quaternion.identity);
+
+        PlaySoundEverywhere(Enums.Sounds.Player_Sound_MegaMushroom_Collect);
+    }
+
     [PunRPC]
     protected void Powerup(int actor, PhotonMessageInfo info) {
         //only trust the master client
@@ -919,22 +939,9 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         bool reserve = cp.statePriority > pp.itemPriority || state == newState;
         bool soundPlayed = false;
 
-        if (powerup.state == Enums.PowerupState.MegaMushroom && state != Enums.PowerupState.MegaMushroom) {
-
-            giantStartTimer = giantStartTime;
-            knockback = false;
-            groundpound = false;
-            crouching = false;
-            propeller = false;
-            usedPropellerThisJump = false;
-            flying = false;
-            drill = false;
-            inShell = false;
-            giantTimer = 15f;
-            transform.localScale = Vector3.one;
-            Instantiate(Resources.Load("Prefabs/Particle/GiantPowerup"), transform.position, Quaternion.identity);
-
-            PlaySoundEverywhere(powerup.soundEffect);
+        if (powerup.state == Enums.PowerupState.MegaMushroom && state != Enums.PowerupState.MegaMushroom)
+        {
+            TransformToMega();
             soundPlayed = true;
 
         } else if (powerup.prefab == "Star") {
@@ -996,8 +1003,11 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             if (!soundPlayed)
                 PlaySound(powerup.soundEffect);
         }
-
-        GameManager.Instance.MatchConditioner.ConditionActioned(this, "GotPowerup");
+        
+        if (giantTimer > 0) 
+            GameManager.Instance.MatchConditioner.ConditionActioned(this, "GotMega");
+        else
+            GameManager.Instance.MatchConditioner.ConditionActioned(this, "GotPowerup");
         UpdateGameState();
 
         if (view.IsMine)
@@ -1075,6 +1085,8 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
 
         propellerTimer = 0;
         skidding = false;
+        
+        GameManager.Instance.MatchConditioner.ConditionActioned(this, "Frozen");
     }
 
     [PunRPC]
@@ -1107,7 +1119,6 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
 
     #region -- COIN / STAR COLLECTION --
 
-    [PunRPC]
     public void CollectBigStarInstantly()
     {
         photonView.RPC(nameof(CollectBigStar), RpcTarget.All, (Vector2) transform.position, -1, stars + 1);
@@ -1197,6 +1208,11 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
 
         photonView.RPC(nameof(CollectCoin), RpcTarget.All, coinID, coins + 1, particle);
     }
+    
+    public void CollectCoinInstantly()
+    {
+        photonView.RPC(nameof(CollectCoin), RpcTarget.All, -1, coins + 1, (Vector2) transform.position);
+    }
 
     [PunRPC]
     protected void CollectCoin(int coinID, int newCount, Vector2 position, PhotonMessageInfo info) {
@@ -1268,6 +1284,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         photonView.RPC(nameof(PlaySound), RpcTarget.All, Enums.Sounds.Player_Sound_PowerupReserveUse);
 
         coins = 0;
+        GameManager.Instance.MatchConditioner.ConditionActioned(this, "ReachedCoinLimit");
     }
 
     private void SpawnStars(int amount, bool deathplane) {
@@ -1674,8 +1691,17 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         body.gravityScale = normalGravity;
         wallSlideLeft = wallSlideRight = false;
 
-        GameManager.Instance.MatchConditioner.ConditionActioned(this, "KnockedBack");
-        GameManager.Instance.MatchConditioner.ConditionActioned(attackerView, "Stomped");
+        if (fireball)
+        {
+            GameManager.Instance.MatchConditioner.ConditionActioned(this, "KnockedByFireball");
+            GameManager.Instance.MatchConditioner.ConditionActioned(attackerView, "FireballedSmn");
+        }
+        else
+        {
+            GameManager.Instance.MatchConditioner.ConditionActioned(this, "KnockedBack");
+            GameManager.Instance.MatchConditioner.ConditionActioned(attackerView, "StompedSmn");
+        }
+
         SpawnStars(starsToDrop, false);
         HandleLayerState();
     }

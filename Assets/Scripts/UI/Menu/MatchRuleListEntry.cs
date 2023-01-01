@@ -3,13 +3,14 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class MatchRuleListEntry : MonoBehaviour, IEquatable<MatchRuleListEntry>
 {
     public string Condition, Action;
     public TMP_Text lbl;
 
-    public GameObject removeButton;
+    public Selectable removeButton;
     // Start is called before the first frame update
     void Start()
     {
