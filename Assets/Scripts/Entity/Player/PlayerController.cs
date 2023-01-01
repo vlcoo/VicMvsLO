@@ -2673,6 +2673,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             body.velocity = new Vector2(body.velocity.x, Mathf.Min(body.velocity.y, -0.1f));
             bool tempHitBlock = false;
             foreach (Vector3Int tile in tilesJumpedInto) {
+                
                 int temp = InteractWithTile(tile, InteractableTile.InteractionDirection.Up);
                 if (temp != -1)
                     tempHitBlock |= temp == 1;

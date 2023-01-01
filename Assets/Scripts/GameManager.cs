@@ -466,11 +466,12 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
 
         if (PhotonNetwork.IsMasterClient)
             quitButtonLbl.text = "End Match";
-        if (MatchConditioner.currentMapping.Count > 0) rulesLbl.text = "";
-        foreach (var entry in MatchConditioner.currentMapping)
+        if (MatchConditioner.currentMapping is not null && MatchConditioner.currentMapping.Count > 0) 
         {
-            rulesLbl.text += entry.Key + " .. " + entry.Value +
-                             (MatchConditioner.currentMapping.Last().Equals(entry) ? "" : "\n");
+            rulesLbl.text = "";
+            foreach (var entry in MatchConditioner.currentMapping)
+                rulesLbl.text += entry.Key + " .. " + entry.Value +
+                                 (MatchConditioner.currentMapping.Last().Equals(entry) ? "" : "\n");
         }
 
         brickBreak = ((GameObject) Instantiate(Resources.Load("Prefabs/Particle/BrickBreak"))).GetComponent<ParticleSystem>();
@@ -678,7 +679,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
                     sfx.PlayOneShot(Enums.Sounds.UI_HurryUp.GetClip());
                 }
                 if (!tenSecondCountdown && (timeRemaining <= 10)) {
-                    StartCoroutine(CountdownSound(1.0f, timeRemaining));
+                    sfx.PlayOneShot(Enums.Sounds.UI_Countdown_Long.GetClip());
                     tenSecondCountdown = true;
                 }
                 if (timeRemaining - Time.deltaTime <= 0) {
