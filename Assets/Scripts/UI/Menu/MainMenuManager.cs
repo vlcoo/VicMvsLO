@@ -32,8 +32,8 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     public GameObject lobbiesContent, lobbyPrefab;
     bool quit, validName;
     public GameObject connecting;
-    public GameObject title, bg, mainMenu, optionsMenu, lobbyMenu, createLobbyPrompt, inLobbyMenu, creditsMenu, controlsMenu, privatePrompt, updateBox, newRulePrompt;
-    public Animator createLobbyPromptAnimator, privatePromptAnimator, updateBoxAnimator, errorBoxAnimator, rebindPromptAnimator, newRulePromptAnimator;
+    public GameObject title, bg, mainMenu, optionsMenu, lobbyMenu, createLobbyPrompt, inLobbyMenu, creditsMenu, controlsMenu, privatePrompt, updateBox, newRulePrompt, emoteListPrompt;
+    public Animator createLobbyPromptAnimator, privatePromptAnimator, updateBoxAnimator, errorBoxAnimator, rebindPromptAnimator, newRulePromptAnimator, emoteListPromptAnimator;
     public GameObject[] levelCameraPositions;
     public GameObject sliderText, lobbyText, currentMaxPlayers, settingsPanel, ruleTemplate, lblConditions;
     public TMP_Dropdown levelDropdown, characterDropdown;
@@ -43,7 +43,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     public GameObject playersContent, playersPrefab, chatContent, chatPrefab;
     public TMP_InputField nicknameField, starsText, coinsText, livesField, timeField, lobbyJoinField, chatTextField;
     public Slider musicSlider, sfxSlider, masterSlider, lobbyPlayersSlider, changePlayersSlider;
-    public GameObject mainMenuSelected, optionsSelected, lobbySelected, currentLobbySelected, createLobbySelected, creditsSelected, controlsSelected, privateSelected, reconnectSelected, updateBoxSelected, newRuleSelected;
+    public GameObject mainMenuSelected, optionsSelected, lobbySelected, currentLobbySelected, createLobbySelected, creditsSelected, controlsSelected, privateSelected, reconnectSelected, updateBoxSelected, newRuleSelected, emoteListSelected;
     public GameObject errorBox, errorButton, rebindPrompt, reconnectBox;
     public TMP_Text errorText, errorDetail, rebindCountdown, rebindText, reconnectText, updateText;
     public TMP_Dropdown region;
@@ -459,6 +459,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         errorBoxAnimator = errorBox.transform.Find("Image").GetComponent<Animator>();
         rebindPromptAnimator = rebindPrompt.transform.Find("Image").GetComponent<Animator>();
         newRulePromptAnimator = newRulePrompt.transform.Find("Image").GetComponent<Animator>();
+        emoteListPromptAnimator = emoteListPrompt.transform.Find("Image").GetComponent<Animator>();
 
         //Photon stuff.
         if (!PhotonNetwork.IsConnected) {
@@ -774,6 +775,14 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
             createLobbyPromptAnimator.SetBool("open", createLobbyPrompt.activeSelf);
 
         EventSystem.current.SetSelectedGameObject(createLobbySelected);
+    }
+    
+    public void OpenEmoteList() {
+        emoteListPrompt.SetActive(true);
+        if (emoteListPromptAnimator != null)
+            emoteListPromptAnimator.SetBool("open", emoteListPrompt.activeSelf);
+        
+        EventSystem.current.SetSelectedGameObject(emoteListSelected);
     }
 
     public void OpenNewRule()
