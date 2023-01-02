@@ -1354,6 +1354,19 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         lives = 1;
         Death(false, false);
     }
+
+    [PunRPC]
+    public void WinByGoal()
+    {
+        spawned = false;
+        body.gravityScale = 0;
+        body.velocity = Vector2.zero;
+        groundpound = false;
+        propeller = false;
+        drill = false;
+        flying = false;
+        animator.Play("deadstart");
+    }
     
     [PunRPC]
     public void Death(bool deathplane, bool fire) {

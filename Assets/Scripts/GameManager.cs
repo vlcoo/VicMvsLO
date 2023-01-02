@@ -714,6 +714,17 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         nametag.SetActive(true);
     }
 
+    public void WinByGoal(PlayerController whom)
+    {
+        foreach (var player in players)
+        {
+            if (player == whom) continue;
+            player.photonView.RPC(nameof(player.Disqualify), RpcTarget.All);
+        }
+
+        whom.WinByGoal();
+    }
+
     public void CheckForWinner() {
         if (gameover || !PhotonNetwork.IsMasterClient)
             return;
