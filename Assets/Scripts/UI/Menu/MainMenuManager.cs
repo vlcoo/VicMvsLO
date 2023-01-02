@@ -1426,7 +1426,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         textComp.color = color;
     }
     public void OpenLinks() {
-        Application.OpenURL("https://github.com/ipodtouch0218/NSMB-MarioVsLuigi/blob/master/LINKS.md");
+        Application.OpenURL("https://github.com/vlcoo/VicMvsLO/blob/master/LINKS.md");
     }
     public void Quit() {
         if (quit)

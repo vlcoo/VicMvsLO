@@ -1,20 +1,23 @@
-# NSMB-MarioVsLuigi
-A unity-standalone 2-10 player remake of the Mario vs. Luigi gamemode from the New Super Mario Bros DS download game. 
+<p align="center"><img src="Assets/Sprites/UI/Menu/TitleAll.png" alt="vic's Custom Match-inator" width="350px"></p>
 
-Includes the 5 default levels (Grassland, Bricks, Castle, Pipes, and Ice), along with a handful of custom levels to battle on! 
-All power-ups are included and remain faithful to their original counterparts, along with the new addition of the Propeller Suit & Ice Flower!
+A **standalone mod** of the 2-10 player remake of the Mario vs. Luigi gamemode from New Super Mario Bros. DS.
+
+This mod introduces the concept of *"Match rules"*, a list of conditions that can trigger whatever the lobby's host desires! Win when dying? Get a mega mush when stomping on another player? Uh, sure, if you're into that sort of thing.
+
+Apart from that, the defining features of the original remake remain!
+
+## Downloads
+
+Go to the repository's releases or use these shortcuts to the latest builds:
+
+- [**Windows**](https://github.com/vlcoo/VicMvsLO/releases/latest/download/vmci-win.zip)
+- [**Linux**](https://github.com/vlcoo/VicMvsLO/releases/latest/download/vmci-unix.zip)
 
 ## Discord
-[**Join the discord**](https://discord.gg/dgKVaUKpj5) to keep up to date with the development of the game, make feature suggestions, report bugs (if you're too lazy to use issues...), get technical support, look for people to play with, and just talk about the game!
-
-## Download
-
-[Play now in browser on itch.io!](https://ipodtouch0218.itch.io/nsmb-mariovsluigi)
-
-Windows, Linux, and Mac Builds: https://github.com/ipodtouch0218/NSMB-MarioVsLuigi/releases/latest
+[**Join the discord**](https://discord.gg/dgKVaUKpj5) of the original game to keep up to date with its development, make feature suggestions, report bugs (if you're too lazy to use issues...), get technical support, look for people to play with, and just talk about the game!
 
 ## Default Controls
-| Action | Keyboard | Gamepad *(unstable)* |
+| Action | Keyboard | Gamepad |
 | --- | --- | --- |
 | Movement | WASD / Arrow Keys | Left Analog / DPad |
 | Jump | Space / Z | A / B Buttons |
@@ -28,19 +31,11 @@ Windows, Linux, and Mac Builds: https://github.com/ipodtouch0218/NSMB-MarioVsLui
 <details>
   <summary><h2>Opening in Unity Editor</h2></summary>
 
-1. Install Unity 2022.1.9f1 (or newer) via Unity Hub (Installs > Install Editor > Scroll to bottom)
-2. Download and install [git](https://git-scm.com/downloads). Do NOT use the .zip download, as it will cause errors within Unity.
-3. Open Command Prompt (Windows) or Terminal (MacOS / Linux)
-4. Navigate to the folder you want the source code to be in using `cd <path>`. For example, `cd %USERPROFILE%\Documents` will save it in My Documents.
-5. Clone the repository by running `git clone https://github.com/ipodtouch0218/NSMB-MarioVsLuigi.git` in the Command Prompt / Terminal
-  - Optionally, [fork the repository](https://github.com/ipodtouch0218/NSMB-MarioVsLuigi/fork)
-6. Open the project in Unity Hub (gray "Open" button in top right)
-7. Change the Unity Editor to use your computer's platform in File > Build Settings
-8. Create a build using "Build and Run" inside File > Build Settings, or Ctrl+B
+Please follow the instructions listed in the [parent repository](https://github.com/ipodtouch0218/NSMB-MarioVsLuigi), but cloning this fork instead.
 
 </details>
 <details>
-  <summary><h2>Credits</h2></summary>
+  <summary><h2>Credits (original remake)</h2></summary>
 
 ### Original Content:
 * New Super Mario Bros.

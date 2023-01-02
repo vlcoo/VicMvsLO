@@ -1,9 +1,9 @@
 # Important Links!
 
-#### Source code: https://github.com/ipodtouch0218/NSMB-MarioVsLuigi/
+#### Source code: https://github.com/vlcoo/VicMvsLO/
 
-#### itch.io (Web version): https://ipodtouch0218.itch.io/nsmb-mariovsluigi
+#### Latest release (GitHub): https://github.com/vlcoo/VicMvsLO/releases/latest
 
-#### Standalone Downloads: https://github.com/ipodtouch0218/NSMB-MarioVsLuigi/releases/latest
+#### Original remake: https://ipodtouch0218.itch.io/nsmb-mariovsluigi
 
 #### Discord Server: https://discord.gg/dgKVaUKpj5 

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 using UnityEngine.InputSystem;
@@ -778,6 +779,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         if (knockback || pipeEntering || GameManager.Instance.gameover || dead || Frozen || holding)
             return;
 
+        bool noTrigger = false;
         switch (state) {
         case Enums.PowerupState.IceFlower:
         case Enums.PowerupState.FireFlower: {
@@ -825,9 +827,15 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             photonView.RPC(nameof(StartPropeller), RpcTarget.All);
             break;
         }
+        default:
+        {
+            noTrigger = true;
+            break;
+        }
         }
         
-        GameManager.Instance.MatchConditioner.ConditionActioned(this, "TriggeredPowerup");
+        if (!noTrigger)
+            GameManager.Instance.MatchConditioner.ConditionActioned(this, "TriggeredPowerup");
     }
 
     [PunRPC]
@@ -906,6 +914,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
     public void TransformToMega(bool alsoSetState)
     {
         if (state == Enums.PowerupState.MegaMushroom) return;
+        Unfreeze(0);
         
         giantStartTimer = giantStartTime;
         knockback = false;

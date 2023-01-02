@@ -10,7 +10,7 @@ using Photon.Pun;
 public class LoadingWaitingOn : MonoBehaviour {
 
     [SerializeField] private TMP_Text playerList, highPingAlert;
-    [SerializeField] private string emptyText = "Loading...", iveLoadedText = "Waiting for others...", readyToStartText = "Starting...", spectatorText = "Joining as Spectator...";
+    [SerializeField] private string emptyText = "Loading...", iveLoadedText = "Wait...", readyToStartText = "OK!", spectatorText = "Joining as Spectator...";
 
     private TMP_Text text;
 
