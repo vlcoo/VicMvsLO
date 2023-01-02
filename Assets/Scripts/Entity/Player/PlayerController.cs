@@ -902,8 +902,11 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         photonView.RPC(nameof(Powerup), RpcTarget.All, powerupID);
     }
 
-    public void TransformToMega()
+    [PunRPC]
+    public void TransformToMega(bool alsoSetState)
     {
+        if (state == Enums.PowerupState.MegaMushroom) return;
+        
         giantStartTimer = giantStartTime;
         knockback = false;
         groundpound = false;
@@ -918,6 +921,11 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         Instantiate(Resources.Load("Prefabs/Particle/GiantPowerup"), transform.position, Quaternion.identity);
 
         PlaySoundEverywhere(Enums.Sounds.Player_Sound_MegaMushroom_Collect);
+        if (alsoSetState)
+        {
+            state = Enums.PowerupState.MegaMushroom;
+            UpdateGameState();
+        }
     }
 
     [PunRPC]
@@ -941,7 +949,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
 
         if (powerup.state == Enums.PowerupState.MegaMushroom && state != Enums.PowerupState.MegaMushroom)
         {
-            TransformToMega();
+            TransformToMega(false);
             soundPlayed = true;
 
         } else if (powerup.prefab == "Star") {
@@ -1064,6 +1072,14 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
     #endregion
 
     #region -- FREEZING --
+
+    [PunRPC]
+    public void FreezeInstantly()
+    {
+        GameObject cube = PhotonNetwork.Instantiate("Prefabs/FrozenCube", transform.position, Quaternion.identity, 0, new object[] { photonView.ViewID });
+        frozenObject = cube.GetComponent<FrozenCube>();
+    }
+    
     [PunRPC]
     public void Freeze(int cube) {
         if (knockback || hitInvincibilityCounter > 0 || invincible > 0 || Frozen || state == Enums.PowerupState.MegaMushroom)
@@ -1071,8 +1087,8 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
 
         PlaySound(Enums.Sounds.Enemy_Generic_Freeze);
         frozenObject = PhotonView.Find(cube).GetComponentInChildren<FrozenCube>();
-        Frozen = true;
         frozenObject.autoBreakTimer = 1.75f;
+        Frozen = true;
         animator.enabled = false;
         body.isKinematic = true;
         body.simulated = false;

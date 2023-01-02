@@ -61,7 +61,7 @@ public class MatchConditioner : MonoBehaviour
 
     public void ActGiveMega(PlayerController whom)
     {
-        whom.photonView.RPC(nameof(whom.TransformToMega), RpcTarget.All);
+        whom.photonView.RPC(nameof(whom.TransformToMega), RpcTarget.All, true);
     }
 
     public void ActKillPlayer(PlayerController whom)
@@ -92,6 +92,11 @@ public class MatchConditioner : MonoBehaviour
     public void ActHardKnockbackPlayer(PlayerController whom)
     {
         whom.photonView.RPC(nameof(whom.Knockback), RpcTarget.All, false, 3, false, -1);
+    }
+    
+    public void ActFreezePlayer(PlayerController whom) 
+    {
+        whom.photonView.RPC(nameof(whom.FreezeInstantly), RpcTarget.All);
     }
 
     public void ActHarmPlayer(PlayerController whom)

@@ -394,7 +394,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
             }
 
             message = message.Substring(0, Mathf.Min(128, message.Length));
-            message = message.Replace("<", "«").Replace(">", "»").Replace("\n", " ").Trim();
+            message = message./*Replace("<", "«").Replace(">", "»").*/Replace("\n", " ").Trim();
             message = sender.GetUniqueNickname() + ": " + message.Filter();
 
             LocalChatMessage(message, Color.black, false);
@@ -1131,7 +1131,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         if (PhotonNetwork.Time - time < 0.75f)
             return;
 
-        string text = chatTextField.text.Replace("<", "«").Replace(">", "»").Trim();
+        string text = chatTextField.text;/*.Replace("<", "«").Replace(">", "»").Trim();*/
         if (text == null || text == "")
             return;
 
