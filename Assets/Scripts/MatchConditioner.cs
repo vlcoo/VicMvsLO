@@ -27,9 +27,9 @@ public class MatchConditioner : MonoBehaviour
 
     public void ConditionActioned(int byWhomsID, string condition)
     {
-        if (byWhomsID < 0) return;
-        PlayerController player = PhotonView.Find(byWhomsID).GetComponent<PlayerController>();
-        ConditionActioned(player, condition);
+        var player = PhotonView.Find(byWhomsID);
+        if (player is null) return;
+        ConditionActioned(player.GetComponent<PlayerController>(), condition);
     }
 
     public void ConditionActioned(PlayerController byWhom, string condition)
@@ -57,6 +57,16 @@ public class MatchConditioner : MonoBehaviour
     public void ActGiveCoin(PlayerController whom)
     {
         whom.CollectCoinInstantly();
+    }
+    
+    public void ActRemoveStar(PlayerController whom)
+    {
+        whom.RemoveBigStarInstantly();
+    }
+
+    public void ActRemoveCoin(PlayerController whom)
+    {
+        whom.RemoveCoinInstantly();
     }
 
     public void ActGiveMega(PlayerController whom)
@@ -91,12 +101,17 @@ public class MatchConditioner : MonoBehaviour
 
     public void ActHardKnockbackPlayer(PlayerController whom)
     {
-        whom.photonView.RPC(nameof(whom.Knockback), RpcTarget.All, false, 3, false, -1);
+        whom.photonView.RPC(nameof(whom.Knockback), RpcTarget.All, whom.facingRight, 3, false, -1);
+    }
+
+    public void ActDoDive(PlayerController whom)
+    {
+        whom.photonView.RPC(nameof(whom.DiveForward), RpcTarget.All);
     }
     
     public void ActFreezePlayer(PlayerController whom) 
     {
-        whom.photonView.RPC(nameof(whom.FreezeInstantly), RpcTarget.All);
+        whom.FreezeInstantly();
     }
 
     public void ActHarmPlayer(PlayerController whom)
