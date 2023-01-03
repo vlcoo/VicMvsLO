@@ -86,6 +86,15 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         "Disqualified", "1MinRemaining"
     };
     public List<string> POSSIBLE_ACTIONS = new List<string>();
+
+    public List<KeyValuePair<string, string>> DISALLOWED_RULES = new List<KeyValuePair<string, string>>
+    {
+        new KeyValuePair<string, string>("GotCoin", "ActGiveCoin"),
+        new KeyValuePair<string, string>("GotStar", "ActGiveStar"),
+        new KeyValuePair<string, string>("Spawned", "ActKillPlayer"),
+        new KeyValuePair<string, string>("KnockedBack", "ActKnockbackPlayer"),
+        new KeyValuePair<string, string>("Frozen", "ActFreezePlayer"),
+    };
     public List<MatchRuleListEntry> ruleList = new List<MatchRuleListEntry>();
 
     // LOBBY CALLBACKS
