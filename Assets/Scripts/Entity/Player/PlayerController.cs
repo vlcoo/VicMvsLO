@@ -143,6 +143,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
     public Vector2 WorldHitboxSize => MainHitbox.size * transform.lossyScale;
 
     private readonly Dictionary<GameObject, double> lastCollectTime = new();
+    public bool isMatchConditioning = false;
 
     #endregion
 
@@ -982,10 +983,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
 
             return;
         } else if (powerup.prefab == "1-Up") {
-            lives++;
-            UpdateGameState();
-            PlaySound(powerup.soundEffect);
-            Instantiate(Resources.Load("Prefabs/Particle/1Up"), transform.position, Quaternion.identity);
+            
 
             if (view.IsMine)
                 PhotonNetwork.Destroy(view);
@@ -1082,13 +1080,12 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
 
     #region -- FREEZING --
 
-    [PunRPC]
     public void FreezeInstantly()
     {
-        if (!Frozen && !frozenObject && !pipeEntering) {
-            GameObject cube = PhotonNetwork.Instantiate("Prefabs/FrozenCube", transform.position, Quaternion.identity, 0, new object[] { photonView.ViewID });
-            frozenObject = cube.GetComponent<FrozenCube>();
-        }
+        if (knockback || hitInvincibilityCounter > 0 || invincible > 0 || Frozen ||
+            state == Enums.PowerupState.MegaMushroom) return;
+        GameObject cube = PhotonNetwork.Instantiate("Prefabs/FrozenCube", transform.position, Quaternion.identity, 0, new object[] { photonView.ViewID });
+        Freeze(cube.GetPhotonView().ViewID);
     }
     
     [PunRPC]
@@ -1358,9 +1355,9 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
     }
 
     private void SpawnStars(int amount, bool deathplane) {
-        /*if (stars > 0) 
-            photonView.RPC(nameof(PlaySound), RpcTarget.All, Enums.Sounds.World_Star_Spawn);*/
-        
+        if (stars > 0) 
+            PlaySound(Enums.Sounds.World_Star_Spawn);
+
         if (!PhotonNetwork.IsMasterClient) {
             stars = Mathf.Max(0, stars - amount);
             return;
@@ -1412,6 +1409,15 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         drill = false;
         flying = false;
         animator.Play("deadstart");
+    }
+
+    [PunRPC]
+    public void Give1Up()
+    {
+        lives++;
+        UpdateGameState();
+        PlaySound(Enums.Sounds.Powerup_Sound_1UP);
+        Instantiate(Resources.Load("Prefabs/Particle/1Up"), transform.position, Quaternion.identity);
     }
     
     [PunRPC]

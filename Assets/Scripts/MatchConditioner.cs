@@ -71,12 +71,18 @@ public class MatchConditioner : MonoBehaviour
 
     public void ActGiveMega(PlayerController whom)
     {
-        whom.photonView.RPC(nameof(whom.TransformToMega), RpcTarget.All, true);
+        whom.TransformToMega(true);
+    }
+
+    public void ActGive1Up(PlayerController whom)
+    {
+        whom.Give1Up();
     }
 
     public void ActKillPlayer(PlayerController whom)
     {
-        whom.photonView.RPC(nameof(whom.Death), RpcTarget.All, false, false);
+        //whom.photonView.RPC(nameof(whom.Death), RpcTarget.All, false, false);
+        whom.Death(false, false);
     }
 
     public void ActWinPlayer(PlayerController whom)
@@ -91,22 +97,22 @@ public class MatchConditioner : MonoBehaviour
 
     public void ActDisqualifyPlayer(PlayerController whom)
     {
-        whom.photonView.RPC(nameof(whom.Disqualify), RpcTarget.All);
+        whom.Disqualify();
     }
     
     public void ActKnockbackPlayer(PlayerController whom)
     {
-        whom.photonView.RPC(nameof(whom.Knockback), RpcTarget.All, whom.facingRight, 1, false, -1);
+        whom.Knockback(whom.facingRight, 1, false, -1);
     }
 
     public void ActHardKnockbackPlayer(PlayerController whom)
     {
-        whom.photonView.RPC(nameof(whom.Knockback), RpcTarget.All, whom.facingRight, 3, false, -1);
+        whom.Knockback(whom.facingRight, 3, false, -1);
     }
 
     public void ActDoDive(PlayerController whom)
     {
-        whom.photonView.RPC(nameof(whom.DiveForward), RpcTarget.All);
+        whom.DiveForward();
     }
     
     public void ActFreezePlayer(PlayerController whom) 
@@ -116,7 +122,12 @@ public class MatchConditioner : MonoBehaviour
 
     public void ActHarmPlayer(PlayerController whom)
     {
-        whom.photonView.RPC(nameof(whom.Powerdown), RpcTarget.All, true);
+        whom.Powerdown(true);
+    }
+
+    public void ActSpawnPowerup(PlayerController whom)
+    {
+        whom.SpawnCoinItem();
     }
 
     public void ActRespawnLevel(PlayerController whom)

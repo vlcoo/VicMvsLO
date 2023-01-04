@@ -593,8 +593,8 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
     }
 
     private IEnumerator EndGame(Player winner) {
-        PhotonNetwork.CurrentRoom.SetCustomProperties(new() { [Enums.NetRoomProperties.GameStarted] = false });
         gameover = true;
+        PhotonNetwork.CurrentRoom.SetCustomProperties(new() { [Enums.NetRoomProperties.GameStarted] = false });
         music.Stop();
         GameObject text = GameObject.FindWithTag("wintext");
         text.GetComponent<TMP_Text>().text = winner != null ? $"{ winner.GetUniqueNickname() } Wins!" : "It's a draw...";
@@ -650,7 +650,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             Vector3 spawnPos = remainingSpawns[index].transform.position;
             //Check for people camping spawn
             foreach (var hit in Physics2D.OverlapCircleAll(spawnPos, 4)) {
-                if (hit.gameObject.CompareTag("Player")) {
+                if (hit.gameObject.CompareTag("Player") || hit.gameObject.CompareTag("bigstar")) {
                     //cant spawn here
                     remainingSpawns.RemoveAt(index);
                     yield return new WaitForSeconds(0.2f);
@@ -732,6 +732,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         bool starGame = starRequirement != -1;
         bool timeUp = endServerTime != -1 && endServerTime - Time.deltaTime - PhotonNetwork.ServerTimestamp < 0;
         int winningStars = -1;
+        int winningLives = -1;
         List<PlayerController> winningPlayers = new();
         List<PlayerController> alivePlayers = new();
         foreach (var player in players) {
@@ -740,14 +741,32 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
 
             alivePlayers.Add(player);
 
-            if ((starGame && player.stars >= starRequirement) || timeUp) {
+            if ((starGame && player.stars >= starRequirement) || (starGame && timeUp))
+            {
                 //we're in a state where this player would win.
                 //check if someone has more stars
-                if (player.stars > winningStars) {
+                if (player.stars > winningStars)
+                {
                     winningPlayers.Clear();
                     winningStars = player.stars;
                     winningPlayers.Add(player);
-                } else if (player.stars == winningStars) {
+                }
+                else if (player.stars == winningStars)
+                {
+                    winningPlayers.Add(player);
+                }
+            }
+            
+            if (!starGame && player.lives >= 1 && timeUp)
+            {
+                if (player.lives > winningLives)
+                {
+                    winningPlayers.Clear();
+                    winningLives = player.lives;
+                    winningPlayers.Add(player);
+                }
+                else if (player.lives == winningLives)
+                {
                     winningPlayers.Add(player);
                 }
             }
