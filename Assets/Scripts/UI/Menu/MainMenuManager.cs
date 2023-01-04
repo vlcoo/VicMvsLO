@@ -543,8 +543,10 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
                 if (upToDate)
                     return;
 
-                updateText.text = $"An update is available:\n\nNew Version: {latestVersion}\nCurrent Version: {Application.version}";
+                updateText.text = $"You're running an old version of this mod. Latest: {latestVersion}";
                 updateBox.SetActive(true);
+                if (updateBoxAnimator != null)
+                    updateBoxAnimator.SetBool("open", updateBox.activeSelf);
                 EventSystem.current.SetSelectedGameObject(updateBoxSelected);
             });
             GlobalController.Instance.checkedForVersion = true;
