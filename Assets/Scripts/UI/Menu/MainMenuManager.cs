@@ -616,6 +616,12 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
     public void onAddMatchRuleExplicit(string cond, string act, bool updateNetRoom, bool updateUIList = true)
     {
+        if (DISALLOWED_RULES.Contains(new KeyValuePair<string, string>(cond, act)))
+        {
+            sfx.PlayOneShot(Enums.Sounds.UI_Error.GetClip());
+            return;
+        }
+
         if (!cond.Equals("") && !act.Equals(""))
         { 
             GameObject newEntry = Instantiate(ruleTemplate);
