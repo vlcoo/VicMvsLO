@@ -82,7 +82,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     public List<string> POSSIBLE_CONDITIONS = new List<string>
     {
         "Spawned", "GotCoin", "GotPowerup", "GotMega", "LostPowerup", "GotStar", "HitBlock", "BumpedInto", "KnockedBack", "Frozen", "BumpedSmn", 
-        "StompedSmn", "TriggeredPowerup", "Died", "Jumped", "LookedRight", "LookedLeft", "LookedUp", "LookedDown", "Ran", "ReachedCoinLimit",
+        "StompedSmn", "TriggeredPowerup", "Died", "SteppedOnEnemy", "Jumped", "LookedRight", "LookedLeft", "LookedUp", "LookedDown", "Ran", "ReachedCoinLimit",
         "Disqualified", "1MinRemaining"
     };
     public List<string> POSSIBLE_ACTIONS = new List<string>();

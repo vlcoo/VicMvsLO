@@ -80,7 +80,7 @@ public abstract class KillableEntity : MonoBehaviourPun, IFreezableEntity, ICust
     #region Unity Callbacks
     public void OnTriggerEnter2D(Collider2D collider) {
         KillableEntity entity = collider.GetComponentInParent<KillableEntity>();
-        if (!collide || !photonView.IsMine || !entity || entity.dead)
+        if (!collide || !photonView.IsMine || !entity || entity.dead || body is null || collider.attachedRigidbody is null)
             return;
 
         bool goLeft = body.position.x < collider.attachedRigidbody.position.x;
@@ -111,10 +111,12 @@ public abstract class KillableEntity : MonoBehaviourPun, IFreezableEntity, ICust
                 if (player.groundpound) {
                     player.groundpound = false;
                     photonView.RPC(nameof(Kill), RpcTarget.All);
+                    GameManager.Instance.MatchConditioner.ConditionActioned(player, "SteppedOnEnemy");
                 }
                 player.bounce = true;
             } else {
                 photonView.RPC(nameof(Kill), RpcTarget.All);
+                GameManager.Instance.MatchConditioner.ConditionActioned(player, "SteppedOnEnemy");
                 player.bounce = !player.groundpound;
             }
             player.photonView.RPC(nameof(PlaySound), RpcTarget.All, Enums.Sounds.Enemy_Generic_Stomp);

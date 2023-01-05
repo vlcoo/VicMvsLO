@@ -10,13 +10,14 @@ using UnityEngine;
 
 public class MatchConditioner : MonoBehaviour
 {
-    public Dictionary<string, string> currentMapping = new Dictionary<string, string>();
+    public Dictionary<string, string> currentMapping = new();
     public bool chainableActions = true;
 
     // Start is called before the first frame update
     void Start()
     {
         Utils.GetCustomProperty(Enums.NetRoomProperties.MatchRules, out currentMapping);
+        Utils.GetCustomProperty(Enums.NetRoomProperties.ChainableRules, out chainableActions);
     }
 
     // Update is called once per frame
@@ -51,27 +52,27 @@ public class MatchConditioner : MonoBehaviour
 
     public void ActGiveStar(PlayerController whom)
     {
-        whom.CollectBigStarInstantly();
+        whom.CollectBigStarInstantly(matchConditioned:chainableActions);
     }
 
     public void ActGiveCoin(PlayerController whom)
     {
-        whom.CollectCoinInstantly();
+        whom.CollectCoinInstantly(matchConditioned:chainableActions);
     }
     
     public void ActRemoveStar(PlayerController whom)
     {
-        whom.RemoveBigStarInstantly();
+        whom.RemoveBigStarInstantly(matchConditioned:chainableActions);
     }
 
     public void ActRemoveCoin(PlayerController whom)
     {
-        whom.RemoveCoinInstantly();
+        whom.RemoveCoinInstantly(matchConditioned:chainableActions);
     }
 
     public void ActGiveMega(PlayerController whom)
     {
-        whom.TransformToMega(true);
+        whom.TransformToMega(true, matchConditioned:chainableActions);
     }
 
     public void ActGive1Up(PlayerController whom)
@@ -82,7 +83,7 @@ public class MatchConditioner : MonoBehaviour
     public void ActKillPlayer(PlayerController whom)
     {
         //whom.photonView.RPC(nameof(whom.Death), RpcTarget.All, false, false);
-        whom.Death(false, false);
+        whom.Death(false, false, matchConditioned:chainableActions);
     }
 
     public void ActWinPlayer(PlayerController whom)
@@ -97,17 +98,17 @@ public class MatchConditioner : MonoBehaviour
 
     public void ActDisqualifyPlayer(PlayerController whom)
     {
-        whom.Disqualify();
+        whom.Disqualify(matchConditioned:chainableActions);
     }
     
     public void ActKnockbackPlayer(PlayerController whom)
     {
-        whom.Knockback(whom.facingRight, 1, false, -1);
+        whom.Knockback(whom.facingRight, 1, false, -1, matchConditioned:chainableActions);
     }
 
     public void ActHardKnockbackPlayer(PlayerController whom)
     {
-        whom.Knockback(whom.facingRight, 3, false, -1);
+        whom.Knockback(whom.facingRight, 3, false, -1, matchConditioned:chainableActions);
     }
 
     public void ActDoDive(PlayerController whom)
@@ -117,17 +118,27 @@ public class MatchConditioner : MonoBehaviour
     
     public void ActFreezePlayer(PlayerController whom) 
     {
-        whom.FreezeInstantly();
+        whom.FreezeInstantly(matchConditioned:chainableActions);
     }
 
     public void ActHarmPlayer(PlayerController whom)
     {
-        whom.Powerdown(true);
+        whom.Powerdown(true, matchConditioned:chainableActions);
     }
 
     public void ActSpawnPowerup(PlayerController whom)
     {
-        whom.SpawnCoinItem();
+        whom.SpawnCoinItemInstantly();
+    }
+
+    public void ActSpawnEnemy(PlayerController whom)
+    {
+        GameObject entity = Utils.GetRandomEnemy();
+        PhotonNetwork.Instantiate("Prefabs/Enemy/" + entity.name,
+            whom.transform.position +
+            (!whom.facingRight
+                ? Vector3.right
+                : Vector3.left) + new Vector3(0, 0.2f, 0), Quaternion.identity);
     }
 
     public void ActRespawnLevel(PlayerController whom)

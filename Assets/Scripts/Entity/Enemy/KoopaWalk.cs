@@ -188,6 +188,7 @@ public class KoopaWalk : HoldableEntity {
             photonView.RPC(nameof(SpecialKill), RpcTarget.All, !originalFacing, false, player.StarCombo++);
         } else if (player.groundpound && player.state != Enums.PowerupState.MiniMushroom && attackedFromAbove) {
             photonView.RPC(nameof(EnterShell), RpcTarget.All);
+            GameManager.Instance.MatchConditioner.ConditionActioned(player, "SteppedOnEnemy");
             if (!blue) {
                 photonView.RPC(nameof(Kick), RpcTarget.All, player.body.position.x < body.position.x, 1f, player.groundpound);
                 player.photonView.RPC(nameof(PlayerController.SetHoldingOld), RpcTarget.All, photonView.ViewID);
@@ -198,11 +199,13 @@ public class KoopaWalk : HoldableEntity {
                 if (player.groundpound) {
                     player.groundpound = false;
                     photonView.RPC(nameof(EnterShell), RpcTarget.All);
+                    GameManager.Instance.MatchConditioner.ConditionActioned(player, "SteppedOnEnemy");
                 }
                 player.bounce = true;
             } else {
                 photonView.RPC(nameof(EnterShell), RpcTarget.All);
                 player.bounce = !player.groundpound;
+                GameManager.Instance.MatchConditioner.ConditionActioned(player, "SteppedOnEnemy");
             }
             player.photonView.RPC(nameof(PlaySound), RpcTarget.All, Enums.Sounds.Enemy_Generic_Stomp);
             player.drill = false;

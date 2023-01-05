@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using UnityEngine;
@@ -8,6 +9,8 @@ using UnityEngine.SceneManagement;
 using Photon.Pun;
 using ExitGames.Client.Photon;
 using NSMB.Utils;
+using Photon.Realtime;
+using Hashtable = ExitGames.Client.Photon.Hashtable;
 
 public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSerializeView, IOnPhotonViewPreNetDestroy {
 
@@ -911,8 +914,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         photonView.RPC(nameof(Powerup), RpcTarget.All, powerupID);
     }
 
-    [PunRPC]
-    public void TransformToMega(bool alsoSetState)
+    public void TransformToMega(bool alsoSetState, bool matchConditioned = false)
     {
         if (state == Enums.PowerupState.MegaMushroom) return;
         Unfreeze(0);
@@ -934,7 +936,8 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         if (alsoSetState)
         {
             state = Enums.PowerupState.MegaMushroom;
-            GameManager.Instance.MatchConditioner.ConditionActioned(this, "GotMega");
+            if (!matchConditioned)
+                GameManager.Instance.MatchConditioner.ConditionActioned(this, "GotMega");
         }
     }
 
@@ -1033,7 +1036,12 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
     }
 
     [PunRPC]
-    public void Powerdown(bool ignoreInvincible) {
+    public void Powerdown(bool ignoreInvincible)
+    {
+        Powerdown(ignoreInvincible, false);
+    }
+    
+    public void Powerdown(bool ignoreInvincible, bool matchConditioned = false) {
         if (!ignoreInvincible && (hitInvincibilityCounter > 0 || invincible > 0))
             return;
 
@@ -1069,7 +1077,8 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         propellerSpinTimer = 0;
         usedPropellerThisJump = false;
         
-        GameManager.Instance.MatchConditioner.ConditionActioned(this, "LostPowerup");
+        if (!matchConditioned)
+            GameManager.Instance.MatchConditioner.ConditionActioned(this, "LostPowerup");
 
         if (!nowDead) {
             hitInvincibilityCounter = 3f;
@@ -1080,16 +1089,21 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
 
     #region -- FREEZING --
 
-    public void FreezeInstantly()
+    public void FreezeInstantly(bool matchConditioned = false)
     {
         if (knockback || hitInvincibilityCounter > 0 || invincible > 0 || Frozen ||
             state == Enums.PowerupState.MegaMushroom) return;
         GameObject cube = PhotonNetwork.Instantiate("Prefabs/FrozenCube", transform.position, Quaternion.identity, 0, new object[] { photonView.ViewID });
-        Freeze(cube.GetPhotonView().ViewID);
+        Freeze(cube.GetPhotonView().ViewID, matchConditioned);
+    }
+
+    [PunRPC]
+    public void Freeze(int cube)
+    {
+        Freeze(cube, false);
     }
     
-    [PunRPC]
-    public void Freeze(int cube) {
+    public void Freeze(int cube, bool matchConditioned = false) {
         if (knockback || hitInvincibilityCounter > 0 || invincible > 0 || Frozen || state == Enums.PowerupState.MegaMushroom)
             return;
 
@@ -1110,7 +1124,8 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         propellerTimer = 0;
         skidding = false;
         
-        GameManager.Instance.MatchConditioner.ConditionActioned(this, "Frozen");
+        if (!matchConditioned)
+            GameManager.Instance.MatchConditioner.ConditionActioned(this, "Frozen");
     }
 
     [PunRPC]
@@ -1143,14 +1158,14 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
 
     #region -- COIN / STAR COLLECTION --
 
-    public void CollectBigStarInstantly()
+    public void CollectBigStarInstantly(bool matchConditioned = false)
     {
-        photonView.RPC(nameof(CollectBigStar), RpcTarget.All, (Vector2) transform.position, -1, stars + 1);
+        CollectBigStar((Vector2) transform.position, -1, stars + 1, null, matchConditioned);
     }
     
-    public void RemoveBigStarInstantly()
+    public void RemoveBigStarInstantly(bool matchConditioned = false)
     {
-        photonView.RPC(nameof(CollectBigStar), RpcTarget.All, (Vector2) transform.position, -1, stars - 1);
+        CollectBigStar((Vector2)transform.position, -1, stars - 1, null, matchConditioned);
     }
     
     [PunRPC]
@@ -1183,9 +1198,13 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
     }
 
     [PunRPC]
-    public void CollectBigStar(Vector2 particle, int starView, int newCount, PhotonMessageInfo info) {
+    public void CollectBigStar(Vector2 particle, int starView, int newCount, PhotonMessageInfo info)
+    {
+        CollectBigStar(particle, starView, newCount, info, false);
+    }
+    public void CollectBigStar(Vector2 particle, int starView, int newCount, PhotonMessageInfo? info, bool matchConditioned = false) {
         //only trust the master client
-        if (!info.Sender.IsMasterClient)
+        if (info is not null && !((PhotonMessageInfo)info).Sender.IsMasterClient)
             return;
 
         //state
@@ -1213,8 +1232,8 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
                 Destroy(star.gameObject);
             }
         }
-
-        GameManager.Instance.MatchConditioner.ConditionActioned(this, "GotStar");
+        if (!matchConditioned)
+            GameManager.Instance.MatchConditioner.ConditionActioned(this, "GotStar");
     }
 
     [PunRPC]
@@ -1239,20 +1258,25 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         photonView.RPC(nameof(CollectCoin), RpcTarget.All, coinID, coins + 1, particle);
     }
     
-    public void CollectCoinInstantly()
+    public void CollectCoinInstantly(bool matchConditioned = false)
     {
-        photonView.RPC(nameof(CollectCoin), RpcTarget.All, -1, coins + 1, (Vector2) transform.position);
+        CollectCoin(-1, coins + 1, (Vector2) transform.position, null, matchConditioned);
     }
     
-    public void RemoveCoinInstantly()
+    public void RemoveCoinInstantly(bool matchConditioned = false)
     {
-        photonView.RPC(nameof(CollectCoin), RpcTarget.All, -1, coins - 1, (Vector2) transform.position);
+        CollectCoin(-1, coins - 1, (Vector2) transform.position, null, matchConditioned);
     }
 
     [PunRPC]
-    protected void CollectCoin(int coinID, int newCount, Vector2 position, PhotonMessageInfo info) {
+    protected void CollectCoin(int coinID, int newCount, Vector2 position, PhotonMessageInfo info)
+    {
+        CollectCoin(coinID, newCount, position, info, false);
+    }
+    
+    protected void CollectCoin(int coinID, int newCount, Vector2 position, PhotonMessageInfo? info, bool matchConditioned = false) {
         //only trust the master client
-        if (!info.Sender.IsLocal && !info.Sender.IsMasterClient)
+        if (info is not null && !((PhotonMessageInfo)info).Sender.IsLocal && !((PhotonMessageInfo)info).Sender.IsMasterClient)
             return;
 
         PhotonView coin = PhotonView.Find(coinID);
@@ -1289,8 +1313,9 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             }
         }
         
-        GameManager.Instance.MatchConditioner.ConditionActioned(this, "GotCoin");
         UpdateGameState();
+        if (!matchConditioned)
+            GameManager.Instance.MatchConditioner.ConditionActioned(this, "GotCoin");
     }
 
     [PunRPC]
@@ -1306,6 +1331,13 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         photonView.RPC(nameof(PlaySound), RpcTarget.All, Enums.Sounds.Player_Sound_PowerupReserveUse);
         storedPowerup = null;
         UpdateGameState();
+    }
+
+    public void SpawnCoinItemInstantly()
+    {
+        string prefab = Utils.GetRandomItem(this).prefab;
+        PhotonNetwork.InstantiateRoomObject("Prefabs/Powerup/" + prefab, body.position + Vector2.up * 5f, Quaternion.identity, 0, new object[] { photonView.ViewID });
+        photonView.RPC(nameof(PlaySound), RpcTarget.All, Enums.Sounds.Player_Sound_PowerupReserveUse);
     }
 
     public void SpawnCoinItem() {
@@ -1391,11 +1423,19 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
     #region -- DEATH / RESPAWNING --
 
     [PunRPC]
-    public void Disqualify()
+    public void Disqualify(bool matchConditioned = false)
     {
-        lives = 1;
-        Death(false, false);
+        GameManager.Instance.CheckForWinner();
+        Destroy(trackIcon);
+        if (photonView.IsMine) {
+            PhotonNetwork.Destroy(photonView);
+            GameManager.Instance.SpectationManager.Spectating = true;
+        }
+        Destroy(gameObject);
+        PlaySound(Enums.Sounds.Player_Sound_DeathOthers);
         
+        if (!matchConditioned)
+            GameManager.Instance.MatchConditioner.ConditionActioned(this, "Disqualified");
     }
 
     [PunRPC]
@@ -1419,9 +1459,14 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         PlaySound(Enums.Sounds.Powerup_Sound_1UP);
         Instantiate(Resources.Load("Prefabs/Particle/1Up"), transform.position, Quaternion.identity);
     }
-    
+
     [PunRPC]
-    public void Death(bool deathplane, bool fire) {
+    public void Death(bool deathplane, bool fire)
+    {
+        Death(deathplane, fire, false);
+    }
+    
+    public void Death(bool deathplane, bool fire, bool matchConditioned = false) {
         if (dead)
             return;
 
@@ -1430,7 +1475,8 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
 
         animator.Play("deadstart");
         if (--lives == 0) {
-            GameManager.Instance.MatchConditioner.ConditionActioned(this, "Disqualified");
+            if (!matchConditioned)
+                GameManager.Instance.MatchConditioner.ConditionActioned(this, "Disqualified");
             GameManager.Instance.CheckForWinner();
         }
 
@@ -1469,7 +1515,8 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         if (photonView.IsMine)
             ScoreboardUpdater.instance.OnDeathToggle();
         
-        GameManager.Instance.MatchConditioner.ConditionActioned(this, "Died");
+        if (!matchConditioned)
+            GameManager.Instance.MatchConditioner.ConditionActioned(this, "Died");
     }
 
     [PunRPC]
@@ -1554,6 +1601,12 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             ScoreboardUpdater.instance.OnRespawnToggle();
 
         UpdateGameState();
+        StartCoroutine(WaitBeforeSpawnedCondition());
+    }
+
+    IEnumerator WaitBeforeSpawnedCondition()
+    {
+        yield return new WaitForSeconds(1);
         GameManager.Instance.MatchConditioner.ConditionActioned(this, "Spawned");
     }
     #endregion
@@ -1720,7 +1773,12 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
     #region -- KNOCKBACK --
 
     [PunRPC]
-    public void Knockback(bool fromRight, int starsToDrop, bool fireball, int attackerView) {
+    public void Knockback(bool fromRight, int starsToDrop, bool fireball, int attackerView)
+    {
+        Knockback(fromRight, starsToDrop, fireball, attackerView, false);
+    }
+    
+    public void Knockback(bool fromRight, int starsToDrop, bool fireball, int attackerView, bool matchConditioned = false) {
         if (fireball && fireballKnockback && knockback)
             return;
         if (knockback && !fireballKnockback)
@@ -1785,15 +1843,18 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         body.gravityScale = normalGravity;
         wallSlideLeft = wallSlideRight = false;
 
-        if (fireball)
+        if (!matchConditioned)
         {
-            GameManager.Instance.MatchConditioner.ConditionActioned(this, "BumpedInto");
-            GameManager.Instance.MatchConditioner.ConditionActioned(attackerView, "BumpedSmn");
-        }
-        else
-        {
-            GameManager.Instance.MatchConditioner.ConditionActioned(this, "KnockedBack");
-            GameManager.Instance.MatchConditioner.ConditionActioned(attackerView, "StompedSmn");
+            if (fireball)
+            {
+                GameManager.Instance.MatchConditioner.ConditionActioned(this, "BumpedInto");
+                GameManager.Instance.MatchConditioner.ConditionActioned(attackerView, "BumpedSmn");
+            }
+            else
+            {
+                GameManager.Instance.MatchConditioner.ConditionActioned(this, "KnockedBack");
+                GameManager.Instance.MatchConditioner.ConditionActioned(attackerView, "StompedSmn");
+            }
         }
 
         SpawnStars(starsToDrop, false);

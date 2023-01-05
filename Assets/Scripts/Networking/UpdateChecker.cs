@@ -7,19 +7,17 @@ using Newtonsoft.Json.Linq;
 
 public class UpdateChecker {
 
-    private static readonly string API_URL = "http://api.github.com/repos/ipodtouch0218/NSMB-MarioVsLuigi/releases/latest";
+    private static readonly string API_URL = "http://api.github.com/repos/vlcoo/VicMvsLO/releases/latest";
 
     /// <summary>
     /// Returns if we're up to date, OR newer, compared to the latest GitHub release version number
     /// </summary>
     public async static void IsUpToDate(Action<bool, string> callback)
     {
-        return; // modify later...
-
         //get http results
         HttpWebRequest request = (HttpWebRequest) WebRequest.Create(API_URL);
         request.Accept = "application/json";
-        request.UserAgent = "ipodtouch0218/NSMB-MarioVsLuigi";
+        request.UserAgent = "vlcoo/VicMvsLO";
 
         HttpWebResponse response = (HttpWebResponse) await request.GetResponseAsync();
 

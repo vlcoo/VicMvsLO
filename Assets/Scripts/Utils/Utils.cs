@@ -390,6 +390,15 @@ namespace NSMB.Utils {
             }
         }
 
+        public static List<GameObject> enemies = null;
+        public static GameObject GetRandomEnemy()
+        {
+            if (enemies == null)
+                enemies = Resources.LoadAll<GameObject>("Prefabs/Enemy").ToList();
+            
+            return enemies[Random.Range(0, enemies.Count)];
+        }
+
         public static Powerup[] powerups = null;
         // MAX(0,$B15+(IF(stars behind >0,LOG(B$1+1, 2.71828),0)*$C15*(1-(($M$15-$M$14))/$M$15)))
         public static Powerup GetRandomItem(PlayerController player) {

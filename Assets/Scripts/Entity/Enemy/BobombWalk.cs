@@ -73,7 +73,11 @@ public class BobombWalk : HoldableEntity {
             return;
         } else if (attackedFromAbove && !lit) {
             if (player.state != Enums.PowerupState.MiniMushroom || (player.groundpound && attackedFromAbove))
+            {
                 photonView.RPC("Light", RpcTarget.All);
+                GameManager.Instance.MatchConditioner.ConditionActioned(player, "SteppedOnEnemy");
+            }
+
             photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.Enemy_Generic_Stomp);
             if (player.groundpound && player.state != Enums.PowerupState.MiniMushroom) {
                 photonView.RPC("Kick", RpcTarget.All, player.body.position.x < body.position.x, Mathf.Abs(player.body.velocity.x) / player.RunningMaxSpeed, player.groundpound);

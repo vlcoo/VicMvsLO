@@ -64,6 +64,7 @@ public class BulletBillMover : KillableEntity {
         }
         if (attackedFromAbove) {
             if (!(player.state == Enums.PowerupState.MiniMushroom && !player.groundpound)) {
+                GameManager.Instance.MatchConditioner.ConditionActioned(player, "SteppedOnEnemy");
                 photonView.RPC(nameof(Kill), RpcTarget.All);
             }
             player.photonView.RPC(nameof(PlayerController.PlaySound), RpcTarget.All, Enums.Sounds.Enemy_Generic_Stomp);
