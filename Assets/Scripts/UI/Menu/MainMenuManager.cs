@@ -39,7 +39,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     public TMP_Dropdown levelDropdown, characterDropdown;
     public RoomIcon selectedRoomIcon, privateJoinRoom;
     public Button joinRoomBtn, createRoomBtn, startGameBtn;
-    public Toggle ndsResolutionToggle, fullscreenToggle, livesEnabled, powerupsEnabled, timeEnabled, starsEnabled, coinsEnabled, drawTimeupToggle, fireballToggle, vsyncToggle, privateToggle, privateToggleRoom, aspectToggle, spectateToggle, scoreboardToggle, filterToggle;
+    public Toggle ndsResolutionToggle, fullscreenToggle, livesEnabled, powerupsEnabled, timeEnabled, starsEnabled, coinsEnabled, drawTimeupToggle, fireballToggle, vsyncToggle, privateToggle, privateToggleRoom, aspectToggle, spectateToggle, scoreboardToggle, filterToggle, chainableActionsToggle;
     public GameObject playersContent, playersPrefab, chatContent, chatPrefab;
     public TMP_InputField nicknameField, starsText, coinsText, livesField, timeField, lobbyJoinField, chatTextField;
     public Slider musicSlider, sfxSlider, masterSlider, lobbyPlayersSlider, changePlayersSlider;
@@ -247,6 +247,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         AttemptToUpdateProperty<int>(updatedProperties, Enums.NetRoomProperties.Time, ChangeTime);
         AttemptToUpdateProperty<bool>(updatedProperties, Enums.NetRoomProperties.DrawTime, ChangeDrawTime);
         AttemptToUpdateProperty<string>(updatedProperties, Enums.NetRoomProperties.HostName, ChangeLobbyHeader);
+        AttemptToUpdateProperty<bool>(updatedProperties, Enums.NetRoomProperties.ChainableRules, ChangeChainableRules);
     }
 
     public void ChangeDebugState(bool enabled) {
@@ -1112,6 +1113,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         starsText.interactable = PhotonNetwork.IsMasterClient && starsEnabled.isOn;
         coinsText.interactable = PhotonNetwork.IsMasterClient && coinsEnabled.isOn;
         drawTimeupToggle.interactable = PhotonNetwork.IsMasterClient && timeEnabled.isOn;
+        chainableActionsToggle.interactable = PhotonNetwork.IsMasterClient;
 
         Utils.GetCustomProperty(Enums.NetRoomProperties.Debug, out bool debug);
         privateToggleRoom.interactable = PhotonNetwork.IsMasterClient && !debug;
@@ -1512,6 +1514,11 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         //ChangeStarRequirement(newValue);
     }
 
+    public void ChangeChainableRules(bool how)
+    {
+        chainableActionsToggle.SetIsOnWithoutNotify(how);
+    }
+
     public void ChangeCoinRequirement(int coins) {
         coinsEnabled.SetIsOnWithoutNotify(coins != -1);
         UpdateSettingEnableStates();
@@ -1549,7 +1556,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     }
 
     public void OpenDownloadsPage() {
-        Application.OpenURL("https://github.com/ipodtouch0218/NSMB-MarioVsLuigi/releases/latest");
+        Application.OpenURL("https://github.com/vlcoo/VicMvsLO/releases/latest");
         OpenMainMenu();
     }
 
@@ -1622,7 +1629,14 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         };
         PhotonNetwork.CurrentRoom.SetCustomProperties(table);
     }
-    
+
+    public void EnableChainableActions(Toggle toggle)
+    {
+        Hashtable properties = new() {
+            [Enums.NetRoomProperties.ChainableRules] = toggle.isOn
+        };
+        PhotonNetwork.CurrentRoom.SetCustomProperties(properties);
+    }
     public void EnableStars(Toggle toggle) {
         Hashtable properties = new() {
             [Enums.NetRoomProperties.StarRequirement] = toggle.isOn ? int.Parse(starsText.text) : -1

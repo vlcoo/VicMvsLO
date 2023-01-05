@@ -188,6 +188,7 @@ public static class Enums {
         public static string Mutes { get; } = "M";
         public static string Bans { get; } = "B";
         public static string MatchRules { get; } = "Mr";
+        public static string ChainableRules { get; } = "Cr";
     }
     public enum NetEventIds : byte {
         // 1-9 = in-lobby events

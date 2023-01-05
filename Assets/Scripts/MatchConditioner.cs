@@ -11,13 +11,14 @@ using UnityEngine;
 public class MatchConditioner : MonoBehaviour
 {
     public Dictionary<string, string> currentMapping = new();
-    public bool chainableActions = true;
+    public bool chainableActions = false;
 
     // Start is called before the first frame update
     void Start()
     {
         Utils.GetCustomProperty(Enums.NetRoomProperties.MatchRules, out currentMapping);
         Utils.GetCustomProperty(Enums.NetRoomProperties.ChainableRules, out chainableActions);
+        chainableActions = !chainableActions;
     }
 
     // Update is called once per frame
