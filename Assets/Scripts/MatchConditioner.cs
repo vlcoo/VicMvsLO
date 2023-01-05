@@ -146,4 +146,9 @@ public class MatchConditioner : MonoBehaviour
     {
         GameManager.Instance.SendAndExecuteEvent(Enums.NetEventIds.ResetTiles, null, SendOptions.SendReliable);
     }
+
+    public void NoActExplodeLevel(PlayerController whom)
+    {
+        GameManager.Instance.DestroyEnvironment();
+    }
 }

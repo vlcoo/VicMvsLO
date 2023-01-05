@@ -631,6 +631,12 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         SceneManager.LoadScene("MainMenu");
     }
 
+    public void DestroyEnvironment()
+    {
+        GameObject bomb = PhotonNetwork.Instantiate("Prefabs/Enemy/Bobomb", Vector3.zero, Quaternion.identity);
+        bomb.GetComponent<BobombWalk>().DetonateBig();
+    }
+
     private IEnumerator BigStarRespawn(bool wait = true) {
         if (starRequirement < 0)
             yield break;

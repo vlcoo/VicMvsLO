@@ -187,6 +187,26 @@ public class BobombWalk : HoldableEntity {
         PhotonNetwork.Destroy(gameObject);
     }
 
+    public void DetonateBig()
+    {
+        explosionTileSize = 50;
+        Vector3Int tileLocation = Utils.WorldToTilemapPosition(Vector3.zero);
+        Tilemap tm = GameManager.Instance.tilemap;
+        for (int x = -explosionTileSize; x <= explosionTileSize; x++) {
+            for (int y = -explosionTileSize; y <= explosionTileSize; y++) {
+                if (Mathf.Abs(x) + Mathf.Abs(y) > explosionTileSize) continue;
+                Vector3Int ourLocation = tileLocation + new Vector3Int(x, y, 0);
+                Utils.WrapTileLocation(ref ourLocation);
+
+                TileBase tile = tm.GetTile(ourLocation);
+                if (tile is InteractableTile iTile) {
+                    iTile.Interact(this, InteractableTile.InteractionDirection.Up, Utils.TilemapToWorldPosition(ourLocation));
+                }
+            }
+        }
+        PhotonNetwork.Destroy(gameObject);
+    }
+
     [PunRPC]
     public override void Kill() {
         Light();
