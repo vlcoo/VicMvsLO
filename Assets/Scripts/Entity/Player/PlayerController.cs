@@ -1160,12 +1160,12 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
 
     public void CollectBigStarInstantly(bool matchConditioned = false)
     {
-        photonView.RPC(nameof(CollectBigStar), RpcTarget.All, (Vector2) transform.position, -1, stars + 1, null);
+        photonView.RPC(nameof(CollectBigStar), RpcTarget.All, (Vector2) transform.position, -1, stars + 1);
     }
     
     public void RemoveBigStarInstantly(bool matchConditioned = false)
     {
-        photonView.RPC(nameof(CollectBigStar), RpcTarget.All, (Vector2) transform.position, -1, stars - 1, null);
+        photonView.RPC(nameof(CollectBigStar), RpcTarget.All, (Vector2) transform.position, -1, stars - 1);
     }
     
     [PunRPC]
@@ -1260,12 +1260,12 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
     
     public void CollectCoinInstantly(bool matchConditioned = false)
     {
-        photonView.RPC(nameof(CollectCoin), RpcTarget.All, -1, coins + 1, (Vector2) transform.position, null);
+        photonView.RPC(nameof(CollectCoin), RpcTarget.All, -1, coins + 1, (Vector2) transform.position);
     }
     
     public void RemoveCoinInstantly(bool matchConditioned = false)
     {
-        photonView.RPC(nameof(CollectCoin), RpcTarget.All, -1, coins - 1, (Vector2) transform.position, null);
+        photonView.RPC(nameof(CollectCoin), RpcTarget.All, -1, coins - 1, (Vector2) transform.position);
     }
 
     [PunRPC]

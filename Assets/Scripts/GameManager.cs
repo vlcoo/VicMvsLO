@@ -763,8 +763,11 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
                 }
             }
             
-            if (!starGame && player.lives >= 1 && timeUp)
+            if (!starGame && timeUp)
             {
+                if (player.lives >= 1)
+                    break;
+
                 if (player.lives > winningLives)
                 {
                     winningPlayers.Clear();
@@ -802,8 +805,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         if (starGame && winningStars >= starRequirement) {
             if (winningPlayers.Count == 1)
                 PhotonNetwork.RaiseEvent((byte) Enums.NetEventIds.EndGame, winningPlayers[0].photonView.Owner, NetworkUtils.EventAll, SendOptions.SendReliable);
-
-            return;
+            
         }
     }
 
