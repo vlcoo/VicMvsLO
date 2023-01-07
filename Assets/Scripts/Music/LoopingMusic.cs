@@ -53,7 +53,9 @@ public class LoopingMusic : MonoBehaviour {
         if (currentSong.loopEndSample != -1) {
             float time = audioSource.time;
             float songStart = currentSong.loopStartSample * (FastMusic ? 0.8f : 1f);
-            float songEnd = currentSong.loopEndSample * (FastMusic ? 0.8f : 1f);
+            float songEnd = currentSong.loopEndSample == 0
+                ? (FastMusic ? currentSong.fastClip.length : currentSong.clip.length)
+                : currentSong.loopEndSample * (FastMusic ? 0.8f : 1f);
 
             if (time >= songEnd)
                 audioSource.time = songStart + (time - songEnd);

@@ -447,6 +447,8 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
          */
 
         Instance = this;
+        if (Random.Range(0f, 1f) > 0.65)
+            GetComponent<LoopingMusic>().FastMusic = true;
 
         //Clear game-specific settings so they don't carry over
         HorizontalCamera.OFFSET_TARGET = 0;

@@ -1094,7 +1094,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         if (knockback || hitInvincibilityCounter > 0 || invincible > 0 || Frozen ||
             state == Enums.PowerupState.MegaMushroom) return;
         GameObject cube = PhotonNetwork.Instantiate("Prefabs/FrozenCube", transform.position, Quaternion.identity, 0, new object[] { photonView.ViewID });
-        Freeze(cube.GetPhotonView().ViewID, matchConditioned);
+        //Freeze(cube.GetPhotonView().ViewID, matchConditioned);
     }
 
     [PunRPC]
@@ -1160,12 +1160,12 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
 
     public void CollectBigStarInstantly(bool matchConditioned = false)
     {
-        CollectBigStar((Vector2) transform.position, -1, stars + 1, null, matchConditioned);
+        photonView.RPC(nameof(CollectBigStar), RpcTarget.All, (Vector2) transform.position, -1, stars + 1, null);
     }
     
     public void RemoveBigStarInstantly(bool matchConditioned = false)
     {
-        CollectBigStar((Vector2)transform.position, -1, stars - 1, null, matchConditioned);
+        photonView.RPC(nameof(CollectBigStar), RpcTarget.All, (Vector2) transform.position, -1, stars - 1, null);
     }
     
     [PunRPC]
@@ -1260,12 +1260,12 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
     
     public void CollectCoinInstantly(bool matchConditioned = false)
     {
-        CollectCoin(-1, coins + 1, (Vector2) transform.position, null, matchConditioned);
+        photonView.RPC(nameof(CollectCoin), RpcTarget.All, -1, coins + 1, (Vector2) transform.position, null);
     }
     
     public void RemoveCoinInstantly(bool matchConditioned = false)
     {
-        CollectCoin(-1, coins - 1, (Vector2) transform.position, null, matchConditioned);
+        photonView.RPC(nameof(CollectCoin), RpcTarget.All, -1, coins - 1, (Vector2) transform.position, null);
     }
 
     [PunRPC]
