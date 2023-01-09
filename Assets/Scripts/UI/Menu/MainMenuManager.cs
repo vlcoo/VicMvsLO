@@ -32,20 +32,20 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     public GameObject lobbiesContent, lobbyPrefab;
     bool quit, validName;
     public GameObject connecting;
-    public GameObject title, bg, mainMenu, optionsMenu, lobbyMenu, createLobbyPrompt, inLobbyMenu, creditsMenu, controlsMenu, privatePrompt, updateBox, newRulePrompt, emoteListPrompt;
-    public Animator createLobbyPromptAnimator, privatePromptAnimator, updateBoxAnimator, errorBoxAnimator, rebindPromptAnimator, newRulePromptAnimator, emoteListPromptAnimator;
+    public GameObject title, bg, mainMenu, optionsMenu, lobbyMenu, createLobbyPrompt, inLobbyMenu, creditsMenu, controlsMenu, privatePrompt, updateBox, newRulePrompt, emoteListPrompt, RNGRulesBox;
+    public Animator createLobbyPromptAnimator, privatePromptAnimator, updateBoxAnimator, errorBoxAnimator, rebindPromptAnimator, newRulePromptAnimator, emoteListPromptAnimator, RNGRulesBoxAnimator;
     public GameObject[] levelCameraPositions;
     public GameObject sliderText, lobbyText, currentMaxPlayers, settingsPanel, ruleTemplate, lblConditions;
     public TMP_Dropdown levelDropdown, characterDropdown;
     public RoomIcon selectedRoomIcon, privateJoinRoom;
     public Button joinRoomBtn, createRoomBtn, startGameBtn;
-    public Toggle ndsResolutionToggle, fullscreenToggle, livesEnabled, powerupsEnabled, timeEnabled, starsEnabled, coinsEnabled, drawTimeupToggle, fireballToggle, vsyncToggle, privateToggle, privateToggleRoom, aspectToggle, spectateToggle, scoreboardToggle, filterToggle, chainableActionsToggle;
+    public Toggle ndsResolutionToggle, fullscreenToggle, livesEnabled, powerupsEnabled, timeEnabled, starsEnabled, coinsEnabled, drawTimeupToggle, fireballToggle, vsyncToggle, privateToggle, privateToggleRoom, aspectToggle, spectateToggle, scoreboardToggle, filterToggle, chainableActionsToggle, RNGClear;
     public GameObject playersContent, playersPrefab, chatContent, chatPrefab;
     public TMP_InputField nicknameField, starsText, coinsText, livesField, timeField, lobbyJoinField, chatTextField;
-    public Slider musicSlider, sfxSlider, masterSlider, lobbyPlayersSlider, changePlayersSlider;
-    public GameObject mainMenuSelected, optionsSelected, lobbySelected, currentLobbySelected, createLobbySelected, creditsSelected, controlsSelected, privateSelected, reconnectSelected, updateBoxSelected, newRuleSelected, emoteListSelected;
+    public Slider musicSlider, sfxSlider, masterSlider, lobbyPlayersSlider, changePlayersSlider, RNGSlider;
+    public GameObject mainMenuSelected, optionsSelected, lobbySelected, currentLobbySelected, createLobbySelected, creditsSelected, controlsSelected, privateSelected, reconnectSelected, updateBoxSelected, newRuleSelected, emoteListSelected, RNGRulesSelected;
     public GameObject errorBox, errorButton, rebindPrompt, reconnectBox;
-    public TMP_Text errorText, errorDetail, rebindCountdown, rebindText, reconnectText, updateText;
+    public TMP_Text errorText, errorDetail, rebindCountdown, rebindText, reconnectText, updateText, RNGSliderText;
     public TMP_Dropdown region;
     public RebindManager rebindManager;
     public static string lastRegion;
@@ -96,6 +96,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         new KeyValuePair<string, string>("Frozen", "ActFreezePlayer"),
     };
     public List<MatchRuleListEntry> ruleList = new List<MatchRuleListEntry>();
+    static System.Random rng = new();
 
     // LOBBY CALLBACKS
     public void OnJoinedLobby() {
@@ -472,6 +473,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         rebindPromptAnimator = rebindPrompt.transform.Find("Image").GetComponent<Animator>();
         newRulePromptAnimator = newRulePrompt.transform.Find("Image").GetComponent<Animator>();
         emoteListPromptAnimator = emoteListPrompt.transform.Find("Image").GetComponent<Animator>();
+        RNGRulesBoxAnimator = RNGRulesBox.transform.Find("Image").GetComponent<Animator>();
 
         //Photon stuff.
         if (!PhotonNetwork.IsConnected) {
@@ -614,11 +616,6 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         }
     }
 
-    public void CloseNewRule()
-    {
-        newRulePrompt.SetActive(false);
-    }
-
     public void onAddMatchRuleExplicit(string cond, string act, bool updateNetRoom, bool updateUIList = true)
     {
         if (DISALLOWED_RULES.Contains(new KeyValuePair<string, string>(cond, act)))
@@ -661,7 +658,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
             .text;
 
         onAddMatchRuleExplicit(cond, act, true, false);
-        CloseNewRule();
+        newRulePrompt.SetActive(false);
     }
 
     public void onRemoveMatchRule(MatchRuleListEntry which)
@@ -805,6 +802,30 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         EventSystem.current.SetSelectedGameObject(emoteListSelected);
     }
 
+    public void GenRandomRules()
+    {
+        int howMany = (int)RNGSlider.value;
+        bool clearFirst = RNGClear.isOn;
+        
+        if (clearFirst)
+        {
+            foreach (var rule in ruleList)
+                Destroy(rule.gameObject);
+            ruleList.Clear();
+        }
+
+        for (int i = 0; i < howMany; i++)
+        {
+            onAddMatchRuleExplicit(POSSIBLE_CONDITIONS[rng.Next(POSSIBLE_CONDITIONS.Count)],
+                POSSIBLE_ACTIONS[rng.Next(POSSIBLE_ACTIONS.Count)], false);
+        }
+        
+        Hashtable table = new() {
+            [Enums.NetRoomProperties.MatchRules] = MatchRulesToDict()
+        };
+        PhotonNetwork.CurrentRoom.SetCustomProperties(table);
+        RNGRulesBox.SetActive(false);
+    }
     public void OpenNewRule()
     {
         newRulePrompt.SetActive(true);
@@ -812,6 +833,15 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
             newRulePromptAnimator.SetBool("open", newRulePrompt.activeSelf);
         
         EventSystem.current.SetSelectedGameObject(newRuleSelected);
+    }
+
+    public void OpenRNGRules()
+    {
+        RNGRulesBox.SetActive(true);
+        if (RNGRulesBoxAnimator != null)
+            RNGRulesBoxAnimator.SetBool("open", RNGRulesBox.activeSelf);
+        
+        EventSystem.current.SetSelectedGameObject(RNGRulesSelected);
     }
     public void OpenOptions() {
         title.SetActive(false);
@@ -1593,6 +1623,9 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
         PhotonNetwork.CurrentRoom.MaxPlayers = (byte) slider.value;
         PhotonNetwork.RaiseEvent((byte) Enums.NetEventIds.ChangeMaxPlayers, (byte) slider.value, NetworkUtils.EventAll, SendOptions.SendReliable);
+    }
+    public void SetNoRNGRules(Slider slider) {
+        RNGSliderText.GetComponent<TMP_Text>().text = slider.value.ToString();
     }
 
 
