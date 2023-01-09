@@ -12,6 +12,8 @@ Go to the repository's releases or use these shortcuts to the latest builds:
 
 - [**Windows**](https://github.com/vlcoo/VicMvsLO/releases/latest/download/vmci-win.zip)
 - [**Linux**](https://github.com/vlcoo/VicMvsLO/releases/latest/download/vmci-unix.zip)
+- [**MacOS**](https://github.com/vlcoo/VicMvsLO/releases/latest/download/vmci-macos.zip)
+- [**Play in browser**](https://vlco-o.itch.io/vics-custom-match-inator) (not recommended)
 
 ## Discord
 [**Join the discord**](https://discord.gg/dgKVaUKpj5) of the original game to keep up to date with its development, make feature suggestions, report bugs (if you're too lazy to use issues...), get technical support, look for people to play with, and just talk about the game!
