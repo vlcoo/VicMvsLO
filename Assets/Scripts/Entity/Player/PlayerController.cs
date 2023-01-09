@@ -1204,8 +1204,8 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
     }
     public void CollectBigStar(Vector2 particle, int starView, int newCount, PhotonMessageInfo? info, bool matchConditioned = false) {
         //only trust the master client
-        if (info is not null && !((PhotonMessageInfo)info).Sender.IsMasterClient)
-            return;
+        /*if (info is not null && !((PhotonMessageInfo)info).Sender.IsMasterClient)
+            return;*/ // i'm so sorry?
 
         //state
         if (newCount > stars)
@@ -1276,8 +1276,8 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
     
     protected void CollectCoin(int coinID, int newCount, Vector2 position, PhotonMessageInfo? info, bool matchConditioned = false) {
         //only trust the master client
-        if (info is not null && !((PhotonMessageInfo)info).Sender.IsLocal && !((PhotonMessageInfo)info).Sender.IsMasterClient)
-            return;
+        /*if (info is not null && !((PhotonMessageInfo)info).Sender.IsLocal && !((PhotonMessageInfo)info).Sender.IsMasterClient)
+            return;*/
 
         PhotonView coin = PhotonView.Find(coinID);
         if (coin) {

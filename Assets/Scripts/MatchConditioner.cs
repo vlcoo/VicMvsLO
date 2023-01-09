@@ -132,14 +132,14 @@ public class MatchConditioner : MonoBehaviour
         whom.SpawnCoinItemInstantly();
     }
 
-    public void ActSpawnEnemy(PlayerController whom)
+    public void NoActSpawnEnemy(PlayerController whom)
     {
         GameObject entity = Utils.GetRandomEnemy();
-        PhotonNetwork.Instantiate("Prefabs/Enemy/" + entity.name,
+        PhotonNetwork.InstantiateRoomObject("Prefabs/Enemy/" + entity.name,
             whom.transform.position +
             (!whom.facingRight
                 ? Vector3.right
-                : Vector3.left) + new Vector3(0, 0.2f, 0), Quaternion.identity);
+                : Vector3.left) + new Vector3(0, 0.2f, 0), Quaternion.identity, 0, new object[] {true});
     }
 
     public void ActRespawnLevel(PlayerController whom)
