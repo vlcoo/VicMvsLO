@@ -534,6 +534,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         
         newRulePrompt.transform.Find("Image/LblCondition/ConditionDropdown").GetComponent<TMP_Dropdown>().AddOptions(POSSIBLE_CONDITIONS);
         newRulePrompt.transform.Find("Image/LblAction/ActionDropdown").GetComponent<TMP_Dropdown>().AddOptions(POSSIBLE_ACTIONS);
+        characterDropdown.captionText.text = $"<sprite={characterDropdown.value + 3}>";
 
         GlobalController.Instance.DiscordController.UpdateActivity();
         EventSystem.current.SetSelectedGameObject(title);
@@ -812,6 +813,11 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
             newRulePromptAnimator.SetBool("open", newRulePrompt.activeSelf);
         
         EventSystem.current.SetSelectedGameObject(newRuleSelected);
+    }
+
+    public void OpenRNGRules()
+    {
+        
     }
     public void OpenOptions() {
         title.SetActive(false);
@@ -1380,7 +1386,10 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         sfx.PlayOneShot(Enums.Sounds.UI_WindowOpen.GetClip());
     }
 
-    public void SwapCharacter(TMP_Dropdown dropdown) {
+    public void SwapCharacter(TMP_Dropdown dropdown)
+    {
+        dropdown.captionText.text = $"<sprite={dropdown.value + 3}>";
+    
         Hashtable prop = new() {
             { Enums.NetPlayerProperties.Character, dropdown.value }
         };
