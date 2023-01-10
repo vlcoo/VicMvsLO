@@ -8,7 +8,7 @@ public class ScoreboardUpdater : MonoBehaviour {
     public static ScoreboardUpdater instance;
     private static IComparer<ScoreboardEntry> entryComparer;
 
-    [SerializeField] GameObject entryTemplate;
+    [SerializeField] GameObject entryTemplate, rulesListBox;
 
     private readonly List<ScoreboardEntry> entries = new();
     private bool manuallyToggled = false, autoToggled = false;
@@ -19,6 +19,7 @@ public class ScoreboardUpdater : MonoBehaviour {
     }
     public void OnDisable() {
         InputSystem.controls.UI.Scoreboard.performed -= OnToggle;
+        rulesListBox.transform.SetSiblingIndex(transform.childCount - 1);
     }
 
     private void OnToggle(InputAction.CallbackContext context) {
@@ -71,6 +72,8 @@ public class ScoreboardUpdater : MonoBehaviour {
     public void Reposition() {
         entries.Sort(entryComparer);
         entries.ForEach(se => se.transform.SetAsLastSibling());
+        
+        rulesListBox.transform.SetSiblingIndex(transform.childCount - 1);
     }
 
     public void Populate(IEnumerable<PlayerController> players) {

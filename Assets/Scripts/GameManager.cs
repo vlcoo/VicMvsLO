@@ -62,7 +62,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
     public bool paused, loaded, started;
     public GameObject pauseUI, pausePanel, pauseButton;
     public TMP_Text quitButtonLbl, rulesLbl;
-    public Animator pausePanel1Animator, pausePanel2Animator;
+    public Animator pausePanel1Animator;
     public bool gameover = false, musicEnabled = false;
     public readonly HashSet<Player> loadedPlayers = new();
     public int starRequirement, timedGameDuration = -1, coinRequirement;
@@ -863,7 +863,6 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         pausePanel.SetActive(true);
         
         pausePanel1Animator.SetBool("open", paused);
-        pausePanel2Animator.SetBool("open", paused);
         
         EventSystem.current.SetSelectedGameObject(pauseButton);
     }
