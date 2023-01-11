@@ -2692,6 +2692,9 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
     }
 
     void HandleFacingDirection() {
+        if (dead || !spawned)
+            return;
+        
         if (groundpound && !onGround)
             return;
 

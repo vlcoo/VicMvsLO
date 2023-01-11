@@ -604,7 +604,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         AudioMixer mixer = music.outputAudioMixerGroup.audioMixer;
         mixer.SetFloat("MusicSpeed", 1f);
         mixer.SetFloat("MusicPitch", 1f);
-
+        
         bool win = winner != null && winner.IsLocal;
         bool draw = winner == null;
         int secondsUntilMenu;
