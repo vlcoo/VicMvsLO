@@ -277,6 +277,9 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
     }
 
     public void OnDestroy() {
+        Debug.Log("gone");
+        Instantiate(Resources.Load("Prefabs/Particle/Puff"), transform.position, Quaternion.identity);
+        
         if (!photonView.IsMine)
             return;
 
