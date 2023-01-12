@@ -836,6 +836,8 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
     public void OpenNewRuleS1()
     {
+        newRuleS1Prompt.transform.Find("Image/Scroll View/Scrollbar Vertical").GetComponent<Scrollbar>().value = 0;
+        
         newRuleS1Prompt.SetActive(true);
         if (newRuleS1PromptAnimator != null)
             newRuleS1PromptAnimator.SetBool("open", newRuleS1Prompt.activeSelf);
