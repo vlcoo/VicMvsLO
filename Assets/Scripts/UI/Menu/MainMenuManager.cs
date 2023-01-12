@@ -32,8 +32,8 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     public GameObject lobbiesContent, lobbyPrefab;
     bool quit, validName;
     public GameObject connecting;
-    public GameObject title, bg, mainMenu, optionsMenu, lobbyMenu, createLobbyPrompt, inLobbyMenu, creditsMenu, controlsMenu, privatePrompt, updateBox, newRulePrompt, emoteListPrompt, RNGRulesBox;
-    public Animator createLobbyPromptAnimator, privatePromptAnimator, updateBoxAnimator, errorBoxAnimator, rebindPromptAnimator, newRulePromptAnimator, emoteListPromptAnimator, RNGRulesBoxAnimator;
+    public GameObject title, bg, mainMenu, optionsMenu, lobbyMenu, createLobbyPrompt, inLobbyMenu, creditsMenu, controlsMenu, privatePrompt, updateBox, newRuleS1Prompt, newRuleS2Prompt, emoteListPrompt, RNGRulesBox;
+    public Animator createLobbyPromptAnimator, privatePromptAnimator, updateBoxAnimator, errorBoxAnimator, rebindPromptAnimator, newRuleS1PromptAnimator, newRuleS2PromptAnimator, emoteListPromptAnimator, RNGRulesBoxAnimator;
     public GameObject[] levelCameraPositions;
     public GameObject sliderText, lobbyText, currentMaxPlayers, settingsPanel, ruleTemplate, lblConditions;
     public TMP_Dropdown levelDropdown, characterDropdown;
@@ -43,7 +43,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     public GameObject playersContent, playersPrefab, chatContent, chatPrefab;
     public TMP_InputField nicknameField, starsText, coinsText, livesField, timeField, lobbyJoinField, chatTextField;
     public Slider musicSlider, sfxSlider, masterSlider, lobbyPlayersSlider, changePlayersSlider, RNGSlider;
-    public GameObject mainMenuSelected, optionsSelected, lobbySelected, currentLobbySelected, createLobbySelected, creditsSelected, controlsSelected, privateSelected, reconnectSelected, updateBoxSelected, newRuleSelected, emoteListSelected, RNGRulesSelected;
+    public GameObject mainMenuSelected, optionsSelected, lobbySelected, currentLobbySelected, createLobbySelected, creditsSelected, controlsSelected, privateSelected, reconnectSelected, updateBoxSelected, newRuleS1Selected, newRuleS2Selected, emoteListSelected, RNGRulesSelected;
     public GameObject errorBox, errorButton, rebindPrompt, reconnectBox;
     public TMP_Text errorText, errorDetail, rebindCountdown, rebindText, reconnectText, updateText, RNGSliderText;
     public TMP_Dropdown region;
@@ -96,6 +96,9 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         new KeyValuePair<string, string>("Frozen", "ActFreezePlayer"),
     };
     public List<MatchRuleListEntry> ruleList = new List<MatchRuleListEntry>();
+    private string aboutToAddCond = "";
+    private string aboutToAddAct = "";
+    
     static System.Random rng = new();
 
     // LOBBY CALLBACKS
@@ -471,7 +474,8 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         updateBoxAnimator = updateBox.transform.Find("Image").GetComponent<Animator>();
         errorBoxAnimator = errorBox.transform.Find("Image").GetComponent<Animator>();
         rebindPromptAnimator = rebindPrompt.transform.Find("Image").GetComponent<Animator>();
-        newRulePromptAnimator = newRulePrompt.transform.Find("Image").GetComponent<Animator>();
+        newRuleS1PromptAnimator = newRuleS1Prompt.transform.Find("Image").GetComponent<Animator>();
+        newRuleS2PromptAnimator = newRuleS2Prompt.transform.Find("Image").GetComponent<Animator>();
         emoteListPromptAnimator = emoteListPrompt.transform.Find("Image").GetComponent<Animator>();
         RNGRulesBoxAnimator = RNGRulesBox.transform.Find("Image").GetComponent<Animator>();
 
@@ -533,9 +537,6 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         foreach (var method in Type.GetType("MatchConditioner").GetMethods())
             if (method.Name.StartsWith("Act"))
                 POSSIBLE_ACTIONS.Add(method.Name);
-        
-        newRulePrompt.transform.Find("Image/LblCondition/ConditionDropdown").GetComponent<TMP_Dropdown>().AddOptions(POSSIBLE_CONDITIONS);
-        newRulePrompt.transform.Find("Image/LblAction/ActionDropdown").GetComponent<TMP_Dropdown>().AddOptions(POSSIBLE_ACTIONS);
 
         GlobalController.Instance.DiscordController.UpdateActivity();
         EventSystem.current.SetSelectedGameObject(title);
@@ -651,14 +652,12 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
     public void onAddMatchRule()
     {
-        // ugh
-        string cond = newRulePrompt.transform.Find("Image/LblCondition/ConditionDropdown/LabelCond")
-            .GetComponent<TMP_Text>().text;
-        string act = newRulePrompt.transform.Find("Image/LblAction/ActionDropdown/LabelAct").GetComponent<TMP_Text>()
-            .text;
-
-        onAddMatchRuleExplicit(cond, act, true, false);
-        newRulePrompt.SetActive(false);
+        if (!POSSIBLE_CONDITIONS.Contains(aboutToAddCond) || !POSSIBLE_ACTIONS.Contains(aboutToAddAct))
+            return;
+        
+        onAddMatchRuleExplicit(aboutToAddCond, aboutToAddAct, true, false);
+        aboutToAddCond = "";
+        aboutToAddAct = "";
     }
 
     public void onRemoveMatchRule(MatchRuleListEntry which)
@@ -826,13 +825,43 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         PhotonNetwork.CurrentRoom.SetCustomProperties(table);
         RNGRulesBox.SetActive(false);
     }
-    public void OpenNewRule()
+    /*public void OpenNewRule()
     {
         newRulePrompt.SetActive(true);
         if (newRulePromptAnimator != null)
             newRulePromptAnimator.SetBool("open", newRulePrompt.activeSelf);
         
         EventSystem.current.SetSelectedGameObject(newRuleSelected);
+    }*/
+
+    public void OpenNewRuleS1()
+    {
+        newRuleS1Prompt.SetActive(true);
+        if (newRuleS1PromptAnimator != null)
+            newRuleS1PromptAnimator.SetBool("open", newRuleS1Prompt.activeSelf);
+        
+        EventSystem.current.SetSelectedGameObject(newRuleS1Selected);
+    }
+
+    public void OpenNewRuleS2(string condition)
+    {
+        newRuleS1Prompt.SetActive(false);
+        
+        aboutToAddCond = condition;
+        newRuleS2Prompt.SetActive(true);
+        if (newRuleS2PromptAnimator != null)
+            newRuleS2PromptAnimator.SetBool("open", newRuleS2Prompt.activeSelf);
+        
+        EventSystem.current.SetSelectedGameObject(newRuleS2Selected);
+        newRuleS2Prompt.transform.Find("Image/LblExplain").GetComponent<TMP_Text>().text =
+            $"What will happen when \"{condition}\" gets triggered?";
+    }
+
+    public void CloseNewRuleS2(string action)
+    {
+        newRuleS2Prompt.SetActive(false);
+        aboutToAddAct = action;
+        onAddMatchRule();
     }
 
     public void OpenRNGRules()
