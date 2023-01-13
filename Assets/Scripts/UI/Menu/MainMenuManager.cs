@@ -836,12 +836,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
     public void OpenNewRuleS1()
     {
-        newRuleS1Prompt.transform.Find("Image/Scroll View/Scrollbar Vertical").GetComponent<Scrollbar>().value = 0;
-        
         newRuleS1Prompt.SetActive(true);
-        if (newRuleS1PromptAnimator != null)
-            newRuleS1PromptAnimator.SetBool("open", newRuleS1Prompt.activeSelf);
-        
         EventSystem.current.SetSelectedGameObject(newRuleS1Selected);
     }
 
@@ -851,8 +846,6 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         
         aboutToAddCond = condition;
         newRuleS2Prompt.SetActive(true);
-        if (newRuleS2PromptAnimator != null)
-            newRuleS2PromptAnimator.SetBool("open", newRuleS2Prompt.activeSelf);
         
         EventSystem.current.SetSelectedGameObject(newRuleS2Selected);
         newRuleS2Prompt.transform.Find("Image/LblExplain").GetComponent<TMP_Text>().text =

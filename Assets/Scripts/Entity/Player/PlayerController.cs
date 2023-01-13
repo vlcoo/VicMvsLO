@@ -1212,7 +1212,14 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
 
         //state
         if (newCount > stars)
-            PlaySoundEverywhere(photonView.IsMine ? Enums.Sounds.World_Star_Collect_Self : Enums.Sounds.World_Star_Collect_Enemy);
+        {
+            PlaySoundEverywhere(photonView.IsMine
+                ? Enums.Sounds.World_Star_Collect_Self
+                : Enums.Sounds.World_Star_Collect_Enemy);
+            if (!matchConditioned)
+                GameManager.Instance.MatchConditioner.ConditionActioned(this, "GotStar");
+        }
+
         stars = Mathf.Clamp(newCount, 0, GameManager.Instance.starRequirement);
         UpdateGameState();
 
@@ -1235,8 +1242,6 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
                 Destroy(star.gameObject);
             }
         }
-        if (!matchConditioned)
-            GameManager.Instance.MatchConditioner.ConditionActioned(this, "GotStar");
     }
 
     [PunRPC]
@@ -1295,7 +1300,12 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         Instantiate(Resources.Load("Prefabs/Particle/CoinCollect"), position, Quaternion.identity);
 
         if (newCount > coins)
+        {
             PlaySound(Enums.Sounds.World_Coin_Collect);
+            if (!matchConditioned)
+                GameManager.Instance.MatchConditioner.ConditionActioned(this, "GotCoin");
+        }
+
         coins = Mathf.Max(0, newCount);
 
         if (GameManager.Instance.coinRequirement >= 0)
@@ -1317,8 +1327,6 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         }
         
         UpdateGameState();
-        if (!matchConditioned)
-            GameManager.Instance.MatchConditioner.ConditionActioned(this, "GotCoin");
     }
 
     [PunRPC]
