@@ -9,9 +9,7 @@ public class HorizontalCamera : MonoBehaviour {
     private Camera ourCamera;
     
     public bool renderToTextureIfAvailable = true;
-    private static float orthoSize = 1f;
-    private float lerpCameraSize = 0;
-    private int lerpTimer = 0;
+    private static float orthoSize = 3.5f;
 
     void Start() {
         ourCamera = GetComponent<Camera>();
@@ -20,13 +18,6 @@ public class HorizontalCamera : MonoBehaviour {
      
     private void Update()
     {
-        lerpTimer++;
-        if (lerpTimer > 300 && lerpTimer < 420)
-        {
-            lerpCameraSize += 0.0083f;
-            orthoSize = Mathf.Lerp(1f, 3.5f, lerpCameraSize);
-        }
-        
         OFFSET = Mathf.SmoothDamp(OFFSET, OFFSET_TARGET, ref OFFSET_VELOCITY, 1f);
         AdjustCamera();
         ourCamera.targetTexture = renderToTextureIfAvailable && Settings.Instance.ndsResolution && SceneManager.GetActiveScene().buildIndex != 0 
