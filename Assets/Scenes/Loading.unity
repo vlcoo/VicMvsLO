@@ -1304,8 +1304,7 @@ MonoBehaviour:
   m_text: Ready?
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: d42c556520644b148ada62f0b573e1a5, type: 2}
-  m_sharedMaterial: {fileID: 6015020410494396785, guid: d42c556520644b148ada62f0b573e1a5,
-    type: 2}
+  m_sharedMaterial: {fileID: 2100000, guid: 8615ffc530d32d743ad868fa924bcb71, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -1320,7 +1319,8 @@ MonoBehaviour:
     topRight: {r: 1, g: 0.11682311, b: 0, a: 1}
     bottomLeft: {r: 1, g: 0.9598201, b: 0, a: 1}
     bottomRight: {r: 1, g: 0.9598201, b: 0, a: 1}
-  m_fontColorGradientPreset: {fileID: 0}
+  m_fontColorGradientPreset: {fileID: 11400000, guid: 7a9b2eb59e61badb8acd3361ec623af7,
+    type: 2}
   m_spriteAsset: {fileID: 0}
   m_tintAllSprites: 0
   m_StyleSheet: {fileID: 0}
@@ -1668,8 +1668,8 @@ MonoBehaviour:
   playerList: {fileID: 2101240301}
   highPingAlert: {fileID: 1508836660}
   emptyText: Loading...
-  iveLoadedText: Waiting for others...
-  readyToStartText: Starting...
+  iveLoadedText: Wait...
+  readyToStartText: OK!
   spectatorText: Joining as Spectator...
 --- !u!1 &1815946838
 GameObject:
@@ -1799,6 +1799,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dbeccd0bed4d67e4f8ad1c997834fd47, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  readyText: {fileID: 1250749736}
+  gradientLuigiText: {fileID: 11400000, guid: 016a6bbde20c0e2c39680ce8085a9fc8, type: 2}
 --- !u!1 &2101240299
 GameObject:
   m_ObjectHideFlags: 0

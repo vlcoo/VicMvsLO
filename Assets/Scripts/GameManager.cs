@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -15,6 +16,7 @@ using Photon.Realtime;
 using ExitGames.Client.Photon;
 using NSMB.Utils;
 using Hashtable = ExitGames.Client.Photon.Hashtable;
+using Random = UnityEngine.Random;
 
 public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IConnectionCallbacks, IMatchmakingCallbacks {
 
@@ -52,6 +54,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
 
     public Canvas nametagCanvas;
     public GameObject nametagPrefab;
+    public TMP_ColorGradient gradientLuigiText;
 
     //Audio
     public AudioSource music, sfx;
@@ -617,6 +620,8 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         else if (win) {
             music.PlayOneShot(Enums.Sounds.UI_Match_Win.GetClip());
             text.GetComponent<Animator>().SetTrigger("start");
+            if ((int)winner.CustomProperties[Enums.NetPlayerProperties.Character] == 1)
+                text.GetComponent<TMP_Text>().colorGradientPreset = gradientLuigiText;
         }
         else {
             music.PlayOneShot(Enums.Sounds.UI_Match_Lose.GetClip());
