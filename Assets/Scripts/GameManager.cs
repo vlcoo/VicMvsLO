@@ -54,6 +54,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
 
     public Canvas nametagCanvas;
     public GameObject nametagPrefab;
+    public TMP_ColorGradient gradientMarioText;
     public TMP_ColorGradient gradientLuigiText;
 
     //Audio
@@ -622,6 +623,8 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             text.GetComponent<Animator>().SetTrigger("start");
             if ((int)winner.CustomProperties[Enums.NetPlayerProperties.Character] == 1)
                 text.GetComponent<TMP_Text>().colorGradientPreset = gradientLuigiText;
+            else
+                text.GetComponent<TMP_Text>().colorGradientPreset = gradientMarioText;
         }
         else {
             music.PlayOneShot(Enums.Sounds.UI_Match_Lose.GetClip());
