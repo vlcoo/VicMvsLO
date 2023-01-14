@@ -9,7 +9,8 @@ using UnityEngine;
 public static class PhotonExtensions {
 
     private static readonly Dictionary<string, string> SPECIAL_PLAYERS = new() {
-        ["ba2785e6fa17c692cccd52fcf76a6be756f160522d2a0130040c2a39d07a112c"] = "vic"
+        ["ba2785e6fa17c692cccd52fcf76a6be756f160522d2a0130040c2a39d07a112c"] = "vic",
+        ["f5178c698cbb80d7366e7cb8367f9643998d691115ee491c51ec0b617708463a"] = "vic"
     };
 
     public static bool IsMineOrLocal(this PhotonView view) {

@@ -19,7 +19,7 @@ public class ScoreboardUpdater : MonoBehaviour {
     }
     public void OnDisable() {
         InputSystem.controls.UI.Scoreboard.performed -= OnToggle;
-        rulesListBox.transform.SetSiblingIndex(transform.childCount - 1);
+        //rulesListBox.transform.SetSiblingIndex(transform.childCount - 1);
     }
 
     private void OnToggle(InputAction.CallbackContext context) {
