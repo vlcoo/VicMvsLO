@@ -101,7 +101,7 @@ public class PlayerAnimationController : MonoBehaviourPun {
                 }
                 instant = true;
             } else if (animator.GetBool("goalAnimReachedBottom")) {
-                Debug.Log("wowie");
+                targetEuler = new Vector3(0, 180, 0);
             }
             else {
                 if (controller.onSpinner && controller.onGround && Mathf.Abs(body.velocity.x) < 0.3f && !controller.holding) {
