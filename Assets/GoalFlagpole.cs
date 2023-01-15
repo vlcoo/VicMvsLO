@@ -27,6 +27,7 @@ public class GoalFlagpole : MonoBehaviour
     {
         PlayerController player = col.gameObject.GetComponent<PlayerController>();
         if (player is null) return;
+        
         GameManager.Instance.WinByGoal(player);
     }
 }

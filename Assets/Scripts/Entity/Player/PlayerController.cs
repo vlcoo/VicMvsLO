@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
@@ -11,6 +12,7 @@ using ExitGames.Client.Photon;
 using NSMB.Utils;
 using Photon.Realtime;
 using Hashtable = ExitGames.Client.Photon.Hashtable;
+using Random = UnityEngine.Random;
 
 public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSerializeView, IOnPhotonViewPreNetDestroy {
 
@@ -445,6 +447,12 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
                 onIce = propTile.iceSkidding;
             }
         }
+    }
+
+    public void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.gameObject.CompareTag("goalBottom"))
+            goalReachedBottom = true;
     }
 
     private ContactPoint2D[] contacts = new ContactPoint2D[0];
@@ -1459,7 +1467,22 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         propeller = false;
         drill = false;
         flying = false;
-        animator.Play("deadstart");
+        animator.SetTrigger("winByGoal");
+        StartCoroutine(nameof(GoalAnimReachBottom));
+    }
+
+    public bool goalReachedBottom = false;
+    private IEnumerator GoalAnimReachBottom()
+    {
+        yield return new WaitForSeconds(3);
+        while (!goalReachedBottom)
+        {
+            transform.position -= new Vector3(0, 0.01f, 0);
+            yield return null;
+        }
+
+        animator.SetBool("goalAnimReachedBottom", true);
+        yield return 0;
     }
 
     [PunRPC]
