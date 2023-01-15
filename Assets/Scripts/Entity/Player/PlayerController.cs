@@ -449,12 +449,6 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         }
     }
 
-    public void OnCollisionEnter2D(Collision2D collision)
-    {
-        if (collision.gameObject.CompareTag("goalBottom"))
-            goalReachedBottom = true;
-    }
-
     private ContactPoint2D[] contacts = new ContactPoint2D[0];
     public void OnCollisionStay2D(Collision2D collision) {
         if (!photonView.IsMine || (knockback && !fireballKnockback) || Frozen)
@@ -1457,9 +1451,11 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             GameManager.Instance.MatchConditioner.ConditionActioned(this, "Disqualified");
     }
 
+    public bool goalReachedBottom;
     [PunRPC]
     public void WinByGoal()
     {
+        goalReachedBottom = false;
         spawned = false;
         body.gravityScale = 0;
         body.velocity = Vector2.zero;
@@ -1471,17 +1467,22 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         StartCoroutine(nameof(GoalAnimReachBottom));
     }
 
-    public bool goalReachedBottom = false;
     private IEnumerator GoalAnimReachBottom()
     {
-        yield return new WaitForSeconds(3);
+        yield return new WaitForSeconds(2);
         while (!goalReachedBottom)
         {
-            transform.position -= new Vector3(0, 0.01f, 0);
+            transform.position -= new Vector3(0, 0.02f, 0);
             yield return null;
         }
 
+        yield return new WaitForSeconds(0.6f);
         animator.SetBool("goalAnimReachedBottom", true);
+        PlaySoundEverywhere(Enums.Sounds.Player_Voice_GoalCeleb);
+        
+        yield return new WaitForSeconds(2);
+        PhotonNetwork.RaiseEvent((byte) Enums.NetEventIds.EndGame, photonView.Owner, NetworkUtils.EventAll, SendOptions.SendReliable);
+        
         yield return 0;
     }
 

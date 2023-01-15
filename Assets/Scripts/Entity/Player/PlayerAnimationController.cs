@@ -100,7 +100,10 @@ public class PlayerAnimationController : MonoBehaviourPun {
                     targetEuler = new Vector3(0, 110, 0);
                 }
                 instant = true;
-            } else {
+            } else if (animator.GetBool("goalAnimReachedBottom")) {
+                Debug.Log("wowie");
+            }
+            else {
                 if (controller.onSpinner && controller.onGround && Mathf.Abs(body.velocity.x) < 0.3f && !controller.holding) {
                     targetEuler += new Vector3(0, -1800, 0) * Time.deltaTime;
                     instant = true;

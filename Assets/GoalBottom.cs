@@ -1,9 +1,8 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GoalFlagpole : MonoBehaviour
+public class GoalBottom : MonoBehaviour
 {
     // Start is called before the first frame update
     void Start()
@@ -16,12 +15,12 @@ public class GoalFlagpole : MonoBehaviour
     {
         
     }
-
+    
     private void OnTriggerEnter2D(Collider2D col)
     {
         PlayerController player = col.gameObject.GetComponent<PlayerController>();
         if (player is null) return;
-        
-        GameManager.Instance.WinByGoal(player);
+
+        player.goalReachedBottom = true;
     }
 }

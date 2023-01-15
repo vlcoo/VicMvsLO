@@ -45,7 +45,7 @@ public static class Enums {
     //Sound effects
     public enum Sounds : byte {
 
-        //CURRENT MAX: 95
+        //CURRENT MAX: 97
 
         //Enemy
         [SoundData("enemy/freeze")]                             Enemy_Generic_Freeze = 0,
@@ -97,6 +97,7 @@ public static class Enums {
         [SoundData("character/{char}/triplejump")]              Player_Voice_TripleJump = 38,
         [SoundData("character/{char}/walljump")]                Player_Voice_WallJump = 39,
         [SoundData("character/{char}/mega_mushroom_collect")]   Player_Sound_MegaMushroom_Collect = 40, //HARDCODED: DO NOT CHANGE WITHOUT CHANGING POWERUPS SCRIPTABLES
+        [SoundData("character/{char}/goal_celeb")]                Player_Voice_GoalCeleb = 97,
 
         //Powerup
         [SoundData("powerup/1-up")]                             Powerup_Sound_1UP = 78, //HARDCODED: DO NOT CHANGE WITHOUT CHANGING POWERUPS SCRIPTABLES
@@ -140,6 +141,7 @@ public static class Enums {
         [SoundData("ui/countdown0")]                            UI_Countdown_0 = 88,
         [SoundData("ui/countdown1")]                            UI_Countdown_1 = 89,
         [SoundData("ui/countdown_long")]                        UI_Countdown_Long = 95,
+        [SoundData("ui/match_goal")]                            UI_Match_Goal = 96,
 
         //World Elements
         [SoundData("world/block_break")]                        World_Block_Break = 67,

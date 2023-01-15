@@ -730,6 +730,8 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
 
     public void WinByGoal(PlayerController whom)
     {
+        sfx.PlayOneShot(Enums.Sounds.UI_Match_Goal.GetClip());
+        
         foreach (var player in players)
         {
             if (player == whom) continue;
