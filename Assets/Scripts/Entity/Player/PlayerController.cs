@@ -1469,7 +1469,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
 
     private IEnumerator GoalAnimReachBottom()
     {
-        yield return new WaitForSeconds(2);
+        yield return new WaitForSeconds(1);
         while (!goalReachedBottom)
         {
             transform.position -= new Vector3(0, 0.03f, 0);
@@ -1480,7 +1480,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         animator.SetBool("goalAnimReachedBottom", true);
         PlaySoundEverywhere(Enums.Sounds.Player_Voice_GoalCeleb);
         
-        yield return new WaitForSeconds(1.5f);
+        yield return new WaitForSeconds(1);
         PhotonNetwork.RaiseEvent((byte) Enums.NetEventIds.EndGame, photonView.Owner, NetworkUtils.EventAll, SendOptions.SendReliable);
         
         yield return 0;
