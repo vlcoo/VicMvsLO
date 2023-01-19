@@ -10,9 +10,9 @@ Apart from that, the defining features of the original remake remain!
 
 Go to the repository's releases or use these shortcuts to the latest builds:
 
-- [**Windows**](https://github.com/vlcoo/VicMvsLO/releases/latest/download/vmci-win.zip)
-- [**Linux**](https://github.com/vlcoo/VicMvsLO/releases/latest/download/vmci-unix.zip)
-- [**MacOS**](https://github.com/vlcoo/VicMvsLO/releases/latest/download/vmci-macos.zip)
+- [**Windows**](https://github.com/vlcoo/VicMvsLO/releases/latest/download/win64.zip)
+- [**Linux**](https://github.com/vlcoo/VicMvsLO/releases/latest/download/linux.zip)
+- [**MacOS**](https://github.com/vlcoo/VicMvsLO/releases/latest/download/macos.zip)
 - [**Play in browser**](https://vlco-o.itch.io/vics-custom-match-inator) (not recommended)
 
 ## Discord
