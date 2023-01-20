@@ -25,7 +25,7 @@ public class LoadingWaitingOn : MonoBehaviour {
     public void Update() {
         if (!GameManager.Instance)
             return;
-
+        
         if (GlobalController.Instance.joinedAsSpectator) {
             text.text = spectatorText;
             return;
