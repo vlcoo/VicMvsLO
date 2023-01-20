@@ -42,6 +42,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
     public bool loopingLevel = true;
     public bool raceLevel = false;
     public Vector3 spawnpoint;
+    public Vector3 checkpoint;
     public Tilemap tilemap;
     [ColorUsage(false)] public Color levelUIColor = new(24, 178, 170);
     public bool spawnBigPowerups = true, spawnVerticalPowerups = true;
@@ -963,6 +964,9 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             Gizmos.color = new Color((float) i / playersToVisualize, 0, 0, 0.75f);
             Gizmos.DrawCube(GetSpawnpoint(i, playersToVisualize) + Vector3.down/4f, Vector2.one/2f);
         }
+
+        Gizmos.color = Color.green;
+        Gizmos.DrawCube(checkpoint, Vector2.one/2f);
 
         Vector3 size = new(levelWidthTile/2f, levelHeightTile/2f);
         Vector3 origin = new(GetLevelMinX() + (levelWidthTile/4f), GetLevelMinY() + (levelHeightTile/4f), 1);

@@ -47,7 +47,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
 
     public PlayerAnimationController AnimationController { get; private set; }
 
-    public bool onGround, previousOnGround, crushGround, doGroundSnap, jumping, properJump, hitRoof, skidding, turnaround, facingRight = true, singlejump, doublejump, triplejump, bounce, crouching, groundpound, groundpoundLastFrame, sliding, knockback, hitBlock, running, functionallyRunning, jumpHeld, flying, drill, inShell, hitLeft, hitRight, stuckInBlock, alreadyStuckInBlock, propeller, usedPropellerThisJump, stationaryGiantEnd, fireballKnockback, startedSliding, canShootProjectile;
+    public bool onGround, previousOnGround, crushGround, doGroundSnap, jumping, properJump, hitRoof, skidding, turnaround, facingRight = true, singlejump, doublejump, triplejump, bounce, crouching, groundpound, groundpoundLastFrame, sliding, knockback, hitBlock, running, functionallyRunning, jumpHeld, flying, drill, inShell, hitLeft, hitRight, stuckInBlock, alreadyStuckInBlock, propeller, usedPropellerThisJump, stationaryGiantEnd, fireballKnockback, startedSliding, canShootProjectile, gotCheckpoint;
     public float jumpLandingTimer, landing, koyoteTime, groundpoundCounter, groundpoundStartTimer, pickupTimer, groundpoundDelay, hitInvincibilityCounter, powerupFlash, throwInvincibility, jumpBuffer, giantStartTimer, giantEndTimer, propellerTimer, propellerSpinTimer, fireballTimer;
     public float invincible, giantTimer, floorAngle, knockbackTimer, pipeTimer, slowdownTimer;
 
@@ -1450,11 +1450,13 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             GameManager.Instance.MatchConditioner.ConditionActioned(this, "Disqualified");
     }
 
-    public bool goalReachedBottom;
+    public bool goalReachedBottom = false;
     [PunRPC]
     public void WinByGoal()
     {
-        goalReachedBottom = false;
+        if (!photonView.IsMine)
+            return;
+        
         spawned = false;
         body.gravityScale = 0;
         body.velocity = Vector2.zero;
@@ -1568,7 +1570,8 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             return;
         }
         transform.localScale = Vector2.one;
-        transform.position = body.position = GameManager.Instance.GetSpawnpoint(playerId);
+        transform.position = body.position =
+            gotCheckpoint ? GameManager.Instance.checkpoint : GameManager.Instance.GetSpawnpoint(playerId);
         dead = false;
         previousState = state = Enums.PowerupState.Small;
         AnimationController.DisableAllModels();
