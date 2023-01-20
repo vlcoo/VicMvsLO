@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 7483127007505898637}
   - component: {fileID: 5705559525082224657}
   - component: {fileID: 4344770169348067693}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Tilemap
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -641,21 +641,21 @@ CompositeCollider2D:
         Y: -55000000
   - m_Collider: {fileID: 5705559525082224657}
     m_ColliderPaths:
-    - - X: -10000000
+    - - X: 25000000
+        Y: 10000000
+      - X: 25000000
+        Y: 30000000
+      - X: -15000000
+        Y: 30000000
+      - X: -15000000
+        Y: 10000000
+      - X: -10000000
         Y: 10000000
       - X: -10000000
         Y: 25000000
       - X: 20000000
         Y: 25000000
       - X: 20000000
-        Y: 10000000
-      - X: 25000000
-        Y: 10000000
-      - X: 25000000
-        Y: 30000000
-      - X: -15000000
-        Y: 30000000
-      - X: -15000000
         Y: 10000000
   m_CompositePaths:
     m_Paths:
@@ -720,7 +720,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5274336083223388513}
   - component: {fileID: 1440633144293087890}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Grid
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -765,7 +765,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5807886754815500834}
   - component: {fileID: 8433585695202144634}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: StartingWall
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -800,4 +800,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e9e253e08ee5f017699f9299a9eee83b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  startDelay: 3
+  startDelay: 9

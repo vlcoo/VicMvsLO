@@ -9,7 +9,7 @@ public class PiranhaPlantController : KillableEntity {
     [SerializeField] private float popupTimerRequirement = 6f;
 
     private float popupTimer;
-    private bool upsideDown;
+    public bool upsideDown;
 
     public new void Start() {
         base.Start();
@@ -30,7 +30,7 @@ public class PiranhaPlantController : KillableEntity {
 
         left = false;
 
-        if (!dead && photonView && photonView.IsMine && Utils.GetTileAtWorldLocation(transform.position + (Vector3.down * 0.1f)) == null) {
+        if (!dead && photonView && photonView.IsMine && Utils.GetTileAtWorldLocation(transform.position + (upsideDown ? Vector3.up : Vector3.down * 0.1f)) == null) {
             photonView.RPC("Kill", RpcTarget.All);
             return;
         }
