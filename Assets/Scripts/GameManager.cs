@@ -658,7 +658,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             yield break;
 
         bigwhile:
-        while (remainingSpawns.Count > 0) {
+        while (starSpawns.Length > 0) {
             if (remainingSpawns.Count <= 0)
                 remainingSpawns.AddRange(starSpawns);
 
