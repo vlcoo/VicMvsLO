@@ -658,7 +658,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             yield break;
 
         bigwhile:
-        while (true) {
+        while (remainingSpawns.Count > 0) {
             if (remainingSpawns.Count <= 0)
                 remainingSpawns.AddRange(starSpawns);
 
@@ -737,7 +737,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         foreach (var player in players)
         {
             if (player == whom) continue;
-            player.photonView.RPC(nameof(player.Disqualify), RpcTarget.All);
+            player.Disqualify();
         }
 
         whom.WinByGoal();

@@ -1454,9 +1454,6 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
     [PunRPC]
     public void WinByGoal()
     {
-        if (!photonView.IsMine)
-            return;
-        
         spawned = false;
         body.gravityScale = 0;
         body.velocity = Vector2.zero;
