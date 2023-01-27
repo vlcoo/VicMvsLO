@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using ExitGames.Client.Photon;
 using UnityEngine;
 
 public class Checkpoin : MonoBehaviour
@@ -27,5 +28,6 @@ public class Checkpoin : MonoBehaviour
         player.gotCheckpoint = true;
         animation.Play();
         GameManager.Instance.sfx.PlayOneShot(Enums.Sounds.World_Checkpoint.GetClip());
+        GameManager.Instance.SendAndExecuteEvent(Enums.NetEventIds.ResetTiles, null, SendOptions.SendReliable);
     }
 }
