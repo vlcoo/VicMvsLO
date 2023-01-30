@@ -1467,18 +1467,18 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
 
     private IEnumerator GoalAnimReachBottom()
     {
-        yield return new WaitForSeconds(1);
+        yield return new WaitForSecondsRealtime(1);
         while (!goalReachedBottom)
         {
             transform.position -= new Vector3(0, 0.03f, 0);
             yield return null;
         }
 
-        yield return new WaitForSeconds(0.6f);
+        yield return new WaitForSecondsRealtime(0.6f);
         animator.SetBool("goalAnimReachedBottom", true);
         PlaySoundEverywhere(Enums.Sounds.Player_Voice_GoalCeleb);
         
-        yield return new WaitForSeconds(1);
+        yield return new WaitForSecondsRealtime(1);
         PhotonNetwork.RaiseEvent((byte) Enums.NetEventIds.EndGame, photonView.Owner, NetworkUtils.EventAll, SendOptions.SendReliable);
         
         yield return 0;
@@ -1636,6 +1636,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
 
         UpdateGameState();
         StartCoroutine(WaitBeforeSpawnedCondition());
+        GameManager.Instance.SetStartSpeedrunTimer(this);
     }
 
     IEnumerator WaitBeforeSpawnedCondition()

@@ -36,6 +36,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
 
     public MusicData mainMusic, invincibleMusic, megaMushroomMusic;
     public MatchConditioner MatchConditioner { get; private set; }
+    private long speedrunTimerStartTimestamp = 0;
 
     public int levelMinTileX, levelMinTileY, levelWidthTile, levelHeightTile;
     public float cameraMinY, cameraHeightY, cameraMinX = -1000, cameraMaxX = 1000;
@@ -67,7 +68,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
     public GameObject localPlayer;
     public bool paused, loaded, started;
     public GameObject pauseUI, pausePanel, pauseButton;
-    public TMP_Text quitButtonLbl, rulesLbl;
+    public TMP_Text quitButtonLbl, rulesLbl, speedrunTimer;
     public Animator pausePanel1Animator;
     public bool gameover = false, musicEnabled = false;
     public readonly HashSet<Player> loadedPlayers = new();
@@ -598,6 +599,14 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         }
     }
 
+    public void SetStartSpeedrunTimer(PlayerController byWhom)
+    {
+        if (!byWhom.photonView.IsMine || speedrunTimerStartTimestamp > 0)
+            return;
+
+        speedrunTimerStartTimestamp = DateTimeOffset.Now.ToUnixTimeMilliseconds();
+    }
+
     private IEnumerator EndGame(Player winner) {
         gameover = true;
         PhotonNetwork.CurrentRoom.SetCustomProperties(new() { [Enums.NetRoomProperties.GameStarted] = false });
@@ -622,6 +631,15 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         }
         else if (win) {
             music.PlayOneShot(Enums.Sounds.UI_Match_Win.GetClip());
+            if (raceLevel)
+            {
+                speedrunTimer.gameObject.SetActive(true);
+                TimeSpan timeTotal =
+                    TimeSpan.FromMilliseconds(DateTimeOffset.Now.ToUnixTimeMilliseconds() -
+                                              speedrunTimerStartTimestamp);
+                speedrunTimer.text = string.Format("{0:D2}:{1:D2}<size=2>.{2:D3}", (int)timeTotal.TotalMinutes,
+                    timeTotal.Seconds, timeTotal.Milliseconds);
+            }
             text.GetComponent<Animator>().SetTrigger("start");
             if ((int)winner.CustomProperties[Enums.NetPlayerProperties.Character] == 1)
                 text.GetComponent<TMP_Text>().colorGradientPreset = gradientLuigiText;
