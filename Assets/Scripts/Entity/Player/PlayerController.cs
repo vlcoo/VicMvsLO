@@ -111,7 +111,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
     }
 
     public Vector2 pipeDirection;
-    public int stars, coins, lives = -1;
+    public int stars, coins, lives, laps = -1;
     public Powerup storedPowerup = null;
     public HoldableEntity holding, holdingOld;
     public FrozenCube frozenObject;

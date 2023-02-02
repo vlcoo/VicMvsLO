@@ -22,9 +22,10 @@ public class StartingWall : MonoBehaviour
     private IEnumerator WaitAndDestroy()
     {
         yield return new WaitForSeconds(startDelay);
-        Destroy(gameObject);
         Instantiate(Resources.Load("Prefabs/Particle/Explosion"), transform.position + new Vector3(2, 3, 0),
             Quaternion.identity);
         GameManager.Instance.sfx.PlayOneShot(Enums.Sounds.Enemy_Bobomb_Explode.GetClip());
+        GameManager.Instance.ResetStartSpeedrunTimer(false);
+        Destroy(gameObject);
     }
 }

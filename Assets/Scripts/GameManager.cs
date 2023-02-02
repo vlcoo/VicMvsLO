@@ -15,6 +15,7 @@ using Photon.Pun;
 using Photon.Realtime;
 using ExitGames.Client.Photon;
 using NSMB.Utils;
+using UnityEngine.UI;
 using Hashtable = ExitGames.Client.Photon.Hashtable;
 using Random = UnityEngine.Random;
 
@@ -69,6 +70,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
     public bool paused, loaded, started;
     public GameObject pauseUI, pausePanel, pauseButton;
     public TMP_Text quitButtonLbl, rulesLbl, speedrunTimer;
+    public GameObject resetButton;
     public Animator pausePanel1Animator;
     public bool gameover = false, musicEnabled = false;
     public readonly HashSet<Player> loadedPlayers = new();
@@ -482,6 +484,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         }
 
         brickBreak = ((GameObject) Instantiate(Resources.Load("Prefabs/Particle/BrickBreak"))).GetComponent<ParticleSystem>();
+        resetButton.SetActive(raceLevel && nonSpectatingPlayers.Count == 1);
     }
 
     private void CheckIfAllLoaded() {
@@ -604,7 +607,23 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         if (!byWhom.photonView.IsMine || speedrunTimerStartTimestamp > 0)
             return;
 
-        speedrunTimerStartTimestamp = DateTimeOffset.Now.ToUnixTimeMilliseconds();
+        ResetStartSpeedrunTimer(false);
+    }
+
+    public void ResetStartSpeedrunTimer(bool fullReset)
+    {
+        if (fullReset)
+        {
+            PlayerController p = players[0];
+            p.gotCheckpoint = false;
+            p.Death(false, false);
+            SendAndExecuteEvent(Enums.NetEventIds.ResetTiles, null, SendOptions.SendReliable);
+            speedrunTimerStartTimestamp = 0;
+        }
+        else
+        {
+            speedrunTimerStartTimestamp = DateTimeOffset.Now.ToUnixTimeMilliseconds();
+        }
     }
 
     private IEnumerator EndGame(Player winner) {
@@ -637,7 +656,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
                 TimeSpan timeTotal =
                     TimeSpan.FromMilliseconds(DateTimeOffset.Now.ToUnixTimeMilliseconds() -
                                               speedrunTimerStartTimestamp);
-                speedrunTimer.text = string.Format("{0:D2}:{1:D2}<size=2>.{2:D3}", (int)timeTotal.TotalMinutes,
+                speedrunTimer.text = string.Format("{0:D2}:{1:D2}<size=22>.{2:D3}", (int)timeTotal.TotalMinutes,
                     timeTotal.Seconds, timeTotal.Milliseconds);
             }
             text.GetComponent<Animator>().SetTrigger("start");
