@@ -110,7 +110,7 @@ public class WaterSplash : MonoBehaviour {
         }
     }
     public void OnTriggerStay2D(Collider2D collision) {
-        if (collision.attachedRigidbody == null)
+        if (collision.attachedRigidbody == null || !(gameObject.tag.Equals("poison") || gameObject.tag.Equals("lava")))
             return;
 
         collision.attachedRigidbody.velocity *= 1-Mathf.Clamp01(resistance);

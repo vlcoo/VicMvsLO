@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!114 &-3421230432447767614
+--- !u!114 &-8179939065131723427
 MonoBehaviour:
   m_ObjectHideFlags: 11
   m_CorrespondingSourceObject: {fileID: 0}
@@ -41,12 +41,20 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _AlphaTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MainTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _SampleTexture2DLOD_14fea36738ec45e9afaddff6a22b8796_Texture_1:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _TopTexture:
-        m_Texture: {fileID: 0}
+        m_Texture: {fileID: 2800000, guid: 1a944befc04030943a81d0be0bb7c848, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - unity_Lightmaps:
@@ -63,26 +71,33 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - BottomYPos: 0
-    - Height: 0
+    - Height: 1.05
+    - PixelSnap: 0
     - Points: 256
     - PointsPerTile: 4
-    - TextureIndex: 5
-    - WaveHeight: 0.15
-    - WaveSpeed: 1
+    - TextureIndex: 7
+    - WaveHeight: 0.3
+    - WaveSpeed: 1.2
     - WaveWidth: 1
     - WidthTiles: 64
-    - _Points: 256
+    - _BUILTIN_QueueControl: -1
+    - _BUILTIN_QueueOffset: 0
+    - _EnableExternalAlpha: 0
+    - _Points: 160
     - _RandomizeOffset: 0
-    - _WaveWidth: 1
+    - _TextureIndex: 0
+    - _WaveWidth: 2.5
     m_Colors:
-    - BackgroundColor: {r: 0.3798112, g: 0, b: 0.62264144, a: 0.8156863}
-    - FoamColor: {r: 1, g: 0.91886795, b: 0.99505395, a: 1}
-    - RippleColor: {r: 0.8113208, g: 0.4240299, b: 0.7696766, a: 1}
-    - TopColor: {r: 1, g: 0, b: 0.29803923, a: 1}
-    - _Glow: {r: 1, g: 0.6273485, b: 0, a: 0.5019608}
+    - BackgroundColor: {r: 1, g: 0, b: 0.019174099, a: 0.8}
+    - FoamColor: {r: 1, g: 0.96761364, b: 0.36226404, a: 1}
+    - RippleColor: {r: 1, g: 0.630872, b: 0, a: 1}
+    - TopColor: {r: 1, g: 0.14068651, b: 0, a: 1}
+    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _Flip: {r: 1, g: 1, b: 1, a: 1}
+    - _Glow: {r: 1, g: 1, b: 1, a: 0}
+    - _RendererColor: {r: 1, g: 1, b: 1, a: 1}
   m_BuildTextureStacks: []
---- !u!114 &5362891914880258063
+--- !u!114 &7893850056676362737
 MonoBehaviour:
   m_ObjectHideFlags: 11
   m_CorrespondingSourceObject: {fileID: 0}
