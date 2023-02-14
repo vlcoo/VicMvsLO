@@ -124,7 +124,7 @@ public class MatchConditioner : MonoBehaviour
 
     public void ActHarmPlayer(PlayerController whom)
     {
-        whom.photonView.RPC(nameof(whom.Powerdown), RpcTarget.All, true);
+        whom.Powerdown(false, matchConditioned:chainableActions);
     }
 
     public void ActSpawnPowerup(PlayerController whom)

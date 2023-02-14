@@ -920,7 +920,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
 
     public void TransformToMega(bool alsoSetState, bool matchConditioned = false)
     {
-        if (state == Enums.PowerupState.MegaMushroom) return;
+        if (state == Enums.PowerupState.MegaMushroom || !photonView.IsMine) return;
         Unfreeze(0);
         
         giantStartTimer = giantStartTime;
