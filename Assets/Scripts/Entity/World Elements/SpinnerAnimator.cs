@@ -10,7 +10,7 @@ public class SpinnerAnimator : MonoBehaviour {
     private float spinPercentage = 0;
     private readonly List<PlayerController> playersInside = new();
 
-    public float launchVelocity = 12f;
+    public Vector2 launchVelocity = new Vector2(0f, 12f);
 
     public void Update() {
         bool players = playersInside.Count >= 1;

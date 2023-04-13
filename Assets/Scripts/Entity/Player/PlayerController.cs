@@ -2381,7 +2381,8 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             if (!bounce && onSpinner && !holding) {
                 photonView.RPC(nameof(PlaySound), RpcTarget.All, Enums.Sounds.Player_Voice_SpinnerLaunch);
                 photonView.RPC(nameof(PlaySound), RpcTarget.All, Enums.Sounds.World_Spinner_Launch);
-                body.velocity = new Vector2(body.velocity.x, onSpinner.GetComponent<SpinnerAnimator>().launchVelocity);
+                Vector2 spinnerVel = onSpinner.GetComponent<SpinnerAnimator>().launchVelocity;
+                body.velocity = new Vector2(spinnerVel.x != 0 ? spinnerVel.x : body.velocity.x, spinnerVel.y);
                 flying = true;
                 onGround = false;
                 body.position += Vector2.up * 0.075f;
