@@ -1477,7 +1477,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         drill = false;
         flying = false;
         animator.SetTrigger("winByGoal");
-        if (GameManager.Instance.nonSpectatingPlayers.Count > 1) StartCoroutine(nameof(GoalAnimReachBottomNotAlone));
+        if (GameManager.Instance.nonSpectatingPlayers.Count <= 1) StartCoroutine(nameof(GoalAnimReachBottomNotAlone));
         else StartCoroutine(nameof(GoalAnimReachBottom));
     }
 
