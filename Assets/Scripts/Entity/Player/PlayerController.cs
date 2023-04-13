@@ -1494,7 +1494,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         yield return new WaitForSecondsRealtime(0.6f);
         while (!goalReachedBottom)
         {
-            transform.position -= new Vector3(0, 2.25f * Time.deltaTime, 0);
+            transform.position -= new Vector3(0, 2.4f * Time.deltaTime, 0);
             yield return null;
         }
 
