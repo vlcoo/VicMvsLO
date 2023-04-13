@@ -1337,6 +1337,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
 
             if (coins >= GameManager.Instance.coinRequirement)
             {
+                GameManager.Instance.MatchConditioner.ConditionActioned(this, "ReachedCoinLimit");
                 SpawnCoinItem();
                 coins = 0;
             }
@@ -1379,7 +1380,6 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         photonView.RPC(nameof(PlaySound), RpcTarget.All, Enums.Sounds.Player_Sound_PowerupReserveUse);
 
         coins = 0;
-        GameManager.Instance.MatchConditioner.ConditionActioned(this, "ReachedCoinLimit");
     }
 
     private void SpawnCoins(int amount)

@@ -83,7 +83,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     {
         "Spawned", "GotCoin", "GotPowerup", "GotMega", "LostPowerup", "GotStar", "HitBlock", "BumpedInto", "KnockedBack", "Frozen", "BumpedSmn", 
         "StompedSmn", "TriggeredPowerup", "Died", "SteppedOnEnemy", "Jumped", "LookedRight", "LookedLeft", "LookedUp", "LookedDown", "Ran", "ReachedCoinLimit",
-        "Disqualified", "1MinRemaining"
+        "Disqualified", "1MinRemaining", "Every1Sec", "Every5Sec", "Every10Sec", "Every30Sec", "Every60Sec"
     };
     public List<string> POSSIBLE_ACTIONS = new List<string>();
 
@@ -94,6 +94,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         new KeyValuePair<string, string>("Spawned", "ActKillPlayer"),
         new KeyValuePair<string, string>("KnockedBack", "ActKnockbackPlayer"),
         new KeyValuePair<string, string>("Frozen", "ActFreezePlayer"),
+        new KeyValuePair<string, string>("Died", "ActFreezePlayer"),
     };
     public List<MatchRuleListEntry> ruleList = new List<MatchRuleListEntry>();
     private string aboutToAddCond = "";

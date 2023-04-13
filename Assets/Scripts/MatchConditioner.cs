@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Timers;
 using ExitGames.Client.Photon;
 using NSMB.Utils;
 using Photon.Pun;
@@ -13,6 +14,12 @@ public class MatchConditioner : MonoBehaviour
     public Dictionary<string, string> currentMapping = new();
     public bool chainableActions = false;
 
+    private float timer1Sec = 1;
+    private float timer5Sec = 5;
+    private float timer10Sec = 10;
+    private float timer30Sec = 30;
+    private float timer60Sec = 60;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -22,9 +29,42 @@ public class MatchConditioner : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
+        if (GameManager.Instance.gameover || !GameManager.Instance.started) return;
+        float delta = Time.fixedDeltaTime;
         
+        if (timer1Sec == 0)
+        {
+            timer1Sec = 1;
+            ConditionActioned(null, "Every1Sec");
+        }
+        if (timer5Sec == 0)
+        {
+            timer5Sec = 5;
+            ConditionActioned(null, "Every5Sec");
+        }
+        if (timer10Sec == 0)
+        {
+            timer10Sec = 10;
+            ConditionActioned(null, "Every10Sec");
+        }
+        if (timer30Sec == 0)
+        {
+            timer30Sec = 30;
+            ConditionActioned(null, "Every30Sec");
+        }
+        if (timer60Sec == 0)
+        {
+            timer60Sec = 60;
+            ConditionActioned(null, "Every60Sec");
+        }
+        
+        Utils.TickTimer(ref timer1Sec, 0, delta);
+        Utils.TickTimer(ref timer5Sec, 0, delta);
+        Utils.TickTimer(ref timer10Sec, 0, delta);
+        Utils.TickTimer(ref timer30Sec, 0, delta);
+        Utils.TickTimer(ref timer60Sec, 0, delta);
     }
 
     public void ConditionActioned(int byWhomsID, string condition)
