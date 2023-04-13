@@ -19,6 +19,7 @@ public class WaterSplash : MonoBehaviour {
     private int totalPoints;
     private bool initialized;
 
+    public bool isWater = false;
 
     private void Awake() {
         Initialize();
@@ -48,7 +49,8 @@ public class WaterSplash : MonoBehaviour {
         heightTex.Apply();
 
         collider.offset = new(0, heightTiles * 0.25f - 0.2f);
-        collider.size = new(widthTiles * 0.5f, heightTiles * 0.5f - 0.1f);
+        if (isWater) collider.size = new(widthTiles * 0.5f, collider.size.y);
+        else collider.size = new(widthTiles * 0.5f, heightTiles * 0.5f - 0.1f);
         spriteRenderer.size = new(widthTiles * 0.5f, heightTiles * 0.5f + 0.5f);
 
         properties = new();
@@ -66,7 +68,7 @@ public class WaterSplash : MonoBehaviour {
         float delta = Time.fixedDeltaTime;
 
         bool valuesChanged = false;
-
+        
         for (int i = 0; i < totalPoints; i++) {
             float height = pointHeights[i];
             pointVelocities[i] += tension * -height;
@@ -97,7 +99,8 @@ public class WaterSplash : MonoBehaviour {
         properties.SetFloat("TextureIndex", animTimer);
         spriteRenderer.SetPropertyBlock(properties);
     }
-    public void OnTriggerEnter2D(Collider2D collider) {
+    public void OnTriggerEnter2D(Collider2D collider)
+    {
         Instantiate(Resources.Load(splashParticle), collider.transform.position, Quaternion.identity);
 
         Rigidbody2D body = collider.attachedRigidbody;
@@ -109,7 +112,8 @@ public class WaterSplash : MonoBehaviour {
             pointVelocities[pointsX] = -splashVelocity * power;
         }
     }
-    public void OnTriggerStay2D(Collider2D collision) {
+    public void OnTriggerStay2D(Collider2D collision)
+    {
         if (collision.attachedRigidbody == null || !(gameObject.tag.Equals("poison") || gameObject.tag.Equals("lava")))
             return;
 
