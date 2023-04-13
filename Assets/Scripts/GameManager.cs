@@ -626,12 +626,15 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         }
     }
 
-    private IEnumerator EndGame(Player winner) {
+    private IEnumerator EndGame(Player winner)
+    {
+        if (gameover) yield return null;
         gameover = true;
+        
         PhotonNetwork.CurrentRoom.SetCustomProperties(new() { [Enums.NetRoomProperties.GameStarted] = false });
         music.Stop();
         GameObject text = GameObject.FindWithTag("wintext");
-        text.GetComponent<TMP_Text>().text = winner != null ? $"{ winner.GetUniqueNickname() } Wins!" : "It's a draw...";
+        text.GetComponent<TMP_Text>().text = winner != null ? $"{ winner.GetUniqueNickname() } Wins!" : "It's a tie...";
 
         yield return new WaitForSecondsRealtime(1);
 
@@ -769,7 +772,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
 
     public void WinByGoal(PlayerController whom)
     {
-        sfx.PlayOneShot(Enums.Sounds.UI_Match_Goal.GetClip());
+        sfx.PlayOneShot(Enums.Sounds.UI_Match_Goal_Short.GetClip());
         
         foreach (var player in players)
         {

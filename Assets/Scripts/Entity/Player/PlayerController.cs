@@ -675,6 +675,21 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             photonView.RPC(nameof(Death), RpcTarget.All, false, obj.CompareTag("lava"));
             return;
         }
+        case "checkpoint":
+        {
+            if (gotCheckpoint) return;
+
+            gotCheckpoint = true;
+            obj.GetComponent<Animation>().Play();
+            GameManager.Instance.sfx.PlayOneShot(Enums.Sounds.World_Checkpoint.GetClip());
+            GameManager.Instance.SendAndExecuteEvent(Enums.NetEventIds.ResetTiles, null, SendOptions.SendReliable);
+            break;
+        }
+        case "goal":
+        {
+            GameManager.Instance.WinByGoal(this);
+            break;
+        }
         }
 
         OnTriggerStay2D(collider);
@@ -1462,19 +1477,28 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         drill = false;
         flying = false;
         animator.SetTrigger("winByGoal");
-        StartCoroutine(nameof(GoalAnimReachBottom));
+        if (GameManager.Instance.nonSpectatingPlayers.Count > 1) StartCoroutine(nameof(GoalAnimReachBottomNotAlone));
+        else StartCoroutine(nameof(GoalAnimReachBottom));
+    }
+
+    private IEnumerator GoalAnimReachBottomNotAlone()
+    {
+        // make it a bit less laggy if there are other ppl
+        PlaySoundEverywhere(Enums.Sounds.Player_Voice_GoalCeleb);
+        yield return new WaitForSecondsRealtime(0.4f);
+        PhotonNetwork.RaiseEvent((byte) Enums.NetEventIds.EndGame, photonView.Owner, NetworkUtils.EventAll, SendOptions.SendReliable);
     }
 
     private IEnumerator GoalAnimReachBottom()
     {
-        yield return new WaitForSecondsRealtime(1);
+        yield return new WaitForSecondsRealtime(0.6f);
         while (!goalReachedBottom)
         {
-            transform.position -= new Vector3(0, 0.03f, 0);
+            transform.position -= new Vector3(0, 2.25f * Time.deltaTime, 0);
             yield return null;
         }
 
-        yield return new WaitForSecondsRealtime(0.6f);
+        yield return new WaitForSecondsRealtime(0.4f);
         animator.SetBool("goalAnimReachedBottom", true);
         PlaySoundEverywhere(Enums.Sounds.Player_Voice_GoalCeleb);
         

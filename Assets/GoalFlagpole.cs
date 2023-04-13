@@ -19,9 +19,6 @@ public class GoalFlagpole : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D col)
     {
-        PlayerController player = col.gameObject.GetComponent<PlayerController>();
-        if (player is null) return;
         
-        GameManager.Instance.WinByGoal(player);
     }
 }

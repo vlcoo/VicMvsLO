@@ -46,6 +46,6 @@ public class LoadingWaitingOn : MonoBehaviour {
 
         HashSet<Player> waitingFor = new(GameManager.Instance.nonSpectatingPlayers);
         waitingFor.ExceptWith(GameManager.Instance.loadedPlayers);
-        playerList.text = (waitingFor.Count) == 0 ? "" : "- Waiting for -\n\n- " + string.Join("\n", waitingFor.Select(pl => pl.GetUniqueNickname()));
+        playerList.text = (waitingFor.Count) == 0 ? "" : "- Waiting for -\n" + string.Join("\n", waitingFor.Select(pl => pl.GetUniqueNickname()));
     }
 }
