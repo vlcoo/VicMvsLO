@@ -479,7 +479,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         {
             rulesLbl.text = "";
             foreach (var entry in MatchConditioner.currentMapping)
-                rulesLbl.text += entry.Key + " .. " + entry.Value +
+                rulesLbl.text += entry.Key + " .. " + entry.Value.Replace("Act", "") +
                                  (MatchConditioner.currentMapping.Last().Equals(entry) ? "" : "\n");
         }
 
@@ -681,10 +681,13 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         SceneManager.LoadScene("MainMenu");
     }
 
-    public void DestroyEnvironment()
+    public IEnumerator DestroyEnvironment()
     {
-        GameObject bomb = PhotonNetwork.Instantiate("Prefabs/Enemy/Bobomb", Vector3.zero, Quaternion.identity);
-        bomb.GetComponent<BobombWalk>().DetonateBig();
+        BobombWalk bomb = PhotonNetwork.Instantiate("Prefabs/Enemy/Bobomb", spawnpoint + new Vector3(10, 0, 0), Quaternion.identity).GetComponent<BobombWalk>();
+        bomb.hasBigExplosion = true;
+        bomb.gameObject.transform.localScale = new Vector3(0.1f, 0.1f, 1);
+        yield return new WaitForSeconds(0.1f);
+        bomb.photonView.RPC("Light", RpcTarget.All);
     }
 
     private IEnumerator BigStarRespawn(bool wait = true) {

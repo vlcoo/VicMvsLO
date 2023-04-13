@@ -11,6 +11,7 @@ public class BobombWalk : HoldableEntity {
     [SerializeField] private int explosionTileSize = 2;
 
     public bool lit, detonated;
+    public bool hasBigExplosion;
 
     private Vector3 previousFrameVelocity;
     private float detonateCount;
@@ -140,6 +141,11 @@ public class BobombWalk : HoldableEntity {
     #region PunRPCs
     [PunRPC]
     public void Detonate() {
+        if (hasBigExplosion)
+        {
+            DetonateBig();
+            return;
+        }
 
         sRenderer.enabled = false;
         hitbox.enabled = false;
@@ -187,9 +193,10 @@ public class BobombWalk : HoldableEntity {
         PhotonNetwork.Destroy(gameObject);
     }
 
+    [PunRPC]
     public void DetonateBig()
     {
-        explosionTileSize = 50;
+        explosionTileSize = 150;
         Vector3Int tileLocation = Utils.WorldToTilemapPosition(Vector3.zero);
         Tilemap tm = GameManager.Instance.tilemap;
         for (int x = -explosionTileSize; x <= explosionTileSize; x++) {
@@ -215,7 +222,7 @@ public class BobombWalk : HoldableEntity {
     [PunRPC]
     public void Light() {
         animator.SetTrigger("lit");
-        detonateCount = detonationTime;
+        detonateCount = hasBigExplosion ? 0 : detonationTime;
         body.velocity = Vector2.zero;
         lit = true;
         PlaySound(Enums.Sounds.Enemy_Bobomb_Fuse);
