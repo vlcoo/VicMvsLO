@@ -618,7 +618,28 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         }
     }
 
-    public void OnTriggerEnter2D(Collider2D collider) {
+    public void OnTriggerEnter2D(Collider2D collider)
+    {
+        GameObject obj = collider.gameObject;
+        switch (obj.tag)
+        {
+            case "checkpoint":
+            {
+                if (gotCheckpoint) return;
+
+                gotCheckpoint = true;
+                obj.GetComponent<Animation>().Play();
+                GameManager.Instance.sfx.PlayOneShot(Enums.Sounds.World_Checkpoint.GetClip());
+                GameManager.Instance.SendAndExecuteEvent(Enums.NetEventIds.ResetTiles, null, SendOptions.SendReliable);
+                break;
+            }
+            case "goal":
+            {
+                GameManager.Instance.WinByGoal(this);
+                break;
+            }
+        }
+        
         if (!photonView.IsMine || dead || Frozen || pipeEntering || !MainHitbox.IsTouching(collider))
             return;
 
@@ -632,7 +653,6 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             return;
         }
 
-        GameObject obj = collider.gameObject;
         switch (obj.tag) {
         case "Fireball": {
             FireballMover fireball = obj.GetComponentInParent<FireballMover>();
@@ -674,21 +694,6 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
                 return;
             photonView.RPC(nameof(Death), RpcTarget.All, false, obj.CompareTag("lava"));
             return;
-        }
-        case "checkpoint":
-        {
-            if (gotCheckpoint) return;
-
-            gotCheckpoint = true;
-            obj.GetComponent<Animation>().Play();
-            GameManager.Instance.sfx.PlayOneShot(Enums.Sounds.World_Checkpoint.GetClip());
-            GameManager.Instance.SendAndExecuteEvent(Enums.NetEventIds.ResetTiles, null, SendOptions.SendReliable);
-            break;
-        }
-        case "goal":
-        {
-            GameManager.Instance.WinByGoal(this);
-            break;
         }
         }
 
@@ -935,7 +940,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
 
     public void TransformToMega(bool alsoSetState, bool matchConditioned = false)
     {
-        if (state == Enums.PowerupState.MegaMushroom || !photonView.IsMine) return;
+        if (state == Enums.PowerupState.MegaMushroom) return;
         Unfreeze(0);
         
         giantStartTimer = giantStartTime;
@@ -982,9 +987,22 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
 
         if (powerup.state == Enums.PowerupState.MegaMushroom && state != Enums.PowerupState.MegaMushroom)
         {
-            TransformToMega(true);
-            megad = true;
+            giantStartTimer = giantStartTime;
+            knockback = false;
+            groundpound = false;
+            crouching = false;
+            propeller = false;
+            usedPropellerThisJump = false;
+            flying = false;
+            drill = false;
+            inShell = false;
+            giantTimer = 15f;
+            transform.localScale = Vector3.one;
+            Instantiate(Resources.Load("Prefabs/Particle/GiantPowerup"), transform.position, Quaternion.identity);
+
+            PlaySoundEverywhere(powerup.soundEffect);
             soundPlayed = true;
+            megad = true;
 
         } else if (powerup.prefab == "Star") {
             //starman

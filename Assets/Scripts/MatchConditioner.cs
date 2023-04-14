@@ -186,11 +186,13 @@ public class MatchConditioner : MonoBehaviour
 
     public void ActRespawnLevel(PlayerController whom)
     {
+        if (!PhotonNetwork.IsMasterClient) return;
         GameManager.Instance.SendAndExecuteEvent(Enums.NetEventIds.ResetTiles, null, SendOptions.SendReliable);
     }
 
     public void ActExplodeLevel(PlayerController whom)
     {
+        if (!PhotonNetwork.IsMasterClient) return;
         StartCoroutine(GameManager.Instance.DestroyEnvironment());
     }
 }

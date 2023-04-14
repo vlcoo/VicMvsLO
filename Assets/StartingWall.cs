@@ -21,6 +21,7 @@ public class StartingWall : MonoBehaviour
 
     private IEnumerator WaitAndDestroy()
     {
+        yield return new WaitUntil(() => GameManager.Instance.started);
         yield return new WaitForSeconds(startDelay);
         Instantiate(Resources.Load("Prefabs/Particle/Explosion"), transform.position + new Vector3(2, 3, 0),
             Quaternion.identity);
