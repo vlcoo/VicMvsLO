@@ -172,8 +172,10 @@ public class MatchConditioner : MonoBehaviour
         whom.SpawnCoinItemInstantly();
     }
 
-    public void NoActSpawnEnemy(PlayerController whom)
+    public void ActSpawnEnemy(PlayerController whom)
     {
+        if (!PhotonNetwork.IsMasterClient) return;
+        
         GameObject entity = Utils.GetRandomEnemy();
         PhotonNetwork.InstantiateRoomObject("Prefabs/Enemy/" + entity.name,
             whom.transform.position +

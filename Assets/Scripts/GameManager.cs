@@ -683,6 +683,8 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
 
     public IEnumerator DestroyEnvironment()
     {
+        if (!PhotonNetwork.IsMasterClient) yield return null;
+    
         BobombWalk bomb = PhotonNetwork.Instantiate("Prefabs/Enemy/Bobomb", spawnpoint + new Vector3(10, 0, 0), Quaternion.identity).GetComponent<BobombWalk>();
         bomb.hasBigExplosion = true;
         bomb.gameObject.transform.localScale = new Vector3(0.1f, 0.1f, 1);
