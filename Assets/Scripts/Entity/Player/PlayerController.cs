@@ -1064,6 +1064,8 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         UpdateGameState();
         if (!megad)
             GameManager.Instance.MatchConditioner.ConditionActioned(this, "GotPowerup");
+        else
+            GameManager.Instance.MatchConditioner.ConditionActioned(this, "GotMega");
 
         if (view.IsMine)
             PhotonNetwork.Destroy(view);
@@ -1685,6 +1687,18 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
     {
         yield return new WaitForSeconds(1);
         GameManager.Instance.MatchConditioner.ConditionActioned(this, "Spawned");
+    }
+
+    [PunRPC]
+    public void RandomTeleport()
+    {
+        // i guess...??
+        Vector2 levelRandomPos = new Vector2(
+            Random.Range(GameManager.Instance.levelMinTileX,
+                GameManager.Instance.levelMinTileX + GameManager.Instance.levelWidthTile)/2,
+            Math.Abs(Random.Range(GameManager.Instance.levelMinTileY,
+                GameManager.Instance.levelMinTileY + GameManager.Instance.levelHeightTile))/2);
+        transform.position = body.position = levelRandomPos;
     }
     #endregion
 

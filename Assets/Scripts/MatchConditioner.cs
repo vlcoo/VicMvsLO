@@ -195,4 +195,9 @@ public class MatchConditioner : MonoBehaviour
         if (!PhotonNetwork.IsMasterClient) return;
         StartCoroutine(GameManager.Instance.DestroyEnvironment());
     }
+
+    public void ActRandomTeleport(PlayerController whom)
+    {
+        whom.RandomTeleport();
+    }
 }
