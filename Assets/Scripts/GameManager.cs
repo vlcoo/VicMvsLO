@@ -553,7 +553,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         } catch { }
 
         if (gameStarting) {
-            yield return new WaitForSeconds(3.5f);
+            if (!GlobalController.Instance.fastLoad) yield return new WaitForSeconds(3.5f);
             sfx.PlayOneShot(Enums.Sounds.UI_StartGame.GetClip());
 
             if (PhotonNetwork.IsMasterClient)
@@ -624,6 +624,13 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         {
             speedrunTimerStartTimestamp = DateTimeOffset.Now.ToUnixTimeMilliseconds();
         }
+    }
+
+    public void ResetHardSpeedrunTimer()
+    {
+        GlobalController.Instance.fastLoad = true;
+        Utils.GetCustomProperty(Enums.NetRoomProperties.Level, out int level);
+        SceneManager.LoadSceneAsync(level + 2, LoadSceneMode.Single);
     }
 
     private IEnumerator EndGame(Player winner)

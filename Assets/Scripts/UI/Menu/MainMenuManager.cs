@@ -383,6 +383,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
             GlobalController.Instance.joinedAsSpectator = spectate || joinedLate;
             Utils.GetCustomProperty(Enums.NetRoomProperties.Level, out int level);
             PhotonNetwork.IsMessageQueueRunning = false;
+            GlobalController.Instance.fastLoad = false;
             SceneManager.LoadSceneAsync(1, LoadSceneMode.Single);
             SceneManager.LoadSceneAsync(level + 2, LoadSceneMode.Additive);
             break;
