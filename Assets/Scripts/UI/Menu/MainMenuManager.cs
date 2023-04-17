@@ -16,6 +16,7 @@ using Photon.Realtime;
 using Hashtable = ExitGames.Client.Photon.Hashtable;
 using NSMB.Utils;
 using UnityEditor.Rendering;
+using UnityEngine.Serialization;
 using UnityEngine.UIElements;
 using Button = UnityEngine.UI.Button;
 using Image = UnityEngine.UI.Image;
@@ -32,7 +33,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     public GameObject lobbiesContent, lobbyPrefab;
     bool quit, validName;
     public GameObject connecting;
-    public GameObject title, bg, mainMenu, optionsMenu, lobbyMenu, createLobbyPrompt, inLobbyMenu, creditsMenu, controlsMenu, privatePrompt, updateBox, newRuleS1Prompt, newRuleS2Prompt, emoteListPrompt, RNGRulesBox;
+    public GameObject title, bg, mainMenu, optionsMenu, lobbyMenu, createLobbyPrompt, inLobbyMenu, creditsMenu, controlsMenu, privatePrompt, updateBox, newRuleS1Prompt, newRuleS2Prompt, emoteListPrompt, RNGRulesBox, specialPrompt;
     public Animator createLobbyPromptAnimator, privatePromptAnimator, updateBoxAnimator, errorBoxAnimator, rebindPromptAnimator, newRuleS1PromptAnimator, newRuleS2PromptAnimator, emoteListPromptAnimator, RNGRulesBoxAnimator;
     public GameObject[] levelCameraPositions;
     public GameObject sliderText, lobbyText, currentMaxPlayers, settingsPanel, ruleTemplate, lblConditions;
@@ -43,7 +44,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     public GameObject playersContent, playersPrefab, chatContent, chatPrefab;
     public TMP_InputField nicknameField, starsText, coinsText, livesField, timeField, lobbyJoinField, chatTextField;
     public Slider musicSlider, sfxSlider, masterSlider, lobbyPlayersSlider, changePlayersSlider, RNGSlider;
-    public GameObject mainMenuSelected, optionsSelected, lobbySelected, currentLobbySelected, createLobbySelected, creditsSelected, controlsSelected, privateSelected, reconnectSelected, updateBoxSelected, newRuleS1Selected, newRuleS2Selected, emoteListSelected, RNGRulesSelected;
+    public GameObject mainMenuSelected, optionsSelected, lobbySelected, currentLobbySelected, createLobbySelected, creditsSelected, controlsSelected, privateSelected, reconnectSelected, updateBoxSelected, newRuleS1Selected, newRuleS2Selected, emoteListSelected, RNGRulesSelected, specialSelected;
     public GameObject errorBox, errorButton, rebindPrompt, reconnectBox;
     public TMP_Text errorText, errorDetail, rebindCountdown, rebindText, reconnectText, updateText, RNGSliderText;
     public TMP_Dropdown region;
@@ -852,6 +853,12 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         EventSystem.current.SetSelectedGameObject(newRuleS2Selected);
         newRuleS2Prompt.transform.Find("Image/LblExplain").GetComponent<TMP_Text>().text =
             $"What will happen when \"{condition}\" gets triggered?";
+    }
+
+    public void OpenSpecialRule()
+    {
+        specialPrompt.SetActive(true);
+        EventSystem.current.SetSelectedGameObject(specialSelected);
     }
 
     public void CloseNewRuleS2(string action)
