@@ -631,6 +631,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
                 obj.GetComponent<Animation>().Play();
                 GameManager.Instance.sfx.PlayOneShot(Enums.Sounds.World_Checkpoint.GetClip());
                 GameManager.Instance.SendAndExecuteEvent(Enums.NetEventIds.ResetTiles, null, SendOptions.SendReliable);
+                GameManager.Instance.MatchConditioner.ConditionActioned(this, "GotCheckpoint");
                 break;
             }
             case "goal":
