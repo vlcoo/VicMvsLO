@@ -10,7 +10,7 @@ public class MarioLoader : MonoBehaviour {
     public PlayerData data;
     public void Start() {
         image = GetComponent<Image>();
-        data = Utils.GetCharacterData();
+        if (data ==null) data = Utils.GetCharacterData();
     }
 
     public void Update() {

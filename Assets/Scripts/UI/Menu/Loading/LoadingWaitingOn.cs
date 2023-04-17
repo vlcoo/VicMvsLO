@@ -7,7 +7,10 @@ using Photon.Realtime;
 using NSMB.Utils;
 using Photon.Pun;
 
-public class LoadingWaitingOn : MonoBehaviour {
+public class LoadingWaitingOn : MonoBehaviour
+{
+    public GameObject marioLoadingScene;
+    public GameObject koopaLoadingScene;
 
     [SerializeField] private TMP_Text playerList, highPingAlert;
     [SerializeField] private string emptyText = "Loading...", iveLoadedText = "Wait...", readyToStartText = "OK!", spectatorText = "Joining as Spectator...";
@@ -17,9 +20,12 @@ public class LoadingWaitingOn : MonoBehaviour {
     public void Start() {
         text = GetComponent<TMP_Text>();
         if (PhotonNetwork.GetPing() < 180)
-        {
             highPingAlert.fontSize = 0;
-        };
+        if (Random.value >= 0.7)
+        {
+            marioLoadingScene.SetActive(false);
+            koopaLoadingScene.SetActive(true);
+        }
     }
 
     public void Update() {
