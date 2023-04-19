@@ -637,6 +637,16 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             case "goal":
             {
                 GameManager.Instance.WinByGoal(this);
+                spawned = false;
+                body.gravityScale = 0;
+                body.velocity = Vector2.zero;
+                groundpound = false;
+                propeller = false;
+                drill = false;
+                flying = false;
+                animator.SetTrigger("winByGoal");
+                if (GameManager.Instance.nonSpectatingPlayers.Count > 1) StartCoroutine(nameof(GoalAnimReachBottomNotAlone));
+                else StartCoroutine(nameof(GoalAnimReachBottom));
                 break;
             }
         }
@@ -1487,21 +1497,6 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
     }
 
     public bool goalReachedBottom = false;
-    [PunRPC]
-    public void WinByGoal()
-    {
-        spawned = false;
-        body.gravityScale = 0;
-        body.velocity = Vector2.zero;
-        groundpound = false;
-        propeller = false;
-        drill = false;
-        flying = false;
-        animator.SetTrigger("winByGoal");
-        if (GameManager.Instance.nonSpectatingPlayers.Count > 1) StartCoroutine(nameof(GoalAnimReachBottomNotAlone));
-        else StartCoroutine(nameof(GoalAnimReachBottom));
-    }
-
     private IEnumerator GoalAnimReachBottomNotAlone()
     {
         // make it a bit less laggy if there are other ppl

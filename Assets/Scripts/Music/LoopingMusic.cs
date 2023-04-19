@@ -4,7 +4,10 @@ public class LoopingMusic : MonoBehaviour {
 
     private bool _fastMusic;
     public bool FastMusic {
-        set {
+        set
+        {
+            if (currentSong.fastClip == null) return;
+            
             if (_fastMusic ^ value) {
                 float scaleFactor = value ? 0.8f : 1.25f;
                 float newTime = audioSource.time * scaleFactor;
