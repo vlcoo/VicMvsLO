@@ -96,8 +96,10 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         new KeyValuePair<string, string>("KnockedBack", "ActKnockbackPlayer"),
         new KeyValuePair<string, string>("Frozen", "ActFreezePlayer"),
         new KeyValuePair<string, string>("Died", "ActFreezePlayer"),
+        new KeyValuePair<string, string>("ReachedCoinLimit", "ActGiveCoin"),
     };
-    public List<MatchRuleListEntry> ruleList = new List<MatchRuleListEntry>();
+    public List<MatchRuleListEntry> ruleList = new();
+    public List<string> specialList = new();
     private string aboutToAddCond = "";
     private string aboutToAddAct = "";
     
@@ -247,6 +249,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         AttemptToUpdateProperty<int>(updatedProperties, Enums.NetRoomProperties.Level, ChangeLevel);
         AttemptToUpdateProperty<int>(updatedProperties, Enums.NetRoomProperties.StarRequirement, ChangeStarRequirement);
         AttemptToUpdateProperty<Dictionary<string, string>>(updatedProperties, Enums.NetRoomProperties.MatchRules, DictToMatchRules);
+        AttemptToUpdateProperty<List<string>>(updatedProperties, Enums.NetRoomProperties.SpecialRules, ListToSpecialRules);
         AttemptToUpdateProperty<int>(updatedProperties, Enums.NetRoomProperties.CoinRequirement, ChangeCoinRequirement);
         AttemptToUpdateProperty<int>(updatedProperties, Enums.NetRoomProperties.Lives, ChangeLives);
         AttemptToUpdateProperty<bool>(updatedProperties, Enums.NetRoomProperties.NewPowerups, ChangeNewPowerups);
@@ -1548,6 +1551,11 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         
         foreach(KeyValuePair<string, string> entry in dict)
             onAddMatchRuleExplicit(entry.Key, entry.Value, false, true);
+    }
+
+    public void ListToSpecialRules(List<string> list)
+    {
+        
     }
 
     public void ChangeStarRequirement(int stars) {
