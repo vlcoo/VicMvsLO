@@ -7,14 +7,19 @@ public class BulletBillLauncher : MonoBehaviourPun {
 
     public float playerSearchRadius = 7, playerCloseCutoff = 1;
     public float initialShootTimer = 5;
+    public bool isBanzai = false;
     private float shootTimer;
     private readonly List<GameObject> bills = new();
+    private string prefabPath;
 
     private Vector2 searchBox, closeSearchBox = new(1.5f, 1f), searchOffset, spawnOffset = new(0.25f, -0.2f);
 
     void Start() {
         searchBox = new(playerSearchRadius, playerSearchRadius);
         searchOffset = new(playerSearchRadius/2 + playerCloseCutoff, 0);
+
+        if (isBanzai) prefabPath = "Prefabs/Enemy/BanzaiBill";
+        else prefabPath = "Prefabs/Enemy/BulletBill";
     }
     void Update() {
         if (!PhotonNetwork.IsMasterClient || GameManager.Instance.gameover)
@@ -42,14 +47,14 @@ public class BulletBillLauncher : MonoBehaviourPun {
 
         //Shoot left
         if (IntersectsPlayer((Vector2) transform.position - searchOffset, searchBox)) {
-            GameObject newBill = PhotonNetwork.InstantiateRoomObject("Prefabs/Enemy/BulletBill", transform.position + new Vector3(-spawnOffset.x, spawnOffset.y), Quaternion.identity, 0, new object[]{ true });
+            GameObject newBill = PhotonNetwork.InstantiateRoomObject(prefabPath, transform.position + new Vector3(-spawnOffset.x, spawnOffset.y), Quaternion.identity, 0, new object[]{ true });
             bills.Add(newBill);
             return;
         }
 
         //Shoot right
         if (IntersectsPlayer((Vector2) transform.position + searchOffset, searchBox)) {
-            GameObject newBill = PhotonNetwork.InstantiateRoomObject("Prefabs/Enemy/BulletBill", transform.position + new Vector3(spawnOffset.x, spawnOffset.y), Quaternion.identity, 0, new object[]{ false });
+            GameObject newBill = PhotonNetwork.InstantiateRoomObject(prefabPath, transform.position + new Vector3(spawnOffset.x, spawnOffset.y), Quaternion.identity, 0, new object[]{ false });
             bills.Add(newBill);
             return;
         }
