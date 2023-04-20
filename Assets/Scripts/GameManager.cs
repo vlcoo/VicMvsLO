@@ -70,7 +70,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
     public bool paused, loaded, started;
     public GameObject pauseUI, pausePanel, pauseButton;
     public TMP_Text quitButtonLbl, rulesLbl, speedrunTimer;
-    public GameObject resetButton;
+    public GameObject resetButton, resetHardButton;
     public Animator pausePanel1Animator;
     public bool gameover = false, musicEnabled = false;
     public readonly HashSet<Player> loadedPlayers = new();
@@ -485,6 +485,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
 
         brickBreak = ((GameObject) Instantiate(Resources.Load("Prefabs/Particle/BrickBreak"))).GetComponent<ParticleSystem>();
         resetButton.SetActive(raceLevel && nonSpectatingPlayers.Count == 1);
+        resetHardButton.SetActive(raceLevel && nonSpectatingPlayers.Count == 1);
     }
 
     private void CheckIfAllLoaded() {
@@ -749,10 +750,6 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
                     sfx.PlayOneShot(Enums.Sounds.UI_Countdown_Long.GetClip());
                     tenSecondCountdown = true;
                 }
-                if (timeRemaining - Time.deltaTime <= 0) {
-                    sfx.PlayOneShot(Enums.Sounds.UI_Countdown_1.GetClip());
-                    CheckForWinner();
-                }
             }
         }
 
@@ -789,8 +786,6 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             if (player == whom) continue;
             player.Disqualify();
         }
-
-        whom.WinByGoal();
     }
 
     public void CheckForWinner() {
