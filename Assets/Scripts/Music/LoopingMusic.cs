@@ -1,8 +1,11 @@
+using System.Linq;
 using UnityEngine;
 
 public class LoopingMusic : MonoBehaviour {
 
     private bool _fastMusic;
+    private int bahIndex = 0;
+    private bool needToBah = false;
     public bool FastMusic {
         set
         {
@@ -36,6 +39,7 @@ public class LoopingMusic : MonoBehaviour {
     public void Start() {
         if (currentSong)
             Play(currentSong);
+        needToBah = currentSong.hasBahs;
     }
 
     public void Play(MusicData song) {
@@ -53,6 +57,13 @@ public class LoopingMusic : MonoBehaviour {
         if (audioSource is not { isPlaying: true })
             return;
 
+        if (needToBah && audioSource.time >= currentSong.bahTimestamps[bahIndex])
+        {
+            GameManager.Instance.BahAllEnemies();
+            bahIndex++;
+            if (bahIndex == currentSong.bahTimestamps.Length) needToBah = false;
+        }
+
         if (currentSong.loopEndSample != -1) {
             float time = audioSource.time;
             float songStart = currentSong.loopStartSample * (FastMusic ? 0.8f : 1f);
@@ -61,7 +72,11 @@ public class LoopingMusic : MonoBehaviour {
                 : currentSong.loopEndSample * (FastMusic ? 0.8f : 1f);
 
             if (time >= songEnd)
+            {
                 audioSource.time = songStart + (time - songEnd);
+                bahIndex = 0;
+                needToBah = currentSong.hasBahs;
+            }
         }
     }
 }

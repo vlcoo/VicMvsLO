@@ -6,4 +6,9 @@ public class MusicData : ScriptableObject {
     public AudioClip clip, fastClip;
     public float loopStartSample, loopEndSample;
 
+    public float[] bahTimestamps;
+    public bool hasBahs
+    {
+        get => bahTimestamps.Length != 0;
+    }
 }

@@ -81,6 +81,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
     public int playerCount = 1;
     public List<PlayerController> players = new();
     public EnemySpawnpoint[] enemySpawnpoints;
+    private List<BahableEntity> bahableEntities = new();
 
     private GameObject[] coins;
     public SpectationManager SpectationManager { get; private set; }
@@ -559,7 +560,11 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
 
             if (PhotonNetwork.IsMasterClient)
                 foreach (EnemySpawnpoint point in FindObjectsOfType<EnemySpawnpoint>())
+                {
                     point.AttemptSpawning();
+                    BahableEntity bahable = point.currentEntity?.GetComponent<BahableEntity>();
+                    if (bahable != null) bahableEntities.Add(bahable);
+                }
 
             if (localPlayer)
                 localPlayer.GetComponent<PlayerController>().OnGameStart();
@@ -863,6 +868,14 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             if (winningPlayers.Count == 1)
                 PhotonNetwork.RaiseEvent((byte) Enums.NetEventIds.EndGame, winningPlayers[0].photonView.Owner, NetworkUtils.EventAll, SendOptions.SendReliable);
             
+        }
+    }
+
+    public void BahAllEnemies()
+    {
+        foreach (BahableEntity enemy in bahableEntities)
+        {
+            enemy.bah();
         }
     }
 
