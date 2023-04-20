@@ -5,7 +5,7 @@ public class LoopingMusic : MonoBehaviour {
 
     private bool _fastMusic;
     private int bahIndex = 0;
-    private bool needToBah = false;
+    private bool needToBah = true;
     public bool FastMusic {
         set
         {
@@ -38,8 +38,10 @@ public class LoopingMusic : MonoBehaviour {
 
     public void Start() {
         if (currentSong)
+        {
             Play(currentSong);
-        needToBah = currentSong.hasBahs;
+            needToBah = currentSong.hasBahs;
+        }
     }
 
     public void Play(MusicData song) {
@@ -57,7 +59,7 @@ public class LoopingMusic : MonoBehaviour {
         if (audioSource is not { isPlaying: true })
             return;
 
-        if (needToBah && audioSource.time >= currentSong.bahTimestamps[bahIndex])
+        if (needToBah && currentSong.hasBahs && audioSource.time >= currentSong.bahTimestamps[bahIndex])
         {
             GameManager.Instance.BahAllEnemies();
             bahIndex++;
@@ -75,7 +77,7 @@ public class LoopingMusic : MonoBehaviour {
             {
                 audioSource.time = songStart + (time - songEnd);
                 bahIndex = 0;
-                needToBah = currentSong.hasBahs;
+                needToBah = true;
             }
         }
     }

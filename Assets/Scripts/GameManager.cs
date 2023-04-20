@@ -562,8 +562,12 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
                 foreach (EnemySpawnpoint point in FindObjectsOfType<EnemySpawnpoint>())
                 {
                     point.AttemptSpawning();
-                    BahableEntity bahable = point.currentEntity?.GetComponent<BahableEntity>();
-                    if (bahable != null) bahableEntities.Add(bahable);
+                    if (point.currentEntity != null)
+                    {
+                        BahableEntity entity = point.currentEntity.GetComponent<BahableEntity>();
+                        if (entity == null) continue;
+                        bahableEntities.Add(entity);
+                    }
                 }
 
             if (localPlayer)
