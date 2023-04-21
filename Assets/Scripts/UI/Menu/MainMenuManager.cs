@@ -46,7 +46,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     public Slider musicSlider, sfxSlider, masterSlider, lobbyPlayersSlider, changePlayersSlider, RNGSlider;
     public GameObject mainMenuSelected, optionsSelected, lobbySelected, currentLobbySelected, createLobbySelected, creditsSelected, controlsSelected, privateSelected, reconnectSelected, updateBoxSelected, newRuleS1Selected, newRuleS2Selected, emoteListSelected, RNGRulesSelected, specialSelected;
     public GameObject errorBox, errorButton, rebindPrompt, reconnectBox;
-    public TMP_Text errorText, errorDetail, rebindCountdown, rebindText, reconnectText, updateText, RNGSliderText, specialCountText;
+    public TMP_Text errorText, errorDetail, rebindCountdown, rebindText, reconnectText, updateText, RNGSliderText, specialCountText, setSpecialBtn;
     public TMP_Dropdown region;
     public RebindManager rebindManager;
     public static string lastRegion;
@@ -614,7 +614,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     IEnumerator UpdatePing() {
         // push our ping into our player properties every N seconds. 2 seems good.
         while (true) {
-            yield return new WaitForSecondsRealtime(2);
+            yield return new WaitForSecondsRealtime(1);
             if (PhotonNetwork.InRoom) {
                 PhotonNetwork.LocalPlayer.SetCustomProperties(new() {
                     { Enums.NetPlayerProperties.Ping, PhotonNetwork.GetPing() }
@@ -626,19 +626,18 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     public void onSetSpecialRule(GameObject element)
     {
         string name = element.name;
-        bool noNetRoomUpdate = false;
+        bool thereWereDuplicates = false;
         bool how = element.transform.GetChild(2).GetComponent<Toggle>().isOn;
-        Debug.Log(name + " " + how.ToString());
 
         if (how)
         {
             if (!specialList.Contains(name)) specialList.Add(name);
-            else noNetRoomUpdate = true;
+            else thereWereDuplicates = true;
         }
         else specialList.Remove(name);
         specialCountText.text = "Special (" + specialList.Count + " active):";
 
-        if (noNetRoomUpdate) return;
+        if (noUpdateNetRoom || thereWereDuplicates) return;
         Hashtable table = new() {
             [Enums.NetRoomProperties.SpecialRules] = SpecialRulesToDict()
         };
@@ -739,6 +738,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         Utils.GetCustomProperty(Enums.NetPlayerProperties.Spectator, out bool spectating, PhotonNetwork.LocalPlayer.CustomProperties);
         spectateToggle.isOn = spectating;
         chatTextField.SetTextWithoutNotify("");
+        noUpdateNetRoom = false;
     }
 
     IEnumerator SetScroll() {
@@ -1029,10 +1029,15 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         PhotonNetwork.Disconnect();
     }
 
+    bool noUpdateNetRoom = false;
     public void QuitRoom() {
         foreach (var rule in ruleList)
             Destroy(rule.gameObject);
         ruleList.Clear();
+        noUpdateNetRoom = true;
+        foreach (Transform toggle in specialTogglesParent.transform)
+            toggle.transform.GetChild(2).GetComponent<Toggle>().isOn = false;
+        specialList.Clear();
         PhotonNetwork.LeaveRoom();
     }
     public void StartGame() {
@@ -1204,6 +1209,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         coinsText.interactable = PhotonNetwork.IsMasterClient && coinsEnabled.isOn;
         drawTimeupToggle.interactable = PhotonNetwork.IsMasterClient && timeEnabled.isOn;
         chainableActionsToggle.interactable = PhotonNetwork.IsMasterClient;
+        setSpecialBtn.text = PhotonNetwork.IsMasterClient ? "Set" : "See";
 
         Utils.GetCustomProperty(Enums.NetRoomProperties.Debug, out bool debug);
         privateToggleRoom.interactable = PhotonNetwork.IsMasterClient && !debug;
@@ -1578,12 +1584,8 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     public void DictToSpecialRules(Dictionary<string, bool> dict)
     {
         specialList = dict.Keys.ToList();
-        // TODO: add looping thru list ma activating toggles
-        foreach (string rule in specialList)
-        {
-            // maybe a bit hardcoded but whatever...
-            specialTogglesParent.transform.Find(rule).GetChild(2).GetComponent<Toggle>().isOn = true;
-        }
+        foreach (Transform toggle in specialTogglesParent.transform)
+            toggle.transform.GetChild(2).GetComponent<Toggle>().isOn = specialList.Contains(toggle.name);
         specialCountText.text = "Special (" + specialList.Count + " active):";
     }
 

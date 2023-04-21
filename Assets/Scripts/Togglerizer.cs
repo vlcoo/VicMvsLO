@@ -14,7 +14,6 @@ public class Togglerizer : MonoBehaviour
         Dictionary<string, bool> currentEffectsDict;
         Utils.GetCustomProperty(Enums.NetRoomProperties.SpecialRules, out currentEffectsDict);
         currentEffects = currentEffectsDict.Keys.ToList();
-        Debug.Log("togglerizer: " + currentEffects.ToString());
     }
 
     // Update is called once per frame
