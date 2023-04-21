@@ -200,9 +200,9 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
 
             if (!PhotonNetwork.IsMasterClient)
                 return;
-
-            foreach (EnemySpawnpoint point in enemySpawnpoints)
-                point.AttemptSpawning();
+            if (!Togglerizer.currentEffects.Contains("NoEnemies"))
+                foreach (EnemySpawnpoint point in enemySpawnpoints)
+                    point.AttemptSpawning();
 
             break;
         }
@@ -486,8 +486,8 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         }
 
         brickBreak = ((GameObject) Instantiate(Resources.Load("Prefabs/Particle/BrickBreak"))).GetComponent<ParticleSystem>();
-        resetButton.SetActive(raceLevel && nonSpectatingPlayers.Count == 1);
-        resetHardButton.SetActive(raceLevel && nonSpectatingPlayers.Count == 1);
+        resetButton.SetActive(raceLevel && nonSpectatingPlayers.Count == 1 && !SpectationManager.Spectating);
+        resetHardButton.SetActive(raceLevel && nonSpectatingPlayers.Count == 1 && !SpectationManager.Spectating);
     }
 
     private void CheckIfAllLoaded() {
@@ -559,7 +559,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             if (!GlobalController.Instance.fastLoad) yield return new WaitForSeconds(3.5f);
             sfx.PlayOneShot(Enums.Sounds.UI_StartGame.GetClip());
 
-            if (PhotonNetwork.IsMasterClient)
+            if (PhotonNetwork.IsMasterClient && !Togglerizer.currentEffects.Contains("NoEnemies"))
                 foreach (EnemySpawnpoint point in FindObjectsOfType<EnemySpawnpoint>())
                     point.AttemptSpawning();
 
