@@ -7,8 +7,5 @@ public class MusicData : ScriptableObject {
     public float loopStartSample, loopEndSample;
 
     public float[] bahTimestamps;
-    public bool hasBahs
-    {
-        get => bahTimestamps.Length != 0;
-    }
+    public bool hasBahs => bahTimestamps != null && bahTimestamps.Length != 0;
 }

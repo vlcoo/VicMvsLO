@@ -487,8 +487,8 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
                 string sanitizedAct = Regex.Replace(entry.Value, "(\\B[A-Z0-9])", " $1").Replace("Act ", "");
                 rulesLbl.text += sanitizedCond + " .. " + sanitizedAct + (MatchConditioner.currentMapping.Last().Equals(entry) ? "" : "\n");
             }
-            rulesLbl.text += "\n& " + Togglerizer.currentEffects.Count + " special effects";
         }
+        rulesLbl.text += "\n& " + Togglerizer.currentEffects.Count + " special effects";
 
         brickBreak = ((GameObject) Instantiate(Resources.Load("Prefabs/Particle/BrickBreak"))).GetComponent<ParticleSystem>();
         resetButton.SetActive(raceLevel && nonSpectatingPlayers.Count == 1 && !SpectationManager.Spectating);

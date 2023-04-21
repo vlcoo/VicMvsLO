@@ -12,6 +12,7 @@ public class Togglerizer : MonoBehaviour
     {
         Dictionary<string, bool> currentEffectsDict;
         Utils.GetCustomProperty(Enums.NetRoomProperties.SpecialRules, out currentEffectsDict);
+        if (currentEffectsDict == null) return;
         currentEffects = currentEffectsDict.Keys.ToList();
     }
 }
