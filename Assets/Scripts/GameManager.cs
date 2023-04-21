@@ -481,8 +481,12 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         {
             rulesLbl.text = "";
             foreach (var entry in MatchConditioner.currentMapping)
-                rulesLbl.text += entry.Key + " .. " + entry.Value.Replace("Act", "") +
-                                 (MatchConditioner.currentMapping.Last().Equals(entry) ? "" : "\n");
+            {
+                string sanitizedCond = Regex.Replace(entry.Key, "(\\B[A-Z0-9])", " $1");
+                string sanitizedAct = Regex.Replace(entry.Value, "(\\B[A-Z0-9])", " $1").Replace("Act ", "");
+                rulesLbl.text += sanitizedCond + " .. " + sanitizedAct + (MatchConditioner.currentMapping.Last().Equals(entry) ? "" : "\n");
+            }
+            rulesLbl.text += "\n& " + Togglerizer.currentEffects.Count + " special effects";
         }
 
         brickBreak = ((GameObject) Instantiate(Resources.Load("Prefabs/Particle/BrickBreak"))).GetComponent<ParticleSystem>();
