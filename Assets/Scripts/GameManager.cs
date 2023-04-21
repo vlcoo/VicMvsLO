@@ -37,6 +37,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
 
     public MusicData mainMusic, invincibleMusic, megaMushroomMusic;
     public MatchConditioner MatchConditioner { get; private set; }
+    public Togglerizer Togglerizer { get; private set; }
     private long speedrunTimerStartTimestamp = 0;
 
     public int levelMinTileX, levelMinTileY, levelWidthTile, levelHeightTile;
@@ -434,6 +435,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
     public void Start() {
         SpectationManager = GetComponent<SpectationManager>();
         MatchConditioner = GetComponent<MatchConditioner>();
+        Togglerizer = GetComponent<Togglerizer>();
         loopMusic = GetComponent<LoopingMusic>();
         coins = GameObject.FindGameObjectsWithTag("coin");
         levelUIColor.a = .7f;

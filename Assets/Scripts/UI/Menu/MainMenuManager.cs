@@ -36,7 +36,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     public GameObject title, bg, mainMenu, optionsMenu, lobbyMenu, createLobbyPrompt, inLobbyMenu, creditsMenu, controlsMenu, privatePrompt, updateBox, newRuleS1Prompt, newRuleS2Prompt, emoteListPrompt, RNGRulesBox, specialPrompt;
     public Animator createLobbyPromptAnimator, privatePromptAnimator, updateBoxAnimator, errorBoxAnimator, rebindPromptAnimator, newRuleS1PromptAnimator, newRuleS2PromptAnimator, emoteListPromptAnimator, RNGRulesBoxAnimator;
     public GameObject[] levelCameraPositions;
-    public GameObject sliderText, lobbyText, currentMaxPlayers, settingsPanel, ruleTemplate, lblConditions;
+    public GameObject sliderText, lobbyText, currentMaxPlayers, settingsPanel, ruleTemplate, lblConditions, specialTogglesParent;
     public TMP_Dropdown levelDropdown, characterDropdown;
     public RoomIcon selectedRoomIcon, privateJoinRoom;
     public Button joinRoomBtn, createRoomBtn, startGameBtn;
@@ -46,7 +46,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     public Slider musicSlider, sfxSlider, masterSlider, lobbyPlayersSlider, changePlayersSlider, RNGSlider;
     public GameObject mainMenuSelected, optionsSelected, lobbySelected, currentLobbySelected, createLobbySelected, creditsSelected, controlsSelected, privateSelected, reconnectSelected, updateBoxSelected, newRuleS1Selected, newRuleS2Selected, emoteListSelected, RNGRulesSelected, specialSelected;
     public GameObject errorBox, errorButton, rebindPrompt, reconnectBox;
-    public TMP_Text errorText, errorDetail, rebindCountdown, rebindText, reconnectText, updateText, RNGSliderText;
+    public TMP_Text errorText, errorDetail, rebindCountdown, rebindText, reconnectText, updateText, RNGSliderText, specialCountText;
     public TMP_Dropdown region;
     public RebindManager rebindManager;
     public static string lastRegion;
@@ -249,7 +249,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         AttemptToUpdateProperty<int>(updatedProperties, Enums.NetRoomProperties.Level, ChangeLevel);
         AttemptToUpdateProperty<int>(updatedProperties, Enums.NetRoomProperties.StarRequirement, ChangeStarRequirement);
         AttemptToUpdateProperty<Dictionary<string, string>>(updatedProperties, Enums.NetRoomProperties.MatchRules, DictToMatchRules);
-        AttemptToUpdateProperty<List<string>>(updatedProperties, Enums.NetRoomProperties.SpecialRules, ListToSpecialRules);
+        AttemptToUpdateProperty<Dictionary<string, bool>>(updatedProperties, Enums.NetRoomProperties.SpecialRules, DictToSpecialRules);
         AttemptToUpdateProperty<int>(updatedProperties, Enums.NetRoomProperties.CoinRequirement, ChangeCoinRequirement);
         AttemptToUpdateProperty<int>(updatedProperties, Enums.NetRoomProperties.Lives, ChangeLives);
         AttemptToUpdateProperty<bool>(updatedProperties, Enums.NetRoomProperties.NewPowerups, ChangeNewPowerups);
@@ -621,6 +621,28 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
                 });
             }
         }
+    }
+
+    public void onSetSpecialRule(GameObject element)
+    {
+        string name = element.name;
+        bool noNetRoomUpdate = false;
+        bool how = element.transform.GetChild(2).GetComponent<Toggle>().isOn;
+        Debug.Log(name + " " + how.ToString());
+
+        if (how)
+        {
+            if (!specialList.Contains(name)) specialList.Add(name);
+            else noNetRoomUpdate = true;
+        }
+        else specialList.Remove(name);
+        specialCountText.text = "Special (" + specialList.Count + " active):";
+
+        if (noNetRoomUpdate) return;
+        Hashtable table = new() {
+            [Enums.NetRoomProperties.SpecialRules] = SpecialRulesToDict()
+        };
+        PhotonNetwork.CurrentRoom.SetCustomProperties(table);
     }
 
     public void onAddMatchRuleExplicit(string cond, string act, bool updateNetRoom, bool updateUIList = true)
@@ -1553,9 +1575,22 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
             onAddMatchRuleExplicit(entry.Key, entry.Value, false, true);
     }
 
-    public void ListToSpecialRules(List<string> list)
+    public void DictToSpecialRules(Dictionary<string, bool> dict)
     {
-        
+        specialList = dict.Keys.ToList();
+        // TODO: add looping thru list ma activating toggles
+        foreach (string rule in specialList)
+        {
+            // maybe a bit hardcoded but whatever...
+            specialTogglesParent.transform.Find(rule).GetChild(2).GetComponent<Toggle>().isOn = true;
+        }
+        specialCountText.text = "Special (" + specialList.Count + " active):";
+    }
+
+    public Dictionary<string, bool> SpecialRulesToDict()
+    {
+        specialList = specialList.Distinct().ToList();
+        return specialList.ToDictionary(x => x, x => true);
     }
 
     public void ChangeStarRequirement(int stars) {

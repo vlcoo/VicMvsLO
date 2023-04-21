@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using NSMB.Utils;
 using UnityEngine;
 
@@ -10,7 +11,10 @@ public class Togglerizer : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        Utils.GetCustomProperty(Enums.NetRoomProperties.SpecialRules, out currentEffects);
+        Dictionary<string, bool> currentEffectsDict;
+        Utils.GetCustomProperty(Enums.NetRoomProperties.SpecialRules, out currentEffectsDict);
+        currentEffects = currentEffectsDict.Keys.ToList();
+        Debug.Log("togglerizer: " + currentEffects.ToString());
     }
 
     // Update is called once per frame
