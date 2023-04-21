@@ -83,7 +83,8 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     {
         "Spawned", "GotCoin", "GotPowerup", "GotMega", "LostPowerup", "GotStar", "HitBlock", "BumpedInto", "KnockedBack", "Frozen", "BumpedSmn", 
         "StompedSmn", "TriggeredPowerup", "Died", "SteppedOnEnemy", "Jumped", "LookedRight", "LookedLeft", "LookedUp", "LookedDown", "Ran", "ReachedCoinLimit",
-        "Disqualified", "1MinRemaining", "Every1Sec", "Every5Sec", "Every10Sec", "Every30Sec", "Every60Sec", "GotCheckpoint"
+        "Disqualified", "1MinRemaining", "Every15Sec", "Every5Sec", "Every10Sec", "Every30Sec", "Every60Sec", "GotCheckpoint", "Bah‘d"  // ← i know that's not an apostrophe but the ui
+                                                                                                                                        // font is wack and uses this character instead
     };
     public List<string> POSSIBLE_ACTIONS = new List<string>();
 

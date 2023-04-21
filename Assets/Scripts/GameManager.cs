@@ -881,6 +881,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         {
             enemy.bah();
         }
+        MatchConditioner.ConditionActioned(null, "Bah‘d");
     }
 
     private void PlaySong(Enums.MusicState state, MusicData musicToPlay) {

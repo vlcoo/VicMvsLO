@@ -14,9 +14,9 @@ public class MatchConditioner : MonoBehaviour
     public Dictionary<string, string> currentMapping = new();
     public bool chainableActions = false;
 
-    private float timer1Sec = 1;
     private float timer5Sec = 5;
     private float timer10Sec = 10;
+    private float timer15Sec = 15;
     private float timer30Sec = 30;
     private float timer60Sec = 60;
 
@@ -34,11 +34,6 @@ public class MatchConditioner : MonoBehaviour
         if (GameManager.Instance.gameover || !GameManager.Instance.started) return;
         float delta = Time.fixedDeltaTime;
         
-        if (timer1Sec == 0)
-        {
-            timer1Sec = 1;
-            ConditionActioned(null, "Every1Sec");
-        }
         if (timer5Sec == 0)
         {
             timer5Sec = 5;
@@ -48,6 +43,11 @@ public class MatchConditioner : MonoBehaviour
         {
             timer10Sec = 10;
             ConditionActioned(null, "Every10Sec");
+        }
+        if (timer15Sec == 0)
+        {
+            timer15Sec = 15;
+            ConditionActioned(null, "Every15Sec");
         }
         if (timer30Sec == 0)
         {
@@ -60,9 +60,9 @@ public class MatchConditioner : MonoBehaviour
             ConditionActioned(null, "Every60Sec");
         }
         
-        Utils.TickTimer(ref timer1Sec, 0, delta);
         Utils.TickTimer(ref timer5Sec, 0, delta);
         Utils.TickTimer(ref timer10Sec, 0, delta);
+        Utils.TickTimer(ref timer15Sec, 0, delta);
         Utils.TickTimer(ref timer30Sec, 0, delta);
         Utils.TickTimer(ref timer60Sec, 0, delta);
     }
