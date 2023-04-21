@@ -276,6 +276,10 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         LoadFromGameState();
         spawned = true;
         cameraController.Recenter();
+
+        normalGravity /= GameManager.Instance.Togglerizer.currentEffects.Contains("LowGravity") ? 4 : 1;
+        groundpoundVelocity /= GameManager.Instance.Togglerizer.currentEffects.Contains("LowGravity") ? 2.25f : 1;
+        propellerLaunchVelocity /= GameManager.Instance.Togglerizer.currentEffects.Contains("NerfedPropeller") ? 3 : 1;
     }
 
     public void OnDestroy() {
@@ -464,7 +468,8 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         switch (collision.gameObject.tag) {
         case "Player": {
             //hit players
-
+            if (GameManager.Instance.Togglerizer.currentEffects.Contains("NoCollisions")) break;
+            
             if (contacts.Length < collision.contactCount)
                 contacts = new ContactPoint2D[collision.contactCount];
             collision.GetContacts(contacts);
@@ -2278,8 +2283,10 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         return ret;
     }
 
-    void HandleWallslide(bool holdingLeft, bool holdingRight, bool jump) {
-
+    void HandleWallslide(bool holdingLeft, bool holdingRight, bool jump)
+    {
+        if (GameManager.Instance.Togglerizer.currentEffects.Contains("LimitedMoveset")) return;
+        
         Vector2 currentWallDirection;
         if (holdingLeft) {
             currentWallDirection = Vector2.left;
@@ -2390,6 +2397,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         if (bounce || (jump && (onGround || (koyoteTime < 0.07f && !propeller)) && !startedSliding)) {
 
             bool canSpecialJump = (jump || (bounce && jumpHeld)) && properJump && !flying && !propeller && topSpeed && landing < 0.45f && !holding && !triplejump && !crouching && !inShell && ((body.velocity.x < 0 && !facingRight) || (body.velocity.x > 0 && facingRight)) && !Physics2D.Raycast(body.position + new Vector2(0, 0.1f), Vector2.up, 1f, Layers.MaskOnlyGround);
+            if (GameManager.Instance.Togglerizer.currentEffects.Contains("LimitedMoveset")) canSpecialJump = false;
             float jumpBoost = 0;
 
             koyoteTime = 1;
@@ -2868,7 +2876,14 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
 
         if (photonView.IsMine && body.position.y + transform.lossyScale.y < GameManager.Instance.GetLevelMinY()) {
             //death via pit
-            photonView.RPC(nameof(Death), RpcTarget.All, true, false);
+            if (GameManager.Instance.Togglerizer.currentEffects.Contains("NoDeathplane"))
+            {
+                Vector2 levelTopPos = new Vector2(
+                    transform.position.x,
+                    GameManager.Instance.levelMinTileY + GameManager.Instance.levelHeightTile + 5);
+                transform.position = body.position = levelTopPos;
+            }
+            else photonView.RPC(nameof(Death), RpcTarget.All, true, false);
             return;
         }
 
@@ -3259,6 +3274,8 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
     }
 
     void HandleGroundpoundStart(bool left, bool right) {
+        if (GameManager.Instance.Togglerizer.currentEffects.Contains("LimitedMoveset")) return;
+        
         if (!photonView.IsMine)
             return;
 

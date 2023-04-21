@@ -37,6 +37,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
 
     public MusicData mainMusic, invincibleMusic, megaMushroomMusic;
     public MatchConditioner MatchConditioner { get; private set; }
+    public Togglerizer Togglerizer { get; private set; }
     private long speedrunTimerStartTimestamp = 0;
 
     public int levelMinTileX, levelMinTileY, levelWidthTile, levelHeightTile;
@@ -200,9 +201,9 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
 
             if (!PhotonNetwork.IsMasterClient)
                 return;
-
-            foreach (EnemySpawnpoint point in enemySpawnpoints)
-                point.AttemptSpawning();
+            if (!Togglerizer.currentEffects.Contains("NoEnemies"))
+                foreach (EnemySpawnpoint point in enemySpawnpoints)
+                    point.AttemptSpawning();
 
             break;
         }
@@ -435,6 +436,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
     public void Start() {
         SpectationManager = GetComponent<SpectationManager>();
         MatchConditioner = GetComponent<MatchConditioner>();
+        Togglerizer = GetComponent<Togglerizer>();
         loopMusic = GetComponent<LoopingMusic>();
         coins = GameObject.FindGameObjectsWithTag("coin");
         levelUIColor.a = .7f;
@@ -480,13 +482,17 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         {
             rulesLbl.text = "";
             foreach (var entry in MatchConditioner.currentMapping)
-                rulesLbl.text += entry.Key + " .. " + entry.Value.Replace("Act", "") +
-                                 (MatchConditioner.currentMapping.Last().Equals(entry) ? "" : "\n");
+            {
+                string sanitizedCond = Regex.Replace(entry.Key, "(\\B[A-Z0-9])", " $1");
+                string sanitizedAct = Regex.Replace(entry.Value, "(\\B[A-Z0-9])", " $1").Replace("Act ", "");
+                rulesLbl.text += sanitizedCond + " .. " + sanitizedAct + (MatchConditioner.currentMapping.Last().Equals(entry) ? "" : "\n");
+            }
+            rulesLbl.text += "\n& " + Togglerizer.currentEffects.Count + " special effects";
         }
 
         brickBreak = ((GameObject) Instantiate(Resources.Load("Prefabs/Particle/BrickBreak"))).GetComponent<ParticleSystem>();
-        resetButton.SetActive(raceLevel && nonSpectatingPlayers.Count == 1);
-        resetHardButton.SetActive(raceLevel && nonSpectatingPlayers.Count == 1);
+        resetButton.SetActive(raceLevel && nonSpectatingPlayers.Count == 1 && !SpectationManager.Spectating);
+        resetHardButton.SetActive(raceLevel && nonSpectatingPlayers.Count == 1 && !SpectationManager.Spectating);
     }
 
     private void CheckIfAllLoaded() {
@@ -558,7 +564,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             if (!GlobalController.Instance.fastLoad) yield return new WaitForSeconds(3.5f);
             sfx.PlayOneShot(Enums.Sounds.UI_StartGame.GetClip());
 
-            if (PhotonNetwork.IsMasterClient)
+            if (PhotonNetwork.IsMasterClient && !Togglerizer.currentEffects.Contains("NoEnemies"))
                 foreach (EnemySpawnpoint point in FindObjectsOfType<EnemySpawnpoint>())
                 {
                     point.AttemptSpawning();

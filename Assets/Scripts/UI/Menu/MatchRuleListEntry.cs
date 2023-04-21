@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -30,7 +31,11 @@ public class MatchRuleListEntry : MonoBehaviour, IEquatable<MatchRuleListEntry>
         Condition = cond;
         Action = act;
         if (lbl is not null)
-            lbl.text = cond + " .. " + act;
+        {
+            string sanitizedCond = Regex.Replace(cond, "(\\B[A-Z0-9])", " $1");
+            string sanitizedAct = Regex.Replace(act, "(\\B[A-Z0-9])", " $1").Replace("Act ", "");
+            lbl.text = sanitizedCond + " .. " + sanitizedAct;
+        }
     }
 
     public void onRemoveButtonPressed()
