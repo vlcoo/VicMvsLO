@@ -418,7 +418,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
             message = message./*Replace("<", "«").Replace(">", "»").*/Replace("\n", " ").Trim();
             message = Regex.Replace(message, ":([^:]+):", "<sprite name=\"$1\">");
 
-            message = "<size=10><i> " + sender.GetUniqueNickname() + "</size></i>\n" + message.Filter();
+            message = "<size=10><i>" + sender.GetUniqueNickname() + "</size></i>\n" + message.Filter();
 
             LocalChatMessage(message, Color.black, false);
             break;
