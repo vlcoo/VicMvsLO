@@ -2876,14 +2876,14 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
 
         if (photonView.IsMine && body.position.y + transform.lossyScale.y < GameManager.Instance.GetLevelMinY()) {
             //death via pit
-            /*if (GameManager.Instance.Togglerizer.currentEffects.Contains("NoDeathplane"))
-            {*/
+            if (GameManager.Instance.Togglerizer.currentEffects.Contains("NoDeathplane"))
+            {
                 Vector2 levelTopPos = new Vector2(
                     transform.position.x,
                     (GameManager.Instance.levelMinTileY + GameManager.Instance.levelHeightTile) + 10);
                 transform.position = body.position = levelTopPos;
-            /*}
-            else photonView.RPC(nameof(Death), RpcTarget.All, true, false);*/
+            }
+            else photonView.RPC(nameof(Death), RpcTarget.All, true, false);
             return;
         }
 
