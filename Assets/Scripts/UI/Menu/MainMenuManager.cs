@@ -740,6 +740,8 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         spectateToggle.isOn = spectating;
         chatTextField.SetTextWithoutNotify("");
         noUpdateNetRoom = false;
+        
+        if (PhotonNetwork.LocalPlayer.HasRainbowName()) SwapCharacterExplicit(2);
     }
 
     IEnumerator SetScroll() {
@@ -1475,15 +1477,17 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         sfx.PlayOneShot(Enums.Sounds.UI_WindowOpen.GetClip());
     }
 
-    public void SwapCharacter(TMP_Dropdown dropdown) {
+    public void SwapCharacterExplicit(int id)
+    {
         Hashtable prop = new() {
-            { Enums.NetPlayerProperties.Character, dropdown.value }
+            { Enums.NetPlayerProperties.Character, id }
         };
         PhotonNetwork.LocalPlayer.SetCustomProperties(prop);
-        Settings.Instance.character = dropdown.value;
+        Settings.Instance.character = id;
         Settings.Instance.SaveSettingsToPreferences();
 
-        PlayerData data = GlobalController.Instance.characters[dropdown.value];
+        if (id > 1) return;
+        PlayerData data = GlobalController.Instance.characters[id];
         sfx.PlayOneShot(Enums.Sounds.Player_Voice_Selected.GetClip(data));
         colorManager.ChangeCharacter(data);
 
@@ -1498,6 +1502,10 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
             overallColor.color = colors.overallsColor;
             shirtColor.color = colors.hatColor;
         }
+    }
+
+    public void SwapCharacter(TMP_Dropdown dropdown) {
+        SwapCharacterExplicit(dropdown.value);
     }
 
     public void SetPlayerColor(int index) {
