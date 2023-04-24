@@ -20,6 +20,7 @@ public class PlayerAnimationController : MonoBehaviourPun {
     private BoxCollider2D mainHitbox;
     private List<Renderer> renderers = new();
     private MaterialPropertyBlock materialBlock;
+    public bool useSpecialSmall = false;
 
     public Color GlowColor {
         get {
@@ -57,6 +58,8 @@ public class PlayerAnimationController : MonoBehaviourPun {
             primaryColor = colors.overallsColor.linear;
             secondaryColor = colors.hatColor.linear;
         }
+
+        if (smallModel == largeModel) useSpecialSmall = true;
     }
 
     public void Update() {
@@ -289,8 +292,12 @@ public class PlayerAnimationController : MonoBehaviourPun {
         //Model changing
         bool large = controller.state >= Enums.PowerupState.Mushroom;
 
-        largeModel.SetActive(large);
-        smallModel.SetActive(!large);
+        if (!useSpecialSmall)
+        {
+            largeModel.SetActive(large);
+            smallModel.SetActive(!large);
+        }
+        else largeModel.SetActive(true);
         blueShell.SetActive(controller.state == Enums.PowerupState.BlueShell);
 
         largeShellExclude.SetActive(!animator.GetCurrentAnimatorStateInfo(0).IsName("in-shell"));
@@ -302,6 +309,7 @@ public class PlayerAnimationController : MonoBehaviourPun {
         HandlePipeAnimation();
 
         transform.position = new(transform.position.x, transform.position.y, animator.GetBool("pipe") ? 1 : -4);
+        if (useSpecialSmall) largeModel.transform.GetChild(0).localScale = large ? new Vector3(1, 1, 1) : new Vector3(1, 0.7f, 0.7f);
     }
     void HandleDeathAnimation() {
         if (!controller.dead) {
