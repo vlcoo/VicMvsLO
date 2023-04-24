@@ -51,6 +51,8 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
     public bool spawnBigPowerups = true, spawnVerticalPowerups = true;
     public string levelDesigner = "", richPresenceId = "", levelName = "Unknown";
     private TileBase[] originalTiles;
+    public TileBase breakableTileReplacement;
+    public TileBase[] nonReplaceableTiles;
     private BoundsInt origin;
     private GameObject[] starSpawns;
     private readonly List<GameObject> remainingSpawns = new();
@@ -455,6 +457,14 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
 
         //Respawning Tilemaps
         origin = new BoundsInt(levelMinTileX, levelMinTileY, 0, levelWidthTile, levelHeightTile, 1);
+        if (Togglerizer.currentEffects.Contains("AllBricks"))
+        { // funny...
+            for (int x = tilemap.cellBounds.min.x; x < tilemap.cellBounds.max.x; x++)
+                for (int y = tilemap.cellBounds.min.y; y < tilemap.cellBounds.max.y; y++)
+                    for (int z = tilemap.cellBounds.min.z; z < tilemap.cellBounds.max.z; z++)
+                        if (!nonReplaceableTiles.Contains(tilemap.GetTile(new Vector3Int(x, y, z))))
+                            tilemap.SetTile(new Vector3Int(x, y, z), breakableTileReplacement);
+        }
         originalTiles = tilemap.GetTilesBlock(origin);
 
         //Star spawning
