@@ -28,7 +28,7 @@ public class FallingSnow : MonoBehaviour
             transform.eulerAngles = new Vector3(
                 transform.eulerAngles.x,
                 transform.eulerAngles.y,
-                Mathf.Sin(wakeupTimer * 20f));
+                Mathf.Sin(wakeupTimer * 120f) * 4f);
             wakeupTimer -= Time.fixedDeltaTime;
         }
     }
