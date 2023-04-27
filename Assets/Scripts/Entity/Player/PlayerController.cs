@@ -711,6 +711,11 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             photonView.RPC(nameof(Knockback), RpcTarget.All, facingRight, 3, false, -1);
             break;
         }
+        case "harmer":
+        {
+            photonView.RPC(nameof(PlayerController.Powerdown), RpcTarget.All, false);
+            break;
+        }
         case "lava":
         case "poison": {
             if (!photonView.IsMine)
