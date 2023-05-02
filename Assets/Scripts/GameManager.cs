@@ -61,8 +61,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
 
     public Canvas nametagCanvas;
     public GameObject nametagPrefab;
-    public TMP_ColorGradient gradientMarioText;
-    public TMP_ColorGradient gradientLuigiText;
+    public TMP_ColorGradient gradientMarioText, gradientLuigiText, gradientNegativeAltText;
 
     //Audio
     public AudioSource music, sfx;
@@ -125,7 +124,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             }
 
             //server room instantiation
-            if (sender == null || sender.IsMasterClient)
+            if (sender is not { IsMasterClient: not true })
                 return;
 
             PlayerController controller = players.FirstOrDefault(pl => sender == pl.photonView.Owner);
@@ -150,11 +149,11 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             break;
         }
         case (byte) Enums.NetEventIds.EndGame: {
-            if (!(sender?.IsMasterClient ?? false))
+            if (!(sender?.IsMasterClient ?? false) || gameover)
                 return;
 
-            Player winner = (Player) customData;
-            StartCoroutine(EndGame(winner));
+            Player winner = customData is string ? null : (Player) customData;
+            StartCoroutine(EndGame(winner, customData is "DUMMY_HOST_END"));
             break;
         }
         case (byte) Enums.NetEventIds.SetTile: {
@@ -659,26 +658,28 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         SceneManager.LoadSceneAsync(level + 2, LoadSceneMode.Single);
     }
 
-    private IEnumerator EndGame(Player winner)
+    private IEnumerator EndGame(Player winner, bool cancelled = false)
     {
-        if (gameover) yield return null;
         gameover = true;
         
         PhotonNetwork.CurrentRoom.SetCustomProperties(new() { [Enums.NetRoomProperties.GameStarted] = false });
         music.Stop();
         GameObject text = GameObject.FindWithTag("wintext");
-        text.GetComponent<TMP_Text>().text = winner != null ? $"{ winner.GetUniqueNickname() } Wins!" : "It's a tie...";
+        text.GetComponent<TMP_Text>().text = cancelled
+            ? "No contest"
+            : (winner == null ? "It's a tie..." : $"{winner.GetUniqueNickname()} Wins!");
 
-        yield return new WaitForSecondsRealtime(1);
+        if (!cancelled) yield return new WaitForSecondsRealtime(1);
 
         AudioMixer mixer = music.outputAudioMixerGroup.audioMixer;
         mixer.SetFloat("MusicSpeed", 1f);
         mixer.SetFloat("MusicPitch", 1f);
         
-        bool win = winner != null && winner.IsLocal;
-        bool draw = winner == null;
+        bool win = winner != null && winner.IsLocal && !cancelled;
+        bool draw = winner == null && !cancelled;
         int secondsUntilMenu;
         secondsUntilMenu = draw ? 5 : 4;
+        if (cancelled) secondsUntilMenu = 1;
 
         if (draw) {
             music.PlayOneShot(Enums.Sounds.UI_Match_Draw.GetClip());
@@ -700,6 +701,12 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
                 text.GetComponent<TMP_Text>().colorGradientPreset = gradientLuigiText;
             else
                 text.GetComponent<TMP_Text>().colorGradientPreset = gradientMarioText;
+        }
+        else if (cancelled)
+        {
+            text.GetComponent<TMP_Text>().colorGradientPreset = gradientNegativeAltText;
+            music.PlayOneShot(Enums.Sounds.UI_Countdown_1.GetClip());
+            text.GetComponent<Animator>().SetTrigger("startNegative");
         }
         else {
             music.PlayOneShot(Enums.Sounds.UI_Match_Lose.GetClip());
@@ -968,11 +975,24 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
 
         Quit();
     }
+    
+    public void GiveUp()
+    {
+        pauseUI.SetActive(false);
+        PlayerController controller = localPlayer.GetComponent<PlayerController>();
+        if (SpectationManager.Spectating)
+        {
+            sfx.PlayOneShot(Enums.Sounds.UI_Error.GetClip());
+            return;
+        }
+        sfx.PlayOneShot(Enums.Sounds.UI_Decide.GetClip());
+        controller.Disqualify();
+    }
 
     public void HostEndMatch() {
         pauseUI.SetActive(false);
         sfx.PlayOneShot(Enums.Sounds.UI_Decide.GetClip());
-        PhotonNetwork.RaiseEvent((byte) Enums.NetEventIds.EndGame, null, NetworkUtils.EventAll, SendOptions.SendReliable);
+        PhotonNetwork.RaiseEvent((byte) Enums.NetEventIds.EndGame, "DUMMY_HOST_END", NetworkUtils.EventAll, SendOptions.SendReliable);
     }
 
     public void Quit() {

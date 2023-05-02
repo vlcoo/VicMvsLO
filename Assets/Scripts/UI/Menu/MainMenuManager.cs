@@ -340,7 +340,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     }
     public void OnCustomAuthenticationFailed(string failure) {
         Debug.Log("[PHOTON] Auth Failure: " + failure);
-        OpenErrorBox(failure);
+        OpenErrorBox("Authentication failure", failure);
     }
     public void OnConnectedToMaster() {
         JoinMainLobby();
@@ -357,12 +357,12 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     }
     public void OnJoinRoomFailed(short reasonId, string reasonMessage) {
         Debug.LogError($"[PHOTON] Join room failed ({reasonId}, {reasonMessage})");
-        OpenErrorBox(reasonMessage, "JoinFail");
+        OpenErrorBox("Can't join room", reasonMessage);
         JoinMainLobby();
     }
     public void OnCreateRoomFailed(short reasonId, string reasonMessage) {
         Debug.LogError($"[PHOTON] Create room failed ({reasonId}, {reasonMessage})");
-        OpenErrorBox(reasonMessage, "CreateFail");
+        OpenErrorBox("Can't create room", reasonMessage);
 
         OnConnectedToMaster();
     }
@@ -991,13 +991,11 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         errorBox.SetActive(true);
         var whyString = cause switch
         {
-            "HostDestinationUnresolved" => "Device not connected to the Internet",
-            "JoinFail" => "Can't join the room",
-            "CreateFail" => "Can't create a room",
-            _ => "Unknown cause"
+            "" => "Unknown cause",
+            _ => cause
         };
-        errorText.text = whyString;
-        errorDetail.text = text;
+        errorText.text = text;
+        errorDetail.text = whyString;
         
         if (errorBoxAnimator != null)
             errorBoxAnimator.SetBool("open", errorBox.activeSelf);
@@ -1153,7 +1151,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         string id = lobbyJoinField.text.ToUpper();
         int index = roomNameChars.IndexOf(id[0]);
         if (id.Length < 8 || index < 0 || index >= allRegions.Count) {
-            OpenErrorBox("Invalid Room ID");
+            OpenErrorBox("Can't join room", "Invalid Room ID");
             return;
         }
         string region = allRegions[index];
