@@ -156,6 +156,11 @@ public class MatchConditioner : MonoBehaviour
     {
         whom.DiveForward();
     }
+
+    public void ActLaunchPlayer(PlayerController whom)
+    {
+        throw new NotImplementedException();
+    }
     
     public void ActFreezePlayer(PlayerController whom) 
     {
@@ -199,5 +204,10 @@ public class MatchConditioner : MonoBehaviour
     public void ActRandomTeleport(PlayerController whom)
     {
         whom.RandomTeleport();
+    }
+
+    public void ActRandom(PlayerController whom)
+    {
+        throw new NotImplementedException();
     }
 }

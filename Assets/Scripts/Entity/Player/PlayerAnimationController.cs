@@ -309,7 +309,7 @@ public class PlayerAnimationController : MonoBehaviourPun {
         HandlePipeAnimation();
 
         transform.position = new(transform.position.x, transform.position.y, animator.GetBool("pipe") ? 1 : -4);
-        if (useSpecialSmall) largeModel.transform.GetChild(0).localScale = large ? new Vector3(1, 1, 1) : new Vector3(1, 0.7f, 0.7f);
+        if (useSpecialSmall) largeModel.transform.GetChild(0).localScale = large ? new Vector3(1, 1, 1) : new Vector3(0.8f, 0.7f, 0.7f);
     }
     void HandleDeathAnimation() {
         if (!controller.dead) {
