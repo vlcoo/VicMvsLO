@@ -2406,7 +2406,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
     {
         photonView.RPC(nameof(PlaySound), RpcTarget.All, Enums.Sounds.Player_Voice_SpinnerLaunch);
         photonView.RPC(nameof(PlaySound), RpcTarget.All, Enums.Sounds.World_Spinner_Launch);
-        body.velocity = new Vector2(0, 12);
+        body.velocity = new Vector2(body.velocity.x, 10);
         flying = true;
         onGround = false;
         body.position += Vector2.up * 0.075f;
