@@ -2762,6 +2762,9 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         Utils.TickTimer(ref groundpoundCounter, 0, delta);
         Utils.TickTimer(ref giantEndTimer, 0, delta);
         Utils.TickTimer(ref groundpoundDelay, 0, delta);
+        if (GameManager.Instance.Togglerizer.currentEffects.Contains("NoIFrames"))
+            hitInvincibilityCounter = 0f;
+        else Utils.TickTimer(ref hitInvincibilityCounter, 0, delta);
         Utils.TickTimer(ref hitInvincibilityCounter, 0, delta);
         Utils.TickTimer(ref propellerSpinTimer, 0, delta);
         Utils.TickTimer(ref propellerTimer, 0, delta);
@@ -2886,16 +2889,26 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         if (dead || !spawned)
             return;
 
-        if (photonView.IsMine && body.position.y + transform.lossyScale.y < GameManager.Instance.GetLevelMinY()) {
+        int deathplaneDirection = 0;
+        if (body.position.y + transform.lossyScale.y < GameManager.Instance.GetLevelMinY()) deathplaneDirection = -1;
+        else if (body.position.y + transform.lossyScale.y >
+                 GameManager.Instance.GetLevelMinY() + GameManager.Instance.levelHeightTile - 2) deathplaneDirection = 1;
+
+        if (photonView.IsMine && deathplaneDirection != 0) {
             //death via pit
             if (GameManager.Instance.Togglerizer.currentEffects.Contains("NoDeathplane"))
             {
-                Vector2 levelTopPos = new Vector2(
-                    transform.position.x,
-                    (GameManager.Instance.levelMinTileY + GameManager.Instance.levelHeightTile) + 10);
-                transform.position = body.position = levelTopPos;
+                if (deathplaneDirection == -1)
+                {
+                    Vector2 levelTopPos = new Vector2(
+                        transform.position.x,
+                        GameManager.Instance.GetLevelMinY() + GameManager.Instance.levelHeightTile);
+                    transform.position = body.position = levelTopPos;
+                }
             }
-            else photonView.RPC(nameof(Death), RpcTarget.All, true, false);
+            else if (GameManager.Instance.Togglerizer.currentEffects.Contains("UpDeathplane") ||
+                     deathplaneDirection == -1)
+                photonView.RPC(nameof(Death), RpcTarget.All, true, false);
             return;
         }
 

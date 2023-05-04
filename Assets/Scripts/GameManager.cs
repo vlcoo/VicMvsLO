@@ -441,6 +441,12 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         loopMusic = GetComponent<LoopingMusic>();
         coins = GameObject.FindGameObjectsWithTag("coin");
         levelUIColor.a = .7f;
+        if (Togglerizer.currentEffects.Contains("ReverseLoop") && !raceLevel) loopingLevel = !loopingLevel;
+        if (loopingLevel)
+        {
+            cameraMinX = -1000;
+            cameraMaxX = 1000;
+        }
 
         InputSystem.controls.LoadBindingOverridesFromJson(GlobalController.Instance.controlsJson);
 
