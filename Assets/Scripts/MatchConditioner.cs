@@ -159,11 +159,12 @@ public class MatchConditioner : MonoBehaviour
 
     public void ActLaunchPlayer(PlayerController whom)
     {
-        throw new NotImplementedException();
+        whom.SpinnerInstantly();
     }
     
-    public void ActFreezePlayer(PlayerController whom) 
+    public void ActFreezePlayer(PlayerController whom)
     {
+        if (!whom.photonView.IsMine) return;
         whom.FreezeInstantly(matchConditioned:chainableActions);
     }
 
@@ -204,10 +205,5 @@ public class MatchConditioner : MonoBehaviour
     public void ActRandomTeleport(PlayerController whom)
     {
         whom.RandomTeleport();
-    }
-
-    public void ActRandom(PlayerController whom)
-    {
-        throw new NotImplementedException();
     }
 }

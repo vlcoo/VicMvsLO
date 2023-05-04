@@ -1338,6 +1338,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
     public void RemoveCoinInstantly(bool matchConditioned = false)
     {
         photonView.RPC(nameof(CollectCoin), RpcTarget.All, -1, coins - 1, (Vector2) transform.position);
+        if (coins == 0) GameManager.Instance.MatchConditioner.ConditionActioned(this, "Reached0Coins");
     }
 
     [PunRPC]
@@ -2399,6 +2400,21 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             return;
 
         wallSlideTimer = 16 / 60f;
+    }
+
+    public void SpinnerInstantly()
+    {
+        photonView.RPC(nameof(PlaySound), RpcTarget.All, Enums.Sounds.Player_Voice_SpinnerLaunch);
+        photonView.RPC(nameof(PlaySound), RpcTarget.All, Enums.Sounds.World_Spinner_Launch);
+        Vector2 spinnerVel = onSpinner.GetComponent<SpinnerAnimator>().launchVelocity;
+        body.velocity = new Vector2(0, 12);
+        flying = true;
+        onGround = false;
+        body.position += Vector2.up * 0.075f;
+        doGroundSnap = false;
+        previousOnGround = false;
+        crouching = false;
+        inShell = false;
     }
 
     void HandleJumping(bool jump) {
