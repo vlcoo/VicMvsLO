@@ -377,19 +377,9 @@ public class PlayerAnimationController : MonoBehaviourPun {
                 offset.y += size;
             }
 
-            if (pe.isRNG)
-            {
-                Vector2 levelRandomPos = new Vector2(
-                    Random.Range(GameManager.Instance.levelMinTileX,
-                        GameManager.Instance.levelMinTileX + GameManager.Instance.levelWidthTile) / 2,
-                    Math.Abs(Random.Range(GameManager.Instance.levelMinTileY,
-                        GameManager.Instance.levelMinTileY + GameManager.Instance.levelHeightTile)) / 2);
-                transform.position = body.position = levelRandomPos;
-            }
-            else
-                transform.position = body.position =
-                    new Vector3(pe.otherPipe.transform.position.x, pe.otherPipe.transform.position.y, 1) -
-                    (Vector3)offset;
+            transform.position = body.position =
+                new Vector3(pe.otherPipe.transform.position.x, pe.otherPipe.transform.position.y, 1) -
+                (Vector3)offset;
             photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.Player_Sound_Powerdown);
             controller.cameraController.Recenter();
         }

@@ -683,9 +683,9 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         
         bool win = winner != null && winner.IsLocal && !cancelled;
         bool draw = winner == null && !cancelled;
-        int secondsUntilMenu;
+        float secondsUntilMenu;
         secondsUntilMenu = draw ? 5 : 4;
-        if (cancelled) secondsUntilMenu = 1;
+        if (cancelled) secondsUntilMenu = 1.5f;
 
         if (draw) {
             music.PlayOneShot(Enums.Sounds.UI_Match_Draw.GetClip());
@@ -711,7 +711,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         else if (cancelled)
         {
             text.GetComponent<TMP_Text>().colorGradientPreset = gradientNegativeAltText;
-            music.PlayOneShot(Enums.Sounds.UI_Countdown_1.GetClip());
+            music.PlayOneShot(Enums.Sounds.UI_Match_Cancelled.GetClip());
             text.GetComponent<Animator>().SetTrigger("startNegative");
         }
         else {
