@@ -71,7 +71,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 1
+    textureCompression: 0
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -92,6 +92,30 @@ TextureImporter:
     forceMaximumCompressionQuality_BC6H_BC7: 0
   - serializedVersion: 3
     buildTarget: Server
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: WebGL
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
@@ -1117,7 +1141,7 @@ TextureImporter:
       name: eating
       rect:
         serializedVersion: 2
-        x: 921
+        x: 924
         y: 44
         width: 44
         height: 44
@@ -1138,7 +1162,7 @@ TextureImporter:
       name: sob
       rect:
         serializedVersion: 2
-        x: 966
+        x: 968
         y: 44
         width: 44
         height: 44
@@ -1151,6 +1175,69 @@ TextureImporter:
       bones: []
       spriteID: 2d152620f37a73c5ea1c13ea7bc88ce6
       internalID: -287624828
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ski
+      rect:
+        serializedVersion: 2
+        x: 1056
+        y: 44
+        width: 44
+        height: 44
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d2e8b25af7500d0159a233461fc16309
+      internalID: -2068924450
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: pain
+      rect:
+        serializedVersion: 2
+        x: 1012
+        y: 44
+        width: 44
+        height: 44
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c32b5996c89bef9f4a740640dc201942
+      internalID: 1824359449
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: thehd
+      rect:
+        serializedVersion: 2
+        x: 1100
+        y: 44
+        width: 44
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 525990d9bfd735882ba043a370b95218
+      internalID: -1539493657
       vertices: []
       indices: 
       edges: []
@@ -1197,6 +1284,7 @@ TextureImporter:
       oh_no: 1350980734
       damn_bro: -2132383037
       classyman: -1671481225
+      thehd: -1539493657
       1up: -1290211119
       iceflower: 1094193296
       the: -762956651
@@ -1212,9 +1300,11 @@ TextureImporter:
       luigisad: 921769039
       troll: -1496145661
       mamohappy: 1894564475
+      ski: -2068924450
       megamushroom1: 1865282294
       walter_yellow: 1233322453
       mamo: 839674233
+      pain: 1824359449
       megamushroom4: -1500550057
   spritePackingTag: 
   pSDRemoveMatte: 0
