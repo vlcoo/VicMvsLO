@@ -338,7 +338,7 @@ public class PlayerAnimationController : MonoBehaviourPun {
             body.gravityScale = 1.2f;
             body.velocity = new Vector2(0, Mathf.Max(-deathForce, body.velocity.y));
         }
-        if (controller.photonView.IsMine && deathTimer + Time.fixedDeltaTime > (3 - 0.43f) && deathTimer < (3 - 0.43f))
+        if (controller.photonView.IsMine && deathTimer + Time.fixedDeltaTime > (2.5f - 0.43f) && deathTimer < (2.5f - 0.43f))
             controller.fadeOut.FadeOutAndIn(0.33f, .1f);
 
         if (photonView.IsMine && deathTimer >= 3f)

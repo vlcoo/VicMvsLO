@@ -8,9 +8,11 @@ public class FadeOutManager : MonoBehaviour {
 
     private Image image;
     private Coroutine fadeCoroutine;
+    private Animator anim;
 
     public void Start() {
         image = GetComponent<Image>();
+        anim = GetComponent<Animator>();
     }
 
     private IEnumerator Fade() {
@@ -24,12 +26,14 @@ public class FadeOutManager : MonoBehaviour {
     }
 
     public void FadeOutAndIn(float fadeTime, float blackTime) {
-        this.fadeTime = fadeTime;
-        this.blackTime = blackTime;
-        totalTime = fadeTime + blackTime;
-        fadeTimer = totalTime;
-
-        if (fadeCoroutine == null)
-            fadeCoroutine = StartCoroutine(Fade());
+        // this.fadeTime = fadeTime;
+        // this.blackTime = blackTime;
+        // totalTime = fadeTime + blackTime;
+        // fadeTimer = totalTime;
+        //
+        // if (fadeCoroutine == null)
+        //     fadeCoroutine = StartCoroutine(Fade());
+        
+        anim.SetTrigger("FadeInAndOut");
     }
 }
