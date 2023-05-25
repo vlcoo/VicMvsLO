@@ -10,6 +10,7 @@ public class FadeOutManager : MonoBehaviour {
     private Image image;
     private Coroutine fadeCoroutine;
     private Animator anim;
+    public bool alreadyInitiallyFadedOut = false;
 
     public void Start() {
         image = GetComponent<Image>();
@@ -22,6 +23,8 @@ public class FadeOutManager : MonoBehaviour {
 
     public void FadeOut()
     {
+        if (alreadyInitiallyFadedOut) return;
         anim.SetTrigger("FadeOut");
+        alreadyInitiallyFadedOut = true;
     }
 }
