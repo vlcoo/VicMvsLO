@@ -2780,7 +2780,6 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         if (GameManager.Instance.Togglerizer.currentEffects.Contains("NoIFrames"))
             hitInvincibilityCounter = 0f;
         else Utils.TickTimer(ref hitInvincibilityCounter, 0, delta);
-        Utils.TickTimer(ref hitInvincibilityCounter, 0, delta);
         Utils.TickTimer(ref propellerSpinTimer, 0, delta);
         Utils.TickTimer(ref propellerTimer, 0, delta);
         Utils.TickTimer(ref knockbackTimer, 0, delta);
