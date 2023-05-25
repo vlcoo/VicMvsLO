@@ -588,13 +588,19 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
                 foreach (EnemySpawnpoint point in FindObjectsOfType<EnemySpawnpoint>())
                 {
                     point.AttemptSpawning();
-                    if (point.currentEntity != null)
-                    {
-                        BahableEntity entity = point.currentEntity.GetComponent<BahableEntity>();
-                        if (entity == null) continue;
-                        bahableEntities.Add(entity);
-                    }
+                    if (point.currentEntity == null) continue;
+                    BahableEntity entity = point.currentEntity.GetComponent<BahableEntity>();
+                    if (entity == null) continue;
+                    bahableEntities.Add(entity);
                 }
+
+            if (Togglerizer.currentEffects.Contains("NoEnemies"))
+            {
+                foreach (BulletBillLauncher launcher in FindObjectsOfType<BulletBillLauncher>())
+                    launcher.enabled = false;
+                foreach (PiranhaPlantController plant in FindObjectsOfType<PiranhaPlantController>())
+                    plant.enabled = false;
+            }
 
             if (localPlayer)
                 localPlayer.GetComponent<PlayerController>().OnGameStart();
