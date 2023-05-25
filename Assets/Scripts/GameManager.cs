@@ -87,6 +87,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
 
     private GameObject[] coins;
     public SpectationManager SpectationManager { get; private set; }
+    public FadeOutManager fader;
 
     private ParticleSystem brickBreak;
 
@@ -576,7 +577,11 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         } catch { }
 
         if (gameStarting) {
-            if (!GlobalController.Instance.fastLoad) yield return new WaitForSeconds(3.5f);
+            if (!GlobalController.Instance.fastLoad)
+            {
+                yield return new WaitForSeconds(3.5f);
+                fader.FadeOut();
+            }
             sfx.PlayOneShot(Enums.Sounds.UI_StartGame.GetClip());
 
             if (PhotonNetwork.IsMasterClient && !Togglerizer.currentEffects.Contains("NoEnemies"))

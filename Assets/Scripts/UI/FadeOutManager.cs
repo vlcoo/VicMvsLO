@@ -1,4 +1,5 @@
 using System.Collections;
+using NSMB.Utils;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -15,25 +16,12 @@ public class FadeOutManager : MonoBehaviour {
         anim = GetComponent<Animator>();
     }
 
-    private IEnumerator Fade() {
-        while (fadeTimer > -totalTime) {
-            fadeTimer -= Time.deltaTime;
-            image.color = new(0, 0, 0, 1 - Mathf.Clamp01((Mathf.Abs(fadeTimer) - blackTime) / fadeTime));
-            yield return null;
-        }
-        image.color = new(0, 0, 0, 0);
-        fadeCoroutine = null;
+    public void FadeOutAndIn(float fadeTime, float blackTime) {
+        anim.SetTrigger("FadeInAndOut");
     }
 
-    public void FadeOutAndIn(float fadeTime, float blackTime) {
-        // this.fadeTime = fadeTime;
-        // this.blackTime = blackTime;
-        // totalTime = fadeTime + blackTime;
-        // fadeTimer = totalTime;
-        //
-        // if (fadeCoroutine == null)
-        //     fadeCoroutine = StartCoroutine(Fade());
-        
-        anim.SetTrigger("FadeInAndOut");
+    public void FadeOut()
+    {
+        anim.SetTrigger("FadeOut");
     }
 }
