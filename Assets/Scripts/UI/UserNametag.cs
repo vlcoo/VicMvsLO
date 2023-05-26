@@ -65,7 +65,7 @@ public class UserNametag : MonoBehaviour {
         if (parent.lives >= 0)
             text.text += Utils.GetCharacterData(parent.photonView.Owner).uistring + Utils.GetSymbolString($"x{parent.lives} ");
         
-        if (parent.stars >= 0)
+        if (parent.stars >= 0 && GameManager.Instance.starRequirement > 0)
             text.text += Utils.GetSymbolString($"Sx{parent.stars}");
 
         if (rainbowName)
