@@ -46,12 +46,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fc22b60a21898684990112e398fb492f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  resultTile: 
-  prefab: 
   sprite: {fileID: 0}
-  fromAbove: 0
-  hitter: {fileID: 0}
   spawnOffset: {x: 0, y: 0}
+  resultTile: 
+  resultPrefab: 
+  fromAbove: 0
 --- !u!95 &1392538299819834460
 Animator:
   serializedVersion: 4
@@ -127,7 +126,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: 3d01629585a9acfcb903f2a62aaa5ca6, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -295,7 +294,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e996f15526c6efc41a2844bb5666b6ce, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  soundRange: 12
-  soundOrigin: {fileID: 8461069782552266576}
   audioSources:
   - {fileID: 8649210667712108321}
+  soundOrigin: {fileID: 8461069782552266576}
+  soundRange: 12
