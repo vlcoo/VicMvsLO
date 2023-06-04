@@ -39,7 +39,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     public GameObject sliderText, lobbyText, currentMaxPlayers, settingsPanel, ruleTemplate, lblConditions, specialTogglesParent;
     public TMP_Dropdown levelDropdown, characterDropdown;
     public RoomIcon selectedRoomIcon, privateJoinRoom;
-    public Button joinRoomBtn, createRoomBtn, startGameBtn;
+    public Button joinRoomBtn, createRoomBtn, startGameBtn, exitBtn;
     public Toggle ndsResolutionToggle, fullscreenToggle, livesEnabled, powerupsEnabled, timeEnabled, starsEnabled, coinsEnabled, drawTimeupToggle, fireballToggle, vsyncToggle, privateToggle, privateToggleRoom, aspectToggle, spectateToggle, scoreboardToggle, filterToggle, chainableActionsToggle, RNGClear;
     public GameObject playersContent, playersPrefab, chatContent, chatPrefab;
     public TMP_InputField nicknameField, starsText, coinsText, livesField, timeField, lobbyJoinField, chatTextField;
@@ -549,6 +549,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
 #if PLATFORM_WEBGL
         fullscreenToggle.interactable = false;
+        exitBtn.interactable = false;
 #else
         if (!GlobalController.Instance.checkedForVersion) {
             UpdateChecker.IsUpToDate((upToDate, latestVersion) => {

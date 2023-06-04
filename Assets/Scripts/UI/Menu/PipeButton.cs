@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
+using DG.Tweening;
 
 public class PipeButton : MonoBehaviour {
 
@@ -39,8 +40,8 @@ public class PipeButton : MonoBehaviour {
 
     private void SetAnchor(Vector2 value) {
         if (leftAnchored)
-            rect.anchorMax = value;
+            DOTween.To(() => rect.anchorMax, v => rect.anchorMin = v, value, 0.2f);
         else
-            rect.anchorMin = value;
+            DOTween.To(() => rect.anchorMin, v => rect.anchorMin = v, value, 0.2f);
     }
 }
