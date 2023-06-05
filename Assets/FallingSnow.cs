@@ -40,7 +40,7 @@ public class FallingSnow : MonoBehaviour
         if (player is null) return;
 
         isActive = true;
-        sfx.PlayOneShot(Enums.Sounds.World_Falling_Snow.GetClip());
+        player.PlaySound(Enums.Sounds.World_Falling_Snow);
         StartCoroutine(nameof(ShakeAndFall));
     }
 

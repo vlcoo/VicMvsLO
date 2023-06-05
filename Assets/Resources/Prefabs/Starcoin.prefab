@@ -863,7 +863,7 @@ ParticleSystem:
           m_PostInfinity: 2
           m_RotationOrder: 4
   EmissionModule:
-    enabled: 1
+    enabled: 0
     serializedVersion: 4
     rateOverTime:
       serializedVersion: 2
@@ -4834,13 +4834,14 @@ GameObject:
   - component: {fileID: 1973747262660636105}
   - component: {fileID: 7013426154861581906}
   - component: {fileID: 1973747262660636107}
+  - component: {fileID: 4045131444209380683}
   - component: {fileID: 858852620204674597}
   - component: {fileID: 7844204986304545686}
   - component: {fileID: 1973747262660636098}
   - component: {fileID: 4766034588940193156}
   m_Layer: 9
   m_Name: Starcoin
-  m_TagString: bigstar
+  m_TagString: starcoin
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -4871,9 +4872,9 @@ Animator:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1973747262660636106}
-  m_Enabled: 0
+  m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 1585ef5c5e82551468c0f24e1785529c, type: 2}
+  m_Controller: {fileID: 9100000, guid: 1910ead5ad3f273fd9d5f981f94216c8, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -4895,6 +4896,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3460820d6c0f2b045999cb2484247103, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &4045131444209380683
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1973747262660636106}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f06b23f437b0ec0239dc6d3a64a17465, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  number: 0
 --- !u!114 &858852620204674597
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4922,7 +4936,7 @@ AudioSource:
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: -8359218312643153770, guid: b73add24eb026c844b85593f8bab1f8c,
     type: 2}
-  m_audioClip: {fileID: 8300000, guid: a6a625e3bb2c8ee41be41a59e4f81fe4, type: 3}
+  m_audioClip: {fileID: 0}
   m_PlayOnAwake: 1
   m_Volume: 0
   m_Pitch: 1
@@ -5056,7 +5070,7 @@ GameObject:
   - component: {fileID: 1973747262981084692}
   m_Layer: 10
   m_Name: Hitbox
-  m_TagString: bigstar
+  m_TagString: starcoin
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -5113,7 +5127,7 @@ GameObject:
   - component: {fileID: 1685891547958204419}
   - component: {fileID: 906891372936302462}
   - component: {fileID: 1817202716429188949}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: coin
   m_TagString: Untagged
   m_Icon: {fileID: 0}

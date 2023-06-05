@@ -50,6 +50,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
     public bool onGround, previousOnGround, crushGround, doGroundSnap, jumping, properJump, hitRoof, skidding, turnaround, facingRight = true, singlejump, doublejump, triplejump, bounce, crouching, groundpound, groundpoundLastFrame, sliding, knockback, hitBlock, running, functionallyRunning, jumpHeld, flying, drill, inShell, hitLeft, hitRight, stuckInBlock, alreadyStuckInBlock, propeller, usedPropellerThisJump, stationaryGiantEnd, fireballKnockback, startedSliding, canShootProjectile, gotCheckpoint;
     public float jumpLandingTimer, landing, koyoteTime, groundpoundCounter, groundpoundStartTimer, pickupTimer, groundpoundDelay, hitInvincibilityCounter, powerupFlash, throwInvincibility, jumpBuffer, giantStartTimer, giantEndTimer, propellerTimer, propellerSpinTimer, fireballTimer;
     public float invincible, giantTimer, floorAngle, knockbackTimer, pipeTimer, slowdownTimer;
+    public bool[] collectedStarcoins = new bool[] {false, false, false};
 
     //MOVEMENT STAGES
     private static readonly int WALK_STAGE = 1, RUN_STAGE = 3, STAR_STAGE = 4;
@@ -634,7 +635,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
 
                 gotCheckpoint = true;
                 obj.GetComponent<Animation>().Play();
-                GameManager.Instance.sfx.PlayOneShot(Enums.Sounds.World_Checkpoint.GetClip());
+                PlaySoundEverywhere(Enums.Sounds.World_Checkpoint);
                 GameManager.Instance.SendAndExecuteEvent(Enums.NetEventIds.ResetTiles, null, SendOptions.SendReliable);
                 GameManager.Instance.MatchConditioner.ConditionActioned(this, "GotCheckpoint");
                 break;
@@ -650,8 +651,18 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
                 drill = false;
                 flying = false;
                 animator.SetTrigger("winByGoal");
-                if (GameManager.Instance.nonSpectatingPlayers.Count > 1) StartCoroutine(nameof(GoalAnimReachBottomNotAlone));
-                else StartCoroutine(nameof(GoalAnimReachBottom));
+                StartCoroutine(GameManager.Instance.nonSpectatingPlayers.Count > 1
+                    ? nameof(GoalAnimReachBottomNotAlone)
+                    : nameof(GoalAnimReachBottom));
+                break;
+            }
+            case "starcoin":
+            {
+                Starcoin coin = collider.transform.parent.GetComponent<Starcoin>();
+                if (collectedStarcoins[coin.number]) return;
+                PlaySound(Enums.Sounds.World_Starcoin, 0, 3);
+                coin.animationController.SetTrigger("collected");
+                collectedStarcoins[coin.number] = true;
                 break;
             }
         }
@@ -2655,7 +2666,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
                 float angle = Mathf.Abs(floorAngle);
                 if (angle > slopeSlidingAngle) {
                     //uphill / downhill
-                    acc = (angle > 30 ? SLIDING_45_ACC : SLIDING_22_ACC) * ((Mathf.Sign(floorAngle) == sign) ? 0 : 1);
+                    acc = (angle > 30 ? SLIDING_45_ACC : SLIDING_22_ACC) * ((Mathf.Sign(floorAngle) == sign) ? -1 : 1);
                 } else {
                     //flat ground
                     acc = -SPEED_STAGE_ACC[0] / (onIce ? 4f : 1f);

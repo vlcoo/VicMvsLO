@@ -2,23 +2,22 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.U2D;
 
 public class GoalFlagpole : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
+    public BoxCollider2D collider, colliderBottom;
+    public SpriteShapeController spline;
+
+    public void Start()
     {
-        
+        SetUnlocked(true);
     }
 
-    // Update is called once per frame
-    void Update()
+    public void SetUnlocked(bool how)
     {
-        
-    }
-
-    private void OnTriggerEnter2D(Collider2D col)
-    {
-        
+        collider.enabled = how;
+        colliderBottom.enabled = how;
+        spline.enabled = !how;
     }
 }
