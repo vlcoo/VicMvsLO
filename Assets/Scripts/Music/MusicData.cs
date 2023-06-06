@@ -8,4 +8,9 @@ public class MusicData : ScriptableObject {
 
     public float[] bahTimestamps;
     public bool hasBahs => bahTimestamps != null && bahTimestamps.Length != 0;
+
+    public MusicData(AudioClip audio)
+    {
+        clip = audio;
+    }
 }

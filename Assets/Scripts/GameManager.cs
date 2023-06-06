@@ -614,6 +614,9 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             if (localPlayer)
                 localPlayer.GetComponent<PlayerController>().OnGameStart();
         }
+        
+        if (Togglerizer.currentEffects.Contains("NoBahs"))
+            mainMusic = new MusicData(mainMusic.fastClip);
 
         startServerTime = startTimestamp + 3500;
         foreach (var wfgs in FindObjectsOfType<WaitForGameStart>())
@@ -976,7 +979,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             PlaySong(Enums.MusicState.Normal, mainMusic);
         }
 
-        loopMusic.FastMusic = speedup;
+        loopMusic.FastMusic = speedup & !raceLevel;
     }
 
     public void OnPause(InputAction.CallbackContext context) {

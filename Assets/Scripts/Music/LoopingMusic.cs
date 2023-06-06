@@ -34,9 +34,10 @@ public class LoopingMusic : MonoBehaviour {
     }
 
     [SerializeField] private AudioSource audioSource;
-    [SerializeField] private MusicData currentSong;
+    [SerializeField] public MusicData currentSong;
 
-    public void Start() {
+    public void Start()
+    {
         if (currentSong)
         {
             Play(currentSong);
