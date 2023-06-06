@@ -25,6 +25,7 @@ public class LoadingWaitingOn : MonoBehaviour
         {
             marioLoadingScene.SetActive(false);
             koopaLoadingScene.SetActive(true);
+            GetComponent<LoopingMusic>().FastMusic = true;
         }
     }
 
