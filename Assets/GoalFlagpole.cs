@@ -11,13 +11,12 @@ public class GoalFlagpole : MonoBehaviour
 
     public void Start()
     {
-        SetUnlocked(true);
     }
 
     public void SetUnlocked(bool how)
     {
         collider.enabled = how;
         colliderBottom.enabled = how;
-        spline.enabled = !how;
+        spline.gameObject.SetActive(!how);
     }
 }

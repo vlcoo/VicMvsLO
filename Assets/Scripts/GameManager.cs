@@ -44,6 +44,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
     public float cameraMinY, cameraHeightY, cameraMinX = -1000, cameraMaxX = 1000;
     public bool loopingLevel = true;
     public bool raceLevel = false;
+    private bool needsStarcoins;
     public Vector3 spawnpoint;
     public Vector3 checkpoint;
     public Tilemap tilemap;
@@ -72,7 +73,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
     public bool paused, loaded, started;
     public GameObject pauseUI, pausePanel, pauseButton;
     public TMP_Text quitButtonLbl, rulesLbl, speedrunTimer;
-    public GameObject resetButton, resetHardButton;
+    public GameObject resetHardButton;
     public Animator pausePanel1Animator;
     public bool gameover = false, musicEnabled = false;
     public readonly HashSet<Player> loadedPlayers = new();
@@ -84,6 +85,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
     public List<PlayerController> players = new();
     public EnemySpawnpoint[] enemySpawnpoints;
     private List<BahableEntity> bahableEntities = new();
+    private GoalFlagpole goal;
 
     private GameObject[] coins;
     public SpectationManager SpectationManager { get; private set; }
@@ -492,6 +494,14 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             SpectationManager.Spectating = true;
         }
 
+        Utils.GetCustomProperty(Enums.NetRoomProperties.Starcoins, out needsStarcoins);
+        if (raceLevel)
+        {
+            goal = FindObjectOfType<GoalFlagpole>();
+            goal.SetUnlocked(!needsStarcoins);
+            if (!needsStarcoins) foreach(Starcoin coin in FindObjectsOfType<Starcoin>()) coin.SetDisabled();
+        }
+
         if (PhotonNetwork.IsMasterClient)
             quitButtonLbl.text = "End Match";
         if (MatchConditioner.currentMapping is not null && MatchConditioner.currentMapping.Count > 0) 
@@ -507,7 +517,6 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         rulesLbl.text += "\n& " + Togglerizer.currentEffects.Count + " special effects";
 
         brickBreak = ((GameObject) Instantiate(Resources.Load("Prefabs/Particle/BrickBreak"))).GetComponent<ParticleSystem>();
-        resetButton.SetActive(raceLevel && nonSpectatingPlayers.Count == 1 && !SpectationManager.Spectating);
         resetHardButton.SetActive(raceLevel && nonSpectatingPlayers.Count == 1 && !SpectationManager.Spectating);
     }
 
@@ -699,7 +708,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         if (cancelled) secondsUntilMenu = 1.5f;
 
         if (draw) {
-            music.PlayOneShot(Enums.Sounds.UI_Match_Draw.GetClip());
+            sfx.PlayOneShot(Enums.Sounds.UI_Match_Draw.GetClip());
             text.GetComponent<Animator>().SetTrigger("startNegative");
         }
         else if (win) {
@@ -722,11 +731,11 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         else if (cancelled)
         {
             text.GetComponent<TMP_Text>().colorGradientPreset = gradientNegativeAltText;
-            music.PlayOneShot(Enums.Sounds.UI_Match_Cancelled.GetClip());
+            sfx.PlayOneShot(Enums.Sounds.UI_Match_Cancelled.GetClip());
             text.GetComponent<Animator>().SetTrigger("startNegative");
         }
         else {
-            music.PlayOneShot(Enums.Sounds.UI_Match_Lose.GetClip());
+            sfx.PlayOneShot(Enums.Sounds.UI_Match_Lose.GetClip());
             text.GetComponent<Animator>().SetTrigger("startNegative");
         }
 
@@ -824,6 +833,12 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         GameObject nametag = Instantiate(nametagPrefab, nametagPrefab.transform.parent);
         nametag.GetComponent<UserNametag>().parent = controller;
         nametag.SetActive(true);
+    }
+
+    public void AllStarcoinsCollected()
+    {
+        if (!raceLevel || !needsStarcoins || !goal) return;
+        goal.SetUnlocked(true);
     }
 
     public void WinByGoal(PlayerController whom)

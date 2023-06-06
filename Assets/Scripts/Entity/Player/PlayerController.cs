@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.InteropServices;
 using UnityEngine;
 using UnityEngine.Tilemaps;
@@ -659,10 +660,11 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             case "starcoin":
             {
                 Starcoin coin = collider.transform.parent.GetComponent<Starcoin>();
-                if (collectedStarcoins[coin.number]) return;
+                if (collectedStarcoins[coin.number-1]) return;
                 PlaySound(Enums.Sounds.World_Starcoin, 0, 3);
                 coin.animationController.SetTrigger("collected");
-                collectedStarcoins[coin.number] = true;
+                collectedStarcoins[coin.number-1] = true;
+                if (collectedStarcoins.All(x => x)) GameManager.Instance.AllStarcoinsCollected();
                 break;
             }
         }

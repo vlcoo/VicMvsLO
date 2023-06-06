@@ -5,17 +5,15 @@ using TMPro;
 
 public class LoadingLevelCreator : MonoBehaviour {
 
-    private TMP_Text text;
-
-    public void Start() {
-        text = GetComponent<TMP_Text>();
-    }
+    public TMP_Text text;
+    public TMP_Text readyText;
 
     public void Update() {
-        if (!GameManager.Instance || GameManager.Instance.levelDesigner == "")
+        if (!GameManager.Instance)
             return;
 
-        text.text = $"Level designed by: {GameManager.Instance.levelDesigner}"; 
+        if (GameManager.Instance.levelDesigner != "") text.text = $"Level designed by: {GameManager.Instance.levelDesigner}";
+        if (GameManager.Instance.MatchConditioner.count >= 10) readyText.text = "You better be ready.";
+        enabled = false;
     }
-
 }

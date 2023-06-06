@@ -40,7 +40,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     public TMP_Dropdown levelDropdown, characterDropdown;
     public RoomIcon selectedRoomIcon, privateJoinRoom;
     public Button joinRoomBtn, createRoomBtn, startGameBtn, exitBtn;
-    public Toggle ndsResolutionToggle, fullscreenToggle, livesEnabled, powerupsEnabled, timeEnabled, starsEnabled, coinsEnabled, drawTimeupToggle, fireballToggle, vsyncToggle, privateToggle, privateToggleRoom, aspectToggle, spectateToggle, scoreboardToggle, filterToggle, chainableActionsToggle, RNGClear;
+    public Toggle ndsResolutionToggle, fullscreenToggle, livesEnabled, powerupsEnabled, timeEnabled, starcoinsEnabled, starsEnabled, coinsEnabled, drawTimeupToggle, fireballToggle, vsyncToggle, privateToggle, privateToggleRoom, aspectToggle, spectateToggle, scoreboardToggle, filterToggle, chainableActionsToggle, RNGClear;
     public GameObject playersContent, playersPrefab, chatContent, chatPrefab;
     public TMP_InputField nicknameField, starsText, coinsText, livesField, timeField, lobbyJoinField, chatTextField;
     public Slider musicSlider, sfxSlider, masterSlider, lobbyPlayersSlider, changePlayersSlider, RNGSlider;
@@ -91,18 +91,19 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
     public List<KeyValuePair<string, string>> DISALLOWED_RULES = new List<KeyValuePair<string, string>>
     {
-        new KeyValuePair<string, string>("GotCoin", "ActGiveCoin"),
-        new KeyValuePair<string, string>("GotStar", "ActGiveStar"),
-        new KeyValuePair<string, string>("Spawned", "ActKillPlayer"),
-        new KeyValuePair<string, string>("KnockedBack", "ActKnockbackPlayer"),
-        new KeyValuePair<string, string>("Frozen", "ActFreezePlayer"),
-        new KeyValuePair<string, string>("Died", "ActFreezePlayer"),
-        new KeyValuePair<string, string>("ReachedCoinLimit", "ActGiveCoin"),
+        new("GotCoin", "ActGiveCoin"),
+        new("GotStar", "ActGiveStar"),
+        new("Spawned", "ActKillPlayer"),
+        new("KnockedBack", "ActKnockbackPlayer"),
+        new("Frozen", "ActFreezePlayer"),
+        new("Died", "ActFreezePlayer"),
+        new("ReachedCoinLimit", "ActGiveCoin"),
     };
     public List<MatchRuleListEntry> ruleList = new();
     public List<string> specialList = new();
     private string aboutToAddCond = "";
     private string aboutToAddAct = "";
+    private bool raceMapSelected = false;
     
     static System.Random rng = new();
 
@@ -257,6 +258,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         AttemptToUpdateProperty<bool>(updatedProperties, Enums.NetRoomProperties.DrawTime, ChangeDrawTime);
         AttemptToUpdateProperty<string>(updatedProperties, Enums.NetRoomProperties.HostName, ChangeLobbyHeader);
         AttemptToUpdateProperty<bool>(updatedProperties, Enums.NetRoomProperties.ChainableRules, ChangeChainableRules);
+        AttemptToUpdateProperty<bool>(updatedProperties, Enums.NetRoomProperties.Starcoins, ChangeStarcoins);
     }
 
     public void ChangeDebugState(bool enabled) {
@@ -1107,6 +1109,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     public void ChangeLevel(int index) {
         levelDropdown.SetValueWithoutNotify(index);
         LocalChatMessage("Map set to " + levelDropdown.options[index].text, Color.red);
+        raceMapSelected = levelDropdown.options[index].text.Contains("racelvl");
         Camera.main.transform.position = levelCameraPositions[index].transform.position;
     }
     public void SetLevelIndex() {
@@ -1209,6 +1212,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         drawTimeupToggle.interactable = PhotonNetwork.IsMasterClient && timeEnabled.isOn;
         chainableActionsToggle.interactable = PhotonNetwork.IsMasterClient;
         setSpecialBtn.text = PhotonNetwork.IsMasterClient ? "Set" : "See";
+        starcoinsEnabled.interactable = PhotonNetwork.IsMasterClient && raceMapSelected;
 
         Utils.GetCustomProperty(Enums.NetRoomProperties.Debug, out bool debug);
         privateToggleRoom.interactable = PhotonNetwork.IsMasterClient && !debug;
@@ -1633,6 +1637,11 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     {
         chainableActionsToggle.SetIsOnWithoutNotify(how);
     }
+    
+    public void ChangeStarcoins(bool how)
+    {
+        starcoinsEnabled.SetIsOnWithoutNotify(how);
+    }
 
     public void ChangeCoinRequirement(int coins) {
         coinsEnabled.SetIsOnWithoutNotify(coins != -1);
@@ -1711,7 +1720,6 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         RNGSliderText.GetComponent<TMP_Text>().text = slider.value.ToString();
     }
 
-
     public void ChangeTime(int time) {
         timeEnabled.SetIsOnWithoutNotify(time != -1);
         UpdateSettingEnableStates();
@@ -1789,6 +1797,14 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
         Hashtable properties = new() {
             [Enums.NetRoomProperties.DrawTime] = toggle.isOn
+        };
+        PhotonNetwork.CurrentRoom.SetCustomProperties(properties);
+    }
+
+    public void SetStarcoins(Toggle toggle)
+    {
+        Hashtable properties = new() {
+            [Enums.NetRoomProperties.Starcoins] = toggle.isOn,
         };
         PhotonNetwork.CurrentRoom.SetCustomProperties(properties);
     }

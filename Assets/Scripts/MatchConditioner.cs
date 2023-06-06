@@ -19,6 +19,8 @@ public class MatchConditioner : MonoBehaviour
     private float timer15Sec = 15;
     private float timer30Sec = 30;
     private float timer60Sec = 60;
+    
+    public int count => currentMapping?.Count ?? 0;
 
     // Start is called before the first frame update
     void Start()

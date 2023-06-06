@@ -2,7 +2,7 @@ Shader "Custom/FlagWave"
 {
 	Properties{
 		_MainTex("Albedo (RGB)", 2D) = "white" {}
-		_Speed("Speed", Range(0, 8.0)) = 1
+		_Speed("Speed", Range(0, 10.0)) = 1
 		_Frequency("Frequency", Range(0, 1.3)) = 1
 		_Amplitude("Amplitude", Range(0, 5.0)) = 1
 	}
