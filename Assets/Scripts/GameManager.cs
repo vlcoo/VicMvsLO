@@ -560,11 +560,11 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         if (canvas) {
             canvas.GetComponent<Animator>().SetTrigger(spectating ? "spectating" : "loaded");
             //please just dont beep at me :(
-            AudioSource source = canvas.GetComponent<AudioSource>();
+            /*AudioSource source = canvas.GetComponent<AudioSource>();
             source.Stop();
             source.volume = 0;
             source.enabled = false;
-            Destroy(canvas.GetComponent<LoopingMusic>());
+            Destroy(canvas.GetComponent<LoopingMusic>());*/
         }
 
         started = true;

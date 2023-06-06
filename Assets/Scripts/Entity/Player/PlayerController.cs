@@ -665,6 +665,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
                 coin.animationController.SetTrigger("collected");
                 collectedStarcoins[coin.number-1] = true;
                 if (collectedStarcoins.All(x => x)) GameManager.Instance.AllStarcoinsCollected();
+                GameManager.Instance.MatchConditioner.ConditionActioned(this, "GotStarcoin");
                 break;
             }
         }

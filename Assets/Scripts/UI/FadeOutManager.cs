@@ -9,7 +9,7 @@ public class FadeOutManager : MonoBehaviour {
 
     private Image image;
     private Coroutine fadeCoroutine;
-    private Animator anim;
+    public Animator anim;
     public bool alreadyInitiallyFadedOut = false;
 
     public void Start() {

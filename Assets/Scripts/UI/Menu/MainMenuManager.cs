@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using DG.Tweening;
 using UnityEngine;
 using UnityEngine.Audio;
 using UnityEngine.EventSystems;
@@ -39,7 +40,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     public GameObject sliderText, lobbyText, currentMaxPlayers, settingsPanel, ruleTemplate, lblConditions, specialTogglesParent;
     public TMP_Dropdown levelDropdown, characterDropdown;
     public RoomIcon selectedRoomIcon, privateJoinRoom;
-    public Button joinRoomBtn, createRoomBtn, startGameBtn, exitBtn;
+    public Button joinRoomBtn, createRoomBtn, startGameBtn, exitBtn, backBtn;
     public Toggle ndsResolutionToggle, fullscreenToggle, livesEnabled, powerupsEnabled, timeEnabled, starcoinsEnabled, starsEnabled, coinsEnabled, drawTimeupToggle, fireballToggle, vsyncToggle, privateToggle, privateToggleRoom, aspectToggle, spectateToggle, scoreboardToggle, filterToggle, chainableActionsToggle, RNGClear;
     public GameObject playersContent, playersPrefab, chatContent, chatPrefab;
     public TMP_InputField nicknameField, starsText, coinsText, livesField, timeField, lobbyJoinField, chatTextField;
@@ -54,7 +55,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     public string selectedRoom;
     public bool askedToJoin;
 
-    public UIDocument dialog;
+    public FadeOutManager fader;
 
     public Image overallColor, shirtColor;
     public GameObject palette, paletteDisabled;
@@ -1041,8 +1042,18 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         specialList.Clear();
         PhotonNetwork.LeaveRoom();
     }
-    public void StartGame() {
+    public void StartGame()
+    {
+        backBtn.interactable = false;
+        sfx.PlayOneShot(Enums.Sounds.UI_Match_Starting.GetClip());
+        DOTween.To(() => music.volume, v => music.volume = v, 0, 0.8f);
+        fader.anim.SetTrigger("out");
+        StartCoroutine(WaitForMusicFadeStartGame());
+    }
 
+    IEnumerator WaitForMusicFadeStartGame()
+    {
+        yield return new WaitForSeconds(0.8f);
         //set started game
         PhotonNetwork.CurrentRoom.SetCustomProperties(new() { [Enums.NetRoomProperties.GameStarted] = true });
 
