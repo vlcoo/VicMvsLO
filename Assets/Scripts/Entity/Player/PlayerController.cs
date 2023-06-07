@@ -2669,7 +2669,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
                 float angle = Mathf.Abs(floorAngle);
                 if (angle > slopeSlidingAngle) {
                     //uphill / downhill
-                    acc = (angle > 30 ? SLIDING_45_ACC : SLIDING_22_ACC) * ((Mathf.Sign(floorAngle) == sign) ? -1 : 1);
+                    if (!onIce) acc = (angle > 30 ? SLIDING_45_ACC : SLIDING_22_ACC) * ((Mathf.Sign(floorAngle) == sign) ? -1 : 1);
                 } else {
                     //flat ground
                     acc = -SPEED_STAGE_ACC[0] / (onIce ? 4f : 1f);

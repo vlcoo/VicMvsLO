@@ -1045,6 +1045,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     public void StartGame()
     {
         backBtn.interactable = false;
+        startGameBtn.interactable = false;
         sfx.PlayOneShot(Enums.Sounds.UI_Match_Starting.GetClip());
         DOTween.To(() => music.volume, v => music.volume = v, 0, 0.8f);
         fader.anim.SetTrigger("out");
