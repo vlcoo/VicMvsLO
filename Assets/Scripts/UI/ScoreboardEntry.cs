@@ -12,7 +12,7 @@ public class ScoreboardEntry : MonoBehaviour {
 
     public PlayerController target;
 
-    private int playerId, currentLives, currentStars;
+    private int playerId, currentLives, currentStars, currentLaps;
     private bool rainbowEnabled;
 
     public void Start() {
@@ -43,12 +43,13 @@ public class ScoreboardEntry : MonoBehaviour {
             background.color = new(0.4f, 0.4f, 0.4f, 0.5f);
             return;
         }
-        if (target.lives == currentLives && target.stars == currentStars)
+        if (target.lives == currentLives && target.stars == currentStars && target.laps == currentLaps)
             // No changes.
             return;
 
         currentLives = target.lives;
         currentStars = target.stars;
+        currentLaps = target.laps;
         UpdateText();
         ScoreboardUpdater.instance.Reposition();
     }
@@ -59,6 +60,8 @@ public class ScoreboardEntry : MonoBehaviour {
             txt += target.character.uistring + Utils.GetSymbolString(currentLives.ToString());
         if (GameManager.Instance.starRequirement > 0)
             txt += Utils.GetSymbolString($"S{currentStars}");
+        if (GameManager.Instance.lapRequirement > 1)
+            txt += Utils.GetSymbolString($"L{currentLaps}");
 
         valuesText.text = txt;
     }
@@ -68,6 +71,13 @@ public class ScoreboardEntry : MonoBehaviour {
             if (x.target == null ^ y.target == null)
                 return x.target == null ? 1 : -1;
 
+            if (GameManager.Instance.lapRequirement > 0)
+            {
+                if (x.currentLaps == y.currentLaps || x.currentLives == 0 || y.currentLives == 0)
+                    return x.playerId - y.playerId;
+                return y.currentLaps - x.currentLaps;
+            }
+            
             if (x.currentStars == y.currentStars || x.currentLives == 0 || y.currentLives == 0) {
                 if (Mathf.Max(0, x.currentLives) == Mathf.Max(0, y.currentLives))
                     return x.playerId - y.playerId;

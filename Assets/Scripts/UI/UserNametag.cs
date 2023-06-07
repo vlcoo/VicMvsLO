@@ -61,14 +61,17 @@ public class UserNametag : MonoBehaviour {
 
         text.text = (parent.photonView.Owner.IsMasterClient ? "<sprite=5>" : "") + parent.photonView.Owner.GetUniqueNickname();
 
-        text.text += "\n";
+        /*text.text += "\n";
         if (parent.lives >= 0)
             text.text += Utils.GetCharacterData(parent.photonView.Owner).uistring + Utils.GetSymbolString($"x{parent.lives} ");
         
         if (parent.stars >= 0 && GameManager.Instance.starRequirement > 0)
             text.text += Utils.GetSymbolString($"Sx{parent.stars}");
+        
+        if (GameManager.Instance.lapRequirement > 1)
+            text.text += Utils.GetSymbolString($"Lx{parent.laps}");
 
         if (rainbowName)
-            text.color = Utils.GetRainbowColor();
+            text.color = Utils.GetRainbowColor();*/
     }
 }

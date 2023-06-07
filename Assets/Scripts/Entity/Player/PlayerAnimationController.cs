@@ -52,7 +52,7 @@ public class PlayerAnimationController : MonoBehaviourPun {
 
         if (photonView) {
             enableGlow = !photonView.IsMine;
-            if (!photonView.IsMine) GameManager.Instance.CreateNametag(controller);
+            /*if (!photonView.IsMine)*/ GameManager.Instance.CreateNametag(controller);
 
             PlayerColorSet colorSet = GlobalController.Instance.skins[(int) photonView.Owner.CustomProperties[Enums.NetPlayerProperties.PlayerColor]];
             PlayerColors colors = colorSet.GetPlayerColors(controller.character);

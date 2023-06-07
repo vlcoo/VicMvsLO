@@ -113,7 +113,8 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
     }
 
     public Vector2 pipeDirection;
-    public int stars, coins, lives, laps = -1;
+    public int stars, coins, lives = -1;
+    [NonSerialized] public int laps = 0;
     public Powerup storedPowerup = null;
     public HoldableEntity holding, holdingOld;
     public FrozenCube frozenObject;
@@ -643,18 +644,30 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             }
             case "goal":
             {
-                GameManager.Instance.WinByGoal(this);
-                spawned = false;
-                body.gravityScale = 0;
-                body.velocity = Vector2.zero;
-                groundpound = false;
-                propeller = false;
-                drill = false;
-                flying = false;
-                animator.SetTrigger("winByGoal");
-                StartCoroutine(GameManager.Instance.nonSpectatingPlayers.Count > 1
-                    ? nameof(GoalAnimReachBottomNotAlone)
-                    : nameof(GoalAnimReachBottom));
+                laps++;
+                if (laps >= GameManager.Instance.lapRequirement)
+                {
+                    GameManager.Instance.WinByGoal(this);
+                    spawned = false;
+                    body.gravityScale = 0;
+                    body.velocity = Vector2.zero;
+                    groundpound = false;
+                    propeller = false;
+                    drill = false;
+                    flying = false;
+                    animator.SetTrigger("winByGoal");
+                    StartCoroutine(GameManager.Instance.nonSpectatingPlayers.Count > 1
+                        ? nameof(GoalAnimReachBottomNotAlone)
+                        : nameof(GoalAnimReachBottom));
+                    break;
+                }
+                gotCheckpoint = false;
+                transform.position = body.position =
+                    gotCheckpoint ? GameManager.Instance.checkpoint : GameManager.Instance.GetSpawnpoint(playerId);
+                PlaySound(Enums.Sounds.UI_WindowOpen);
+                GameManager.Instance.SendAndExecuteEvent(Enums.NetEventIds.ResetTiles, null, SendOptions.SendReliable);
+                GameManager.Instance.MatchConditioner.ConditionActioned(this, "FinishedLap");
+                goalReachedBottom = false;
                 break;
             }
             case "starcoin":

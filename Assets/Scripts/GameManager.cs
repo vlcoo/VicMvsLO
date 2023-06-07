@@ -77,7 +77,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
     public Animator pausePanel1Animator;
     public bool gameover = false, musicEnabled = false;
     public readonly HashSet<Player> loadedPlayers = new();
-    public int starRequirement, timedGameDuration = -1, coinRequirement;
+    public int starRequirement, timedGameDuration = -1, coinRequirement, lapRequirement;
     public bool hurryup = false;
     public bool tenSecondCountdown = false;
 
@@ -480,6 +480,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         starSpawns = GameObject.FindGameObjectsWithTag("StarSpawn");
         Utils.GetCustomProperty(Enums.NetRoomProperties.StarRequirement, out starRequirement);
         Utils.GetCustomProperty(Enums.NetRoomProperties.CoinRequirement, out coinRequirement);
+        Utils.GetCustomProperty(Enums.NetRoomProperties.LapRequirement, out lapRequirement);
 
         SceneManager.SetActiveScene(gameObject.scene);
 

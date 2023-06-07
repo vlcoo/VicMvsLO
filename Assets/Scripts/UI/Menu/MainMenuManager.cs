@@ -43,7 +43,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     public Button joinRoomBtn, createRoomBtn, startGameBtn, exitBtn, backBtn;
     public Toggle ndsResolutionToggle, fullscreenToggle, livesEnabled, powerupsEnabled, timeEnabled, starcoinsEnabled, starsEnabled, coinsEnabled, drawTimeupToggle, fireballToggle, vsyncToggle, privateToggle, privateToggleRoom, aspectToggle, spectateToggle, scoreboardToggle, filterToggle, chainableActionsToggle, RNGClear;
     public GameObject playersContent, playersPrefab, chatContent, chatPrefab;
-    public TMP_InputField nicknameField, starsText, coinsText, livesField, timeField, lobbyJoinField, chatTextField;
+    public TMP_InputField nicknameField, starsText, lapsText, coinsText, livesField, timeField, lobbyJoinField, chatTextField;
     public Slider musicSlider, sfxSlider, masterSlider, lobbyPlayersSlider, changePlayersSlider, RNGSlider;
     public GameObject mainMenuSelected, optionsSelected, lobbySelected, currentLobbySelected, createLobbySelected, creditsSelected, controlsSelected, privateSelected, reconnectSelected, updateBoxSelected, newRuleS1Selected, newRuleS2Selected, emoteListSelected, RNGRulesSelected, specialSelected;
     public GameObject errorBox, errorButton, rebindPrompt, reconnectBox;
@@ -250,6 +250,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         AttemptToUpdateProperty<bool>(updatedProperties, Enums.NetRoomProperties.Debug, ChangeDebugState);
         AttemptToUpdateProperty<int>(updatedProperties, Enums.NetRoomProperties.Level, ChangeLevel);
         AttemptToUpdateProperty<int>(updatedProperties, Enums.NetRoomProperties.StarRequirement, ChangeStarRequirement);
+        AttemptToUpdateProperty<int>(updatedProperties, Enums.NetRoomProperties.LapRequirement, ChangeLapRequirement);
         AttemptToUpdateProperty<Dictionary<string, string>>(updatedProperties, Enums.NetRoomProperties.MatchRules, DictToMatchRules);
         AttemptToUpdateProperty<Dictionary<string, bool>>(updatedProperties, Enums.NetRoomProperties.SpecialRules, DictToSpecialRules);
         AttemptToUpdateProperty<int>(updatedProperties, Enums.NetRoomProperties.CoinRequirement, ChangeCoinRequirement);
@@ -1122,6 +1123,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         levelDropdown.SetValueWithoutNotify(index);
         LocalChatMessage("Map set to " + levelDropdown.options[index].text, Color.red);
         raceMapSelected = levelDropdown.options[index].text.Contains("racelvl");
+        UpdateSettingEnableStates();
         Camera.main.transform.position = levelCameraPositions[index].transform.position;
     }
     public void SetLevelIndex() {
@@ -1224,7 +1226,10 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         drawTimeupToggle.interactable = PhotonNetwork.IsMasterClient && timeEnabled.isOn;
         chainableActionsToggle.interactable = PhotonNetwork.IsMasterClient;
         setSpecialBtn.text = PhotonNetwork.IsMasterClient ? "Set" : "See";
-        starcoinsEnabled.interactable = PhotonNetwork.IsMasterClient && raceMapSelected;
+        starcoinsEnabled.transform.parent.gameObject.SetActive(raceMapSelected);
+        starcoinsEnabled.interactable = PhotonNetwork.IsMasterClient;
+        lapsText.transform.parent.gameObject.SetActive(raceMapSelected);
+        lapsText.interactable = PhotonNetwork.IsMasterClient;
 
         Utils.GetCustomProperty(Enums.NetRoomProperties.Debug, out bool debug);
         privateToggleRoom.interactable = PhotonNetwork.IsMasterClient && !debug;
@@ -1643,6 +1648,26 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         };
         PhotonNetwork.CurrentRoom.SetCustomProperties(table);
         //ChangeStarRequirement(newValue);
+    }
+
+    public void ChangeLapRequirement(int laps)
+    {
+        lapsText.SetTextWithoutNotify(laps.ToString());
+    }
+    public void SetLapRequirement(TMP_InputField input)
+    {
+        if (!PhotonNetwork.IsMasterClient)
+            return;
+
+        int.TryParse(input.text, out int newValue);
+
+        newValue = Math.Clamp(newValue, 1, 99);
+        ChangeLapRequirement(newValue);
+
+        Hashtable table = new() {
+            [Enums.NetRoomProperties.LapRequirement] = newValue
+        };
+        PhotonNetwork.CurrentRoom.SetCustomProperties(table);
     }
 
     public void ChangeChainableRules(bool how)

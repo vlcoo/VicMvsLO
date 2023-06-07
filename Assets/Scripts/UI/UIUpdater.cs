@@ -13,16 +13,16 @@ public class UIUpdater : MonoBehaviour {
     public GameObject playerTrackTemplate, starTrackTemplate;
     public PlayerController player;
     public Sprite storedItemNull;
-    public TMP_Text uiStars, uiCoins, uiDebug, uiLives, uiCountdown;
+    public TMP_Text uiStars, uiCoins, uiDebug, uiLives, uiCountdown, uiLaps;
     public Image itemReserve, itemColor;
     public float pingSample = 0;
 
     private Material timerMaterial;
-    private GameObject starsParent, coinsParent, livesParent, timerParent;
+    private GameObject starsParent, coinsParent, livesParent, timerParent, lapsParent;
     private readonly List<Image> backgrounds = new();
     private bool uiHidden, invis;
 
-    private int coins = -1, stars = -1, lives = -1, timer = -1;
+    private int coins = -1, stars = -1, lives = -1, timer = -1, laps = -1;
 
     public void Start() {
         Instance = this;
@@ -32,11 +32,13 @@ public class UIUpdater : MonoBehaviour {
         coinsParent = uiCoins.transform.parent.gameObject;
         livesParent = uiLives.transform.parent.gameObject;
         timerParent = uiCountdown.transform.parent.gameObject;
+        lapsParent = uiLaps.transform.parent.gameObject;
 
         backgrounds.Add(starsParent.GetComponentInChildren<Image>());
         backgrounds.Add(coinsParent.GetComponentInChildren<Image>());
         backgrounds.Add(livesParent.GetComponentInChildren<Image>());
         backgrounds.Add(timerParent.GetComponentInChildren<Image>());
+        backgrounds.Add(lapsParent.GetComponentInChildren<Image>());
 
         foreach (Image bg in backgrounds)
             bg.color = GameManager.Instance.levelUIColor;
@@ -88,6 +90,7 @@ public class UIUpdater : MonoBehaviour {
         livesParent.SetActive(!hidden);
         coinsParent.SetActive(!hidden);
         timerParent.SetActive(!hidden);
+        lapsParent.SetActive(!hidden);
     }
 
     private void UpdateStoredItemUI() {
@@ -111,6 +114,14 @@ public class UIUpdater : MonoBehaviour {
             }
         }
         else starsParent.SetActive(false);
+        
+        if (GameManager.Instance.lapRequirement > 1) {
+            if (player.laps != laps) {
+                laps = player.laps;
+                uiLaps.text = Utils.GetSymbolString("Lx" + laps + "/" + GameManager.Instance.lapRequirement);
+            }
+        }
+        else lapsParent.SetActive(false);
         
         if (player.coins != coins) {
             coins = player.coins;
