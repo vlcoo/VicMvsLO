@@ -20,7 +20,7 @@ public class UIUpdater : MonoBehaviour {
     private Material timerMaterial;
     private GameObject starsParent, coinsParent, livesParent, timerParent;
     private readonly List<Image> backgrounds = new();
-    private bool uiHidden;
+    private bool uiHidden, invis;
 
     private int coins = -1, stars = -1, lives = -1, timer = -1;
 
@@ -77,7 +77,7 @@ public class UIUpdater : MonoBehaviour {
         if (uiHidden)
             ToggleUI(false);
 
-        UpdateStoredItemUI();
+        if (player && !invis) UpdateStoredItemUI();
         UpdateTextUI();
     }
 
@@ -91,8 +91,11 @@ public class UIUpdater : MonoBehaviour {
     }
 
     private void UpdateStoredItemUI() {
-        if (!player)
-            return;
+        if (GameManager.Instance.Togglerizer.currentEffects.Contains("NoReserve"))
+        {
+            itemReserve.gameObject.SetActive(false);
+            invis = true;
+        }
 
         itemReserve.sprite = player.storedPowerup != null ? player.storedPowerup.reserveSprite : storedItemNull;
     }

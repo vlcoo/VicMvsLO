@@ -1023,7 +1023,6 @@ RectTransform:
   - {fileID: 3537434420574305115}
   - {fileID: 4754722929323754623}
   - {fileID: 4269451001951704030}
-  - {fileID: 5981962928583605274}
   - {fileID: 8191025320669391644}
   - {fileID: 1284403462586313449}
   - {fileID: 7945231628787611118}
@@ -1125,6 +1124,8 @@ MonoBehaviour:
   itemReserve: {fileID: 2321423708915906539}
   itemColor: {fileID: 2568638592884976754}
   pingSample: 20
+  uiHidden: 0
+  invis: 0
 --- !u!225 &77425761379163978
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -4551,12 +4552,12 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 7256241718061403626}
-  m_RootOrder: 5
+  m_Father: {fileID: 4269451001951704030}
+  m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0}
   m_AnchorMax: {x: 1, y: 0}
-  m_AnchoredPosition: {x: -10, y: 10}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 72, y: 72}
   m_Pivot: {x: 1, y: 0}
 --- !u!222 &3370467046366093852
@@ -5882,7 +5883,8 @@ RectTransform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 5981962928583605274}
   m_Father: {fileID: 7256241718061403626}
   m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

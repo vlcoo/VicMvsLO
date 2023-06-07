@@ -112,6 +112,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
 
         //Debug.Log($"id:{eventId} sender:{sender} master:{sender?.IsMasterClient ?? false}");
         switch (eventId) {
+            // object spawning anti-cheat
         case PunEvent.Instantiation: {
             Hashtable table = (Hashtable) parameters.paramDict[245];
             string prefab = (string) table[0];
@@ -616,7 +617,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         }
         
         if (Togglerizer.currentEffects.Contains("NoBahs"))
-            mainMusic = new MusicData(mainMusic.fastClip);
+            mainMusic = new MusicData(mainMusic.fastClip, mainMusic.loopStartSample, mainMusic.loopEndSample);
 
         startServerTime = startTimestamp + 3500;
         foreach (var wfgs in FindObjectsOfType<WaitForGameStart>())

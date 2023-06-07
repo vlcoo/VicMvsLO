@@ -941,7 +941,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         if (!photonView.IsMine || GameManager.Instance.paused || GameManager.Instance.gameover)
             return;
 
-        if (storedPowerup == null || dead || !spawned) {
+        if (storedPowerup == null || dead || !spawned || GameManager.Instance.Togglerizer.currentEffects.Contains("NoReserve")) {
             PlaySound(Enums.Sounds.UI_Error);
             return;
         }
@@ -2926,18 +2926,21 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             //death via pit
             if (GameManager.Instance.Togglerizer.currentEffects.Contains("NoDeathplane"))
             {
-                if (deathplaneDirection == -1)
-                {
-                    Vector2 levelTopPos = new Vector2(
+                Vector2 levelWrapPos = Vector2.zero;
+                if (deathplaneDirection == -1 && body.velocity.y < 0)
+                    levelWrapPos = new Vector2(
                         transform.position.x,
                         GameManager.Instance.GetLevelMinY() + GameManager.Instance.levelHeightTile);
-                    transform.position = body.position = levelTopPos;
-                }
+                else if (deathplaneDirection == 1 && body.velocity.y > 0)
+                    levelWrapPos = new Vector2(transform.position.x, GameManager.Instance.GetLevelMinY());
+                if (levelWrapPos != Vector2.zero) transform.position = body.position = levelWrapPos;
             }
             else if (GameManager.Instance.Togglerizer.currentEffects.Contains("UpDeathplane") ||
                      deathplaneDirection == -1)
+            {
                 photonView.RPC(nameof(Death), RpcTarget.All, true, false);
-            return;
+                return;
+            }
         }
 
         if (Frozen) {
