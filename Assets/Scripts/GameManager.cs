@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using DG.Tweening;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 using UnityEngine.Audio;
@@ -656,6 +657,11 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
                 yield return new WaitForSeconds(t);
             }
         }
+    }
+
+    public void fadeMusic(bool how)
+    {
+        DOTween.To(() => music.volume, v => music.volume = v, how ? 1f : 0f, how ? 0.7f : 0.1f).SetEase(Ease.Linear);
     }
 
     public void SetStartSpeedrunTimer(PlayerController byWhom)

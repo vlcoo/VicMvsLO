@@ -1631,8 +1631,11 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         holdingOld = null;
 
         if (photonView.IsMine)
+        {
             ScoreboardUpdater.instance.OnDeathToggle();
-        
+            GameManager.Instance.fadeMusic(false);
+        }
+
         if (!matchConditioned)
             GameManager.Instance.MatchConditioner.ConditionActioned(this, "Died");
     }
@@ -1641,6 +1644,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
     public void PreRespawn() {
 
         sfx.enabled = true;
+        GameManager.Instance.fadeMusic(true);
         if (lives == 0) {
             GameManager.Instance.CheckForWinner();
             Destroy(trackIcon);
