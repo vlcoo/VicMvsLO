@@ -661,7 +661,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
 
     public void fadeMusic(bool how)
     {
-        DOTween.To(() => music.volume, v => music.volume = v, how ? 1f : 0f, how ? 0.7f : 0.1f).SetEase(Ease.Linear);
+        DOTween.To(() => music.volume, v => music.volume = v, how ? 1f : 0f, how ? 0.5f : 0.1f).SetEase(Ease.Linear);
     }
 
     public void SetStartSpeedrunTimer(PlayerController byWhom)
