@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using System.Linq;
@@ -6,6 +7,7 @@ using UnityEngine.Tilemaps;
 
 using Photon.Pun;
 using Photon.Realtime;
+using UnityEngine.InputSystem;
 
 namespace NSMB.Utils {
     public class Utils {
@@ -589,6 +591,14 @@ namespace NSMB.Utils {
 
         public static void TickTimer(ref float counter, float min, float delta, float max = float.MaxValue) {
             counter = Mathf.Clamp(counter - delta, min, max);
+        }
+
+        public static IEnumerator RumbleForSeconds(float low, float high, float duration)
+        {
+            if (!GlobalController.Instance.settings.rumbleController) yield break;
+            Gamepad.current.SetMotorSpeeds(low, high);
+            yield return new WaitForSecondsRealtime(duration);
+            Gamepad.current.SetMotorSpeeds(0f, 0f);
         }
 
         public static Color GetRainbowColor() {

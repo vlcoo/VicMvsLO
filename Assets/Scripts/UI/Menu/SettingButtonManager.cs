@@ -1,3 +1,4 @@
+using NSMB.Utils;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -33,6 +34,13 @@ public class SettingButtonManager : MonoBehaviour {
     public void OnFireballToggle(Toggle toggle) {
         Settings.fireballFromSprint = toggle.isOn;
         Settings.SaveSettingsToPreferences();
+    }
+    
+    public void OnRumbleToggle(Toggle toggle)
+    {
+        Settings.rumbleController = toggle.isOn;
+        Settings.SaveSettingsToPreferences();
+        StartCoroutine(Utils.RumbleForSeconds(0.5f, 0.5f, 0.2f));
     }
 
     public void OnScoreboardToggle(Toggle toggle) {

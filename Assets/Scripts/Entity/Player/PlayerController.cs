@@ -679,6 +679,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
                 collectedStarcoins[coin.number-1] = true;
                 if (collectedStarcoins.All(x => x)) GameManager.Instance.AllStarcoinsCollected();
                 GameManager.Instance.MatchConditioner.ConditionActioned(this, "GotStarcoin");
+                if (photonView.IsMine) StartCoroutine(Utils.RumbleForSeconds(0f, 1f, 0.1f));
                 break;
             }
         }
@@ -1307,6 +1308,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             PlaySoundEverywhere(photonView.IsMine
                 ? Enums.Sounds.World_Star_Collect_Self
                 : Enums.Sounds.World_Star_Collect_Enemy);
+            if (photonView.IsMine) StartCoroutine(Utils.RumbleForSeconds(0f, 1f, 0.1f));
             if (!matchConditioned)
                 GameManager.Instance.MatchConditioner.ConditionActioned(this, "GotStar");
         }
@@ -1944,10 +1946,11 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
                 SpawnParticle("Prefabs/Particle/PlayerBounce", attacker.transform.position);
         }
 
-        if (fireballKnockback)
-                PlaySound(Enums.Sounds.Player_Sound_Collision_Fireball, 0, 3);
-            else
-                PlaySound(Enums.Sounds.Player_Sound_Collision, 0, 3);
+        PlaySound(
+            fireballKnockback ? Enums.Sounds.Player_Sound_Collision_Fireball : Enums.Sounds.Player_Sound_Collision, 0,
+            3);
+        if (photonView.IsMine)
+            StartCoroutine(Utils.RumbleForSeconds(0.3f, 0f, fireballKnockback ? 0.1f : 0.2f));
 
         animator.SetBool("fireballKnockback", fireball);
         animator.SetBool("knockforwards", facingRight != fromRight);
@@ -3443,6 +3446,8 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
                 } else {
                     CameraController.ScreenShake = 0.15f;
                 }
+
+                if (photonView.IsMine) StartCoroutine(Utils.RumbleForSeconds(0.7f, 0.5f, state == Enums.PowerupState.MegaMushroom ? 0.3f : 0.1f));
             }
             if (hitBlock) {
                 koyoteTime = 1.5f;
