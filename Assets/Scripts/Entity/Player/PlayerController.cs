@@ -672,6 +672,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             }
             case "starcoin":
             {
+                if (!photonView.IsMine) break;
                 Starcoin coin = collider.transform.parent.GetComponent<Starcoin>();
                 if (collectedStarcoins[coin.number-1]) return;
                 PlaySound(Enums.Sounds.World_Starcoin, 0, 3);
@@ -679,7 +680,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
                 collectedStarcoins[coin.number-1] = true;
                 if (collectedStarcoins.All(x => x)) GameManager.Instance.AllStarcoinsCollected();
                 GameManager.Instance.MatchConditioner.ConditionActioned(this, "GotStarcoin");
-                if (photonView.IsMine) StartCoroutine(Utils.RumbleForSeconds(0f, 1f, 0.1f));
+                StartCoroutine(Utils.RumbleForSeconds(0f, 1f, 0.1f));
                 break;
             }
         }
