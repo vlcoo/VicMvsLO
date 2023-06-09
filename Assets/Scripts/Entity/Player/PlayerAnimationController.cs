@@ -4,6 +4,7 @@ using UnityEngine;
 
 using Photon.Pun;
 using NSMB.Utils;
+using UnityEngine.Serialization;
 using Random = UnityEngine.Random;
 
 public class PlayerAnimationController : MonoBehaviourPun {
@@ -22,8 +23,11 @@ public class PlayerAnimationController : MonoBehaviourPun {
     private BoxCollider2D mainHitbox;
     private List<Renderer> renderers = new();
     private MaterialPropertyBlock materialBlock;
-    public bool useSpecialSmall = false;
-
+    private bool useSpecialSmall = false;
+    [FormerlySerializedAs("isHopper")] public bool excludeMaterialForSmall = false;
+    private SkinnedMeshRenderer largeMesh;
+    private Material[] rememberedMaterialsLarge, rememberedMaterialsSmall;
+    
     public Color GlowColor {
         get {
             if (_glowColor == null)
@@ -47,6 +51,7 @@ public class PlayerAnimationController : MonoBehaviourPun {
         body = GetComponent<Rigidbody2D>();
         mainHitbox = GetComponent<BoxCollider2D>();
         drillParticleAudio = drillParticle.GetComponent<AudioSource>();
+        largeMesh = largeModel.GetComponentInChildren<SkinnedMeshRenderer>();
 
         DisableAllModels();
 
@@ -61,6 +66,11 @@ public class PlayerAnimationController : MonoBehaviourPun {
         }
 
         if (smallModel == largeModel) useSpecialSmall = true;
+        if (excludeMaterialForSmall)
+        {
+            rememberedMaterialsLarge = largeMesh.materials;
+            rememberedMaterialsSmall = new[] { largeMesh.materials[0], largeMesh.materials[1] };
+        }
     }
 
     public void Update() {
@@ -310,7 +320,8 @@ public class PlayerAnimationController : MonoBehaviourPun {
         HandlePipeAnimation();
 
         transform.position = new(transform.position.x, transform.position.y, animator.GetBool("pipe") ? 1 : -4);
-        if (useSpecialSmall) largeModel.transform.GetChild(0).localScale = large ? new Vector3(1, 1, 1) : new Vector3(0.8f, 0.7f, 0.7f);
+        if (excludeMaterialForSmall) largeMesh.materials = large ? rememberedMaterialsLarge : rememberedMaterialsSmall;
+        else if (useSpecialSmall) largeModel.transform.GetChild(0).localScale = large ? new Vector3(1, 1, 1) : new Vector3(0.8f, 0.7f, 0.7f);
     }
     void HandleDeathAnimation() {
         if (!controller.dead) {
