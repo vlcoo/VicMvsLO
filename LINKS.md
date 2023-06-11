@@ -6,4 +6,4 @@
 
 #### Original remake: https://ipodtouch0218.itch.io/nsmb-mariovsluigi
 
-#### Discord Server: https://discord.gg/dgKVaUKpj5 
+#### Discord Server: https://discord.gg/cKgE8dsV7t & https://discord.gg/dgKVaUKpj5 
