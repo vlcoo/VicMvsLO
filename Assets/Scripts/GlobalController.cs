@@ -21,6 +21,7 @@ public class GlobalController : Singleton<GlobalController>, IInRoomCallbacks, I
     public PlayerData[] characters;
     public Settings settings;
     public DiscordController DiscordController { get; private set; }
+    public DeviceRumbler rumbler { get; private set; }
     public string controlsJson = null;
 
     public bool joinedAsSpectator = false, checkedForVersion, fastLoad = false;
@@ -40,6 +41,7 @@ public class GlobalController : Singleton<GlobalController>, IInRoomCallbacks, I
         Instance = this;
         settings = GetComponent<Settings>();
         DiscordController = GetComponent<DiscordController>();
+        rumbler = GetComponent<DeviceRumbler>();
 
         PhotonNetwork.AddCallbackTarget(this);
     }

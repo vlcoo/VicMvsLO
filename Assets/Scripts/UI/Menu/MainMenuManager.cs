@@ -394,6 +394,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
             GlobalController.Instance.fastLoad = false;
             SceneManager.LoadSceneAsync(1, LoadSceneMode.Single);
             SceneManager.LoadSceneAsync(level + 2, LoadSceneMode.Additive);
+            GlobalController.Instance.rumbler.RumbleForSeconds(0.1f, 0.3f, 0.5f);
             break;
         }
         case (byte) Enums.NetEventIds.PlayerChatMessage: {

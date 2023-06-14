@@ -40,7 +40,7 @@ public class SettingButtonManager : MonoBehaviour {
     {
         Settings.rumbleController = toggle.isOn;
         Settings.SaveSettingsToPreferences();
-        StartCoroutine(Utils.RumbleForSeconds(0.5f, 0.5f, 0.2f));
+        GlobalController.Instance.rumbler.RumbleForSeconds(0.5f, 0.5f, 0.2f);
     }
 
     public void OnScoreboardToggle(Toggle toggle) {

@@ -192,6 +192,7 @@ GameObject:
   - component: {fileID: 1776850482587567145}
   - component: {fileID: 4164633649054386327}
   - component: {fileID: 3073743129255606538}
+  - component: {fileID: 4439238172108758342}
   m_Layer: 0
   m_Name: GlobalController
   m_TagString: Untagged
@@ -322,7 +323,6 @@ MonoBehaviour:
   fireballFromSprint: 1
   vsync: 0
   fourByThreeRatio: 0
-  rumbleController: 1
   scoreboardAlways: 0
   filter: 1
 --- !u!82 &1776850482587567145
@@ -446,6 +446,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3833d4fd28fcf2443b18644b341e86bb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &4439238172108758342
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1776850482587567141}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5e760383bcd13abc2a4771bff71f6caf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  rumbleEnabled: 1
 --- !u!1 &1955773772637164072
 GameObject:
   m_ObjectHideFlags: 0

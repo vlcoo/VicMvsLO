@@ -593,14 +593,6 @@ namespace NSMB.Utils {
             counter = Mathf.Clamp(counter - delta, min, max);
         }
 
-        public static IEnumerator RumbleForSeconds(float low, float high, float duration)
-        {
-            if (!GlobalController.Instance.settings.rumbleController) yield break;
-            Gamepad.current.SetMotorSpeeds(low, high);
-            yield return new WaitForSecondsRealtime(duration);
-            Gamepad.current.SetMotorSpeeds(0f, 0f);
-        }
-
         public static Color GetRainbowColor() {
             double time = PhotonNetwork.Time * 0.1;
             time %= 1;

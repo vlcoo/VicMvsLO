@@ -30,9 +30,20 @@ public class Settings : Singleton<Settings> {
         }
     }
 
+    private bool _rumbleController;
+    public bool rumbleController
+    {
+        get => _rumbleController;
+        set
+        {
+            _rumbleController = value;
+            GlobalController.Instance.rumbler.rumbleEnabled = value;
+        }
+    }
+
     public string nickname;
     public int character, skin;
-    public bool ndsResolution = false, fireballFromSprint = true, vsync = false, fourByThreeRatio = false, rumbleController = true;
+    public bool ndsResolution = false, fireballFromSprint = true, vsync = false, fourByThreeRatio = false;
     public bool scoreboardAlways = false, filter = true;
 
     public void Awake() {
