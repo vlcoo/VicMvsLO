@@ -21,12 +21,11 @@ public class LoadingWaitingOn : MonoBehaviour
         text = GetComponent<TMP_Text>();
         if (PhotonNetwork.GetPing() < 180)
             highPingAlert.fontSize = 0;
-        if (Random.value >= 0.7)
-        {
-            marioLoadingScene.SetActive(false);
-            koopaLoadingScene.SetActive(true);
-            GetComponent<LoopingMusic>().FastMusic = true;
-        }
+
+        bool isBowsers = Utils.GetCharacterData().isBowsers;
+        marioLoadingScene.SetActive(!isBowsers);
+        koopaLoadingScene.SetActive(isBowsers);
+        GetComponent<LoopingMusic>().FastMusic = Random.value >= 0.6;
     }
 
     public void Update() {
