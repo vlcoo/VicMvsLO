@@ -177,6 +177,7 @@ public static class Enums {
     }
     public static class NetPlayerGameState {
         public static string Stars { get; } = "S";
+        public static string Laps { get; } = "La";
         public static string Coins { get; } = "C";
         public static string Lives { get; } = "L";
         public static string PowerupState { get; } = "P";

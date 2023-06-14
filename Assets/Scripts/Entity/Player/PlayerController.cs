@@ -321,6 +321,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         lives = (int) gs[Enums.NetPlayerGameState.Lives];
         stars = (int) gs[Enums.NetPlayerGameState.Stars];
         coins = (int) gs[Enums.NetPlayerGameState.Coins];
+        laps = (int) gs[Enums.NetPlayerGameState.Laps];
         state = (Enums.PowerupState) gs[Enums.NetPlayerGameState.PowerupState];
         if (gs[Enums.NetPlayerGameState.ReserveItem] != null) {
             storedPowerup = (Powerup) Resources.Load("Scriptables/Powerups/" + (Enums.PowerupState) gs[Enums.NetPlayerGameState.ReserveItem]);
@@ -335,6 +336,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
 
         UpdateGameStateVariable(Enums.NetPlayerGameState.Lives, lives);
         UpdateGameStateVariable(Enums.NetPlayerGameState.Stars, stars);
+        UpdateGameStateVariable(Enums.NetPlayerGameState.Laps, laps);
         UpdateGameStateVariable(Enums.NetPlayerGameState.Coins, coins);
         UpdateGameStateVariable(Enums.NetPlayerGameState.PowerupState, (byte) state);
         UpdateGameStateVariable(Enums.NetPlayerGameState.ReserveItem, storedPowerup ? storedPowerup.state : null);
@@ -644,30 +646,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             }
             case "goal":
             {
-                laps++;
-                if (laps >= GameManager.Instance.lapRequirement)
-                {
-                    GameManager.Instance.WinByGoal(this);
-                    spawned = false;
-                    body.gravityScale = 0;
-                    body.velocity = Vector2.zero;
-                    groundpound = false;
-                    propeller = false;
-                    drill = false;
-                    flying = false;
-                    animator.SetTrigger("winByGoal");
-                    StartCoroutine(GameManager.Instance.nonSpectatingPlayers.Count > 1
-                        ? nameof(GoalAnimReachBottomNotAlone)
-                        : nameof(GoalAnimReachBottom));
-                    break;
-                }
-                gotCheckpoint = false;
-                transform.position = body.position =
-                    gotCheckpoint ? GameManager.Instance.checkpoint : GameManager.Instance.GetSpawnpoint(playerId);
-                PlaySound(Enums.Sounds.UI_WindowOpen);
-                GameManager.Instance.SendAndExecuteEvent(Enums.NetEventIds.ResetTiles, null, SendOptions.SendReliable);
-                GameManager.Instance.MatchConditioner.ConditionActioned(this, "FinishedLap");
-                goalReachedBottom = false;
+                photonView.RPC(nameof(AttemptCollectLap), RpcTarget.AllViaServer);
                 break;
             }
             case "starcoin":
@@ -1264,7 +1243,60 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
     {
         photonView.RPC(nameof(CollectBigStar), RpcTarget.All, (Vector2) transform.position, -1, stars - 1);
     }
-    
+
+    [PunRPC]
+    public void AttemptCollectLap(PhotonMessageInfo info)
+    {
+        if (info.Sender != photonView.Owner || !PhotonNetwork.IsMasterClient)
+            return;
+        if (dead || !spawned)
+            return;
+        
+        photonView.RPC(nameof(CollectLap), RpcTarget.All, laps + 1);
+    }
+
+    [PunRPC]
+    public void CollectLap(int newCount, PhotonMessageInfo info)
+    {
+        gotCheckpoint = false;
+        
+        if (newCount > laps)
+        {
+            if (newCount >= GameManager.Instance.lapRequirement && (!GameManager.Instance.needsStarcoins || (collectedStarcoins.All(x => x) && GameManager.Instance.needsStarcoins)))
+            {
+                laps = Mathf.Clamp(newCount, 0, GameManager.Instance.lapRequirement);
+                GameManager.Instance.WinByGoal(this);
+                spawned = false;
+                body.gravityScale = 0;
+                body.velocity = Vector2.zero;
+                groundpound = false;
+                propeller = false;
+                drill = false;
+                flying = false;
+                animator.SetTrigger("winByGoal");
+                StartCoroutine(GameManager.Instance.nonSpectatingPlayers.Count > 1
+                    ? nameof(GoalAnimReachBottomNotAlone)
+                    : nameof(GoalAnimReachBottom));
+            }
+            else if (newCount < GameManager.Instance.lapRequirement)
+            {
+                laps = Mathf.Clamp(newCount, 0, GameManager.Instance.lapRequirement);
+                PlaySound(Enums.Sounds.UI_WindowOpen);
+                GameManager.Instance.MatchConditioner.ConditionActioned(this, "FinishedLap");
+                transform.position = body.position =
+                    gotCheckpoint ? GameManager.Instance.checkpoint : GameManager.Instance.GetSpawnpoint(playerId);
+                GameManager.Instance.SendAndExecuteEvent(Enums.NetEventIds.ResetTiles, null, SendOptions.SendReliable);
+                goalReachedBottom = false;
+            }
+            else
+            {
+                goalReachedBottom = false;
+            }
+        }
+
+        UpdateGameState();
+    }
+
     [PunRPC]
     public void AttemptCollectBigStar(int starID, PhotonMessageInfo info) {
         //only the owner can request a big star, and only the master client can decide for us

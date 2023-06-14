@@ -45,7 +45,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
     public float cameraMinY, cameraHeightY, cameraMinX = -1000, cameraMaxX = 1000;
     public bool loopingLevel = true;
     public bool raceLevel = false;
-    private bool needsStarcoins;
+    [NonSerialized] public bool needsStarcoins;
     public Vector3 spawnpoint;
     public Vector3 checkpoint;
     public Tilemap tilemap;
