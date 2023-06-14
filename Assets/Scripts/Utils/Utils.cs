@@ -7,6 +7,7 @@ using UnityEngine.Tilemaps;
 
 using Photon.Pun;
 using Photon.Realtime;
+using TMPro;
 using UnityEngine.InputSystem;
 
 namespace NSMB.Utils {
@@ -593,10 +594,8 @@ namespace NSMB.Utils {
             counter = Mathf.Clamp(counter - delta, min, max);
         }
 
-        public static Color GetRainbowColor() {
-            double time = PhotonNetwork.Time * 0.1;
-            time %= 1;
-            return GlobalController.Instance.rainbowGradient.Evaluate((float) time);
+        public static TMP_ColorGradient GetRainbowColor() {
+            return GlobalController.Instance.logoGradient;
         }
     }
 }

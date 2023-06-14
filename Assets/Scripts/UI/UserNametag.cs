@@ -17,6 +17,7 @@ public class UserNametag : MonoBehaviour {
 
     public void Start() {
         rainbowName = parent.photonView.Owner.HasRainbowName();
+        if (rainbowName) text.colorGradientPreset = Utils.GetRainbowColor();
     }
 
     public void LateUpdate() {

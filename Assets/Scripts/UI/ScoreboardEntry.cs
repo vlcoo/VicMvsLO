@@ -34,7 +34,7 @@ public class ScoreboardEntry : MonoBehaviour {
         CheckForTextUpdate();
 
         if (rainbowEnabled)
-            nameText.color = Utils.GetRainbowColor();
+            nameText.colorGradientPreset = Utils.GetRainbowColor();
     }
 
     public void CheckForTextUpdate() {

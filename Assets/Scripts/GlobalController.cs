@@ -9,11 +9,12 @@ using Photon.Pun;
 using Photon.Realtime;
 using ExitGames.Client.Photon;
 using NSMB.Utils;
+using TMPro;
 
 public class GlobalController : Singleton<GlobalController>, IInRoomCallbacks, ILobbyCallbacks {
 
     public PlayerColorSet[] skins;
-    public Gradient rainbowGradient;
+    public TMP_ColorGradient logoGradient;
 
     public GameObject ndsCanvas, fourByThreeImage, anyAspectImage, graphy;
 

@@ -30,7 +30,7 @@ public class PlayerListEntry : MonoBehaviour {
     }
 
     public void Update() {
-        nameText.color = Utils.GetRainbowColor();
+        nameText.colorGradientPreset = Utils.GetRainbowColor();
     }
 
     public void UpdateText() {
