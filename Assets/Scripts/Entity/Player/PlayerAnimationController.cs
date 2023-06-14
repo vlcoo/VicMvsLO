@@ -27,6 +27,14 @@ public class PlayerAnimationController : MonoBehaviourPun {
     [FormerlySerializedAs("isHopper")] public bool excludeMaterialForSmall = false;
     private SkinnedMeshRenderer largeMesh;
     private Material[] rememberedMaterialsLarge, rememberedMaterialsSmall;
+
+    private Vector3 outShellPos,
+        outShellRot,
+        outShellSca,
+        inShellPos = new(0f, -.0008f, -.0039f),
+        inShellRot = new(0f, 90f, 89.454f),
+        inShellSca = new(.85f, .85f, .85f);
+    
     
     public Color GlowColor {
         get {
@@ -74,6 +82,10 @@ public class PlayerAnimationController : MonoBehaviourPun {
             rememberedMaterialsLarge = largeMesh.materials;
             rememberedMaterialsSmall = new[] { largeMesh.materials[0], largeMesh.materials[1] };
         }
+
+        outShellPos = blueShell.transform.localPosition;
+        outShellRot = blueShell.transform.localRotation.eulerAngles;
+        outShellSca = blueShell.transform.localScale;
     }
 
     public void Update() {
@@ -314,7 +326,11 @@ public class PlayerAnimationController : MonoBehaviourPun {
         else largeModel.SetActive(true);
         blueShell.SetActive(controller.state == Enums.PowerupState.BlueShell);
 
-        largeShellExclude.SetActive(!animator.GetCurrentAnimatorStateInfo(0).IsName("in-shell"));
+        bool inShellAnim = animator.GetCurrentAnimatorStateInfo(0).IsName("in-shell");
+        blueShell.transform.localScale = inShellAnim ? inShellSca : outShellSca;
+        blueShell.transform.localRotation = Quaternion.Euler(inShellAnim ? inShellRot : outShellRot);
+        blueShell.transform.localPosition = inShellAnim ? inShellPos : outShellPos;
+        largeShellExclude.SetActive(!inShellAnim);
         propellerHelmet.SetActive(controller.state == Enums.PowerupState.PropellerMushroom);
         animator.avatar = large ? largeAvatar : smallAvatar;
         animator.runtimeAnimatorController = large ? controller.character.largeOverrides : controller.character.smallOverrides;
