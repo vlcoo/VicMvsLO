@@ -41,7 +41,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     public TMP_Dropdown levelDropdown, characterDropdown;
     public RoomIcon selectedRoomIcon, privateJoinRoom;
     public Button joinRoomBtn, createRoomBtn, startGameBtn, exitBtn, backBtn;
-    public Toggle ndsResolutionToggle, fullscreenToggle, livesEnabled, powerupsEnabled, timeEnabled, starcoinsEnabled, starsEnabled, coinsEnabled, drawTimeupToggle, fireballToggle, rumbleToggle, vsyncToggle, privateToggle, privateToggleRoom, aspectToggle, spectateToggle, scoreboardToggle, filterToggle, chainableActionsToggle, RNGClear;
+    public Toggle ndsResolutionToggle, fullscreenToggle, livesEnabled, powerupsEnabled, timeEnabled, starcoinsEnabled, starsEnabled, coinsEnabled, drawTimeupToggle, fireballToggle, rumbleToggle, animsToggle, vsyncToggle, privateToggle, privateToggleRoom, aspectToggle, spectateToggle, scoreboardToggle, filterToggle, chainableActionsToggle, RNGClear;
     public GameObject playersContent, playersPrefab, chatContent, chatPrefab;
     public TMP_InputField nicknameField, starsText, lapsText, coinsText, livesField, timeField, lobbyJoinField, chatTextField;
     public Slider musicSlider, sfxSlider, masterSlider, lobbyPlayersSlider, changePlayersSlider, RNGSlider;
@@ -589,6 +589,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         rumbleToggle.isOn = Settings.Instance.rumbleController;
         vsyncToggle.isOn = Settings.Instance.vsync;
         scoreboardToggle.isOn = Settings.Instance.scoreboardAlways;
+        animsToggle.isOn = Settings.Instance.reduceUIAnims;
         filterToggle.isOn = Settings.Instance.filter;
         QualitySettings.vSyncCount = Settings.Instance.vsync ? 1 : 0;
     }
@@ -1048,9 +1049,9 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     public void StartGame()
     {
         backBtn.interactable = false;
-        startGameBtn.interactable = false;
         sfx.PlayOneShot(Enums.Sounds.UI_Match_Starting.GetClip());
         DOTween.To(() => music.volume, v => music.volume = v, 0, 0.8f);
+        fader.SetInvisible(GlobalController.Instance.settings.reduceUIAnims);
         fader.anim.SetTrigger("out");
         StartCoroutine(WaitForMusicFadeStartGame());
     }

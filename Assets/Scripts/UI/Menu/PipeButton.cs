@@ -40,8 +40,8 @@ public class PipeButton : MonoBehaviour {
 
     private void SetAnchor(Vector2 value) {
         if (leftAnchored)
-            DOTween.To(() => rect.anchorMax, v => rect.anchorMin = v, value, 0.2f);
+            DOTween.To(() => rect.anchorMax, v => rect.anchorMax = v, value, 0.15f);
         else
-            DOTween.To(() => rect.anchorMin, v => rect.anchorMin = v, value, 0.2f);
+            DOTween.To(() => rect.anchorMin, v => rect.anchorMin = v, value, 0.15f);
     }
 }

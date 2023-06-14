@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.Audio;
 
 using Photon.Pun;
+using UnityEngine.Serialization;
 
 public class Settings : Singleton<Settings> {
     public AudioMixer mixer;
@@ -44,7 +45,7 @@ public class Settings : Singleton<Settings> {
     public string nickname;
     public int character, skin;
     public bool ndsResolution = false, fireballFromSprint = true, vsync = false, fourByThreeRatio = false;
-    public bool scoreboardAlways = false, filter = true;
+    public bool scoreboardAlways = false, filter = true, reduceUIAnims = true;
 
     public void Awake() {
         if (!InstanceCheck())
@@ -69,6 +70,7 @@ public class Settings : Singleton<Settings> {
         vsync = PlayerPrefs.GetInt("VSync", 0) == 1;
         fourByThreeRatio = PlayerPrefs.GetInt("NDS4by3", 0) == 1;
         scoreboardAlways = PlayerPrefs.GetInt("ScoreboardAlwaysVisible", 1) == 1;
+        reduceUIAnims = PlayerPrefs.GetInt("ReduceUIAnims", 0) == 1;
         filter = PlayerPrefs.GetInt("ChatFilter", 1) == 1;
         character = PlayerPrefs.GetInt("Character", 0);
         skin = PlayerPrefs.GetInt("Skin", 0);
@@ -84,6 +86,7 @@ public class Settings : Singleton<Settings> {
         PlayerPrefs.SetInt("VSync", vsync ? 1 : 0);
         PlayerPrefs.SetInt("NDS4by3", fourByThreeRatio ? 1 : 0);
         PlayerPrefs.SetInt("ScoreboardAlwaysVisible", scoreboardAlways ? 1 : 0);
+        PlayerPrefs.SetInt("ReduceUIAnims", reduceUIAnims ? 1 : 0);
         PlayerPrefs.SetInt("ChatFilter", filter ? 1 : 0);
         PlayerPrefs.SetInt("Character", character);
         PlayerPrefs.SetInt("Skin", skin);

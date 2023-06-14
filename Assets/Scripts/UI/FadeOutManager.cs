@@ -12,12 +12,19 @@ public class FadeOutManager : MonoBehaviour {
     public Animator anim;
     public bool alreadyInitiallyFadedOut = false;
 
+    public void SetInvisible(bool how)
+    {
+        transform.localScale = how ? Vector3.zero : new Vector3(1f, 1f, 1f);
+    }
+
     public void Start() {
         image = GetComponent<Image>();
         anim = GetComponent<Animator>();
+        SetInvisible(GlobalController.Instance.settings.reduceUIAnims);
     }
 
-    public void FadeOutAndIn(float fadeTime, float blackTime) {
+    public void FadeOutAndIn(float fadeTime, float blackTime)
+    {
         anim.SetTrigger("FadeInAndOut");
     }
 

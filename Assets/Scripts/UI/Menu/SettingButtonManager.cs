@@ -53,6 +53,12 @@ public class SettingButtonManager : MonoBehaviour {
         Settings.SaveSettingsToPreferences();
     }
 
+    public void OnUIAnimsToggle(Toggle toggle)
+    {
+        Settings.reduceUIAnims = toggle.isOn;
+        Settings.SaveSettingsToPreferences();
+    }
+
 
     public void OnFullscreenToggle(Toggle toggle) {
         bool value = toggle.isOn;
