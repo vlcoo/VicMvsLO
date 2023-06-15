@@ -1285,6 +1285,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
                 GameManager.Instance.MatchConditioner.ConditionActioned(this, "FinishedLap");
                 transform.position = body.position =
                     gotCheckpoint ? GameManager.Instance.checkpoint : GameManager.Instance.GetSpawnpoint(playerId);
+                hitInvincibilityCounter = 2f;
                 GameManager.Instance.SendAndExecuteEvent(Enums.NetEventIds.ResetTiles, null, SendOptions.SendReliable);
                 goalReachedBottom = false;
             }
@@ -1680,7 +1681,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
     public void PreRespawn() {
 
         sfx.enabled = true;
-        GameManager.Instance.fadeMusic(true);
+        if (photonView.IsMine) GameManager.Instance.fadeMusic(true);
         if (lives == 0) {
             GameManager.Instance.CheckForWinner();
             Destroy(trackIcon);
