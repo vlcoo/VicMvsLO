@@ -856,13 +856,9 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
 
     public void WinByGoal(PlayerController whom)
     {
-        sfx.PlayOneShot(Enums.Sounds.UI_Match_Goal_Short.GetClip());
-        
-        foreach (var player in players)
-        {
-            if (player == whom) continue;
-            player.Disqualify();
-        }
+        if (!PhotonNetwork.IsMasterClient) return;
+        foreach (var player in players.Where(player => player != whom))
+            player.photonView.RPC("Disqualify", RpcTarget.All, false);
     }
 
     public void CheckForWinner() {

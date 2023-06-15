@@ -628,6 +628,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         }
     }
 
+    private GameObject currentFlagpole;
     public void OnTriggerEnter2D(Collider2D collider)
     {
         GameObject obj = collider.gameObject;
@@ -646,6 +647,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             }
             case "goal":
             {
+                currentFlagpole = obj;
                 photonView.RPC(nameof(AttemptCollectLap), RpcTarget.AllViaServer);
                 break;
             }
@@ -1265,7 +1267,10 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             if (newCount >= GameManager.Instance.lapRequirement && (!GameManager.Instance.needsStarcoins || (collectedStarcoins.All(x => x) && GameManager.Instance.needsStarcoins)))
             {
                 laps = Mathf.Clamp(newCount, 0, GameManager.Instance.lapRequirement);
+                sfx.PlayOneShot(Enums.Sounds.UI_Match_Goal_Short.GetClip());
                 GameManager.Instance.WinByGoal(this);
+                transform.position =
+                    body.position = new Vector3(currentFlagpole.transform.position.x, transform.position.y, 1);
                 spawned = false;
                 body.gravityScale = 0;
                 body.velocity = Vector2.zero;
