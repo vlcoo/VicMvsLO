@@ -857,7 +857,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
     public void WinByGoal(PlayerController whom)
     {
         if (!PhotonNetwork.IsMasterClient) return;
-        foreach (var player in players.Where(player => player != whom))
+        foreach (var player in players.Where(player => player != null && player != whom))
             player.photonView.RPC("Disqualify", RpcTarget.All, false);
     }
 

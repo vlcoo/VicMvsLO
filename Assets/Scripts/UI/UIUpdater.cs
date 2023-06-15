@@ -115,7 +115,7 @@ public class UIUpdater : MonoBehaviour {
         }
         else starsParent.SetActive(false);
         
-        if (GameManager.Instance.lapRequirement > 1) {
+        if (GameManager.Instance.raceLevel && GameManager.Instance.lapRequirement > 1) {
             if (player.laps != laps) {
                 laps = player.laps;
                 uiLaps.text = Utils.GetSymbolString("Lx" + laps + "/" + GameManager.Instance.lapRequirement);

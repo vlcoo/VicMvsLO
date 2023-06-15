@@ -71,7 +71,7 @@ public class ScoreboardEntry : MonoBehaviour {
             if (x.target == null ^ y.target == null)
                 return x.target == null ? 1 : -1;
 
-            if (GameManager.Instance.lapRequirement > 0)
+            if (GameManager.Instance.raceLevel)
             {
                 if (x.currentLaps == y.currentLaps || x.currentLives == 0 || y.currentLives == 0)
                     return x.playerId - y.playerId;
