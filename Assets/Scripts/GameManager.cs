@@ -640,6 +640,8 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
 
         if (canvas)
             SceneManager.UnloadSceneAsync("Loading");
+        
+        if (SpectationManager.Spectating) fader.SetInvisible(true);
     }
 
     IEnumerator CountdownSound(float t, float times) { //The match countdown sound system. t is the tempo, and times is the # of times the sound will play (variable if match is started at 10s or less)
@@ -1021,7 +1023,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
     
     public void GiveUp()
     {
-        pauseUI.SetActive(false);
+        Pause();
         PlayerController controller = localPlayer.GetComponent<PlayerController>();
         if (SpectationManager.Spectating)
         {
