@@ -1012,8 +1012,8 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         sfx.PlayOneShot(Enums.Sounds.UI_Back.GetClip());
     }
 
-    public void ConfirmSound() {
-        sfx.PlayOneShot(Enums.Sounds.UI_Decide.GetClip());
+    public void ConfirmSound(bool alternate = false) {
+        sfx.PlayOneShot(alternate ? Enums.Sounds.UI_Select.GetClip() : Enums.Sounds.UI_Decide.GetClip());
     }
 
     public void ConnectToDropdownRegion() {
