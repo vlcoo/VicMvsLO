@@ -71,13 +71,17 @@ public class MovingPowerup : MonoBehaviourPun {
         float size = followMe.flying ? 3.8f : 2.8f;
         transform.position = new Vector3(followMe.transform.position.x, followMe.cameraController.currentPosition.y + (size*0.6f));
 
-        sRenderer.enabled = followMeCounter * blinkingRate % 2 > 1;
+        //float scale = Mathf.Abs(Mathf.Sin(followMeCounter * blinkingRate / 2f) / 8f);
+        float scale = Mathf.PingPong(followMeCounter*1.5f, 0.2f) + 0.5f;
         if ((followMeCounter -= Time.deltaTime) < 0) {
             followMe = null;
             sRenderer.sortingOrder = originalLayer;
             if (photonView.IsMine)
                 photonView.TransferOwnership(PhotonNetwork.MasterClient);
+            scale = 0.5f;
         }
+        else Debug.Log(followMeCounter);
+        sRenderer.transform.localScale = new Vector3(scale, scale, 1f);
     }
 
     public void FixedUpdate() {
