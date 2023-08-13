@@ -146,6 +146,8 @@ public static class Enums {
         [SoundData("ui/match_goal_short")]                      UI_Match_Goal_Short = 99,
         [SoundData("ui/match_cancelled")]                       UI_Match_Cancelled = 101,
         [SoundData("ui/file_select")]                           UI_Match_Starting = 103,
+        [SoundData("music/loading-drop")]                           Jingle_Loading_Finished_1 = 105,
+        [SoundData("music/loading2-drop")]                           Jingle_Loading_Finished_2 = 106,
 
         //World Elements
         [SoundData("world/block_break")]                        World_Block_Break = 67,

@@ -562,6 +562,9 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         GameObject canvas = GameObject.FindGameObjectWithTag("LoadingCanvas");
         if (canvas) {
             canvas.GetComponent<Animator>().SetTrigger(spectating ? "spectating" : "loaded");
+            /* sfx.PlayOneShot(GameObject.Find("LoadingText").GetComponent<LoadingWaitingOn>().isPlayingAltSong
+                ? Enums.Sounds.Jingle_Loading_Finished_2.GetClip()
+                : Enums.Sounds.Jingle_Loading_Finished_1.GetClip()); */
             //please just dont beep at me :(
             /*AudioSource source = canvas.GetComponent<AudioSource>();
             source.Stop();
