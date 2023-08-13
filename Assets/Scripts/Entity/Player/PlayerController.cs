@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Runtime.InteropServices;
 using UnityEngine;
 using UnityEngine.Tilemaps;
@@ -262,6 +263,16 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             InputSystem.controls.Player.Sprint.canceled += OnSprint;
             InputSystem.controls.Player.PowerupAction.performed += OnPowerupAction;
             InputSystem.controls.Player.ReserveItem.performed += OnReserveItem;
+            InputSystem.controls.Player.Taunt0.performed += Taunt;
+            InputSystem.controls.Player.Taunt1.performed += Taunt;
+            InputSystem.controls.Player.Taunt2.performed += Taunt;
+            InputSystem.controls.Player.Taunt3.performed += Taunt;
+            InputSystem.controls.Player.Taunt4.performed += Taunt;
+            InputSystem.controls.Player.Taunt5.performed += Taunt;
+            InputSystem.controls.Player.Taunt6.performed += Taunt;
+            InputSystem.controls.Player.Taunt7.performed += Taunt;
+            InputSystem.controls.Player.Taunt8.performed += Taunt;
+            InputSystem.controls.Player.Taunt9.performed += Taunt;
         }
 
         GameManager.Instance.players.Add(this);
@@ -298,6 +309,16 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         InputSystem.controls.Player.Sprint.canceled -= OnSprint;
         InputSystem.controls.Player.PowerupAction.performed -= OnPowerupAction;
         InputSystem.controls.Player.ReserveItem.performed -= OnReserveItem;
+        InputSystem.controls.Player.Taunt0.performed -= Taunt;
+        InputSystem.controls.Player.Taunt1.performed -= Taunt;
+        InputSystem.controls.Player.Taunt2.performed -= Taunt;
+        InputSystem.controls.Player.Taunt3.performed -= Taunt;
+        InputSystem.controls.Player.Taunt4.performed -= Taunt;
+        InputSystem.controls.Player.Taunt5.performed -= Taunt;
+        InputSystem.controls.Player.Taunt6.performed -= Taunt;
+        InputSystem.controls.Player.Taunt7.performed -= Taunt;
+        InputSystem.controls.Player.Taunt8.performed -= Taunt;
+        InputSystem.controls.Player.Taunt9.performed -= Taunt;
     }
 
     public void OnGameStart() {
@@ -788,6 +809,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
     #endregion
 
     #region -- CONTROLLER FUNCTIONS --
+    
     public void OnMovement(InputAction.CallbackContext context) {
         if (!photonView.IsMine)
             return;
@@ -2264,6 +2286,21 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             return true;
         }
         return false;
+    }
+
+    void Taunt(InputAction.CallbackContext context)
+    {
+        int emoteId = 0;
+        if (context.action.name.StartsWith("!Taunt")) emoteId = Int32.Parse(context.action.name.Substring(6));
+        else return;
+
+        var emoteObj = PhotonNetwork.Instantiate("Prefabs/Particle/EmoteTaunt", transform.position + new Vector3(0, .8f, 0), Quaternion.identity);
+        var normalized_position = emoteId / 54f;
+        var row_index = Mathf.Floor(normalized_position * 2);
+        var column_index = Mathf.Floor(normalized_position * 27);
+        var emoteObjParticles = emoteObj.GetComponent<ParticleSystem>();
+        emoteObjParticles.GetComponent<Renderer>().material.mainTextureOffset = new Vector2(0.037f*column_index, 0.5f*row_index);
+        emoteObjParticles.Emit(1);
     }
 
     #region -- PIPES --

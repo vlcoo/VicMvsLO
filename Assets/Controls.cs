@@ -71,6 +71,96 @@ public partial class @Controls : IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""!Taunt0"",
+                    ""type"": ""Button"",
+                    ""id"": ""c36096bd-9f63-4249-9324-66f56670ba56"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""!Taunt1"",
+                    ""type"": ""Button"",
+                    ""id"": ""df88d19f-6eaf-46a1-bda2-dd8be91969b3"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""!Taunt2"",
+                    ""type"": ""Button"",
+                    ""id"": ""f5710f69-1c6e-4363-8860-27479a3a3230"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""!Taunt3"",
+                    ""type"": ""Button"",
+                    ""id"": ""16ea5a29-2b18-4523-bf02-198f0a94c11b"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""!Taunt4"",
+                    ""type"": ""Button"",
+                    ""id"": ""39a9282c-280d-476d-847a-a7dc97f202ef"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""!Taunt5"",
+                    ""type"": ""Button"",
+                    ""id"": ""de1b9ec8-47aa-4620-abc9-3292e1392226"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""!Taunt6"",
+                    ""type"": ""Button"",
+                    ""id"": ""cd85daf8-ac06-46c2-a0c8-43aa0fa3ce73"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""!Taunt7"",
+                    ""type"": ""Button"",
+                    ""id"": ""78d61e03-fe8b-41ff-b481-63a0da14e3fb"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""!Taunt8"",
+                    ""type"": ""Button"",
+                    ""id"": ""1e9f5a6a-9d73-43d5-8e37-e87c3cd19bb7"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""!Taunt9"",
+                    ""type"": ""Button"",
+                    ""id"": ""f821ded2-3309-4aa4-98d4-ef72dea8f0af"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -379,6 +469,116 @@ public partial class @Controls : IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""groups"": ""Gamepad"",
                     ""action"": ""Sprint"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""fce9e737-4e5d-45c2-aa45-aa87d69d2fe7"",
+                    ""path"": ""<Keyboard>/1"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""!Taunt1"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""bb0d5f4c-c1e7-4d02-9985-5e69b2530cbd"",
+                    ""path"": ""<Keyboard>/2"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""!Taunt2"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""7224346d-d6f0-410b-b223-baa851b7e1e5"",
+                    ""path"": ""<Keyboard>/3"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""!Taunt3"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""6b1692fb-9518-4503-8078-6c3b7b7a060b"",
+                    ""path"": ""<Keyboard>/4"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""!Taunt4"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""2b390f3a-9373-43f3-b7e0-b0f51ba8fe28"",
+                    ""path"": ""<Keyboard>/5"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""!Taunt5"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""325feb72-29b9-448c-9665-02d52fbf4394"",
+                    ""path"": ""<Keyboard>/6"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""!Taunt6"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""842bf8c9-6947-44d6-b88c-0caf5d3fc2e0"",
+                    ""path"": ""<Keyboard>/7"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""!Taunt7"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""bdff5db0-5ace-4c65-9d3f-2ec32036748e"",
+                    ""path"": ""<Keyboard>/8"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""!Taunt8"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""77461d40-3455-4498-a887-b584174563d4"",
+                    ""path"": ""<Keyboard>/9"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""!Taunt9"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""9a186c55-c2c0-46ac-928c-e3e2a9f462c6"",
+                    ""path"": ""<Keyboard>/0"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""!Taunt0"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -1115,6 +1315,16 @@ public partial class @Controls : IInputActionCollection2, IDisposable
         m_Player_Sprint = m_Player.FindAction("Sprint", throwIfNotFound: true);
         m_Player_PowerupAction = m_Player.FindAction("Powerup Action", throwIfNotFound: true);
         m_Player_ReserveItem = m_Player.FindAction("Reserve Item", throwIfNotFound: true);
+        m_Player_Taunt0 = m_Player.FindAction("!Taunt0", throwIfNotFound: true);
+        m_Player_Taunt1 = m_Player.FindAction("!Taunt1", throwIfNotFound: true);
+        m_Player_Taunt2 = m_Player.FindAction("!Taunt2", throwIfNotFound: true);
+        m_Player_Taunt3 = m_Player.FindAction("!Taunt3", throwIfNotFound: true);
+        m_Player_Taunt4 = m_Player.FindAction("!Taunt4", throwIfNotFound: true);
+        m_Player_Taunt5 = m_Player.FindAction("!Taunt5", throwIfNotFound: true);
+        m_Player_Taunt6 = m_Player.FindAction("!Taunt6", throwIfNotFound: true);
+        m_Player_Taunt7 = m_Player.FindAction("!Taunt7", throwIfNotFound: true);
+        m_Player_Taunt8 = m_Player.FindAction("!Taunt8", throwIfNotFound: true);
+        m_Player_Taunt9 = m_Player.FindAction("!Taunt9", throwIfNotFound: true);
         // UI
         m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
         m_UI_Navigate = m_UI.FindAction("Navigate", throwIfNotFound: true);
@@ -1193,6 +1403,16 @@ public partial class @Controls : IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_Sprint;
     private readonly InputAction m_Player_PowerupAction;
     private readonly InputAction m_Player_ReserveItem;
+    private readonly InputAction m_Player_Taunt0;
+    private readonly InputAction m_Player_Taunt1;
+    private readonly InputAction m_Player_Taunt2;
+    private readonly InputAction m_Player_Taunt3;
+    private readonly InputAction m_Player_Taunt4;
+    private readonly InputAction m_Player_Taunt5;
+    private readonly InputAction m_Player_Taunt6;
+    private readonly InputAction m_Player_Taunt7;
+    private readonly InputAction m_Player_Taunt8;
+    private readonly InputAction m_Player_Taunt9;
     public struct PlayerActions
     {
         private @Controls m_Wrapper;
@@ -1202,6 +1422,16 @@ public partial class @Controls : IInputActionCollection2, IDisposable
         public InputAction @Sprint => m_Wrapper.m_Player_Sprint;
         public InputAction @PowerupAction => m_Wrapper.m_Player_PowerupAction;
         public InputAction @ReserveItem => m_Wrapper.m_Player_ReserveItem;
+        public InputAction @Taunt0 => m_Wrapper.m_Player_Taunt0;
+        public InputAction @Taunt1 => m_Wrapper.m_Player_Taunt1;
+        public InputAction @Taunt2 => m_Wrapper.m_Player_Taunt2;
+        public InputAction @Taunt3 => m_Wrapper.m_Player_Taunt3;
+        public InputAction @Taunt4 => m_Wrapper.m_Player_Taunt4;
+        public InputAction @Taunt5 => m_Wrapper.m_Player_Taunt5;
+        public InputAction @Taunt6 => m_Wrapper.m_Player_Taunt6;
+        public InputAction @Taunt7 => m_Wrapper.m_Player_Taunt7;
+        public InputAction @Taunt8 => m_Wrapper.m_Player_Taunt8;
+        public InputAction @Taunt9 => m_Wrapper.m_Player_Taunt9;
         public InputActionMap Get() { return m_Wrapper.m_Player; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -1226,6 +1456,36 @@ public partial class @Controls : IInputActionCollection2, IDisposable
                 @ReserveItem.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnReserveItem;
                 @ReserveItem.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnReserveItem;
                 @ReserveItem.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnReserveItem;
+                @Taunt0.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnTaunt0;
+                @Taunt0.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnTaunt0;
+                @Taunt0.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnTaunt0;
+                @Taunt1.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnTaunt1;
+                @Taunt1.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnTaunt1;
+                @Taunt1.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnTaunt1;
+                @Taunt2.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnTaunt2;
+                @Taunt2.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnTaunt2;
+                @Taunt2.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnTaunt2;
+                @Taunt3.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnTaunt3;
+                @Taunt3.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnTaunt3;
+                @Taunt3.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnTaunt3;
+                @Taunt4.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnTaunt4;
+                @Taunt4.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnTaunt4;
+                @Taunt4.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnTaunt4;
+                @Taunt5.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnTaunt5;
+                @Taunt5.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnTaunt5;
+                @Taunt5.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnTaunt5;
+                @Taunt6.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnTaunt6;
+                @Taunt6.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnTaunt6;
+                @Taunt6.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnTaunt6;
+                @Taunt7.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnTaunt7;
+                @Taunt7.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnTaunt7;
+                @Taunt7.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnTaunt7;
+                @Taunt8.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnTaunt8;
+                @Taunt8.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnTaunt8;
+                @Taunt8.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnTaunt8;
+                @Taunt9.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnTaunt9;
+                @Taunt9.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnTaunt9;
+                @Taunt9.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnTaunt9;
             }
             m_Wrapper.m_PlayerActionsCallbackInterface = instance;
             if (instance != null)
@@ -1245,6 +1505,36 @@ public partial class @Controls : IInputActionCollection2, IDisposable
                 @ReserveItem.started += instance.OnReserveItem;
                 @ReserveItem.performed += instance.OnReserveItem;
                 @ReserveItem.canceled += instance.OnReserveItem;
+                @Taunt0.started += instance.OnTaunt0;
+                @Taunt0.performed += instance.OnTaunt0;
+                @Taunt0.canceled += instance.OnTaunt0;
+                @Taunt1.started += instance.OnTaunt1;
+                @Taunt1.performed += instance.OnTaunt1;
+                @Taunt1.canceled += instance.OnTaunt1;
+                @Taunt2.started += instance.OnTaunt2;
+                @Taunt2.performed += instance.OnTaunt2;
+                @Taunt2.canceled += instance.OnTaunt2;
+                @Taunt3.started += instance.OnTaunt3;
+                @Taunt3.performed += instance.OnTaunt3;
+                @Taunt3.canceled += instance.OnTaunt3;
+                @Taunt4.started += instance.OnTaunt4;
+                @Taunt4.performed += instance.OnTaunt4;
+                @Taunt4.canceled += instance.OnTaunt4;
+                @Taunt5.started += instance.OnTaunt5;
+                @Taunt5.performed += instance.OnTaunt5;
+                @Taunt5.canceled += instance.OnTaunt5;
+                @Taunt6.started += instance.OnTaunt6;
+                @Taunt6.performed += instance.OnTaunt6;
+                @Taunt6.canceled += instance.OnTaunt6;
+                @Taunt7.started += instance.OnTaunt7;
+                @Taunt7.performed += instance.OnTaunt7;
+                @Taunt7.canceled += instance.OnTaunt7;
+                @Taunt8.started += instance.OnTaunt8;
+                @Taunt8.performed += instance.OnTaunt8;
+                @Taunt8.canceled += instance.OnTaunt8;
+                @Taunt9.started += instance.OnTaunt9;
+                @Taunt9.performed += instance.OnTaunt9;
+                @Taunt9.canceled += instance.OnTaunt9;
             }
         }
     }
@@ -1395,6 +1685,16 @@ public partial class @Controls : IInputActionCollection2, IDisposable
         void OnSprint(InputAction.CallbackContext context);
         void OnPowerupAction(InputAction.CallbackContext context);
         void OnReserveItem(InputAction.CallbackContext context);
+        void OnTaunt0(InputAction.CallbackContext context);
+        void OnTaunt1(InputAction.CallbackContext context);
+        void OnTaunt2(InputAction.CallbackContext context);
+        void OnTaunt3(InputAction.CallbackContext context);
+        void OnTaunt4(InputAction.CallbackContext context);
+        void OnTaunt5(InputAction.CallbackContext context);
+        void OnTaunt6(InputAction.CallbackContext context);
+        void OnTaunt7(InputAction.CallbackContext context);
+        void OnTaunt8(InputAction.CallbackContext context);
+        void OnTaunt9(InputAction.CallbackContext context);
     }
     public interface IUIActions
     {
