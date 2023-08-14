@@ -80,7 +80,6 @@ public class MovingPowerup : MonoBehaviourPun {
                 photonView.TransferOwnership(PhotonNetwork.MasterClient);
             scale = 0.5f;
         }
-        else Debug.Log(followMeCounter);
         sRenderer.transform.localScale = new Vector3(scale, scale, 1f);
     }
 
