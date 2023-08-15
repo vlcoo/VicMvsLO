@@ -45,7 +45,7 @@ public static class Enums {
     //Sound effects
     public enum Sounds : byte {
 
-        //CURRENT MAX: 104
+        //CURRENT MAX: 103
 
         //Enemy
         [SoundData("enemy/freeze")]                             Enemy_Generic_Freeze = 0,
@@ -132,7 +132,6 @@ public static class Enums {
         [SoundData("ui/player_connect")]                        UI_PlayerConnect = 79,
         [SoundData("ui/player_disconnect")]                     UI_PlayerDisconnect = 80,
         [SoundData("ui/decide")]                                UI_Decide = 81,
-        [SoundData("ui/select")]                                UI_Select = 103,
         [SoundData("ui/back")]                                  UI_Back = 82,
         [SoundData("ui/cursor")]                                UI_Cursor = 83,
         [SoundData("ui/warn")]                                  UI_Error = 84,
@@ -146,8 +145,6 @@ public static class Enums {
         [SoundData("ui/match_goal_short")]                      UI_Match_Goal_Short = 99,
         [SoundData("ui/match_cancelled")]                       UI_Match_Cancelled = 101,
         [SoundData("ui/file_select")]                           UI_Match_Starting = 103,
-        [SoundData("music/loading-drop")]                           Jingle_Loading_Finished_1 = 105,
-        [SoundData("music/loading2-drop")]                           Jingle_Loading_Finished_2 = 106,
 
         //World Elements
         [SoundData("world/block_break")]                        World_Block_Break = 67,

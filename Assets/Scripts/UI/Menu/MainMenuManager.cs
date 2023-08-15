@@ -34,7 +34,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     public GameObject lobbiesContent, lobbyPrefab;
     bool quit, validName;
     public GameObject connecting;
-    public GameObject title, bg, mainMenu, optionsMenu, lobbyMenu, createLobbyPrompt, inLobbyMenu, creditsMenu, controlsMenu, privatePrompt, updateBox, newRuleS1Prompt, newRuleS2Prompt, emoteListPrompt, RNGRulesBox, specialPrompt;
+    public GameObject title, bg, mainMenu, optionsMenu, lobbyMenu, createLobbyPrompt, inLobbyMenu, creditsMenu, controlsMenu, privatePrompt, updateBox, newRuleS1Prompt, newRuleS2Prompt, emoteListPrompt, RNGRulesBox, specialPrompt, stagePrompt;
     public Animator createLobbyPromptAnimator, privatePromptAnimator, updateBoxAnimator, errorBoxAnimator, rebindPromptAnimator, newRuleS1PromptAnimator, newRuleS2PromptAnimator, emoteListPromptAnimator, RNGRulesBoxAnimator;
     public GameObject[] levelCameraPositions;
     public GameObject sliderText, lobbyText, currentMaxPlayers, settingsPanel, ruleTemplate, lblConditions, specialTogglesParent;
@@ -45,9 +45,9 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     public GameObject playersContent, playersPrefab, chatContent, chatPrefab;
     public TMP_InputField nicknameField, starsText, lapsText, coinsText, livesField, timeField, lobbyJoinField, chatTextField;
     public Slider musicSlider, sfxSlider, masterSlider, lobbyPlayersSlider, changePlayersSlider, RNGSlider;
-    public GameObject mainMenuSelected, optionsSelected, lobbySelected, currentLobbySelected, createLobbySelected, creditsSelected, controlsSelected, privateSelected, reconnectSelected, updateBoxSelected, newRuleS1Selected, newRuleS2Selected, emoteListSelected, RNGRulesSelected, specialSelected;
+    public GameObject mainMenuSelected, optionsSelected, lobbySelected, currentLobbySelected, createLobbySelected, creditsSelected, controlsSelected, privateSelected, reconnectSelected, updateBoxSelected, newRuleS1Selected, newRuleS2Selected, emoteListSelected, RNGRulesSelected, specialSelected, stageSelected;
     public GameObject errorBox, errorButton, rebindPrompt, reconnectBox;
-    public TMP_Text errorText, errorDetail, rebindCountdown, rebindText, reconnectText, updateText, RNGSliderText, specialCountText, setSpecialBtn;
+    public TMP_Text errorText, errorDetail, rebindCountdown, rebindText, reconnectText, updateText, RNGSliderText, specialCountText, setSpecialBtn, stageText;
     public TMP_Dropdown region;
     public RebindManager rebindManager;
     public static string lastRegion;
@@ -893,6 +893,12 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         specialPrompt.SetActive(true);
         EventSystem.current.SetSelectedGameObject(specialSelected);
     }
+    
+    public void OpenMapSelector()
+    {
+        stagePrompt.SetActive(true);
+        EventSystem.current.SetSelectedGameObject(stageSelected);
+    }
 
     public void CloseNewRuleS2(string action)
     {
@@ -1013,7 +1019,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     }
 
     public void ConfirmSound(bool alternate = false) {
-        sfx.PlayOneShot(alternate ? Enums.Sounds.UI_Select.GetClip() : Enums.Sounds.UI_Decide.GetClip());
+        sfx.PlayOneShot(alternate ? Enums.Sounds.UI_Cursor.GetClip() : Enums.Sounds.UI_Decide.GetClip());
     }
 
     public void ConnectToDropdownRegion() {
@@ -1124,23 +1130,23 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
     public void ChangeLevel(int index) {
         levelDropdown.SetValueWithoutNotify(index);
+        stageText.text = "Map (" + levelDropdown.options[index].text + "):";
         LocalChatMessage("Map set to " + levelDropdown.options[index].text, Color.red);
         raceMapSelected = levelDropdown.options[index].text.Contains("racelvl");
         UpdateSettingEnableStates();
         Camera.main.transform.position = levelCameraPositions[index].transform.position;
     }
-    public void SetLevelIndex() {
+    public void SetLevelIndex(int newLevelIndex) {
         if (!PhotonNetwork.IsMasterClient)
             return;
 
-        int newLevelIndex = levelDropdown.value;
         if (newLevelIndex == (int) PhotonNetwork.CurrentRoom.CustomProperties[Enums.NetRoomProperties.Level])
             return;
 
         //ChangeLevel(newLevelIndex);
 
         Hashtable table = new() {
-            [Enums.NetRoomProperties.Level] = levelDropdown.value
+            [Enums.NetRoomProperties.Level] = newLevelIndex
         };
         PhotonNetwork.CurrentRoom.SetCustomProperties(table);
     }

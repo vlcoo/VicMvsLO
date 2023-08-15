@@ -1598,11 +1598,11 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             PhotonNetwork.Destroy(photonView);
             GameManager.Instance.SpectationManager.Spectating = true;
         }
-        Destroy(gameObject);
         PlaySound(Enums.Sounds.Player_Sound_DeathOthers);
-        
         if (!matchConditioned)
             GameManager.Instance.MatchConditioner.ConditionActioned(this, "Disqualified");
+        
+        Destroy(gameObject);
     }
 
     public bool goalReachedBottom = false;
