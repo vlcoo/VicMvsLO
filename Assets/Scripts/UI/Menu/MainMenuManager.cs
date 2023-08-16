@@ -1018,6 +1018,11 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         sfx.PlayOneShot(Enums.Sounds.UI_Back.GetClip());
     }
 
+    public void ConfirmSound()
+    {
+        ConfirmSound(false);
+    }
+
     public void ConfirmSound(bool alternate = false) {
         sfx.PlayOneShot(alternate ? Enums.Sounds.UI_Cursor.GetClip() : Enums.Sounds.UI_Decide.GetClip());
     }

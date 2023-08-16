@@ -15,6 +15,7 @@ using TMPro;
 using Photon.Pun;
 using Photon.Realtime;
 using ExitGames.Client.Photon;
+using ExitGames.Client.Photon.StructWrapping;
 using NSMB.Utils;
 using UnityEngine.UI;
 using Hashtable = ExitGames.Client.Photon.Hashtable;
@@ -39,12 +40,14 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
     public MusicData mainMusic, invincibleMusic, megaMushroomMusic;
     public MatchConditioner MatchConditioner { get; private set; }
     public Togglerizer Togglerizer { get; private set; }
+    public TeamGrouper TeamGrouper { get; private set; }
     private long speedrunTimerStartTimestamp = 0;
 
     public int levelMinTileX, levelMinTileY, levelWidthTile, levelHeightTile;
     public float cameraMinY, cameraHeightY, cameraMinX = -1000, cameraMaxX = 1000;
     public bool loopingLevel = true;
     public bool raceLevel = false;
+    [NonSerialized] public bool teamsMatch = false;
     [NonSerialized] public bool needsStarcoins;
     public Vector3 spawnpoint;
     public Vector3 checkpoint;
@@ -443,6 +446,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         SpectationManager = GetComponent<SpectationManager>();
         MatchConditioner = GetComponent<MatchConditioner>();
         Togglerizer = GetComponent<Togglerizer>();
+        this.TeamGrouper = new TeamGrouper();
         loopMusic = GetComponent<LoopingMusic>();
         coins = GameObject.FindGameObjectsWithTag("coin");
         levelUIColor.a = .7f;
@@ -546,6 +550,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         loaded = true;
         loadedPlayers.Clear();
         enemySpawnpoints = FindObjectsOfType<EnemySpawnpoint>();
+        TeamGrouper.LoadAll();
         bool spectating = GlobalController.Instance.joinedAsSpectator;
         bool gameStarting = startTimestamp - PhotonNetwork.ServerTimestamp > 0;
 
@@ -574,7 +579,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         }
 
         started = true;
-
+        
         playerCount = players.Count;
         foreach (PlayerController controllers in players)
             if (controllers) {
@@ -583,6 +588,8 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
                     controllers.sfx.enabled = true;
                 }
                 controllers.gameObject.SetActive(spectating);
+                
+                this.TeamGrouper.teams[controllers.character.prefab].Add(controllers);
             }
 
         try {
@@ -705,11 +712,16 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         gameover = true;
         
         PhotonNetwork.CurrentRoom.SetCustomProperties(new() { [Enums.NetRoomProperties.GameStarted] = false });
+        int winnerCharacterIndex = (int)winner.CustomProperties[Enums.NetPlayerProperties.Character];
         music.Stop();
         GameObject text = GameObject.FindWithTag("wintext");
+        string uniqueName = teamsMatch
+            ? ("The " + GlobalController.Instance.characters[winnerCharacterIndex].prefab.Replace("Player", "") + "\n" +
+               GlobalController.Instance.characters[winnerCharacterIndex].uistring + "Team")
+            : winner.GetUniqueNickname();
         text.GetComponent<TMP_Text>().text = cancelled
             ? "No contest"
-            : (winner == null ? "It's a tie..." : $"{winner.GetUniqueNickname()} Wins!");
+            : (winner == null ? "It's a tie..." : $"{uniqueName} Wins!");
 
         if (!cancelled) yield return new WaitForSecondsRealtime(1);
 
@@ -739,7 +751,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
                     timeTotal.Seconds, timeTotal.Milliseconds);
             }
             text.GetComponent<Animator>().SetTrigger("start");
-            if ((int)winner.CustomProperties[Enums.NetPlayerProperties.Character] == 1)
+            if (winnerCharacterIndex == 1)
                 text.GetComponent<TMP_Text>().colorGradientPreset = gradientLuigiText;
             else
                 text.GetComponent<TMP_Text>().colorGradientPreset = gradientMarioText;
