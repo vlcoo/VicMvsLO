@@ -7,7 +7,7 @@ public class TeamGrouper : MonoBehaviour
 {
     public Dictionary<string, List<PlayerController>> teams = new();
 
-    public void LoadAll()
+    public void Start()
     {
         foreach (PlayerData character in GlobalController.Instance.characters)
         {

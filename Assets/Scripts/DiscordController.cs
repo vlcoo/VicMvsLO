@@ -68,6 +68,7 @@ public class DiscordController : MonoBehaviour {
         discord?.Dispose();
     }
 
+    private PlayerController localController;
     public void UpdateActivity() {
 #if UNITY_WEBGL
         return;
@@ -81,10 +82,11 @@ public class DiscordController : MonoBehaviour {
             //in a level
             GameManager gm = GameManager.Instance;
             Room room = PhotonNetwork.CurrentRoom;
+            if (localController == null) localController = gm.localPlayer.GetComponent<PlayerController>();
 
-            activity.Details = PhotonNetwork.OfflineMode ? "Playing Offline" : "Playing Online";
+            // activity.Details = PhotonNetwork.OfflineMode ? "Playing Offline" : "Playing Online";
             activity.Party = new() { Size = new() { CurrentSize = room.PlayerCount, MaxSize = room.MaxPlayers }, Id = PhotonNetwork.CurrentRoom.Name };
-            activity.State = room.IsVisible ? "In a Public Game" : "In a Private Game";
+            activity.State = room.IsVisible ? "In a Public Match" : "In a Private Match";
             activity.Secrets = new() { Join = PhotonNetwork.CloudRegion + "-" + room.Name };
 
             ActivityAssets assets = new();
@@ -93,7 +95,17 @@ public class DiscordController : MonoBehaviour {
             else
                 assets.LargeImage = "mainmenu";*/ // TODO: add app and images...
             assets.LargeImage = "logo";
-            assets.LargeText = gm.levelName;
+            assets.LargeText = "Playing in " + gm.levelName;
+            if (localController == null || gm.SpectationManager.Spectating)
+            {
+                assets.SmallImage = "spectating";
+                assets.SmallText = "Spectating";
+            }
+            else
+            {
+                assets.SmallImage = localController.character.prefab.ToLower();
+                assets.SmallText = "Playing as " + localController.character.prefab.Replace("Player", "");
+            }
 
             activity.Assets = assets;
 
@@ -106,8 +118,9 @@ public class DiscordController : MonoBehaviour {
         } else if (PhotonNetwork.InRoom) {
             //in a room
             Room room = PhotonNetwork.CurrentRoom;
+            localController = null;
 
-            activity.Details = PhotonNetwork.OfflineMode ? "Playing Offline" : "Playing Online";
+            // activity.Details = PhotonNetwork.OfflineMode ? "Playing Offline" : "Playing Online";
             activity.Party = new() { Size = new() { CurrentSize = room.PlayerCount, MaxSize = room.MaxPlayers }, Id = PhotonNetwork.CurrentRoom.Name };
             activity.State = room.IsVisible ? "In a Public Lobby" : "In a Private Lobby";
             activity.Secrets = new() { Join = PhotonNetwork.CloudRegion + "-" + room.Name };
@@ -116,8 +129,9 @@ public class DiscordController : MonoBehaviour {
 
         } else {
             //in the main menu, not in a room
+            localController = null;
 
-            activity.Details = "Browsing the Main Menu...";
+            activity.Details = "In the Main Menu";
             activity.Assets = new() { LargeImage = "logo" };
 
         }

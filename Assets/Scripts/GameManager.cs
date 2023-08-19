@@ -446,7 +446,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         SpectationManager = GetComponent<SpectationManager>();
         MatchConditioner = GetComponent<MatchConditioner>();
         Togglerizer = GetComponent<Togglerizer>();
-        this.TeamGrouper = new TeamGrouper();
+        TeamGrouper = GetComponent<TeamGrouper>();
         loopMusic = GetComponent<LoopingMusic>();
         coins = GameObject.FindGameObjectsWithTag("coin");
         levelUIColor.a = .7f;
@@ -550,7 +550,6 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         loaded = true;
         loadedPlayers.Clear();
         enemySpawnpoints = FindObjectsOfType<EnemySpawnpoint>();
-        TeamGrouper.LoadAll();
         bool spectating = GlobalController.Instance.joinedAsSpectator;
         bool gameStarting = startTimestamp - PhotonNetwork.ServerTimestamp > 0;
 
@@ -589,7 +588,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
                 }
                 controllers.gameObject.SetActive(spectating);
                 
-                this.TeamGrouper.teams[controllers.character.prefab].Add(controllers);
+                TeamGrouper.teams[controllers.character.prefab].Add(controllers);
             }
 
         try {
@@ -712,13 +711,20 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         gameover = true;
         
         PhotonNetwork.CurrentRoom.SetCustomProperties(new() { [Enums.NetRoomProperties.GameStarted] = false });
-        int winnerCharacterIndex = (int)winner.CustomProperties[Enums.NetPlayerProperties.Character];
         music.Stop();
         GameObject text = GameObject.FindWithTag("wintext");
-        string uniqueName = teamsMatch
-            ? ("The " + GlobalController.Instance.characters[winnerCharacterIndex].prefab.Replace("Player", "") + "\n" +
-               GlobalController.Instance.characters[winnerCharacterIndex].uistring + "Team")
-            : winner.GetUniqueNickname();
+        int winnerCharacterIndex = -1;
+        string uniqueName = "";
+        if (winner != null)
+        {
+            winnerCharacterIndex = (int)winner.CustomProperties[Enums.NetPlayerProperties.Character];
+            uniqueName = teamsMatch
+                ? ("The " + GlobalController.Instance.characters[winnerCharacterIndex].prefab.Replace("Player", "") +
+                   "\n" +
+                   GlobalController.Instance.characters[winnerCharacterIndex].uistring + "Team")
+                : winner.GetUniqueNickname();
+        }
+
         text.GetComponent<TMP_Text>().text = cancelled
             ? "No contest"
             : (winner == null ? "It's a tie..." : $"{uniqueName} Wins!");
