@@ -41,7 +41,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     public TMP_Dropdown levelDropdown, characterDropdown;
     public RoomIcon selectedRoomIcon, privateJoinRoom;
     public Button joinRoomBtn, createRoomBtn, startGameBtn, exitBtn, backBtn;
-    public Toggle ndsResolutionToggle, fullscreenToggle, livesEnabled, powerupsEnabled, timeEnabled, starcoinsEnabled, starsEnabled, coinsEnabled, drawTimeupToggle, fireballToggle, rumbleToggle, animsToggle, vsyncToggle, privateToggle, privateToggleRoom, aspectToggle, spectateToggle, scoreboardToggle, filterToggle, chainableActionsToggle, RNGClear;
+    public Toggle ndsResolutionToggle, fullscreenToggle, livesEnabled, powerupsEnabled, timeEnabled, starcoinsEnabled, starsEnabled, coinsEnabled, drawTimeupToggle, fireballToggle, rumbleToggle, animsToggle, vsyncToggle, privateToggle, privateToggleRoom, aspectToggle, spectateToggle, scoreboardToggle, filterToggle, chainableActionsToggle, RNGClear, teamsToggle;
     public GameObject playersContent, playersPrefab, chatContent, chatPrefab;
     public TMP_InputField nicknameField, starsText, lapsText, coinsText, livesField, timeField, lobbyJoinField, chatTextField;
     public Slider musicSlider, sfxSlider, masterSlider, lobbyPlayersSlider, changePlayersSlider, RNGSlider;
@@ -261,6 +261,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         AttemptToUpdateProperty<string>(updatedProperties, Enums.NetRoomProperties.HostName, ChangeLobbyHeader);
         AttemptToUpdateProperty<bool>(updatedProperties, Enums.NetRoomProperties.ChainableRules, ChangeChainableRules);
         AttemptToUpdateProperty<bool>(updatedProperties, Enums.NetRoomProperties.Starcoins, ChangeStarcoins);
+        AttemptToUpdateProperty<bool>(updatedProperties, Enums.NetRoomProperties.Teams, ChangeTeams);
     }
 
     public void ChangeDebugState(bool enabled) {
@@ -1688,6 +1689,10 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     {
         chainableActionsToggle.SetIsOnWithoutNotify(how);
     }
+    public void ChangeTeams(bool how)
+    {
+        teamsToggle.SetIsOnWithoutNotify(how);
+    }
     
     public void ChangeStarcoins(bool how)
     {
@@ -1831,6 +1836,12 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
             [Enums.NetPlayerProperties.Spectator] = toggle.isOn,
         };
         PhotonNetwork.LocalPlayer.SetCustomProperties(properties);
+    }
+    public void EnableTeams(Toggle toggle) {
+        Hashtable properties = new() {
+            [Enums.NetRoomProperties.Teams] = toggle.isOn,
+        };
+        PhotonNetwork.CurrentRoom.SetCustomProperties(properties);
     }
 
     public void EnableTime(Toggle toggle) {

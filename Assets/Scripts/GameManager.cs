@@ -627,6 +627,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
                 localPlayer.GetComponent<PlayerController>().OnGameStart();
         }
         
+        teamsMatch = TeamGrouper.isTeamsMatch;
         if (Togglerizer.currentEffects.Contains("NoBahs"))
             mainMusic = new MusicData(mainMusic.fastClip, mainMusic.loopStartSample, mainMusic.loopEndSample);
 
