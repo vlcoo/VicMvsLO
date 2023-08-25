@@ -19,7 +19,6 @@ public class RoomIcon : MonoBehaviour {
 
     public void Start() {
         icon = GetComponent<Image>();
-        Unselect();
     }
 
     public void UpdateUI(RoomInfo newRoom) {
@@ -57,23 +56,16 @@ public class RoomIcon : MonoBehaviour {
         symbolsText.text = symbols;
     }
 
-    public void Select() {
-        icon.color = selectedColor;
+     public void Select() {
     }
-
+    
     public void Unselect() {
-        icon.color = defaultColor;
     }
-
+    
     public void Hover() {
-        icon.color = highlightColor;
     }
-
+    
     public void Unhover() {
-        if (MainMenuManager.Instance.selectedRoomIcon == this) {
-            Select();
-        } else {
-            Unselect();
-        }
+        
     }
 }

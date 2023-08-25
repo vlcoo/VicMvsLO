@@ -46,7 +46,7 @@ AudioMixerController:
   - {fileID: 24500006}
   m_StartSnapshot: {fileID: 24500006}
   m_SuspendThreshold: -80
-  m_EnableSuspend: 1
+  m_EnableSuspend: 0
   m_UpdateMode: 0
   m_ExposedParameters:
   - guid: 74d99c89300a7a34b96b1c3baa434dc8
@@ -214,6 +214,7 @@ AudioMixerGroupController:
   m_Effects:
   - {fileID: 4033943391198585222}
   - {fileID: -7423277699796284261}
+  - {fileID: 6474755726829864193}
   m_UserColorIndex: 0
   m_Mute: 0
   m_Solo: 0
@@ -237,6 +238,20 @@ AudioMixerEffectController:
     m_GUID: 2ef7f2523762f6c49a9baad9874c97e9
   - m_ParameterName: Max channels
     m_GUID: a27d0c6f96eb76b41b2bb7524840f324
+  m_SendTarget: {fileID: 0}
+  m_EnableWetMix: 0
+  m_Bypass: 0
+--- !u!244 &6474755726829864193
+AudioMixerEffectController:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: 
+  m_EffectID: c2d4b93acd1c0f6439dd519f6b004540
+  m_EffectName: FluidSynth
+  m_MixLevel: 17bf77d643646bf4bb64815c22612658
+  m_Parameters: []
   m_SendTarget: {fileID: 0}
   m_EnableWetMix: 0
   m_Bypass: 0

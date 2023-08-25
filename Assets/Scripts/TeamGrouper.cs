@@ -12,6 +12,7 @@ public class TeamGrouper : MonoBehaviour
     public void Start()
     {
         Utils.GetCustomProperty(Enums.NetRoomProperties.Teams, out isTeamsMatch);
+        if (!isTeamsMatch) return;
         
         foreach (PlayerData character in GlobalController.Instance.characters)
         {

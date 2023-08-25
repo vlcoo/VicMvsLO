@@ -588,7 +588,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
                 }
                 controllers.gameObject.SetActive(spectating);
                 
-                TeamGrouper.teams[controllers.character.prefab].Add(controllers);
+                if (TeamGrouper.isTeamsMatch) TeamGrouper.teams[controllers.character.prefab].Add(controllers);
             }
 
         try {
@@ -730,7 +730,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             ? "No contest"
             : (winner == null ? "It's a tie..." : $"{uniqueName} Wins!");
 
-        if (!cancelled) yield return new WaitForSecondsRealtime(1);
+        if (!cancelled) yield return new WaitForSecondsRealtime(0.5f);
 
         AudioMixer mixer = music.outputAudioMixerGroup.audioMixer;
         mixer.SetFloat("MusicSpeed", 1f);
