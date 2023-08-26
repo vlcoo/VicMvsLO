@@ -329,7 +329,10 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
             System.Array.Sort(pingSortedRegions, NetworkUtils.PingComparer);
 
             foreach (Region r in pingSortedRegions)
-                formattedRegions.Add($"{r.Code} <color=#bbbbbb>({(r.Ping == 4000 ? "N/A" : r.Ping + "ms")})");
+            {
+                Debug.Log(r.Code);
+                formattedRegions.Add($"{NetworkUtils.regionsFullNames.GetValueOrDefault(r.Code, r.Code)}");
+            }
 
             lastRegion = pingSortedRegions[0].Code;
             pingsReceived = true;

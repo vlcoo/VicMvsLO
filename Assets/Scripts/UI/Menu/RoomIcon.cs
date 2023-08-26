@@ -28,8 +28,9 @@ public class RoomIcon : MonoBehaviour {
         room = newRoom;
         Hashtable prop = room.CustomProperties;
 
-        nameText.text = $"{((string) prop[Enums.NetRoomProperties.HostName]).ToValidUsername()}'s Lobby";
-        playersText.text = $"{room.PlayerCount}/{room.MaxPlayers} players";
+        nameText.text = $"{((string) prop[Enums.NetRoomProperties.HostName]).ToValidUsername()}";
+        if (room.PlayerCount >= room.MaxPlayers) playersText.text = " Full!";
+        else playersText.text = $"  {room.PlayerCount}\n    /\n     {room.MaxPlayers}";
         inProgressText.text = (bool) prop[Enums.NetRoomProperties.GameStarted] ? "In Progress" : "Not Started";
 
         string symbols = "";

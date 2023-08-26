@@ -10,6 +10,26 @@ namespace NSMB.Utils {
 
         public static WebFlags forward = new(WebFlags.HttpForwardConst);
 
+        public static Dictionary<string, string> regionsFullNames = new()
+        {
+            ["asia"] = "Asia",
+            ["au"] = "Australia",
+            ["cae"] = "Canada",
+            ["cn"] = "Mainland China",
+            ["eu"] = "Europe",
+            ["in"] = "India",
+            ["jp"] = "Japan",
+            ["za"] = "South Africa",
+            ["sa"] = "South America",
+            ["kr"] = "South Korea",
+            ["tr"] = "Turkey",
+            ["us"] = "USA",
+            ["usw"] = "USA, West",
+            ["ussc"] = "USA, Central",
+            ["ru"] = "Russia",
+            ["rue"] = "Russia, East",
+        };
+
         public static Dictionary<DisconnectCause, string> disconnectMessages = new() {
 
             [DisconnectCause.MaxCcuReached] = "This region is full",
@@ -28,6 +48,11 @@ namespace NSMB.Utils {
         private readonly static Hashtable _defaultRoomProperties = new() {
             [Enums.NetRoomProperties.Level] = 0,
             [Enums.NetRoomProperties.StarRequirement] = 10,
+            [Enums.NetRoomProperties.LapRequirement] = 1,
+            [Enums.NetRoomProperties.Starcoins] = false,
+            [Enums.NetRoomProperties.ChainableRules] = true,
+            [Enums.NetRoomProperties.MatchRules] = new Dictionary<string, string>(),
+            [Enums.NetRoomProperties.SpecialRules] = new Dictionary<string, bool>(),
             [Enums.NetRoomProperties.CoinRequirement] = 8,
             [Enums.NetRoomProperties.Lives] = -1,
             [Enums.NetRoomProperties.Time] = -1,
@@ -57,6 +82,7 @@ namespace NSMB.Utils {
         Enums.NetRoomProperties.NewPowerups,
         Enums.NetRoomProperties.GameStarted,
         Enums.NetRoomProperties.HostName,
+        Enums.NetRoomProperties.Teams,
     };
 
         public static readonly RegionPingComparer PingComparer = new();
