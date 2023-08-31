@@ -730,7 +730,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             ? "No contest"
             : (winner == null ? "It's a tie..." : $"{uniqueName} Wins!");
 
-        if (!cancelled) yield return new WaitForSecondsRealtime(0.5f);
+        if (!cancelled) yield return new WaitForSecondsRealtime(0.2f);
 
         AudioMixer mixer = music.outputAudioMixerGroup.audioMixer;
         mixer.SetFloat("MusicSpeed", 1f);

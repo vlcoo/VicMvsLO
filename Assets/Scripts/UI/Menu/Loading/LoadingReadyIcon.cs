@@ -10,7 +10,7 @@ public class LoadingReadyIcon : MonoBehaviour
 
     public void Start() {
         GetComponent<Image>().sprite = Utils.GetCharacterData().readySprite;
-        if (Utils.GetCharacterData().prefab.Equals("PlayerLuigi"))
-            readyText.colorGradientPreset = gradientLuigiText;
+        // if (Utils.GetCharacterData().prefab.Equals("PlayerLuigi"))
+        //     readyText.colorGradientPreset = gradientLuigiText;
     }
 }
