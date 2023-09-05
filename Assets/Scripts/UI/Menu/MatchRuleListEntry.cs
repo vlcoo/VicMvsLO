@@ -1,28 +1,50 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
+public class MatchRuleDataEntry : IEquatable<MatchRuleDataEntry>
+{
+    public string Condition, Action;
+    public List<string> Parameters;
+
+    public MatchRuleDataEntry(string cond, string act, List<string> param)
+    {
+        Condition = cond;
+        Action = act;
+        Parameters = param;
+    }
+    
+    public bool Equals(MatchRuleDataEntry other)
+    {
+        if (ReferenceEquals(null, other)) return false;
+        if (ReferenceEquals(this, other)) return true;
+        return base.Equals(other) && Condition == other.Condition && Action == other.Action;
+    }
+
+    public override bool Equals(object obj)
+    {
+        if (ReferenceEquals(null, obj)) return false;
+        if (ReferenceEquals(this, obj)) return true;
+        if (obj.GetType() != typeof(MatchRuleDataEntry)) return false;
+        return Equals((MatchRuleDataEntry)obj);
+    }
+
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(base.GetHashCode(), Condition, Action);
+    }
+} 
+
 public class MatchRuleListEntry : MonoBehaviour, IEquatable<MatchRuleListEntry>
 {
     public string Condition, Action;
+    public List<string> Parameters;
+
     public TMP_Text lbl;
-
     public Selectable removeButton;
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
 
     public void setRules(string cond, string act)
     {
@@ -41,6 +63,19 @@ public class MatchRuleListEntry : MonoBehaviour, IEquatable<MatchRuleListEntry>
     public void onRemoveButtonPressed()
     {
         
+    }
+
+    public void Deserialize(MatchRuleDataEntry rule)
+    {
+        Condition = rule.Condition;
+        Action = rule.Action;
+        Parameters = rule.Parameters;
+    }
+
+    public MatchRuleDataEntry Serialize()
+    {
+        MatchRuleDataEntry rule = new(Condition, Action, Parameters);
+        return rule;
     }
 
     public bool Equals(MatchRuleListEntry other)

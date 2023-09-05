@@ -251,7 +251,8 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         AttemptToUpdateProperty<int>(updatedProperties, Enums.NetRoomProperties.Level, ChangeLevel);
         AttemptToUpdateProperty<int>(updatedProperties, Enums.NetRoomProperties.StarRequirement, ChangeStarRequirement);
         AttemptToUpdateProperty<int>(updatedProperties, Enums.NetRoomProperties.LapRequirement, ChangeLapRequirement);
-        AttemptToUpdateProperty<Dictionary<string, string>>(updatedProperties, Enums.NetRoomProperties.MatchRules, DictToMatchRules);
+        // AttemptToUpdateProperty<Dictionary<string, string>>(updatedProperties, Enums.NetRoomProperties.MatchRules, DictToMatchRules);
+        AttemptToUpdateProperty<string>(updatedProperties, Enums.NetRoomProperties.MatchRules, JsonToMatchRules);
         AttemptToUpdateProperty<Dictionary<string, bool>>(updatedProperties, Enums.NetRoomProperties.SpecialRules, DictToSpecialRules);
         AttemptToUpdateProperty<int>(updatedProperties, Enums.NetRoomProperties.CoinRequirement, ChangeCoinRequirement);
         AttemptToUpdateProperty<int>(updatedProperties, Enums.NetRoomProperties.Lives, ChangeLives);
@@ -679,7 +680,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
             {
                 Hashtable table = new()
                 {
-                    [Enums.NetRoomProperties.MatchRules] = MatchRulesToDict()
+                    [Enums.NetRoomProperties.MatchRules] = MatchRulesToJson()
                 };
                 PhotonNetwork.CurrentRoom.SetCustomProperties(table);
             }
@@ -703,7 +704,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         Destroy(which.gameObject);
         
         Hashtable table = new() {
-            [Enums.NetRoomProperties.MatchRules] = MatchRulesToDict()
+            [Enums.NetRoomProperties.MatchRules] = MatchRulesToJson()
         };
         PhotonNetwork.CurrentRoom.SetCustomProperties(table);
     }
@@ -857,7 +858,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         }
         
         Hashtable table = new() {
-            [Enums.NetRoomProperties.MatchRules] = MatchRulesToDict()
+            [Enums.NetRoomProperties.MatchRules] = MatchRulesToJson()
         };
         PhotonNetwork.CurrentRoom.SetCustomProperties(table);
         RNGRulesBox.SetActive(false);
@@ -1082,18 +1083,6 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         powerupsEnabled.SetIsOnWithoutNotify(value);
     }
 
-    public Dictionary<string, string> MatchRulesToDict()
-    {
-        Dictionary<string, string> dict = new Dictionary<string, string>();
-        foreach (var rule in ruleList)
-        {
-            if (dict.ContainsKey(rule.Condition)) continue;
-            dict.Add(rule.Condition, rule.Action);
-        }
-
-        return dict;
-    }
-
     public void ChangeLives(int lives) {
         livesEnabled.SetIsOnWithoutNotify(lives != -1);
         UpdateSettingEnableStates();
@@ -1231,7 +1220,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     public void UpdateSettingEnableStates() {
         foreach (Selectable s in roomSettings)
             s.interactable = PhotonNetwork.IsMasterClient;
-        foreach (var s in ruleList)
+        if (ruleList != null) foreach (var s in ruleList)
             s.removeButton.interactable = PhotonNetwork.IsMasterClient;
 
         livesField.interactable = PhotonNetwork.IsMasterClient && livesEnabled.isOn;
@@ -1612,15 +1601,46 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 #endif
     }
 
-    public void DictToMatchRules(Dictionary<string, string> dict)
+    public void JsonToMatchRules(string j)
     {
-        foreach (var rule in ruleList)
-            Destroy(rule.gameObject);
+        foreach (var rule in ruleList) Destroy(rule.gameObject);
         ruleList.Clear();
         
-        foreach(KeyValuePair<string, string> entry in dict)
-            onAddMatchRuleExplicit(entry.Key, entry.Value, false, true);
+        List<MatchRuleDataEntry> dataList = Newtonsoft.Json.JsonConvert.DeserializeObject<List<MatchRuleDataEntry>>(j);
+        if (dataList == null) dataList = new List<MatchRuleDataEntry>();
+        
+        foreach (var data in dataList)
+        {
+            onAddMatchRuleExplicit(data.Condition, data.Action, false, true);
+        }
     }
+
+    public string MatchRulesToJson()
+    {
+        return Newtonsoft.Json.JsonConvert.SerializeObject(ruleList.Select(rule => rule.Serialize()).ToList());
+    }
+
+    // public void DictToMatchRules(Dictionary<string, string> dict)
+    // {
+    //     foreach (var rule in ruleList)
+    //         Destroy(rule.gameObject);
+    //     ruleList.Clear();
+    //     
+    //     foreach(KeyValuePair<string, string> entry in dict)
+    //         onAddMatchRuleExplicit(entry.Key, entry.Value, false, true);
+    // }
+    //
+    // public Dictionary<string, string> MatchRulesToDict()
+    // {
+    //     Dictionary<string, string> dict = new Dictionary<string, string>();
+    //     foreach (var rule in ruleList)
+    //     {
+    //         if (dict.ContainsKey(rule.Condition)) continue;
+    //         dict.Add(rule.Condition, rule.Action);
+    //     }
+    //
+    //     return dict;
+    // }
 
     public void DictToSpecialRules(Dictionary<string, bool> dict)
     {

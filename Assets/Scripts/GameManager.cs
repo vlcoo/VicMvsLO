@@ -511,14 +511,14 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
 
         if (PhotonNetwork.IsMasterClient)
             quitButtonLbl.text = "End Match";
-        if (MatchConditioner.currentMapping is not null && MatchConditioner.currentMapping.Count > 0) 
+        if (MatchConditioner.ruleList is not null && MatchConditioner.ruleList.Count > 0) 
         {
             rulesLbl.text = "";
-            foreach (var entry in MatchConditioner.currentMapping)
+            foreach (var entry in MatchConditioner.ruleList)
             {
-                string sanitizedCond = Regex.Replace(entry.Key, "(\\B[A-Z0-9])", " $1");
-                string sanitizedAct = Regex.Replace(entry.Value, "(\\B[A-Z0-9])", " $1").Replace("Act ", "");
-                rulesLbl.text += sanitizedCond + " .. " + sanitizedAct + (MatchConditioner.currentMapping.Last().Equals(entry) ? "" : "\n");
+                string sanitizedCond = Regex.Replace(entry.Condition, "(\\B[A-Z0-9])", " $1");
+                string sanitizedAct = Regex.Replace(entry.Action, "(\\B[A-Z0-9])", " $1").Replace("Act ", "");
+                rulesLbl.text += sanitizedCond + " .. " + sanitizedAct + (MatchConditioner.ruleList.Last().Equals(entry) ? "" : "\n");
             }
         }
         rulesLbl.text += "\n& " + Togglerizer.currentEffects.Count + " special effects";

@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Timers;
 using ExitGames.Client.Photon;
@@ -11,7 +12,10 @@ using UnityEngine;
 
 public class MatchConditioner : MonoBehaviour
 {
-    public Dictionary<string, string> currentMapping = new();
+    // new mapping: dictionary<string*, dictionary<string**, list<string***>>> *condition, **action, ***parameter(s)
+    // list<matchrulelistentry>
+    // public Dictionary<string, string> currentMapping = new();
+    public List<MatchRuleDataEntry> ruleList;
 
     private float timer5Sec = 5;
     private float timer10Sec = 10;
@@ -19,12 +23,13 @@ public class MatchConditioner : MonoBehaviour
     private float timer30Sec = 30;
     private float timer60Sec = 60;
     
-    public int count => currentMapping?.Count ?? 0;
+    public int count => ruleList?.Count ?? 0;
 
     // Start is called before the first frame update
     void Start()
     {
-        Utils.GetCustomProperty(Enums.NetRoomProperties.MatchRules, out currentMapping);
+        Utils.GetCustomProperty(Enums.NetRoomProperties.MatchRules, out string j);
+        ruleList = Newtonsoft.Json.JsonConvert.DeserializeObject<List<MatchRuleDataEntry>>(j);
     }
 
     // Update is called once per frame
@@ -76,14 +81,17 @@ public class MatchConditioner : MonoBehaviour
     public void ConditionActioned(PlayerController byWhom, string condition)
     {
         if (!PhotonNetwork.IsMasterClient) return;
-        if (ReferenceEquals(currentMapping, null) || !currentMapping.ContainsKey(condition)) return;
-        
-        MethodInfo actionMethod = GetType().GetMethod(currentMapping[condition]);
-        if (actionMethod == null) return;
-        if (byWhom is null)
-            DoToEveryone(actionMethod);
-        else
-            actionMethod.Invoke(this, new[] { byWhom });
+        if (ReferenceEquals(ruleList, null)) return;
+
+        foreach (MatchRuleDataEntry rule in ruleList.Where(r => r.Condition.Equals(condition)))
+        {
+            MethodInfo actionMethod = GetType().GetMethod(rule.Action);
+            if (actionMethod == null) return;
+            if (byWhom is null)
+                DoToEveryone(actionMethod);
+            else
+                actionMethod.Invoke(this, new[] { byWhom });
+        }
     }
 
     public void DoToEveryone(MethodInfo actionFunc)
