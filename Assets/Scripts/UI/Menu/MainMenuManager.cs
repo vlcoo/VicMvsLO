@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using AnotherFileBrowser.Windows;
 using DG.Tweening;
 using UnityEngine;
 using UnityEngine.Audio;
@@ -12,6 +14,7 @@ using UnityEngine.UI;
 using TMPro;
 
 using ExitGames.Client.Photon;
+using Newtonsoft.Json;
 using Photon.Pun;
 using Photon.Realtime;
 using Hashtable = ExitGames.Client.Photon.Hashtable;
@@ -654,9 +657,39 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         PhotonNetwork.CurrentRoom.SetCustomProperties(table);
     }
 
+    public void saveMatchRules()
+    {
+        var bp = new BrowserProperties();
+        bp.filter = "JSON files (*.json)|*.json";
+        bp.filterIndex = 0;
+
+        new FileBrowser().SaveFileBrowser(bp, "vcmiRuleset", ".json", path =>
+        {
+            File.WriteAllText(path, MatchRulesToJson());
+        });
+    }
+
+    public void loadMatchRules()
+    {
+        var bp = new BrowserProperties();
+        bp.filter = "json files (*.json)|*.json";
+        bp.filterIndex = 0;
+
+        new FileBrowser().OpenFileBrowser(bp, path =>
+        {
+            JsonToMatchRules(File.ReadAllText(path));
+            Hashtable table = new() {
+                [Enums.NetRoomProperties.MatchRules] = MatchRulesToJson()
+            };
+            PhotonNetwork.CurrentRoom.SetCustomProperties(table);
+        });
+    }
+
     public void onAddMatchRuleExplicit(string cond, string act, bool updateNetRoom, bool updateUIList = true)
     {
-        if (DISALLOWED_RULES.Contains(new KeyValuePair<string, string>(cond, act)))
+        Debug.Log("adding " + cond + " .. " + act);
+        if (cond is null || act is null || !POSSIBLE_CONDITIONS.Contains(cond) ||
+            DISALLOWED_RULES.Contains(new KeyValuePair<string, string>(cond, act)))
         {
             sfx.PlayOneShot(Enums.Sounds.UI_Error.GetClip());
             return;
@@ -1605,19 +1638,28 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     {
         foreach (var rule in ruleList) Destroy(rule.gameObject);
         ruleList.Clear();
-        
-        List<MatchRuleDataEntry> dataList = Newtonsoft.Json.JsonConvert.DeserializeObject<List<MatchRuleDataEntry>>(j);
-        if (dataList == null) dataList = new List<MatchRuleDataEntry>();
+        List<MatchRuleDataEntry> dataList;
+
+        try
+        {
+            dataList = JsonConvert.DeserializeObject<List<MatchRuleDataEntry>>(j);
+        }
+        catch (JsonReaderException e)
+        {
+            dataList = new List<MatchRuleDataEntry>();
+        }
+        if (dataList is not List<MatchRuleDataEntry>) dataList = new List<MatchRuleDataEntry>();
         
         foreach (var data in dataList)
         {
+            if (data is not MatchRuleDataEntry) return;
             onAddMatchRuleExplicit(data.Condition, data.Action, false, true);
         }
     }
 
     public string MatchRulesToJson()
     {
-        return Newtonsoft.Json.JsonConvert.SerializeObject(ruleList.Select(rule => rule.Serialize()).ToList());
+        return JsonConvert.SerializeObject(ruleList.Select(rule => rule.Serialize()).ToList());
     }
 
     // public void DictToMatchRules(Dictionary<string, string> dict)
