@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using AnotherFileBrowser.Windows;
 using DG.Tweening;
 using UnityEngine;
 using UnityEngine.Audio;
@@ -12,6 +14,7 @@ using UnityEngine.UI;
 using TMPro;
 
 using ExitGames.Client.Photon;
+using Newtonsoft.Json;
 using Photon.Pun;
 using Photon.Realtime;
 using Hashtable = ExitGames.Client.Photon.Hashtable;
@@ -251,7 +254,8 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         AttemptToUpdateProperty<int>(updatedProperties, Enums.NetRoomProperties.Level, ChangeLevel);
         AttemptToUpdateProperty<int>(updatedProperties, Enums.NetRoomProperties.StarRequirement, ChangeStarRequirement);
         AttemptToUpdateProperty<int>(updatedProperties, Enums.NetRoomProperties.LapRequirement, ChangeLapRequirement);
-        AttemptToUpdateProperty<Dictionary<string, string>>(updatedProperties, Enums.NetRoomProperties.MatchRules, DictToMatchRules);
+        // AttemptToUpdateProperty<Dictionary<string, string>>(updatedProperties, Enums.NetRoomProperties.MatchRules, DictToMatchRules);
+        AttemptToUpdateProperty<string>(updatedProperties, Enums.NetRoomProperties.MatchRules, JsonToMatchRules);
         AttemptToUpdateProperty<Dictionary<string, bool>>(updatedProperties, Enums.NetRoomProperties.SpecialRules, DictToSpecialRules);
         AttemptToUpdateProperty<int>(updatedProperties, Enums.NetRoomProperties.CoinRequirement, ChangeCoinRequirement);
         AttemptToUpdateProperty<int>(updatedProperties, Enums.NetRoomProperties.Lives, ChangeLives);
@@ -656,9 +660,43 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         PhotonNetwork.CurrentRoom.SetCustomProperties(table);
     }
 
+    public void saveMatchRules()
+    {
+        var bp = new BrowserProperties();
+        bp.filter = "JSON files (*.json)|*.json";
+        bp.title = "Save ruleset where?";
+        bp.filterIndex = 0;
+
+        new FileBrowser().SaveFileBrowser(bp, "vcmiRuleset", ".json", path =>
+        {
+            if (path == null) return;
+            File.WriteAllText(path, MatchRulesToJson());
+        });
+    }
+
+    public void loadMatchRules()
+    {
+        var bp = new BrowserProperties();
+        bp.filter = "JSON files (*.json)|*.json";
+        bp.title = Random.value >= 0.8 ? "Load which ruleset?" : "hey can you like choose a file to load please";
+        bp.filterIndex = 0;
+
+        new FileBrowser().OpenFileBrowser(bp, path =>
+        {
+            if (path == null) return;
+            JsonToMatchRules(File.ReadAllText(path));
+            Hashtable table = new() {
+                [Enums.NetRoomProperties.MatchRules] = MatchRulesToJson()
+            };
+            PhotonNetwork.CurrentRoom.SetCustomProperties(table);
+        });
+    }
+
     public void onAddMatchRuleExplicit(string cond, string act, bool updateNetRoom, bool updateUIList = true)
     {
-        if (DISALLOWED_RULES.Contains(new KeyValuePair<string, string>(cond, act)))
+        Debug.Log("adding " + cond + " .. " + act);
+        if (cond is null || act is null || !POSSIBLE_CONDITIONS.Contains(cond) ||
+            DISALLOWED_RULES.Contains(new KeyValuePair<string, string>(cond, act)))
         {
             sfx.PlayOneShot(Enums.Sounds.UI_Error.GetClip());
             return;
@@ -682,7 +720,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
             {
                 Hashtable table = new()
                 {
-                    [Enums.NetRoomProperties.MatchRules] = MatchRulesToDict()
+                    [Enums.NetRoomProperties.MatchRules] = MatchRulesToJson()
                 };
                 PhotonNetwork.CurrentRoom.SetCustomProperties(table);
             }
@@ -706,7 +744,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         Destroy(which.gameObject);
         
         Hashtable table = new() {
-            [Enums.NetRoomProperties.MatchRules] = MatchRulesToDict()
+            [Enums.NetRoomProperties.MatchRules] = MatchRulesToJson()
         };
         PhotonNetwork.CurrentRoom.SetCustomProperties(table);
     }
@@ -860,7 +898,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         }
         
         Hashtable table = new() {
-            [Enums.NetRoomProperties.MatchRules] = MatchRulesToDict()
+            [Enums.NetRoomProperties.MatchRules] = MatchRulesToJson()
         };
         PhotonNetwork.CurrentRoom.SetCustomProperties(table);
         RNGRulesBox.SetActive(false);
@@ -1085,18 +1123,6 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         powerupsEnabled.SetIsOnWithoutNotify(value);
     }
 
-    public Dictionary<string, string> MatchRulesToDict()
-    {
-        Dictionary<string, string> dict = new Dictionary<string, string>();
-        foreach (var rule in ruleList)
-        {
-            if (dict.ContainsKey(rule.Condition)) continue;
-            dict.Add(rule.Condition, rule.Action);
-        }
-
-        return dict;
-    }
-
     public void ChangeLives(int lives) {
         livesEnabled.SetIsOnWithoutNotify(lives != -1);
         UpdateSettingEnableStates();
@@ -1234,7 +1260,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     public void UpdateSettingEnableStates() {
         foreach (Selectable s in roomSettings)
             s.interactable = PhotonNetwork.IsMasterClient;
-        foreach (var s in ruleList)
+        if (ruleList != null) foreach (var s in ruleList)
             s.removeButton.interactable = PhotonNetwork.IsMasterClient;
 
         livesField.interactable = PhotonNetwork.IsMasterClient && livesEnabled.isOn;
@@ -1615,15 +1641,55 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 #endif
     }
 
-    public void DictToMatchRules(Dictionary<string, string> dict)
+    public void JsonToMatchRules(string j)
     {
-        foreach (var rule in ruleList)
-            Destroy(rule.gameObject);
+        foreach (var rule in ruleList) Destroy(rule.gameObject);
         ruleList.Clear();
+        List<MatchRuleDataEntry> dataList;
+
+        try
+        {
+            dataList = JsonConvert.DeserializeObject<List<MatchRuleDataEntry>>(j);
+        }
+        catch (JsonReaderException e)
+        {
+            dataList = new List<MatchRuleDataEntry>();
+        }
+        if (dataList is not List<MatchRuleDataEntry>) dataList = new List<MatchRuleDataEntry>();
         
-        foreach(KeyValuePair<string, string> entry in dict)
-            onAddMatchRuleExplicit(entry.Key, entry.Value, false, true);
+        foreach (var data in dataList)
+        {
+            if (data is not MatchRuleDataEntry) return;
+            onAddMatchRuleExplicit(data.Condition, data.Action, false, true);
+        }
     }
+
+    public string MatchRulesToJson()
+    {
+        return JsonConvert.SerializeObject(ruleList.Select(rule => rule.Serialize()).ToList());
+    }
+
+    // public void DictToMatchRules(Dictionary<string, string> dict)
+    // {
+    //     foreach (var rule in ruleList)
+    //         Destroy(rule.gameObject);
+    //     ruleList.Clear();
+    //     
+    //     foreach(KeyValuePair<string, string> entry in dict)
+    //         onAddMatchRuleExplicit(entry.Key, entry.Value, false, true);
+    // }
+    //
+    // public Dictionary<string, string> MatchRulesToDict()
+    // {
+    //     Dictionary<string, string> dict = new Dictionary<string, string>();
+    //     foreach (var rule in ruleList)
+    //     {
+    //         if (dict.ContainsKey(rule.Condition)) continue;
+    //         dict.Add(rule.Condition, rule.Action);
+    //     }
+    //
+    //     return dict;
+    // }
 
     public void DictToSpecialRules(Dictionary<string, bool> dict)
     {

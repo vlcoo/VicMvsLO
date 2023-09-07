@@ -63,6 +63,7 @@ namespace NSMB.Utils {
             [Enums.NetRoomProperties.Debug] = false,
             [Enums.NetRoomProperties.Mutes] = new string[0],
             [Enums.NetRoomProperties.Bans] = new object[0],
+            [Enums.NetRoomProperties.MatchRules] = "",
         };
 
         public static Hashtable DefaultRoomProperties {

@@ -103,8 +103,8 @@ public class DiscordController : MonoBehaviour {
             }
             else
             {
-                assets.SmallImage = localController.character.prefab.ToLower();
-                assets.SmallText = "Playing as " + localController.character.prefab.Replace("Player", "");
+                assets.SmallImage = localController.character.legalName.ToLower().Replace(" ", "");
+                assets.SmallText = "Playing as " + localController.character.legalName;
             }
 
             activity.Assets = assets;

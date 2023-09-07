@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Timers;
 using ExitGames.Client.Photon;
@@ -11,8 +12,10 @@ using UnityEngine;
 
 public class MatchConditioner : MonoBehaviour
 {
-    public Dictionary<string, string> currentMapping = new();
-    public bool chainableActions = false;
+    // new mapping: dictionary<string*, dictionary<string**, list<string***>>> *condition, **action, ***parameter(s)
+    // list<matchrulelistentry>
+    // public Dictionary<string, string> currentMapping = new();
+    public List<MatchRuleDataEntry> ruleList;
 
     private float timer5Sec = 5;
     private float timer10Sec = 10;
@@ -20,14 +23,13 @@ public class MatchConditioner : MonoBehaviour
     private float timer30Sec = 30;
     private float timer60Sec = 60;
     
-    public int count => currentMapping?.Count ?? 0;
+    public int count => ruleList?.Count ?? 0;
 
     // Start is called before the first frame update
     void Start()
     {
-        Utils.GetCustomProperty(Enums.NetRoomProperties.MatchRules, out currentMapping);
-        Utils.GetCustomProperty(Enums.NetRoomProperties.ChainableRules, out chainableActions);
-        chainableActions = !chainableActions;
+        Utils.GetCustomProperty(Enums.NetRoomProperties.MatchRules, out string j);
+        ruleList = Newtonsoft.Json.JsonConvert.DeserializeObject<List<MatchRuleDataEntry>>(j);
     }
 
     // Update is called once per frame
@@ -78,13 +80,18 @@ public class MatchConditioner : MonoBehaviour
 
     public void ConditionActioned(PlayerController byWhom, string condition)
     {
-        if (ReferenceEquals(currentMapping, null) || !currentMapping.ContainsKey(condition)) return;
-        MethodInfo actionMethod = GetType().GetMethod(currentMapping[condition]);
-        if (actionMethod == null) return;
-        if (byWhom is null)
-            DoToEveryone(actionMethod);
-        else
-            actionMethod.Invoke(this, new[] { byWhom });
+        if (!PhotonNetwork.IsMasterClient) return;
+        if (ReferenceEquals(ruleList, null)) return;
+
+        foreach (MatchRuleDataEntry rule in ruleList.Where(r => r.Condition.Equals(condition)))
+        {
+            MethodInfo actionMethod = GetType().GetMethod(rule.Action);
+            if (actionMethod == null) return;
+            if (byWhom is null)
+                DoToEveryone(actionMethod);
+            else
+                actionMethod.Invoke(this, new[] { byWhom });
+        }
     }
 
     public void DoToEveryone(MethodInfo actionFunc)
@@ -95,38 +102,41 @@ public class MatchConditioner : MonoBehaviour
 
     public void ActGiveStar(PlayerController whom)
     {
-        whom.CollectBigStarInstantly(matchConditioned:chainableActions);
+        // whom.photonView.RPC(nameof(PlayerController.CollectBigStarInstantly), RpcTarget.All, chainableActions);
+        whom.CollectBigStarInstantly();
     }
 
     public void ActGiveCoin(PlayerController whom)
     {
-        whom.CollectCoinInstantly(matchConditioned:chainableActions);
+        // whom.photonView.RPC(nameof(PlayerController.CollectCoinInstantly), RpcTarget.All, chainableActions);
+        whom.CollectCoinInstantly();
     }
     
     public void ActRemoveStar(PlayerController whom)
     {
-        whom.RemoveBigStarInstantly(matchConditioned:chainableActions);
+        // whom.photonView.RPC(nameof(PlayerController.RemoveBigStarInstantly), RpcTarget.All, chainableActions);
+        whom.RemoveBigStarInstantly();
     }
 
     public void ActRemoveCoin(PlayerController whom)
     {
-        whom.RemoveCoinInstantly(matchConditioned:chainableActions);
+        // whom.photonView.RPC(nameof(PlayerController.RemoveCoinInstantly), RpcTarget.All, chainableActions);
+        whom.RemoveCoinInstantly();
     }
 
     public void ActGiveMega(PlayerController whom)
     {
-        whom.TransformToMega(true, matchConditioned:chainableActions);
+        whom.photonView.RPC(nameof(PlayerController.TransformToMega), RpcTarget.All, true);
     }
 
     public void ActGive1Up(PlayerController whom)
     {
-        whom.Give1Up();
+        whom.photonView.RPC(nameof(PlayerController.Give1Up), RpcTarget.All);
     }
 
     public void ActKillPlayer(PlayerController whom)
     {
-        //whom.photonView.RPC(nameof(whom.Death), RpcTarget.All, false, false);
-        whom.Death(false, false, matchConditioned:chainableActions);
+        whom.photonView.RPC(nameof(PlayerController.Death), RpcTarget.All, false, false);
     }
 
     public void ActWinPlayer(PlayerController whom)
@@ -141,22 +151,22 @@ public class MatchConditioner : MonoBehaviour
 
     public void ActDisqualifyPlayer(PlayerController whom)
     {
-        whom.Disqualify(matchConditioned:chainableActions);
+        whom.photonView.RPC(nameof(PlayerController.Disqualify), RpcTarget.All);
     }
     
     public void ActKnockbackPlayer(PlayerController whom)
     {
-        whom.Knockback(whom.facingRight, 1, false, -1, matchConditioned:chainableActions);
+        whom.photonView.RPC(nameof(PlayerController.Knockback), RpcTarget.All, whom.facingRight, 1, false, -1);
     }
 
     public void ActHardKnockbackPlayer(PlayerController whom)
     {
-        whom.Knockback(whom.facingRight, 3, false, -1, matchConditioned:chainableActions);
+        whom.photonView.RPC(nameof(PlayerController.Knockback), RpcTarget.All, whom.facingRight, 3, false, -1);
     }
 
     public void ActDoDive(PlayerController whom)
     {
-        whom.DiveForward();
+        whom.photonView.RPC(nameof(PlayerController.DiveForward), RpcTarget.All);
     }
 
     public void ActLaunchPlayer(PlayerController whom)
@@ -166,24 +176,21 @@ public class MatchConditioner : MonoBehaviour
     
     public void ActFreezePlayer(PlayerController whom)
     {
-        if (!whom.photonView.IsMine) return;
-        whom.FreezeInstantly(matchConditioned:chainableActions);
+        whom.photonView.RPC(nameof(PlayerController.FreezeInstantly), RpcTarget.All);
     }
 
     public void ActHarmPlayer(PlayerController whom)
     {
-        whom.Powerdown(false, matchConditioned:chainableActions);
+        whom.photonView.RPC(nameof(PlayerController.Powerdown), RpcTarget.All, false);
     }
 
     public void ActSpawnPowerup(PlayerController whom)
     {
-        whom.SpawnCoinItemInstantly();
+        whom.photonView.RPC(nameof(PlayerController.SpawnCoinItemInstantly), RpcTarget.All);
     }
 
     public void ActSpawnEnemy(PlayerController whom)
     {
-        if (!PhotonNetwork.IsMasterClient) return;
-        
         GameObject entity = Utils.GetRandomEnemy();
         PhotonNetwork.InstantiateRoomObject("Prefabs/Enemy/" + entity.name,
             whom.transform.position +
@@ -194,13 +201,11 @@ public class MatchConditioner : MonoBehaviour
 
     public void ActRespawnLevel(PlayerController whom)
     {
-        if (!PhotonNetwork.IsMasterClient) return;
         GameManager.Instance.SendAndExecuteEvent(Enums.NetEventIds.ResetTiles, null, SendOptions.SendReliable);
     }
 
     public void ActExplodeLevel(PlayerController whom)
     {
-        if (!PhotonNetwork.IsMasterClient) return;
         StartCoroutine(GameManager.Instance.DestroyEnvironment());
     }
 
