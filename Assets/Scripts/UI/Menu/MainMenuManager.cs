@@ -661,10 +661,12 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     {
         var bp = new BrowserProperties();
         bp.filter = "JSON files (*.json)|*.json";
+        bp.title = "Save ruleset where?";
         bp.filterIndex = 0;
 
         new FileBrowser().SaveFileBrowser(bp, "vcmiRuleset", ".json", path =>
         {
+            if (path == null) return;
             File.WriteAllText(path, MatchRulesToJson());
         });
     }
@@ -672,11 +674,13 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     public void loadMatchRules()
     {
         var bp = new BrowserProperties();
-        bp.filter = "json files (*.json)|*.json";
+        bp.filter = "JSON files (*.json)|*.json";
+        bp.title = Random.value >= 0.8 ? "Load which ruleset?" : "hey can you like choose a file to load please";
         bp.filterIndex = 0;
 
         new FileBrowser().OpenFileBrowser(bp, path =>
         {
+            if (path == null) return;
             JsonToMatchRules(File.ReadAllText(path));
             Hashtable table = new() {
                 [Enums.NetRoomProperties.MatchRules] = MatchRulesToJson()
