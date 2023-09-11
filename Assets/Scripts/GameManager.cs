@@ -442,6 +442,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         Instance = this;
     }
 
+    private const float TARGET_PITCH = 1.5f;
     public void Start() {
         SpectationManager = GetComponent<SpectationManager>();
         MatchConditioner = GetComponent<MatchConditioner>();
@@ -501,6 +502,18 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             SpectationManager.Spectating = true;
         }
 
+        if (Togglerizer.currentEffects.Contains("HeckaSpeed"))
+        {
+            PlayerController controller = localPlayer.GetComponent<PlayerController>();
+            AudioSource loadingMusic = GameObject.Find("LoadingText").GetComponent<AudioSource>();
+            DOTween.To(() => loadingMusic.pitch, p => loadingMusic.pitch = p, TARGET_PITCH, 2f);
+            sfx.pitch = TARGET_PITCH;
+            music.pitch = TARGET_PITCH;
+            controller.sfx.pitch = TARGET_PITCH;
+            controller.sfxBrick.pitch = TARGET_PITCH;
+            Time.timeScale = TARGET_PITCH;
+        }
+        
         Utils.GetCustomProperty(Enums.NetRoomProperties.Starcoins, out needsStarcoins);
         if (raceLevel)
         {
@@ -730,7 +743,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             ? "No contest"
             : (winner == null ? "It's a tie..." : $"{uniqueName} Wins!");
 
-        if (!cancelled) yield return new WaitForSecondsRealtime(1);
+        if (!cancelled) yield return new WaitForSecondsRealtime(0.2f);
 
         AudioMixer mixer = music.outputAudioMixerGroup.audioMixer;
         mixer.SetFloat("MusicSpeed", 1f);
