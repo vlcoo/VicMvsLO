@@ -11,12 +11,12 @@ public class GroundLoader : MonoBehaviour
     
     void Start()
     {
-        Utils.GetCustomProperty(Enums.NetRoomProperties.Level, out int level);
+        Utils.GetCustomProperty(Enums.NetRoomProperties.Level, out int? level);
         if (level == null || level < 0 || level > levelGroundMapping.Count) level = 0;
         
         foreach (Image sprite in sprites)
         {
-            sprite.sprite = levelGroundMapping[level];
+            sprite.sprite = levelGroundMapping[(int)level];
         }
     }
 }

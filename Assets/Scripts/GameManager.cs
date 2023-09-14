@@ -893,7 +893,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
     {
         if (!PhotonNetwork.IsMasterClient) return;
         foreach (var player in players.Where(player => player != null && player != whom))
-            player.photonView.RPC("Disqualify", RpcTarget.All, false);
+            player.photonView.RPC("Disqualify", RpcTarget.All);
     }
 
     public void CheckForWinner() {
@@ -1062,7 +1062,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             return;
         }
         sfx.PlayOneShot(Enums.Sounds.UI_Decide.GetClip());
-        controller.Disqualify();
+        controller.photonView.RPC(nameof(PlayerController.Disqualify), RpcTarget.All);
     }
 
     public void HostEndMatch() {

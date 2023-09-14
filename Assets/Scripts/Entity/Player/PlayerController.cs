@@ -1569,7 +1569,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
     #region -- DEATH / RESPAWNING --
 
     [PunRPC]
-    public void Disqualify()
+    public void Disqualify(PhotonMessageInfo info)
     {
         GameManager.Instance.CheckForWinner();
         Destroy(trackIcon);

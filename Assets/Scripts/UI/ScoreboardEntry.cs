@@ -1,9 +1,11 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
 using NSMB.Utils;
+using UnityEngine.Assertions.Comparers;
 
 public class ScoreboardEntry : MonoBehaviour {
 
@@ -60,32 +62,29 @@ public class ScoreboardEntry : MonoBehaviour {
             txt += target.character.uistring + Utils.GetSymbolString(currentLives.ToString());
         if (GameManager.Instance.starRequirement > 0)
             txt += Utils.GetSymbolString($"S{currentStars}");
-        if (GameManager.Instance.lapRequirement > 1)
+        if (GameManager.Instance.raceLevel && GameManager.Instance.lapRequirement > 1)
             txt += Utils.GetSymbolString($"L{currentLaps}");
 
         valuesText.text = txt;
     }
 
     public class EntryComparer : IComparer<ScoreboardEntry> {
-        public int Compare(ScoreboardEntry x, ScoreboardEntry y) {
-            if (x.target == null ^ y.target == null)
-                return x.target == null ? 1 : -1;
+        public int Compare(ScoreboardEntry x, ScoreboardEntry y)
+        {
+            if (x.target == null ^ y.target == null) return x.target == null ? -1 : 1;
+            int comparisonResult = 0;
 
-            if (GameManager.Instance.raceLevel)
-            {
-                if (x.currentLaps == y.currentLaps || x.currentLives == 0 || y.currentLives == 0)
-                    return x.playerId - y.playerId;
-                return y.currentLaps - x.currentLaps;
-            }
-            
-            if (x.currentStars == y.currentStars || x.currentLives == 0 || y.currentLives == 0) {
-                if (Mathf.Max(0, x.currentLives) == Mathf.Max(0, y.currentLives))
-                    return x.playerId - y.playerId;
+            // if race level then sort by lap
+            if (GameManager.Instance.raceLevel) comparisonResult = x.currentLaps.CompareTo(y.currentLaps);
 
-                return y.currentLives - x.currentLives;
-            }
-
-            return y.currentStars - x.currentStars;
+            // if no race level or a tie then sort by stars, if a tie then by lives, if a tie then by id.
+            if (comparisonResult != 0) return -comparisonResult;
+            comparisonResult = x.currentStars.CompareTo(y.currentStars);
+            if (comparisonResult != 0) return -comparisonResult;
+            comparisonResult = x.currentLives.CompareTo(y.currentLives);
+            if (comparisonResult != 0) return -comparisonResult;
+            comparisonResult = x.playerId.CompareTo(y.playerId);
+            return -comparisonResult;
         }
     }
 }
