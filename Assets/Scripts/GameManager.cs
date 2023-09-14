@@ -733,7 +733,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         {
             winnerCharacterIndex = (int)winner.CustomProperties[Enums.NetPlayerProperties.Character];
             uniqueName = teamsMatch
-                ? ("The " + GlobalController.Instance.characters[winnerCharacterIndex].prefab.Replace("Player", "") +
+                ? ("The " + GlobalController.Instance.characters[winnerCharacterIndex].legalName +
                    "\n" +
                    GlobalController.Instance.characters[winnerCharacterIndex].uistring + "Team")
                 : winner.GetUniqueNickname();

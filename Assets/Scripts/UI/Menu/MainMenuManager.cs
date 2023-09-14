@@ -50,7 +50,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     public Slider musicSlider, sfxSlider, masterSlider, lobbyPlayersSlider, changePlayersSlider, RNGSlider;
     public GameObject mainMenuSelected, optionsSelected, lobbySelected, currentLobbySelected, createLobbySelected, creditsSelected, controlsSelected, privateSelected, reconnectSelected, updateBoxSelected, newRuleS1Selected, newRuleS2Selected, emoteListSelected, RNGRulesSelected, specialSelected, stageSelected;
     public GameObject errorBox, errorButton, rebindPrompt, reconnectBox;
-    public TMP_Text errorText, errorDetail, rebindCountdown, rebindText, reconnectText, updateText, RNGSliderText, specialCountText, setSpecialBtn, stageText;
+    public TMP_Text errorText, errorDetail, rebindCountdown, rebindText, reconnectText, updateText, RNGSliderText, specialCountText, teamHintText, setSpecialBtn, stageText;
     public TMP_Dropdown region;
     public RebindManager rebindManager;
     public static string lastRegion;
@@ -648,7 +648,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
             else thereWereDuplicates = true;
         }
         else specialList.Remove(name);
-        specialCountText.text = "Special (" + specialList.Count + " active):";
+        specialCountText.text = "Specials: " + specialList.Count;
 
         if (noUpdateNetRoom || thereWereDuplicates) return;
         Hashtable table = new() {
@@ -1162,8 +1162,8 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
     public void ChangeLevel(int index) {
         levelDropdown.SetValueWithoutNotify(index);
-        stageText.text = "Map (" + levelDropdown.options[index].text + "):";
-        LocalChatMessage("Map set to " + levelDropdown.options[index].text, Color.red);
+        stageText.text = "Map: " + levelDropdown.options[index].text;
+        // LocalChatMessage("Map set to " + levelDropdown.options[index].text, Color.red);
         raceMapSelected = levelDropdown.options[index].text.Contains("racelvl");
         UpdateSettingEnableStates();
         Camera.main.transform.position = levelCameraPositions[index].transform.position;
@@ -1266,11 +1266,11 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         coinsText.interactable = PhotonNetwork.IsMasterClient && coinsEnabled.isOn;
         drawTimeupToggle.interactable = PhotonNetwork.IsMasterClient && timeEnabled.isOn;
         chainableActionsToggle.interactable = PhotonNetwork.IsMasterClient;
-        setSpecialBtn.text = PhotonNetwork.IsMasterClient ? "Set" : "See";
-        starcoinsEnabled.transform.parent.gameObject.SetActive(raceMapSelected);
-        starcoinsEnabled.interactable = PhotonNetwork.IsMasterClient;
-        lapsText.transform.parent.gameObject.SetActive(raceMapSelected);
-        lapsText.interactable = PhotonNetwork.IsMasterClient;
+        // setSpecialBtn.text = PhotonNetwork.IsMasterClient ? "Set" : "See";
+        // starcoinsEnabled.transform.parent.gameObject.SetActive(raceMapSelected);
+        starcoinsEnabled.interactable = PhotonNetwork.IsMasterClient && raceMapSelected;
+        // lapsText.transform.parent.gameObject.SetActive(raceMapSelected);
+        lapsText.interactable = PhotonNetwork.IsMasterClient && raceMapSelected;
 
         Utils.GetCustomProperty(Enums.NetRoomProperties.Debug, out bool debug);
         privateToggleRoom.interactable = PhotonNetwork.IsMasterClient && !debug;
@@ -1693,7 +1693,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         specialList = dict.Keys.ToList();
         foreach (Transform toggle in specialTogglesParent.transform)
             toggle.transform.GetChild(2).GetComponent<Toggle>().isOn = specialList.Contains(toggle.name);
-        specialCountText.text = "Special (" + specialList.Count + " active):";
+        specialCountText.text = "Specials: " + specialList.Count;
     }
 
     public Dictionary<string, bool> SpecialRulesToDict()
@@ -1908,6 +1908,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
             [Enums.NetRoomProperties.Teams] = toggle.isOn,
         };
         PhotonNetwork.CurrentRoom.SetCustomProperties(properties);
+        teamHintText.text = "Teams: " + (toggle.isOn ? "ON" : "OFF");
     }
 
     public void EnableTime(Toggle toggle) {
