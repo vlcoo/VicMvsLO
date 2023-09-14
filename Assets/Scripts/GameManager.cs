@@ -856,6 +856,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
                     sfx.PlayOneShot(Enums.Sounds.UI_Countdown_Long.GetClip());
                     tenSecondCountdown = true;
                 }
+                if (timeRemaining - Time.deltaTime <= 0) CheckForWinner();
             }
         }
 

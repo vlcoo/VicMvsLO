@@ -1648,7 +1648,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         {
             dataList = JsonConvert.DeserializeObject<List<MatchRuleDataEntry>>(j);
         }
-        catch (JsonReaderException e)
+        catch (JsonReaderException)
         {
             dataList = new List<MatchRuleDataEntry>();
         }
