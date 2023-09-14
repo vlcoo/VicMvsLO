@@ -123,7 +123,7 @@ public class ResourceItem
         else
             parent = ResourceDB.GetFolder(path);
         if (parent != null)
-            parent.childs.Add(name, this);
+            parent.childs.TryAdd(name, this);
         if (type == Type.Folder)
         {
             childs = new Dictionary<string, ResourceItem>();
