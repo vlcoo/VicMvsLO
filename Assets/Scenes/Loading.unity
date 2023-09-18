@@ -938,11 +938,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b9e79eb7bbc8db64dbe2a4253144008d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  autoStart: 1
   player: {fileID: 856526101}
   songs:
   - {fileID: 11400000, guid: 62607898c36915f479bb2cb3ea51489b, type: 2}
   - {fileID: 11400000, guid: 860cffca1d85bd0458d34fc0a4438e80, type: 2}
   chances: 3c00000028000000
+  currentSong: {fileID: 0}
 --- !u!4 &856526104
 Transform:
   m_ObjectHideFlags: 0
@@ -950,9 +952,9 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 856526099}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0.000030517578, y: 0, z: 0}
+  m_LocalScale: {x: 1.1089602, y: 1.1089602, z: 1.1089602}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -1048,6 +1050,7 @@ GameObject:
   - component: {fileID: 993008382}
   - component: {fileID: 993008381}
   - component: {fileID: 993008387}
+  - component: {fileID: 993008388}
   m_Layer: 5
   m_Name: Canvas
   m_TagString: LoadingCanvas
@@ -1159,6 +1162,27 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
+--- !u!114 &993008388
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 993008379}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 01dca6baa8d081040b4df20a56cfe882, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  marioLoadingScene: {fileID: 1249995677}
+  koopaLoadingScene: {fileID: 1164778389}
+  MusicSynth: {fileID: 0}
+  playerList: {fileID: 2101240301}
+  highPingAlert: {fileID: 1508836660}
+  emptyText: Loading...
+  iveLoadedText: Wait...
+  readyToStartText: OK!
+  spectatorText: Joining as Spectator...
 --- !u!1 &1009680475
 GameObject:
   m_ObjectHideFlags: 0
@@ -2225,13 +2249,14 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1555839130}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 01dca6baa8d081040b4df20a56cfe882, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   marioLoadingScene: {fileID: 1249995677}
   koopaLoadingScene: {fileID: 1164778389}
+  MusicSynth: {fileID: 0}
   playerList: {fileID: 2101240301}
   highPingAlert: {fileID: 1508836660}
   emptyText: Loading...

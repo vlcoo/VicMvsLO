@@ -247,7 +247,11 @@ namespace FluidMidi
         public int EndTicks
         {
             get => endTicks.Value;
-            set => endTicks.Value = value;
+            set
+            {
+                endTicks.Enabled = value != 0;
+                endTicks.Value = value;
+            }
         }
 
         /// <summary>

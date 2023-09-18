@@ -11,6 +11,7 @@ public class LoadingWaitingOn : MonoBehaviour
 {
     public GameObject marioLoadingScene;
     public GameObject koopaLoadingScene;
+    public Songinator MusicSynth;
 
     [SerializeField] private TMP_Text playerList, highPingAlert;
     [SerializeField] private string emptyText = "Loading...", iveLoadedText = "Wait...", readyToStartText = "OK!", spectatorText = "Joining as Spectator...";
@@ -25,7 +26,6 @@ public class LoadingWaitingOn : MonoBehaviour
         bool isBowsers = Utils.GetCharacterData().isBowsers;
         marioLoadingScene.SetActive(!isBowsers);
         koopaLoadingScene.SetActive(isBowsers);
-        GetComponent<LoopingMusic>().FastMusic = Random.value >= 0.6;
     }
 
     public void Update() {

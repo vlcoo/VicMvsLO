@@ -35498,11 +35498,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b9e79eb7bbc8db64dbe2a4253144008d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  autoStart: 1
   player: {fileID: 559363950}
   songs:
   - {fileID: 11400000, guid: fbb858dcb435b534f91fdc94822c7337, type: 2}
   - {fileID: 11400000, guid: d3e46c597fc89be4dbf7210de8f5bdf8, type: 2}
   chances: 3c00000028000000
+  currentSong: {fileID: 0}
 --- !u!1 &559532740
 GameObject:
   m_ObjectHideFlags: 0
@@ -61104,6 +61106,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   sfx: {fileID: 887693659}
   music: {fileID: 887693667}
+  MusicSynth: {fileID: 559363953}
   lobbiesContent: {fileID: 1508729836}
   lobbyPrefab: {fileID: 1927022865}
   connecting: {fileID: 1248603848}
@@ -86268,8 +86271,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 47220571}
   m_HandleRect: {fileID: 47220570}
   m_Direction: 2
-  m_Value: 0.99999976
-  m_Size: 0.7535529
+  m_Value: 1
+  m_Size: 0.7534191
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:

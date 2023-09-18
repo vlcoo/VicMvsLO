@@ -38,6 +38,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
     }
 
     public MusicData mainMusic, invincibleMusic, megaMushroomMusic;
+    public Songinator MusicSynth;
     public MatchConditioner MatchConditioner { get; private set; }
     public Togglerizer Togglerizer { get; private set; }
     public TeamGrouper TeamGrouper { get; private set; }
@@ -443,12 +444,14 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
     }
 
     private const float TARGET_PITCH = 1.5f;
+    Songinator loadingMusic;
     public void Start() {
         SpectationManager = GetComponent<SpectationManager>();
         MatchConditioner = GetComponent<MatchConditioner>();
         Togglerizer = GetComponent<Togglerizer>();
         TeamGrouper = GetComponent<TeamGrouper>();
         loopMusic = GetComponent<LoopingMusic>();
+        loadingMusic = GameObject.Find("MusicSynth").GetComponent<Songinator>();
         coins = GameObject.FindGameObjectsWithTag("coin");
         levelUIColor.a = .7f;
         if (Togglerizer.currentEffects.Contains("ReverseLoop") && !raceLevel) loopingLevel = !loopingLevel;
@@ -505,10 +508,9 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         if (Togglerizer.currentEffects.Contains("HeckaSpeed"))
         {
             PlayerController controller = localPlayer.GetComponent<PlayerController>();
-            AudioSource loadingMusic = GameObject.Find("LoadingText").GetComponent<AudioSource>();
-            DOTween.To(() => loadingMusic.pitch, p => loadingMusic.pitch = p, TARGET_PITCH, 2f);
+            DOTween.To(() => loadingMusic.GlobalTempoMultiplier, p => loadingMusic.GlobalTempoMultiplier = p, TARGET_PITCH, 2f);
             sfx.pitch = TARGET_PITCH;
-            music.pitch = TARGET_PITCH;
+            MusicSynth.GlobalTempoMultiplier = TARGET_PITCH;
             controller.sfx.pitch = TARGET_PITCH;
             controller.sfxBrick.pitch = TARGET_PITCH;
             Time.timeScale = TARGET_PITCH;
@@ -579,6 +581,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         GameObject canvas = GameObject.FindGameObjectWithTag("LoadingCanvas");
         if (canvas) {
             canvas.GetComponent<Animator>().SetTrigger(spectating ? "spectating" : "loaded");
+            DOTween.To(() => loadingMusic.player.Gain, v => loadingMusic.player.Gain = v, 0f,  2f).SetEase(Ease.Linear);
             /* sfx.PlayOneShot(GameObject.Find("LoadingText").GetComponent<LoadingWaitingOn>().isPlayingAltSong
                 ? Enums.Sounds.Jingle_Loading_Finished_2.GetClip()
                 : Enums.Sounds.Jingle_Loading_Finished_1.GetClip()); */
@@ -642,7 +645,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         
         teamsMatch = TeamGrouper.isTeamsMatch;
         if (Togglerizer.currentEffects.Contains("NoBahs"))
-            mainMusic = new MusicData(mainMusic.fastClip, mainMusic.loopStartSample, mainMusic.loopEndSample);
+            MusicSynth.player.DisableChannels(new []{MusicSynth.currentSong.bahChannel});
 
         startServerTime = startTimestamp + 3500;
         foreach (var wfgs in FindObjectsOfType<WaitForGameStart>())
@@ -651,6 +654,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         yield return new WaitForSeconds(1f);
 
         musicEnabled = true;
+        MusicSynth.StartPlayback();
         Utils.GetCustomProperty(Enums.NetRoomProperties.Time, out timedGameDuration);
 
         startRealTime = System.DateTimeOffset.Now.ToUnixTimeMilliseconds();
@@ -686,7 +690,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
 
     public void fadeMusic(bool how)
     {
-        DOTween.To(() => music.volume, v => music.volume = v, how ? 1f : 0f, how ? 0.5f : 0.1f).SetEase(Ease.Linear);
+        DOTween.To(() => MusicSynth.player.Gain, v => MusicSynth.player.Gain = v, how ? 1f : 0f, how ? 0.5f : 0.1f).SetEase(Ease.Linear);
     }
 
     public void SetStartSpeedrunTimer(PlayerController byWhom)
@@ -725,7 +729,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         gameover = true;
         
         PhotonNetwork.CurrentRoom.SetCustomProperties(new() { [Enums.NetRoomProperties.GameStarted] = false });
-        music.Stop();
+        MusicSynth.player.Pause();
         GameObject text = GameObject.FindWithTag("wintext");
         int winnerCharacterIndex = -1;
         string uniqueName = "";
@@ -760,7 +764,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             text.GetComponent<Animator>().SetTrigger("startNegative");
         }
         else if (win) {
-            music.PlayOneShot(Enums.Sounds.UI_Match_Win.GetClip());
+            sfx.PlayOneShot(Enums.Sounds.UI_Match_Win.GetClip());
             if (raceLevel)
             {
                 speedrunTimer.gameObject.SetActive(true);
@@ -901,6 +905,10 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         if (gameover || !PhotonNetwork.IsMasterClient)
             return;
 
+        MusicSynth.player.Tempo = speedup & !raceLevel
+            ? MusicSynth.currentSong.playbackSpeedFast
+            : MusicSynth.currentSong.playbackSpeedNormal;
+        
         bool starGame = starRequirement != -1;
         bool timeUp = endServerTime != -1 && endServerTime - Time.deltaTime - PhotonNetwork.ServerTimestamp < 0;
         int winningStars = -1;
@@ -992,10 +1000,10 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         musicState = state;
     }
 
+    bool speedup = false;
     private void HandleMusic() {
         bool invincible = false;
         bool mega = false;
-        bool speedup = false;
 
         foreach (var player in players) {
             if (!player)
@@ -1020,8 +1028,6 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         } else {
             PlaySong(Enums.MusicState.Normal, mainMusic);
         }
-
-        loopMusic.FastMusic = speedup & !raceLevel;
     }
 
     public void OnPause(InputAction.CallbackContext context) {

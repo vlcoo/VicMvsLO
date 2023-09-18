@@ -284,9 +284,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b9e79eb7bbc8db64dbe2a4253144008d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  autoStart: 0
   player: {fileID: 961745358089294958}
   songs: []
   chances: 64000000
+  currentSong: {fileID: 0}
 --- !u!114 &1103714139019050007
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5165,6 +5167,7 @@ MonoBehaviour:
   mainMusic: {fileID: 11400000, guid: 488f1c737d498714c951d86c1a790bcc, type: 2}
   invincibleMusic: {fileID: 11400000, guid: fb397722d9ffbb145a088ac9ce60908c, type: 2}
   megaMushroomMusic: {fileID: 11400000, guid: 3fb519076901a294493ae6e0c10c979b, type: 2}
+  MusicSynth: {fileID: 1621225637622541343}
   levelMinTileX: -30
   levelMinTileY: -12
   levelWidthTile: 50

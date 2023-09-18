@@ -7,10 +7,22 @@ using UnityEngine;
 
 public class Songinator : MonoBehaviour
 {
+    [SerializeField] public bool autoStart = true;
     [SerializeField] public SongPlayer player;
     [SerializeField] public List<MIDISong> songs;
     [SerializeField] public List<int> chances;
-    private MIDISong currentSong;
+    public MIDISong currentSong;
+    private float globalTempoMultiplier = 1.0f;
+
+    public float GlobalTempoMultiplier
+    {
+        get => globalTempoMultiplier;
+        set
+        {
+            // player.Tempo = player.Tempo * value / globalTempoMultiplier ;
+            // globalTempoMultiplier = value;
+        }
+    }
     private readonly WeightedList<MIDISong> weightedList = new();
 
     public void Start()
@@ -39,12 +51,7 @@ public class Songinator : MonoBehaviour
         player.Tempo = currentSong.playbackSpeedNormal;
         player.Init();
 
-        if (currentSong.startTicks > 0) StartCoroutine(StartSkip());
-        else
-        {
-            player.Channels = ~currentSong.mutedChannelsNormal;
-            player.Play();
-        }
+        if (autoStart) StartPlayback();
     }
     
     IEnumerator StartSkip()
@@ -54,5 +61,15 @@ public class Songinator : MonoBehaviour
         yield return new WaitForSeconds(0.1f);  // wowie...
         player.Seek(currentSong.startTicks);
         player.Channels = ~currentSong.mutedChannelsNormal;
+    }
+
+    public void StartPlayback()
+    {
+        if (currentSong.startTicks > 0) StartCoroutine(StartSkip());
+        else
+        {
+            player.Channels = ~currentSong.mutedChannelsNormal;
+            player.Play();
+        }
     }
 }

@@ -34,6 +34,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
     public static MainMenuManager Instance;
     public AudioSource sfx, music;
+    public Songinator MusicSynth;
     public GameObject lobbiesContent, lobbyPrefab;
     bool quit, validName;
     public GameObject connecting;
@@ -1100,7 +1101,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     {
         backBtn.interactable = false;
         sfx.PlayOneShot(Enums.Sounds.UI_Match_Starting.GetClip());
-        DOTween.To(() => music.volume, v => music.volume = v, 0, 0.8f);
+        DOTween.To(() => MusicSynth.player.Gain, v => MusicSynth.player.Gain = v, 0, 0.8f);
         fader.SetInvisible(GlobalController.Instance.settings.reduceUIAnims);
         fader.anim.SetTrigger("out");
         StartCoroutine(WaitForMusicFadeStartGame());
