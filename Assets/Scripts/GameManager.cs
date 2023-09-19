@@ -578,20 +578,8 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
 
         yield return new WaitForSeconds(Mathf.Max(1f, (startTimestamp - PhotonNetwork.ServerTimestamp) / 1000f));
 
-        GameObject canvas = GameObject.FindGameObjectWithTag("LoadingCanvas");
-        if (canvas) {
-            canvas.GetComponent<Animator>().SetTrigger(spectating ? "spectating" : "loaded");
-            DOTween.To(() => loadingMusic.player.Gain, v => loadingMusic.player.Gain = v, 0f,  2f).SetEase(Ease.Linear);
-            /* sfx.PlayOneShot(GameObject.Find("LoadingText").GetComponent<LoadingWaitingOn>().isPlayingAltSong
-                ? Enums.Sounds.Jingle_Loading_Finished_2.GetClip()
-                : Enums.Sounds.Jingle_Loading_Finished_1.GetClip()); */
-            //please just dont beep at me :(
-            /*AudioSource source = canvas.GetComponent<AudioSource>();
-            source.Stop();
-            source.volume = 0;
-            source.enabled = false;
-            Destroy(canvas.GetComponent<LoopingMusic>());*/
-        }
+        LoadingWaitingOn loadingScript = GameObject.FindGameObjectWithTag("LoadingCanvas")?.GetComponent<LoadingWaitingOn>();
+        if (loadingScript) loadingScript.StopLoading(spectating);
 
         started = true;
         
@@ -665,7 +653,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
 
         GlobalController.Instance.DiscordController.UpdateActivity();
 
-        if (canvas)
+        if (loadingScript)
             SceneManager.UnloadSceneAsync("Loading");
         
         if (SpectationManager.Spectating) fader.SetInvisible(true);

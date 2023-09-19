@@ -11,7 +11,7 @@ public class Songinator : MonoBehaviour
     [SerializeField] public SongPlayer player;
     [SerializeField] public List<MIDISong> songs;
     [SerializeField] public List<int> chances;
-    public MIDISong currentSong;
+    [NonSerialized] public MIDISong currentSong;
     private float globalTempoMultiplier = 1.0f;
 
     public float GlobalTempoMultiplier
