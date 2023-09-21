@@ -12,7 +12,6 @@ using UnityEngine.InputSystem;
 
 namespace NSMB.Utils {
     public class Utils {
-
         public static int FirstPlaceStars {
             get => GameManager.Instance.players.Where(pl => pl.lives != 0).Max(pc => pc.stars);
         }

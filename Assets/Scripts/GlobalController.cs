@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Net;
 using System.Runtime.InteropServices;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -8,11 +11,12 @@ using UnityEngine.SceneManagement;
 using Photon.Pun;
 using Photon.Realtime;
 using ExitGames.Client.Photon;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using NSMB.Utils;
 using TMPro;
 
 public class GlobalController : Singleton<GlobalController>, IInRoomCallbacks, ILobbyCallbacks {
-
     public PlayerColorSet[] skins;
     public TMP_ColorGradient logoGradient;
 
@@ -27,12 +31,33 @@ public class GlobalController : Singleton<GlobalController>, IInRoomCallbacks, I
 
     public bool joinedAsSpectator = false, checkedForVersion, fastLoad = false;
     public DisconnectCause? disconnectCause = null;
+    
+    public List<string> SPECIAL_PLAYERS = new() {};
 
     private int windowWidth, windowHeight;
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
     public static void CreateInstance() {
         Instantiate(Resources.Load("Prefabs/Static/GlobalController"));
+    }
+
+    private async void PopulateSpecialPlayers()
+    {
+        //get http results
+        HttpWebRequest request = (HttpWebRequest) WebRequest.Create(PhotonExtensions.SPECIALS_URL);
+        request.Accept = "application/json";
+        request.UserAgent = "vlcoo/VicMvsLO";
+
+        HttpWebResponse response = (HttpWebResponse) await request.GetResponseAsync();
+
+        if (response.StatusCode != HttpStatusCode.OK)
+            return;
+
+        try {
+            string json = new StreamReader(response.GetResponseStream()).ReadToEnd();
+            var deserializedJson = JsonConvert.DeserializeObject<Dictionary<string, string>>(json);
+            if (deserializedJson != null) SPECIAL_PLAYERS = deserializedJson.Values.ToList();
+        } catch { }
     }
 
     public void Awake() {
@@ -43,10 +68,10 @@ public class GlobalController : Singleton<GlobalController>, IInRoomCallbacks, I
         settings = GetComponent<Settings>();
         DiscordController = GetComponent<DiscordController>();
         rumbler = GetComponent<DeviceRumbler>();
+        PopulateSpecialPlayers();
 
         PhotonNetwork.AddCallbackTarget(this);
     }
-
 
     [Obsolete]
     public void Start() {

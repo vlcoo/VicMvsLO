@@ -12,7 +12,7 @@ public class UpdateChecker {
     /// <summary>
     /// Returns if we're up to date, OR newer, compared to the latest GitHub release version number
     /// </summary>
-    public async static void IsUpToDate(Action<bool, string> callback)
+    public static async void IsUpToDate(Action<bool, string> callback)
     {
         //get http results
         HttpWebRequest request = (HttpWebRequest) WebRequest.Create(API_URL);
