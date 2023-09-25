@@ -295,6 +295,8 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         normalGravity /= GameManager.Instance.Togglerizer.currentEffects.Contains("LowGravity") ? 4 : 1;
         groundpoundVelocity /= GameManager.Instance.Togglerizer.currentEffects.Contains("LowGravity") ? 2.25f : 1;
         propellerLaunchVelocity /= GameManager.Instance.Togglerizer.currentEffects.Contains("NerfedPropeller") ? 3 : 1;
+
+        if (GameManager.Instance.Togglerizer.currentEffects.Contains("BouncyPlayer")) body.sharedMaterial.bounciness = 1;
     }
 
     public void OnDestroy() {
@@ -495,7 +497,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         switch (collision.gameObject.tag) {
         case "Player": {
             //hit players
-            if (GameManager.Instance.Togglerizer.currentEffects.Contains("NoCollisions")) break;
+            // if (GameManager.Instance.Togglerizer.currentEffects.Contains("NoCollisions")) break;
             
             if (contacts.Length < collision.contactCount)
                 contacts = new ContactPoint2D[collision.contactCount];
@@ -2107,6 +2109,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             pickupTimer = 0;
         } else {
             pickupTimer = pickupTime;
+            GameManager.Instance.MatchConditioner.ConditionActioned(this, "GrabbedShell");
         }
         animator.ResetTrigger("throw");
         animator.SetBool("holding", true);
@@ -2298,6 +2301,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             transform.position = body.position = new Vector2(obj.transform.position.x, transform.position.y);
 
             photonView.RPC(nameof(PlaySound), RpcTarget.All, Enums.Sounds.Player_Sound_Powerdown);
+            GameManager.Instance.MatchConditioner.ConditionActioned(this, "EnteredPipe");
             crouching = false;
             sliding = false;
             propeller = false;
@@ -2332,6 +2336,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             transform.position = body.position = new Vector2(obj.transform.position.x, transform.position.y);
 
             photonView.RPC(nameof(PlaySound), RpcTarget.All, Enums.Sounds.Player_Sound_Powerdown);
+            GameManager.Instance.MatchConditioner.ConditionActioned(this, "EnteredPipe");
             crouching = false;
             sliding = false;
             propeller = false;
@@ -2496,6 +2501,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         doGroundSnap = false;
         previousOnGround = false;
         crouching = false;
+        knockback = false;
         inShell = false;
     }
 

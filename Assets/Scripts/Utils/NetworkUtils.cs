@@ -9,6 +9,26 @@ namespace NSMB.Utils {
     public static class NetworkUtils {
 
         public static WebFlags forward = new(WebFlags.HttpForwardConst);
+        
+        public static Dictionary<string, string> regionsFullNames = new()
+        {
+            ["asia"] = "Asia",
+            ["au"] = "Australia",
+            ["cae"] = "Canada",
+            ["cn"] = "Mainland China",
+            ["eu"] = "Europe",
+            ["in"] = "India",
+            ["jp"] = "Japan",
+            ["za"] = "South Africa",
+            ["sa"] = "South America",
+            ["kr"] = "South Korea",
+            ["tr"] = "Turkey",
+            ["us"] = "USA",
+            ["usw"] = "USA, West",
+            ["ussc"] = "USA, Central",
+            ["ru"] = "Russia",
+            ["rue"] = "Russia, East",
+        };
 
         public static Dictionary<DisconnectCause, string> disconnectMessages = new() {
 

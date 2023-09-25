@@ -334,7 +334,8 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
             System.Array.Sort(pingSortedRegions, NetworkUtils.PingComparer);
 
             foreach (Region r in pingSortedRegions)
-                formattedRegions.Add($"{r.Code} <color=#bbbbbb>({(r.Ping == 4000 ? "N/A" : r.Ping + "ms")})");
+                // formattedRegions.Add($"{r.Code} <color=#bbbbbb>({(r.Ping == 4000 ? "N/A" : r.Ping + "ms")})");
+                formattedRegions.Add($"{NetworkUtils.regionsFullNames.GetValueOrDefault(r.Code, r.Code)}");
 
             lastRegion = pingSortedRegions[0].Code;
             pingsReceived = true;
@@ -1101,7 +1102,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     {
         backBtn.interactable = false;
         sfx.PlayOneShot(Enums.Sounds.UI_Match_Starting.GetClip());
-        DOTween.To(() => MusicSynth.player.Gain, v => MusicSynth.player.Gain = v, 0, 0.8f);
+        DOTween.To(() => MusicSynth.player.Gain, v => MusicSynth.player.Gain = v, 0, 0.1f);
         fader.SetInvisible(GlobalController.Instance.settings.reduceUIAnims);
         fader.anim.SetTrigger("out");
         StartCoroutine(WaitForMusicFadeStartGame());
