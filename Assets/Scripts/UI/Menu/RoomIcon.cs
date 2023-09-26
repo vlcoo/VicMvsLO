@@ -6,6 +6,7 @@ using TMPro;
 using Photon.Realtime;
 using NSMB.Utils;
 using ExitGames.Client.Photon;
+using WebSocketSharp;
 
 public class RoomIcon : MonoBehaviour {
 
@@ -37,20 +38,20 @@ public class RoomIcon : MonoBehaviour {
         Utils.GetCustomProperty(Enums.NetRoomProperties.StarRequirement, out int stars, newRoom.CustomProperties);
         Utils.GetCustomProperty(Enums.NetRoomProperties.CoinRequirement, out int coins, newRoom.CustomProperties);
         Utils.GetCustomProperty(Enums.NetRoomProperties.Lives, out int lives, newRoom.CustomProperties);
+        Utils.GetCustomProperty(Enums.NetRoomProperties.Teams, out bool teams, newRoom.CustomProperties);
+        Utils.GetCustomProperty(Enums.NetRoomProperties.MatchRules, out string matchRules, newRoom.CustomProperties);
         bool powerups = (bool) prop[Enums.NetRoomProperties.NewPowerups];
         bool time = ((int) prop[Enums.NetRoomProperties.Time]) >= 1;
         //bool password = ((string) prop[Enums.NetRoomProperties.Password]) != "";
 
-        if (powerups)
-            symbols += "<sprite=8>";
-        if (time)
-            symbols += "<sprite=6>";
-        if (lives >= 1)
-            symbols += "<sprite=9>" + Utils.GetSymbolString(lives.ToString(), Utils.smallSymbols);
-        if (stars >= 1)
-            symbols += "<sprite=38>" + Utils.GetSymbolString(stars.ToString(), Utils.smallSymbols);
-        if (coins >= 1)
-            symbols += "<sprite=37>" + Utils.GetSymbolString(coins.ToString(), Utils.smallSymbols);
+        if (!matchRules.Trim().IsNullOrEmpty()) symbols += "<sprite=56>";
+        Debug.Log(matchRules);
+        if (teams) symbols += "<sprite=76>";
+        if (powerups) symbols += "<sprite=8>";
+        if (time) symbols += "<sprite=6>";
+        if (lives >= 1) symbols += "<sprite=9>" + Utils.GetSymbolString(lives.ToString(), Utils.smallSymbols);
+        if (stars >= 1) symbols += "<sprite=38>" + Utils.GetSymbolString(stars.ToString(), Utils.smallSymbols);
+        if (coins >= 1) symbols += "<sprite=37>" + Utils.GetSymbolString(coins.ToString(), Utils.smallSymbols);
         //if (password)
         //    symbols += "<sprite=7>";
 

@@ -1,3 +1,4 @@
+using System;
 using NSMB.Utils;
 using TMPro;
 using UnityEngine;
@@ -10,7 +11,7 @@ public class LoadingReadyIcon : MonoBehaviour
 
     public void Start() {
         GetComponent<Image>().sprite = Utils.GetCharacterData().readySprite;
-        if (Utils.GetCharacterData().prefab.Equals("PlayerLuigi"))
+        if (Array.IndexOf<PlayerData>(GlobalController.Instance.characters, Utils.GetCharacterData()) % 2 != 0)
             readyText.colorGradientPreset = gradientLuigiText;
     }
 }

@@ -296,7 +296,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         groundpoundVelocity /= GameManager.Instance.Togglerizer.currentEffects.Contains("LowGravity") ? 2.25f : 1;
         propellerLaunchVelocity /= GameManager.Instance.Togglerizer.currentEffects.Contains("NerfedPropeller") ? 3 : 1;
 
-        if (GameManager.Instance.Togglerizer.currentEffects.Contains("BouncyPlayer")) body.sharedMaterial.bounciness = 1;
+        body.sharedMaterial.bounciness = GameManager.Instance.Togglerizer.currentEffects.Contains("BouncyPlayer") ? 1 : 0;
     }
 
     public void OnDestroy() {
@@ -1250,14 +1250,14 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
 
     #region -- COIN / STAR COLLECTION --
 
-    public void CollectBigStarInstantly()
+    public void CollectBigStarInstantly(int id = -1)
     {
-        photonView.RPC(nameof(CollectBigStar), RpcTarget.All, (Vector2) transform.position, -1, stars + 1);
+        photonView.RPC(nameof(CollectBigStar), RpcTarget.All, (Vector2) transform.position, id, stars + 1);
     }
     
-    public void RemoveBigStarInstantly()
+    public void RemoveBigStarInstantly(int id = -1)
     {
-        photonView.RPC(nameof(CollectBigStar), RpcTarget.All, (Vector2) transform.position, -1, stars - 1);
+        photonView.RPC(nameof(CollectBigStar), RpcTarget.All, (Vector2) transform.position, id, stars - 1);
     }
 
     [PunRPC]
@@ -1351,11 +1351,12 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         //only trust the master client
         /*if (info is not null && !((PhotonMessageInfo)info).Sender.IsMasterClient)
             return;*/ // i'm so sorry?
-
+        
+        // starIDs: >= 0 physical stars, -1 match conditioned, -2 team grouped
         //state
-        if (newCount > stars)
+        if (newCount > stars && starView != -2)
         {
-            PlaySoundEverywhere(photonView.IsMine
+            PlaySoundEverywhere(photonView.IsMine || (GameManager.Instance.localPlayer != null && GameManager.Instance.TeamGrouper.IsPlayerTeammate(this, GameManager.Instance.localPlayer.GetComponent<PlayerController>()))
                 ? Enums.Sounds.World_Star_Collect_Self
                 : Enums.Sounds.World_Star_Collect_Enemy);
             if (photonView.IsMine) GlobalController.Instance.rumbler.RumbleForSeconds(0f, 0.8f, 0.1f);
@@ -1384,6 +1385,8 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
                 Destroy(star.gameObject);
             }
         }
+        
+        if (starView != -2) GameManager.Instance.TeamGrouper.PlayerGotStar(this);
     }
 
     [PunRPC]
@@ -1558,7 +1561,8 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
                     starDirection = 1;
             }
             PhotonNetwork.InstantiateRoomObject("Prefabs/BigStar", body.position + Vector2.up * transform.localScale * MainHitbox.size, Quaternion.identity, 0, new object[] { starDirection, photonView.ViewID, PhotonNetwork.ServerTimestamp + 1000, deathplane });
-
+            GameManager.Instance.TeamGrouper.PlayerLostStar(this);
+            
             starDirection = (starDirection + 1) % 4;
             stars--;
             amount--;
@@ -1947,7 +1951,9 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
     #region -- KNOCKBACK --
 
     [PunRPC]
-    public void Knockback(bool fromRight, int starsToDrop, bool fireball, int attackerView) {
+    public void Knockback(bool fromRight, int starsToDrop, bool fireball, int attackerView)
+    {
+        if (GameManager.Instance.TeamGrouper.IsPlayerTeammate(this, attackerView)) return;
         if (fireball && fireballKnockback && knockback)
             return;
         if (knockback && !fireballKnockback)

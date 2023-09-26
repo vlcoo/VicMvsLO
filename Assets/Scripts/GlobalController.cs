@@ -20,7 +20,7 @@ public class GlobalController : Singleton<GlobalController>, IInRoomCallbacks, I
     public PlayerColorSet[] skins;
     public TMP_ColorGradient logoGradient;
 
-    public GameObject ndsCanvas, fourByThreeImage, anyAspectImage, graphy;
+    public GameObject ndsCanvas, fourByThreeImage, anyAspectImage;
 
     public RenderTexture ndsTexture;
     public PlayerData[] characters;
@@ -80,10 +80,6 @@ public class GlobalController : Singleton<GlobalController>, IInRoomCallbacks, I
         PhotonNetwork.SerializationRate = 30;
         PhotonNetwork.SendRate = 30;
         PhotonNetwork.MaxResendsBeforeDisconnect = 15;
-
-        InputSystem.controls.UI.DebugInfo.performed += (context) => {
-            graphy.SetActive(!graphy.activeSelf);
-        };
 
 #if PLATFORM_STANDALONE_WIN && !UNITY_EDITOR
         try {

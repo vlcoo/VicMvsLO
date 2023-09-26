@@ -740,8 +740,10 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         AudioMixer mixer = music.outputAudioMixerGroup.audioMixer;
         mixer.SetFloat("MusicSpeed", 1f);
         mixer.SetFloat("MusicPitch", 1f);
-        
-        bool win = winner != null && winner.IsLocal && !cancelled;
+
+        bool teams = winner != null && localPlayer != null && TeamGrouper.IsPlayerTeammate(localPlayer.GetComponent<PlayerController>(),
+            GlobalController.Instance.characters[winnerCharacterIndex].prefab);
+        bool win = winner != null && (winner.IsLocal || teams) && !cancelled;
         bool draw = winner == null && !cancelled;
         float secondsUntilMenu;
         secondsUntilMenu = draw ? 5 : 4;
@@ -763,10 +765,10 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
                     timeTotal.Seconds, timeTotal.Milliseconds);
             }
             text.GetComponent<Animator>().SetTrigger("start");
-            if (winnerCharacterIndex == 1)
-                text.GetComponent<TMP_Text>().colorGradientPreset = gradientLuigiText;
-            else
+            if (winnerCharacterIndex % 2 == 0)
                 text.GetComponent<TMP_Text>().colorGradientPreset = gradientMarioText;
+            else
+                text.GetComponent<TMP_Text>().colorGradientPreset = gradientLuigiText;
         }
         else if (cancelled)
         {
@@ -775,8 +777,17 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             text.GetComponent<Animator>().SetTrigger("startNegative");
         }
         else {
-            sfx.PlayOneShot(Enums.Sounds.UI_Match_Lose.GetClip());
-            text.GetComponent<Animator>().SetTrigger("startNegative");
+            if (SpectationManager.Spectating)
+            {
+                text.GetComponent<TMP_Text>().colorGradientPreset = gradientNegativeAltText;
+                sfx.PlayOneShot(Enums.Sounds.UI_Match_Concluded.GetClip());
+                text.GetComponent<Animator>().SetTrigger("start");
+            }
+            else
+            {
+                sfx.PlayOneShot(Enums.Sounds.UI_Match_Lose.GetClip());
+                text.GetComponent<Animator>().SetTrigger("startNegative");
+            }
         }
 
         //TOOD: make a results screen?

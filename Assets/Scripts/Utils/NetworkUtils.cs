@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -59,6 +60,12 @@ namespace NSMB.Utils {
             [Enums.NetRoomProperties.Mutes] = new string[0],
             [Enums.NetRoomProperties.Bans] = new object[0],
             [Enums.NetRoomProperties.MatchRules] = "",
+            [Enums.NetRoomProperties.SpecialRules] = new Dictionary<string, bool>(),
+            [Enums.NetRoomProperties.Teams] = false,
+            [Enums.NetRoomProperties.ShareStars] = true,
+            [Enums.NetRoomProperties.FriendlyFire] = true,
+            [Enums.NetRoomProperties.LapRequirement] = 1,
+            [Enums.NetRoomProperties.Starcoins] = false,
         };
 
         public static Hashtable DefaultRoomProperties {
@@ -78,6 +85,8 @@ namespace NSMB.Utils {
         Enums.NetRoomProperties.NewPowerups,
         Enums.NetRoomProperties.GameStarted,
         Enums.NetRoomProperties.HostName,
+        Enums.NetRoomProperties.Teams,
+        Enums.NetRoomProperties.MatchRules,
     };
 
         public static readonly RegionPingComparer PingComparer = new();

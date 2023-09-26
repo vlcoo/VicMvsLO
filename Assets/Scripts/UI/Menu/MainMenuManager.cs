@@ -38,18 +38,18 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     public GameObject lobbiesContent, lobbyPrefab;
     bool quit, validName;
     public GameObject connecting;
-    public GameObject title, bg, mainMenu, optionsMenu, lobbyMenu, createLobbyPrompt, inLobbyMenu, creditsMenu, controlsMenu, privatePrompt, updateBox, newRuleS1Prompt, newRuleS2Prompt, emoteListPrompt, RNGRulesBox, specialPrompt, stagePrompt;
+    public GameObject title, bg, mainMenu, optionsMenu, lobbyMenu, createLobbyPrompt, inLobbyMenu, creditsMenu, controlsMenu, privatePrompt, updateBox, newRuleS1Prompt, newRuleS2Prompt, emoteListPrompt, RNGRulesBox, specialPrompt, stagePrompt, teamsPrompt;
     public Animator createLobbyPromptAnimator, privatePromptAnimator, updateBoxAnimator, errorBoxAnimator, rebindPromptAnimator, newRuleS1PromptAnimator, newRuleS2PromptAnimator, emoteListPromptAnimator, RNGRulesBoxAnimator;
     public GameObject[] levelCameraPositions;
     public GameObject sliderText, lobbyText, currentMaxPlayers, settingsPanel, ruleTemplate, lblConditions, specialTogglesParent;
     public TMP_Dropdown levelDropdown, characterDropdown;
     public RoomIcon selectedRoomIcon, privateJoinRoom;
     public Button joinRoomBtn, createRoomBtn, startGameBtn, exitBtn, backBtn;
-    public Toggle ndsResolutionToggle, fullscreenToggle, livesEnabled, powerupsEnabled, timeEnabled, starcoinsEnabled, starsEnabled, coinsEnabled, drawTimeupToggle, fireballToggle, rumbleToggle, animsToggle, vsyncToggle, privateToggle, privateToggleRoom, aspectToggle, spectateToggle, scoreboardToggle, filterToggle, chainableActionsToggle, RNGClear, teamsToggle;
+    public Toggle ndsResolutionToggle, fullscreenToggle, livesEnabled, powerupsEnabled, timeEnabled, starcoinsEnabled, starsEnabled, coinsEnabled, drawTimeupToggle, fireballToggle, rumbleToggle, animsToggle, vsyncToggle, privateToggle, privateToggleRoom, aspectToggle, spectateToggle, scoreboardToggle, filterToggle, chainableActionsToggle, RNGClear, teamsToggle, friendlyToggle, shareToggle;
     public GameObject playersContent, playersPrefab, chatContent, chatPrefab;
     public TMP_InputField nicknameField, starsText, lapsText, coinsText, livesField, timeField, lobbyJoinField, chatTextField;
     public Slider musicSlider, sfxSlider, masterSlider, lobbyPlayersSlider, changePlayersSlider, RNGSlider;
-    public GameObject mainMenuSelected, optionsSelected, lobbySelected, currentLobbySelected, createLobbySelected, creditsSelected, controlsSelected, privateSelected, reconnectSelected, updateBoxSelected, newRuleS1Selected, newRuleS2Selected, emoteListSelected, RNGRulesSelected, specialSelected, stageSelected;
+    public GameObject mainMenuSelected, optionsSelected, lobbySelected, currentLobbySelected, createLobbySelected, creditsSelected, controlsSelected, privateSelected, reconnectSelected, updateBoxSelected, newRuleS1Selected, newRuleS2Selected, emoteListSelected, RNGRulesSelected, specialSelected, stageSelected, teamsSelected;
     public GameObject errorBox, errorButton, rebindPrompt, reconnectBox;
     public TMP_Text errorText, errorDetail, rebindCountdown, rebindText, reconnectText, updateText, RNGSliderText, specialCountText, teamHintText, setSpecialBtn, stageText;
     public TMP_Dropdown region;
@@ -188,7 +188,8 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
             selectedRoomIcon = null;
         }
 
-        privateJoinRoom.transform.SetAsLastSibling();
+        privateJoinRoom.transform.SetAsFirstSibling();
+        privateJoinRoom.gameObject.SetActive(currentRooms.Count <= 0);
     }
 
     // ROOM CALLBACKS
@@ -267,6 +268,8 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         AttemptToUpdateProperty<bool>(updatedProperties, Enums.NetRoomProperties.ChainableRules, ChangeChainableRules);
         AttemptToUpdateProperty<bool>(updatedProperties, Enums.NetRoomProperties.Starcoins, ChangeStarcoins);
         AttemptToUpdateProperty<bool>(updatedProperties, Enums.NetRoomProperties.Teams, ChangeTeams);
+        AttemptToUpdateProperty<bool>(updatedProperties, Enums.NetRoomProperties.FriendlyFire, ChangeFriendly);
+        AttemptToUpdateProperty<bool>(updatedProperties, Enums.NetRoomProperties.ShareStars, ChangeShare);
     }
 
     public void ChangeDebugState(bool enabled) {
@@ -334,8 +337,8 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
             System.Array.Sort(pingSortedRegions, NetworkUtils.PingComparer);
 
             foreach (Region r in pingSortedRegions)
-                // formattedRegions.Add($"{r.Code} <color=#bbbbbb>({(r.Ping == 4000 ? "N/A" : r.Ping + "ms")})");
-                formattedRegions.Add($"{NetworkUtils.regionsFullNames.GetValueOrDefault(r.Code, r.Code)}");
+                formattedRegions.Add(
+                    $"{NetworkUtils.regionsFullNames.GetValueOrDefault(r.Code, r.Code)} <color=#bbbbbb>({(r.Ping == 4000 ? "?" : r.Ping)} ms)");
 
             lastRegion = pingSortedRegions[0].Code;
             pingsReceived = true;
@@ -536,7 +539,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
             int index = 0;
             for (int i = 0; i < pingSortedRegions.Length; i++) {
                 Region r = pingSortedRegions[i];
-                newRegions.Add($"{r.Code} <color=#cccccc>({(r.Ping == 4000 ? "N/A" : r.Ping + "ms")})");
+                newRegions.Add($"{NetworkUtils.regionsFullNames.GetValueOrDefault(r.Code, r.Code)} <color=#bbbbbb>({(r.Ping == 4000 ? "?" : r.Ping)} ms)");
                 if (r.Code == lastRegion)
                     index = i;
             }
@@ -604,9 +607,8 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     void Update() {
         bool connected = PhotonNetwork.IsConnectedAndReady && PhotonNetwork.InLobby;
         connecting.SetActive(!connected && lobbyMenu.activeInHierarchy);
-        privateJoinRoom.gameObject.SetActive(connected);
 
-        joinRoomBtn.interactable = connected && selectedRoomIcon != null && validName;
+        joinRoomBtn.interactable = connected && validName;
         createRoomBtn.interactable = connected && validName;
         region.interactable = connected;
 
@@ -940,6 +942,12 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         stagePrompt.SetActive(true);
         EventSystem.current.SetSelectedGameObject(stageSelected);
     }
+    
+    public void OpenTeams()
+    {
+        teamsPrompt.SetActive(true);
+        EventSystem.current.SetSelectedGameObject(teamsSelected);
+    }
 
     public void CloseNewRuleS2(string action)
     {
@@ -1102,7 +1110,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     {
         backBtn.interactable = false;
         sfx.PlayOneShot(Enums.Sounds.UI_Match_Starting.GetClip());
-        DOTween.To(() => MusicSynth.player.Gain, v => MusicSynth.player.Gain = v, 0, 0.1f);
+        MusicSynth.player.Pause();
         fader.SetInvisible(GlobalController.Instance.settings.reduceUIAnims);
         fader.anim.SetTrigger("out");
         StartCoroutine(WaitForMusicFadeStartGame());
@@ -1273,6 +1281,8 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         starcoinsEnabled.interactable = PhotonNetwork.IsMasterClient && raceMapSelected;
         // lapsText.transform.parent.gameObject.SetActive(raceMapSelected);
         lapsText.interactable = PhotonNetwork.IsMasterClient && raceMapSelected;
+        shareToggle.interactable = PhotonNetwork.IsMasterClient && teamsToggle.isOn;
+        friendlyToggle.interactable = PhotonNetwork.IsMasterClient && teamsToggle.isOn;
 
         Utils.GetCustomProperty(Enums.NetRoomProperties.Debug, out bool debug);
         privateToggleRoom.interactable = PhotonNetwork.IsMasterClient && !debug;
@@ -1757,11 +1767,23 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     {
         chainableActionsToggle.SetIsOnWithoutNotify(how);
     }
+
     public void ChangeTeams(bool how)
     {
         teamsToggle.SetIsOnWithoutNotify(how);
+        UpdateSettingEnableStates();
+        teamHintText.text = "Teams: " + (how ? "ON" : "OFF");
     }
-    
+    public void ChangeFriendly(bool how)
+    {
+        friendlyToggle.SetIsOnWithoutNotify(how);
+    }
+    public void ChangeShare(bool how)
+    {
+        shareToggle.SetIsOnWithoutNotify(how);
+    }
+
+
     public void ChangeStarcoins(bool how)
     {
         starcoinsEnabled.SetIsOnWithoutNotify(how);
@@ -1911,6 +1933,18 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         };
         PhotonNetwork.CurrentRoom.SetCustomProperties(properties);
         teamHintText.text = "Teams: " + (toggle.isOn ? "ON" : "OFF");
+    }
+    public void EnableFriendly(Toggle toggle) {
+        Hashtable properties = new() {
+            [Enums.NetRoomProperties.FriendlyFire] = toggle.isOn,
+        };
+        PhotonNetwork.CurrentRoom.SetCustomProperties(properties);
+    }
+    public void EnableShare(Toggle toggle) {
+        Hashtable properties = new() {
+            [Enums.NetRoomProperties.ShareStars] = toggle.isOn,
+        };
+        PhotonNetwork.CurrentRoom.SetCustomProperties(properties);
     }
 
     public void EnableTime(Toggle toggle) {
