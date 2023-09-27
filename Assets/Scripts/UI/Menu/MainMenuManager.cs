@@ -474,6 +474,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         Instance = this;
         if (Random.value > 0.65)
             GetComponent<LoopingMusic>().FastMusic = true;
+        sfx.outputAudioMixerGroup.audioMixer.SetFloat("SFXReverb", 0f);
 
         //Clear game-specific settings so they don't carry over
         HorizontalCamera.OFFSET_TARGET = 0;
@@ -695,7 +696,6 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
     public void onAddMatchRuleExplicit(string cond, string act, bool updateNetRoom, bool updateUIList = true)
     {
-        Debug.Log("adding " + cond + " .. " + act);
         if (cond is null || act is null || !POSSIBLE_CONDITIONS.Contains(cond) ||
             DISALLOWED_RULES.Contains(new KeyValuePair<string, string>(cond, act)))
         {
@@ -1703,7 +1703,10 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     public void DictToSpecialRules(Dictionary<string, bool> dict)
     {
         specialList = dict.Keys.ToList();
-        foreach (Transform toggle in specialTogglesParent.transform)
+        // whatever lol
+        foreach (Transform toggle in specialTogglesParent.transform.GetChild(0).transform)
+            toggle.transform.GetChild(2).GetComponent<Toggle>().isOn = specialList.Contains(toggle.name);
+        foreach (Transform toggle in specialTogglesParent.transform.GetChild(1).transform)
             toggle.transform.GetChild(2).GetComponent<Toggle>().isOn = specialList.Contains(toggle.name);
         specialCountText.text = "Specials: " + specialList.Count;
     }

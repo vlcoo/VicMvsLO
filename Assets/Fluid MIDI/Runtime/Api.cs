@@ -3,12 +3,14 @@ using System.Runtime.InteropServices;
 
 namespace FluidSynth
 {
-    static class Api
+    public static class Api
     {
         private const string LibraryName = "audioplugin-fluidsynth-3";
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate int MidiEventDelegate(IntPtr data, IntPtr midiEvent);
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        public delegate int TickEventDelegate(IntPtr data, int tick);
 
         public static class Settings
         {
@@ -128,6 +130,8 @@ namespace FluidSynth
 
             [DllImport(LibraryName, EntryPoint = "fluid_player_set_playback_callback")]
             public static extern int SetPlaybackCallback(IntPtr player, MidiEventDelegate callback, IntPtr data);
+            [DllImport(LibraryName, EntryPoint = "fluid_player_set_tick_callback")]
+            public static extern int SetTickCallback(IntPtr player, TickEventDelegate callback, IntPtr data);
 
             [DllImport(LibraryName, EntryPoint = "fluid_player_set_loop")]
             public static extern int SetLoop(IntPtr player, int loop);

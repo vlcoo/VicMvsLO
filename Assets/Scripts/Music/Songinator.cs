@@ -2,7 +2,9 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using FluidMidi;
+using FluidSynth;
 using KaimiraGames;
+using UnityEditor;
 using UnityEngine;
 
 public class Songinator : MonoBehaviour
@@ -11,18 +13,12 @@ public class Songinator : MonoBehaviour
     [SerializeField] public SongPlayer player;
     [SerializeField] public List<MIDISong> songs;
     [SerializeField] public List<int> chances;
+    
     [NonSerialized] public MIDISong currentSong;
+    [NonSerialized] public int nextBahTick;
+    
+    private int nextBahIndex = -1;
     private float globalTempoMultiplier = 1.0f;
-
-    public float GlobalTempoMultiplier
-    {
-        get => globalTempoMultiplier;
-        set
-        {
-            // player.Tempo = player.Tempo * value / globalTempoMultiplier ;
-            // globalTempoMultiplier = value;
-        }
-    }
     private readonly WeightedList<MIDISong> weightedList = new();
 
     public void Start()
@@ -40,6 +36,8 @@ public class Songinator : MonoBehaviour
         }
         else currentSong = songs[0];
 
+        if (currentSong.hasBahs) AdvanceBah(); 
+
         player.synthesizer.soundFont.SetFullPath(currentSong.autoSoundfont
             ? currentSong.song.GetFullPath().Replace(".mid", ".sf2")
             : currentSong.soundfont.GetFullPath());
@@ -52,8 +50,10 @@ public class Songinator : MonoBehaviour
         player.Init();
 
         if (autoStart) StartPlayback();
+        
+        // player.SetTickEvent(tick => OnTick(tick));
     }
-    
+
     IEnumerator StartSkip()
     {
         player.Channels = 0;
@@ -71,5 +71,11 @@ public class Songinator : MonoBehaviour
             player.Channels = ~currentSong.mutedChannelsNormal;
             player.Play();
         }
+    }
+
+    public void AdvanceBah()
+    {
+        nextBahIndex = (nextBahIndex + 1) % currentSong.bahTicks.Length;
+        nextBahTick = currentSong.bahTicks[nextBahIndex];
     }
 }

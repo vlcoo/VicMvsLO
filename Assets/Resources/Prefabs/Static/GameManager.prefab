@@ -5356,10 +5356,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: faa509be0aa8ac641ad4ddf6c01d26db, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mainMusic: {fileID: 11400000, guid: 488f1c737d498714c951d86c1a790bcc, type: 2}
-  invincibleMusic: {fileID: 11400000, guid: fb397722d9ffbb145a088ac9ce60908c, type: 2}
-  megaMushroomMusic: {fileID: 11400000, guid: 3fb519076901a294493ae6e0c10c979b, type: 2}
   MusicSynth: {fileID: 1621225637622541343}
+  MusicSynthMega: {fileID: 5962611842195706897}
+  MusicSynthStarman: {fileID: 5178649533400463330}
   levelMinTileX: -30
   levelMinTileY: -12
   levelWidthTile: 50
@@ -5370,6 +5369,7 @@ MonoBehaviour:
   cameraMaxX: 1000
   loopingLevel: 1
   raceLevel: 0
+  reverberedSFX: 0
   spawnpoint: {x: 0, y: 0, z: 0}
   checkpoint: {x: 0, y: 0, z: 0}
   tilemap: {fileID: 0}
@@ -5402,7 +5402,6 @@ MonoBehaviour:
   gradientLuigiText: {fileID: 11400000, guid: 016a6bbde20c0e2c39680ce8085a9fc8, type: 2}
   gradientNegativeAltText: {fileID: 11400000, guid: ce0375a0456f177779b2974345d4c18c,
     type: 2}
-  music: {fileID: 3063105634746227037}
   sfx: {fileID: 8814515203468784576}
   localPlayer: {fileID: 0}
   paused: 0
@@ -5705,6 +5704,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isTeamsMatch: 0
+  friendlyFire: 0
+  shareStars: 0
 --- !u!1 &5576651048504557500
 GameObject:
   m_ObjectHideFlags: 0

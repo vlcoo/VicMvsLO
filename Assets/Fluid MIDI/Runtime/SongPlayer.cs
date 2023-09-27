@@ -61,6 +61,7 @@ namespace FluidMidi
 
         [SerializeField] public Synthesizer synthesizer;
         [SerializeField] public StreamingAsset song = new StreamingAsset();
+        public event Api.TickEventDelegate onTick;
 
         [SerializeField] [Tooltip("Start playing after the song is loaded for the first time.")]
         bool playOnStart = true;
@@ -159,6 +160,16 @@ namespace FluidMidi
         public bool Seek(int ticks)
         {
             return playerPtr != IntPtr.Zero && Api.Player.Seek(playerPtr, ticks) == Api.Result.OK;
+        }
+
+        public void SetTickEvent(Action<int> action)
+        {
+            Api.Player.SetTickCallback(playerPtr, (data, tick) =>
+            {
+                if (action == null) return -1;
+                action.Invoke(tick);
+                return 0;
+            }, IntPtr.Zero);
         }
 
         public bool IsChannelEnabled(int channel)

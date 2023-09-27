@@ -37,8 +37,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         private set => _instance = value;
     }
 
-    public MusicData mainMusic, invincibleMusic, megaMushroomMusic;
-    public Songinator MusicSynth;
+    public Songinator MusicSynth, MusicSynthMega, MusicSynthStarman;
     public MatchConditioner MatchConditioner { get; private set; }
     public Togglerizer Togglerizer { get; private set; }
     public TeamGrouper TeamGrouper { get; private set; }
@@ -48,6 +47,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
     public float cameraMinY, cameraHeightY, cameraMinX = -1000, cameraMaxX = 1000;
     public bool loopingLevel = true;
     public bool raceLevel = false;
+    public bool reverberedSFX = false;
     [NonSerialized] public bool teamsMatch = false;
     [NonSerialized] public bool needsStarcoins;
     public Vector3 spawnpoint;
@@ -70,9 +70,8 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
     public TMP_ColorGradient gradientMarioText, gradientLuigiText, gradientNegativeAltText;
 
     //Audio
-    public AudioSource music, sfx;
-    private LoopingMusic loopMusic;
-    public Enums.MusicState? musicState = null;
+    public AudioSource sfx;
+    public Enums.MusicState? musicState = Enums.MusicState.Normal;
 
     public GameObject localPlayer;
     public bool paused, loaded, started;
@@ -444,14 +443,11 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
     }
 
     private const float TARGET_PITCH = 1.5f;
-    Songinator loadingMusic;
     public void Start() {
         SpectationManager = GetComponent<SpectationManager>();
         MatchConditioner = GetComponent<MatchConditioner>();
         Togglerizer = GetComponent<Togglerizer>();
         TeamGrouper = GetComponent<TeamGrouper>();
-        loopMusic = GetComponent<LoopingMusic>();
-        loadingMusic = GameObject.Find("MusicSynth").GetComponent<Songinator>();
         coins = GameObject.FindGameObjectsWithTag("coin");
         levelUIColor.a = .7f;
         if (Togglerizer.currentEffects.Contains("ReverseLoop") && !raceLevel) loopingLevel = !loopingLevel;
@@ -459,6 +455,11 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         {
             cameraMinX = -1000;
             cameraMaxX = 1000;
+        }
+
+        if (reverberedSFX)
+        {
+            sfx.outputAudioMixerGroup.audioMixer.SetFloat("SFXReverb", 0.5f);
         }
 
         InputSystem.controls.LoadBindingOverridesFromJson(GlobalController.Instance.controlsJson);
@@ -508,9 +509,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         if (Togglerizer.currentEffects.Contains("HeckaSpeed"))
         {
             PlayerController controller = localPlayer.GetComponent<PlayerController>();
-            DOTween.To(() => loadingMusic.GlobalTempoMultiplier, p => loadingMusic.GlobalTempoMultiplier = p, TARGET_PITCH, 2f);
             sfx.pitch = TARGET_PITCH;
-            MusicSynth.GlobalTempoMultiplier = TARGET_PITCH;
             controller.sfx.pitch = TARGET_PITCH;
             controller.sfxBrick.pitch = TARGET_PITCH;
             Time.timeScale = TARGET_PITCH;
@@ -634,6 +633,12 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         teamsMatch = TeamGrouper.isTeamsMatch;
         if (Togglerizer.currentEffects.Contains("NoBahs"))
             MusicSynth.player.DisableChannels(new []{MusicSynth.currentSong.bahChannel});
+        // else {
+        //     if (MusicSynth.currentSong.hasBahs) MusicSynth.player.SetTickEvent(tick =>
+        // {
+        //     if (MusicSynth.nextBahTick == tick) BahAllEnemies();
+        //     MusicSynth.AdvanceBah();
+        // });}
 
         startServerTime = startTimestamp + 3500;
         foreach (var wfgs in FindObjectsOfType<WaitForGameStart>())
@@ -715,6 +720,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
     private IEnumerator EndGame(Player winner, bool cancelled = false)
     {
         gameover = true;
+        sfx.outputAudioMixerGroup.audioMixer.SetFloat("SFXReverb", 0f);
         
         PhotonNetwork.CurrentRoom.SetCustomProperties(new() { [Enums.NetRoomProperties.GameStarted] = false });
         MusicSynth.player.Pause();
@@ -736,10 +742,6 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             : (winner == null ? "It's a tie..." : $"{uniqueName} Wins!");
 
         if (!cancelled) yield return new WaitForSecondsRealtime(0.2f);
-
-        AudioMixer mixer = music.outputAudioMixerGroup.audioMixer;
-        mixer.SetFloat("MusicSpeed", 1f);
-        mixer.SetFloat("MusicPitch", 1f);
 
         bool teams = winner != null && localPlayer != null && TeamGrouper.IsPlayerTeammate(localPlayer.GetComponent<PlayerController>(),
             GlobalController.Instance.characters[winnerCharacterIndex].prefab);
@@ -903,10 +905,6 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
     public void CheckForWinner() {
         if (gameover || !PhotonNetwork.IsMasterClient)
             return;
-
-        MusicSynth.player.Tempo = speedup & !raceLevel
-            ? MusicSynth.currentSong.playbackSpeedFast
-            : MusicSynth.currentSong.playbackSpeedNormal;
         
         bool starGame = starRequirement != -1;
         bool timeUp = endServerTime != -1 && endServerTime - Time.deltaTime - PhotonNetwork.ServerTimestamp < 0;
@@ -991,11 +989,27 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         MatchConditioner.ConditionActioned(null, "Bah‘d");
     }
 
-    private void PlaySong(Enums.MusicState state, MusicData musicToPlay) {
+    private void PlaySong(Enums.MusicState state) {
         if (musicState == state)
             return;
+        
+        MusicSynth.player.Stop();
+        MusicSynthMega.player.Stop();
+        MusicSynthStarman.player.Stop();
 
-        loopMusic.Play(musicToPlay);
+        switch (state)
+        {
+            case Enums.MusicState.Normal:
+                MusicSynth.player.Play();
+                break;
+            case Enums.MusicState.MegaMushroom:
+                MusicSynthMega.player.Play();
+                break;
+            case Enums.MusicState.Starman:
+                MusicSynthStarman.player.Play();
+                break;
+        }
+
         musicState = state;
     }
 
@@ -1021,11 +1035,11 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         speedup |= players.All(pl => !pl || pl.lives == 1 || pl.lives == 0);
 
         if (mega) {
-            PlaySong(Enums.MusicState.MegaMushroom, megaMushroomMusic);
+            PlaySong(Enums.MusicState.MegaMushroom);
         } else if (invincible) {
-            PlaySong(Enums.MusicState.Starman, invincibleMusic);
+            PlaySong(Enums.MusicState.Starman);
         } else {
-            PlaySong(Enums.MusicState.Normal, mainMusic);
+            PlaySong(Enums.MusicState.Normal);
         }
     }
 
