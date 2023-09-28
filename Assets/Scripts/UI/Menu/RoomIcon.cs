@@ -44,8 +44,9 @@ public class RoomIcon : MonoBehaviour {
         bool time = ((int) prop[Enums.NetRoomProperties.Time]) >= 1;
         //bool password = ((string) prop[Enums.NetRoomProperties.Password]) != "";
 
-        if (!matchRules.Trim().IsNullOrEmpty()) symbols += "<sprite=56>";
-        Debug.Log(matchRules);
+        if (!matchRules.Trim().IsNullOrEmpty())
+            symbols += "<sprite=56>" +
+                       Utils.GetSymbolString((matchRules.Split("},{").Length).ToString(), Utils.smallSymbols);
         if (teams) symbols += "<sprite=76>";
         if (powerups) symbols += "<sprite=8>";
         if (time) symbols += "<sprite=6>";

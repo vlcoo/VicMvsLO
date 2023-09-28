@@ -85,14 +85,8 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
     public ColorChooser colorManager;
 
-    public List<string> POSSIBLE_CONDITIONS = new List<string>
-    {
-        "Spawned", "GotCoin", "GotPowerup", "GotMega", "LostPowerup", "GotStar", "HitBlock", "BumpedInto", "KnockedBack", "Frozen", "BumpedSmn", 
-        "StompedSmn", "TriggeredPowerup", "Died", "SteppedOnEnemy", "Jumped", "LookedRight", "LookedLeft", "LookedUp", "LookedDown", "Ran", "ReachedCoinLimit",
-        "Disqualified", "1MinRemaining", "Every15Sec", "Every5Sec", "Every10Sec", "Every30Sec", "Every60Sec", "GotCheckpoint", "Bah‘d", // ← i know that's not an apostrophe but the ui
-        "Reached0Coins"                                                                                                                 // font is wack and uses this character instead
-    };
-    public List<string> POSSIBLE_ACTIONS = new List<string>();
+    public List<string> POSSIBLE_CONDITIONS = new List<string>();
+    [NonSerialized] public List<string> POSSIBLE_ACTIONS = new List<string>();
 
     public List<KeyValuePair<string, string>> DISALLOWED_RULES = new List<KeyValuePair<string, string>>
     {
@@ -472,8 +466,6 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
          */
 
         Instance = this;
-        if (Random.value > 0.65)
-            GetComponent<LoopingMusic>().FastMusic = true;
         sfx.outputAudioMixerGroup.audioMixer.SetFloat("SFXReverb", 0f);
 
         //Clear game-specific settings so they don't carry over
@@ -1097,13 +1089,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
     bool noUpdateNetRoom = false;
     public void QuitRoom() {
-        foreach (var rule in ruleList)
-            Destroy(rule.gameObject);
-        ruleList.Clear();
         noUpdateNetRoom = true;
-        foreach (Transform toggle in specialTogglesParent.transform)
-            toggle.transform.GetChild(2).GetComponent<Toggle>().isOn = false;
-        specialList.Clear();
         PhotonNetwork.LeaveRoom();
     }
     public void StartGame()
