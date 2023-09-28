@@ -2261,15 +2261,10 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         return false;
     }
 
-    private Dictionary<int, int> emoteKeyMapping = new()
-    {
-        { 1, 7 }, { 2, 17 }, { 3, 27 }, { 4, 28 }, { 5, 29 }, { 6, 43 }, { 7, 35 }, { 8, 36 }, { 9, 52 }, { 0, 54 }
-    };
-
     void Taunt(InputAction.CallbackContext context)
     {
         int emoteId = 0;
-        if (context.action.name.StartsWith("!Taunt")) emoteId = emoteKeyMapping[Int32.Parse(context.action.name.Substring(6))];
+        if (context.action.name.StartsWith("!Taunt")) emoteId = GlobalController.Instance.emoteKeyMapping[Int32.Parse(context.action.name.Substring(6))];
         else return;
         photonView.RPC(nameof(SpawnEmoteWithId), RpcTarget.All, emoteId);
     }
@@ -2279,7 +2274,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
     {
         var emoteObj = Instantiate(Resources.Load("Prefabs/Particle/EmoteTaunt"), transform.position + new Vector3(0, .8f, 0), Quaternion.identity) as GameObject;
         var emoteObjParticles = emoteObj.GetComponent<ParticleSystem>();
-        emoteObjParticles.GetComponent<Renderer>().material.mainTextureOffset = new Vector2(0.0357f*(emoteId % 28f), emoteId >= 28 ? 0.5f : 0);
+        emoteObjParticles.GetComponent<Renderer>().material.mainTextureOffset = new Vector2(0.125f*(emoteId % 8f), 0.125f*(int)(emoteId / 8f));
         emoteObjParticles.Emit(1);
     }
 

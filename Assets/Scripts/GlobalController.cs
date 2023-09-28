@@ -24,6 +24,7 @@ public class GlobalController : Singleton<GlobalController>, IInRoomCallbacks, I
 
     public RenderTexture ndsTexture;
     public PlayerData[] characters;
+    public int[] emoteKeyMapping;
     public Settings settings;
     public DiscordController DiscordController { get; private set; }
     public DeviceRumbler rumbler { get; private set; }
