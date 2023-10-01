@@ -416,10 +416,7 @@ namespace NSMB.Utils {
             GetCustomProperty(Enums.NetRoomProperties.StarRequirement, out int starsToWin);
             GetCustomProperty(Enums.NetRoomProperties.NewPowerups, out bool custom);
             GetCustomProperty(Enums.NetRoomProperties.Lives, out int livesOn);
-            bool lives = false;
-            if (livesOn > 0)
-                lives = true;
-
+            bool lives = livesOn > 0;
             bool big = gm.spawnBigPowerups;
             bool vertical = gm.spawnVerticalPowerups;
 

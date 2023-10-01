@@ -38,7 +38,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     public GameObject lobbiesContent, lobbyPrefab;
     bool quit, validName;
     public GameObject connecting;
-    public GameObject title, bg, mainMenu, optionsMenu, lobbyMenu, createLobbyPrompt, inLobbyMenu, creditsMenu, controlsMenu, privatePrompt, updateBox, newRuleS1Prompt, newRuleS2Prompt, emoteListPrompt, RNGRulesBox, specialPrompt, stagePrompt, teamsPrompt;
+    public GameObject title, bg, mainMenu, optionsMenu, lobbyMenu, createLobbyPrompt, inLobbyMenu, creditsMenu, controlsMenu, privatePrompt, updateBox, newRuleS1Prompt, newRuleS2Prompt, emoteListPrompt, RNGRulesBox, specialPrompt, stagePrompt, teamsPrompt, powerupsPrompt;
     public Animator createLobbyPromptAnimator, privatePromptAnimator, updateBoxAnimator, errorBoxAnimator, rebindPromptAnimator, newRuleS1PromptAnimator, newRuleS2PromptAnimator, emoteListPromptAnimator, RNGRulesBoxAnimator;
     public GameObject[] levelCameraPositions;
     public GameObject sliderText, lobbyText, currentMaxPlayers, settingsPanel, ruleTemplate, lblConditions, specialTogglesParent;
@@ -49,7 +49,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     public GameObject playersContent, playersPrefab, chatContent, chatPrefab;
     public TMP_InputField nicknameField, starsText, lapsText, coinsText, livesField, timeField, lobbyJoinField, chatTextField;
     public Slider musicSlider, sfxSlider, masterSlider, lobbyPlayersSlider, changePlayersSlider, RNGSlider;
-    public GameObject mainMenuSelected, optionsSelected, lobbySelected, currentLobbySelected, createLobbySelected, creditsSelected, controlsSelected, privateSelected, reconnectSelected, updateBoxSelected, newRuleS1Selected, newRuleS2Selected, emoteListSelected, RNGRulesSelected, specialSelected, stageSelected, teamsSelected;
+    public GameObject mainMenuSelected, optionsSelected, lobbySelected, currentLobbySelected, createLobbySelected, creditsSelected, controlsSelected, privateSelected, reconnectSelected, updateBoxSelected, newRuleS1Selected, newRuleS2Selected, emoteListSelected, RNGRulesSelected, specialSelected, stageSelected, teamsSelected, powerupsSelected;
     public GameObject errorBox, errorButton, rebindPrompt, reconnectBox;
     public TMP_Text errorText, errorDetail, rebindCountdown, rebindText, reconnectText, updateText, RNGSliderText, specialCountText, teamHintText, setSpecialBtn, stageText;
     public TMP_Dropdown region;
@@ -100,6 +100,19 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     };
     public List<MatchRuleListEntry> ruleList = new();
     public List<string> specialList = new();
+
+    public Dictionary<string, int> powerupsDict = new()
+    {
+        {"1-Up", 1},
+        {"BlueShell", 1},
+        {"FireFlower", 2},
+        {"IceFlower", 1},
+        {"MegaMushroom", 1},
+        {"MiniMushroom", 1},
+        {"Mushroom", 1},
+        {"PropellerMushroom", 1},
+        {"Star", 1},
+    };
     private string aboutToAddCond = "";
     private string aboutToAddAct = "";
     private bool raceMapSelected = false;
@@ -253,6 +266,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         // AttemptToUpdateProperty<Dictionary<string, string>>(updatedProperties, Enums.NetRoomProperties.MatchRules, DictToMatchRules);
         AttemptToUpdateProperty<string>(updatedProperties, Enums.NetRoomProperties.MatchRules, JsonToMatchRules);
         AttemptToUpdateProperty<Dictionary<string, bool>>(updatedProperties, Enums.NetRoomProperties.SpecialRules, DictToSpecialRules);
+        AttemptToUpdateProperty<Dictionary<string, int>>(updatedProperties, Enums.NetRoomProperties.PowerupChances, DictToPowerupChances);
         AttemptToUpdateProperty<int>(updatedProperties, Enums.NetRoomProperties.CoinRequirement, ChangeCoinRequirement);
         AttemptToUpdateProperty<int>(updatedProperties, Enums.NetRoomProperties.Lives, ChangeLives);
         AttemptToUpdateProperty<bool>(updatedProperties, Enums.NetRoomProperties.NewPowerups, ChangeNewPowerups);
@@ -1701,6 +1715,11 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     {
         specialList = specialList.Distinct().ToList();
         return specialList.ToDictionary(x => x, x => true);
+    }
+
+    public void DictToPowerupChances(Dictionary<string, int> dict)
+    {
+        powerupsDict = dict;
     }
 
     public void ChangeStarRequirement(int stars) {

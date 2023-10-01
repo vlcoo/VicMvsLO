@@ -1494,7 +1494,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
     }
 
     public void SpawnCoinItem() {
-        if (coins < GameManager.Instance.coinRequirement)
+        if (coins < GameManager.Instance.coinRequirement || GameManager.Instance.Togglerizer.powerupChanceMultipliers.All(pair => pair.Value == 0))
             return;
 
         if (!PhotonNetwork.IsMasterClient)

@@ -193,6 +193,7 @@ public static class Enums {
         public static string Time { get; } = "T";
         public static string DrawTime { get; } = "Dt";
         public static string NewPowerups { get; } = "C";
+        public static string PowerupChances { get; } = "Po";
         public static string Teams { get; } = "Te";
         public static string FriendlyFire { get; } = "Fr";
         public static string ShareStars { get; } = "Sh";

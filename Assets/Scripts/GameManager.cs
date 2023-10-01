@@ -459,7 +459,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
 
         if (reverberedSFX)
         {
-            sfx.outputAudioMixerGroup.audioMixer.SetFloat("SFXReverb", 0.5f);
+            sfx.outputAudioMixerGroup.audioMixer.SetFloat("SFXReverb", 0.35f);
         }
 
         InputSystem.controls.LoadBindingOverridesFromJson(GlobalController.Instance.controlsJson);
@@ -956,7 +956,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             //everyone's dead...? ok then, draw?
             PhotonNetwork.RaiseEvent((byte) Enums.NetEventIds.EndGame, null, NetworkUtils.EventAll, SendOptions.SendReliable);
             return;
-        } else if (alivePlayers.Count == 1 && playerCount >= 2) {
+        } else if ((alivePlayers.Count == 1 || (teamsMatch && alivePlayers.Count != 0 && alivePlayers.All(controller => TeamGrouper.IsPlayerTeammate(alivePlayers[0], controller)))) && playerCount >= 2) {
             //one player left alive (and not in a solo game). winner!
             PhotonNetwork.RaiseEvent((byte) Enums.NetEventIds.EndGame, alivePlayers[0].photonView.Owner, NetworkUtils.EventAll, SendOptions.SendReliable);
             return;
@@ -968,7 +968,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             if (draw)
                 // it's a draw! Thanks for playing the demo!
                 PhotonNetwork.RaiseEvent((byte) Enums.NetEventIds.EndGame, null, NetworkUtils.EventAll, SendOptions.SendReliable);
-            else if (winningPlayers.Count == 1)
+            else if (winningPlayers.Count == 1 || (teamsMatch && winningPlayers.Count != 0 && winningPlayers.All(controller => TeamGrouper.IsPlayerTeammate(winningPlayers[0], controller))))
                 PhotonNetwork.RaiseEvent((byte) Enums.NetEventIds.EndGame, winningPlayers[0].photonView.Owner, NetworkUtils.EventAll, SendOptions.SendReliable);
 
             return;
@@ -976,7 +976,6 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         if (starGame && winningStars >= starRequirement) {
             if (winningPlayers.Count == 1)
                 PhotonNetwork.RaiseEvent((byte) Enums.NetEventIds.EndGame, winningPlayers[0].photonView.Owner, NetworkUtils.EventAll, SendOptions.SendReliable);
-            
         }
     }
 
