@@ -98,21 +98,10 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         new("Died", "ActFreezePlayer"),
         new("ReachedCoinLimit", "ActGiveCoin"),
     };
-    public List<MatchRuleListEntry> ruleList = new();
-    public List<string> specialList = new();
-
-    public Dictionary<string, int> powerupsDict = new()
-    {
-        {"1-Up", 1},
-        {"BlueShell", 1},
-        {"FireFlower", 2},
-        {"IceFlower", 1},
-        {"MegaMushroom", 1},
-        {"MiniMushroom", 1},
-        {"Mushroom", 1},
-        {"PropellerMushroom", 1},
-        {"Star", 1},
-    };
+    [NonSerialized] public List<MatchRuleListEntry> ruleList = new();
+    [NonSerialized] public List<string> specialList = new();
+    public List<PowerupChanceListEntry> powerupList = new();
+    
     private string aboutToAddCond = "";
     private string aboutToAddAct = "";
     private bool raceMapSelected = false;
@@ -756,6 +745,24 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         PhotonNetwork.CurrentRoom.SetCustomProperties(table);
     }
 
+    public void onUpPowerupChance(String powerup)
+    {
+        powerupList.Find(entry => entry.powerup.Equals(powerup)).Chance += 1;
+        Hashtable table = new() {
+            [Enums.NetRoomProperties.PowerupChances] = PowerupChancesToDict()
+        };
+        PhotonNetwork.CurrentRoom.SetCustomProperties(table);
+    }
+
+    public void onDownPowerupChance(String powerup)
+    {
+        powerupList.Find(entry => entry.powerup.Equals(powerup)).Chance -= 1;
+        Hashtable table = new() {
+            [Enums.NetRoomProperties.PowerupChances] = PowerupChancesToDict()
+        };
+        PhotonNetwork.CurrentRoom.SetCustomProperties(table);
+    }
+
     public void EnterRoom() {
         Room room = PhotonNetwork.CurrentRoom;
         PlayerPrefs.SetString("in-room", null);
@@ -953,6 +960,12 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     {
         teamsPrompt.SetActive(true);
         EventSystem.current.SetSelectedGameObject(teamsSelected);
+    }
+
+    public void OpenPowerups()
+    {
+        powerupsPrompt.SetActive(true);
+        EventSystem.current.SetSelectedGameObject(powerupsSelected);
     }
 
     public void CloseNewRuleS2(string action)
@@ -1719,7 +1732,23 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
     public void DictToPowerupChances(Dictionary<string, int> dict)
     {
-        powerupsDict = dict;
+        if (dict.Count == 0) return;
+        
+        foreach (PowerupChanceListEntry entry in powerupList)
+        {
+            entry.Chance = dict[entry.powerup];
+        }
+    }
+
+    public Dictionary<string, int> PowerupChancesToDict()
+    {
+        Dictionary<string, int> dict = new();
+        foreach (PowerupChanceListEntry entry in powerupList)
+        {
+            dict[entry.powerup] = entry.Chance;
+        }
+
+        return dict;
     }
 
     public void ChangeStarRequirement(int stars) {

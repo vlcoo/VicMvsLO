@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using NSMB.Utils;
 using UnityEngine;
+using UnityEngine.Rendering.UI;
 
 public class Togglerizer : MonoBehaviour
 {
@@ -14,17 +15,18 @@ public class Togglerizer : MonoBehaviour
         Utils.GetCustomProperty(Enums.NetRoomProperties.SpecialRules, out Dictionary<string, bool> currentEffectsDict);
         Utils.GetCustomProperty(Enums.NetRoomProperties.PowerupChances, out powerupChanceMultipliers);
         if (currentEffectsDict != null) currentEffects = currentEffectsDict.Keys.ToList();
-        powerupChanceMultipliers ??= new Dictionary<string, int>
-        {
-            { "1-Up", 1 },
-            { "BlueShell", 1 },
-            { "FireFlower", 1 },
-            { "IceFlower", 1 },
-            { "MegaMushroom", 1 },
-            { "MiniMushroom", 1 },
-            { "Mushroom", 1 },
-            { "PropellerMushroom", 1 },
-            { "Star", 1 },
-        };
+        if (powerupChanceMultipliers == null || powerupChanceMultipliers.All(pair => pair.Value == 3)) 
+            powerupChanceMultipliers = new Dictionary<string, int>
+            {
+                { "BlueShell", 1 },
+                { "FireFlower", 1 },
+                { "IceFlower", 1 },
+                { "MegaMushroom", 1 },
+                { "MiniMushroom", 1 },
+                { "Mushroom", 1 },
+                { "PropellerMushroom", 1 },
+                { "Star", 1 },
+            };
+        Debug.Log(string.Join("; ", powerupChanceMultipliers));
     }
 }

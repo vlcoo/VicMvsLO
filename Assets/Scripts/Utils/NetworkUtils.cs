@@ -54,6 +54,7 @@ namespace NSMB.Utils {
             [Enums.NetRoomProperties.Time] = -1,
             [Enums.NetRoomProperties.DrawTime] = false,
             [Enums.NetRoomProperties.NewPowerups] = true,
+            [Enums.NetRoomProperties.PowerupChances] = new Dictionary<string, int>(),
             [Enums.NetRoomProperties.GameStarted] = false,
             [Enums.NetRoomProperties.HostName] = "",
             [Enums.NetRoomProperties.Debug] = false,

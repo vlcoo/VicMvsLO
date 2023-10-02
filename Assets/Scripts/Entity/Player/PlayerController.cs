@@ -1488,6 +1488,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
     [PunRPC]
     public void SpawnCoinItemInstantly(PhotonMessageInfo info)
     {
+        if (GameManager.Instance.Togglerizer.powerupChanceMultipliers.All(pair => pair.Value == 0)) return;
         string prefab = Utils.GetRandomItem(this).prefab;
         PhotonNetwork.InstantiateRoomObject("Prefabs/Powerup/" + prefab, body.position + Vector2.up * 5f, Quaternion.identity, 0, new object[] { photonView.ViewID });
         photonView.RPC(nameof(PlaySound), RpcTarget.All, Enums.Sounds.Player_Sound_PowerupReserveUse);

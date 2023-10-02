@@ -1,3 +1,4 @@
+using System.Linq;
 using UnityEngine;
 using Photon.Pun;
 using NSMB.Utils;
@@ -40,7 +41,7 @@ public class RouletteTile : BreakableBrickTile {
                 return true;
             }
 
-            spawnResult = Utils.GetRandomItem(player).prefab;
+            spawnResult = GameManager.Instance.Togglerizer.powerupChanceMultipliers.All(pair => pair.Value == 0) ? null : Utils.GetRandomItem(player).prefab;
         }
 
         Bump(interacter, direction, worldLocation);
