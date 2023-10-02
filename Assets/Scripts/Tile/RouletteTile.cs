@@ -41,7 +41,8 @@ public class RouletteTile : BreakableBrickTile {
                 return true;
             }
 
-            spawnResult = GameManager.Instance.Togglerizer.powerupChanceMultipliers.All(pair => pair.Value == 0) ? null : Utils.GetRandomItem(player).prefab;
+            spawnResult = Utils.GetRandomItem(player).prefab;
+            if (GameManager.Instance.Togglerizer.powerupChanceMultipliers[spawnResult] == 0) spawnResult = null;
         }
 
         Bump(interacter, direction, worldLocation);
@@ -50,7 +51,7 @@ public class RouletteTile : BreakableBrickTile {
         object[] parametersBump = new object[] { tileLocation.x, tileLocation.y, direction == InteractionDirection.Down, resultTile, spawnResult, offset };
         GameManager.Instance.SendAndExecuteEvent(Enums.NetEventIds.BumpTile, parametersBump, ExitGames.Client.Photon.SendOptions.SendReliable);
 
-        if (interacter is MonoBehaviourPun pun2)
+        if (interacter is MonoBehaviourPun pun2 && spawnResult != null)
             pun2.photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.World_Block_Powerup);
         return false;
     }
