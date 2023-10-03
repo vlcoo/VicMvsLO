@@ -82,7 +82,7 @@ public class DiscordController : MonoBehaviour {
             //in a level
             GameManager gm = GameManager.Instance;
             Room room = PhotonNetwork.CurrentRoom;
-            if (localController == null) localController = gm.localPlayer.GetComponent<PlayerController>();
+            if (localController == null && gm.localPlayer != null) localController = gm.localPlayer.GetComponent<PlayerController>();
 
             // activity.Details = PhotonNetwork.OfflineMode ? "Playing Offline" : "Playing Online";
             activity.Party = new() { Size = new() { CurrentSize = room.PlayerCount, MaxSize = room.MaxPlayers }, Id = PhotonNetwork.CurrentRoom.Name };

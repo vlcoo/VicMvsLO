@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using DG.Tweening;
+using ExitGames.Client.Photon;
 using UnityEngine;
 using TMPro;
 
@@ -76,10 +77,13 @@ public class LoadingWaitingOn : MonoBehaviour
         MusicSynthIdle.StartPlayback();
         waitingLastTimer = waitingLastTime;
         yield return new WaitForSeconds(waitingLastTime);
-        PhotonNetwork.CurrentRoom.SetCustomProperties(new() { [Enums.NetRoomProperties.GameStarted] = false });
         if (PhotonNetwork.IsMasterClient)
-            PhotonNetwork.DestroyAll();
-        SceneManager.LoadScene("MainMenu");
+            PhotonNetwork.RaiseEvent((byte) Enums.NetEventIds.EndGame, "DUMMY_TIMEOUT", NetworkUtils.EventAll, SendOptions.SendReliable);
+        else
+        {
+            PhotonNetwork.LeaveRoom();
+            SceneManager.LoadScene("MainMenu");
+        }
     }
 
     public void StopLoading(bool spectating)

@@ -78,4 +78,9 @@ public class Songinator : MonoBehaviour
         nextBahIndex = (nextBahIndex + 1) % currentSong.bahTicks.Length;
         nextBahTick = currentSong.bahTicks[nextBahIndex];
     }
+
+    public void SetSpectating(bool how)
+    {
+        player.Channels = how ? ~currentSong.mutedChannelsSpectating : ~currentSong.mutedChannelsNormal;
+    }
 }

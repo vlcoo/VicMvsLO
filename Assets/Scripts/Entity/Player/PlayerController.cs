@@ -1580,7 +1580,6 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
     [PunRPC]
     public void Disqualify(PhotonMessageInfo info)
     {
-        GameManager.Instance.CheckForWinner();
         Destroy(trackIcon);
         if (photonView.IsMine) {
             PhotonNetwork.Destroy(photonView);
@@ -1588,6 +1587,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         }
         PlaySound(Enums.Sounds.Player_Sound_DeathOthers);
         GameManager.Instance.MatchConditioner.ConditionActioned(this, "Disqualified");
+        GameManager.Instance.CheckForWinner();
         
         Destroy(gameObject);
     }

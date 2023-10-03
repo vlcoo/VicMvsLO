@@ -161,7 +161,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
                 return;
 
             Player winner = customData is string ? null : (Player) customData;
-            StartCoroutine(EndGame(winner, customData is "DUMMY_HOST_END"));
+            StartCoroutine(EndGame(winner, customData as String));
             break;
         }
         case (byte) Enums.NetEventIds.SetTile: {
@@ -686,6 +686,13 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         DOTween.To(() => MusicSynth.player.Gain, v => MusicSynth.player.Gain = v, how ? 0.5f : 0f, how ? 0.5f : 0.1f).SetEase(Ease.Linear);
     }
 
+    public void setSpectateMusic(bool how)
+    {
+        MusicSynth.SetSpectating(how);
+        MusicSynthMega.SetSpectating(how);
+        MusicSynthStarman.SetSpectating(how);
+    }
+
     public void SetStartSpeedrunTimer(PlayerController byWhom)
     {
         if (!byWhom.photonView.IsMine || speedrunTimerStartTimestamp > 0)
@@ -717,13 +724,26 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         SceneManager.LoadSceneAsync(level + 2, LoadSceneMode.Single);
     }
 
-    private IEnumerator EndGame(Player winner, bool cancelled = false)
+    private IEnumerator EndGame(Player winner, String causeString = "")
     {
         gameover = true;
+        bool cancelled = causeString.Equals("DUMMY_HOST_END");
         sfx.outputAudioMixerGroup.audioMixer.SetFloat("SFXReverb", 0f);
         
         PhotonNetwork.CurrentRoom.SetCustomProperties(new() { [Enums.NetRoomProperties.GameStarted] = false });
         MusicSynth.player.Pause();
+
+        if (causeString != null && causeString.Equals("DUMMY_TIMEOUT"))
+        {
+            sfx.PlayOneShot(Enums.Sounds.UI_Error.GetClip());
+            if (PhotonNetwork.IsMasterClient)
+                PhotonNetwork.DestroyAll();
+            
+            yield return new WaitForSecondsRealtime(1f);
+            SceneManager.LoadScene("MainMenu");
+            yield return null;
+        }
+        
         GameObject text = GameObject.FindWithTag("wintext");
         int winnerCharacterIndex = -1;
         string uniqueName = "";

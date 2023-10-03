@@ -23,6 +23,7 @@ public class Firebar : MonoBehaviour
 
     private void Initialize()
     {
+        if (sprite == null) return;
         sprite.size = new Vector2(0.13f * tiles, sprite.size.y);
         colliderBar.size = new Vector2(sprite.size.x, colliderBar.size.y);
         spriteTform.localPosition = onlyOneSide
