@@ -1,4 +1,6 @@
 using System.Collections;
+using System.Windows.Forms;
+using DG.Tweening;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using TMPro;
@@ -26,12 +28,12 @@ public class RebindButton : MonoBehaviour {
         targetAction.actionMap.Disable();
 
         GameObject rebindPrompt = MainMenuManager.Instance.rebindPrompt;
-        Animator rebindPromptAnimator = MainMenuManager.Instance.rebindPromptAnimator;
         rebindPrompt.SetActive(true);
         MainMenuManager.Instance.rebindText.text = $"Rebinding {targetAction.name} {targetBinding.name} ({targetBinding.groups})\nPress any button or key.";
         
-        if (rebindPromptAnimator != null)
-            rebindPromptAnimator.SetBool("open", rebindPrompt.activeSelf);
+        var boxChild = rebindPrompt.transform.GetChild(0).transform;
+        boxChild.localScale = new Vector3(0, 0, 1);
+        DOTween.To(() => boxChild.localScale, s => boxChild.localScale = s, new Vector3(1, 1, 1), MainMenuManager.PROMPT_ANIM_DURATION);
 
         rebinding = targetAction
             .PerformInteractiveRebinding()

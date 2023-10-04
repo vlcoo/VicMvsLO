@@ -28,9 +28,11 @@ using Random = UnityEngine.Random;
 using Slider = UnityEngine.UI.Slider;
 using Toggle = UnityEngine.UI.Toggle;
 
-public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks, IOnEventCallback, IConnectionCallbacks, IMatchmakingCallbacks {
+public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks, IOnEventCallback, IConnectionCallbacks, IMatchmakingCallbacks
+{
 
     public const int NICKNAME_MIN = 2, NICKNAME_MAX = 20;
+    public const float PROMPT_ANIM_DURATION = 0.17f;
 
     public static MainMenuManager Instance;
     public AudioSource sfx, music;
@@ -39,7 +41,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     bool quit, validName;
     public GameObject connecting;
     public GameObject title, bg, mainMenu, optionsMenu, lobbyMenu, createLobbyPrompt, inLobbyMenu, creditsMenu, controlsMenu, privatePrompt, updateBox, newRuleS1Prompt, newRuleS2Prompt, emoteListPrompt, RNGRulesBox, specialPrompt, stagePrompt, teamsPrompt, powerupsPrompt;
-    public Animator createLobbyPromptAnimator, privatePromptAnimator, updateBoxAnimator, errorBoxAnimator, rebindPromptAnimator, newRuleS1PromptAnimator, newRuleS2PromptAnimator, emoteListPromptAnimator, RNGRulesBoxAnimator;
+    // public Animator createLobbyPromptAnimator, privatePromptAnimator, updateBoxAnimator, errorBoxAnimator, rebindPromptAnimator, newRuleS1PromptAnimator, newRuleS2PromptAnimator, emoteListPromptAnimator, RNGRulesBoxAnimator;
     public GameObject[] levelCameraPositions;
     public GameObject sliderText, lobbyText, currentMaxPlayers, settingsPanel, ruleTemplate, lblConditions, specialTogglesParent;
     public TMP_Dropdown levelDropdown, characterDropdown;
@@ -485,16 +487,6 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         Camera.main.transform.position = levelCameraPositions[Random.Range(0, maps.Count)].transform.position;
         levelDropdown.AddOptions(maps);
         LoadSettings(!PhotonNetwork.InRoom);
-        
-        createLobbyPromptAnimator = createLobbyPrompt.transform.Find("Image").GetComponent<Animator>();
-        privatePromptAnimator = privatePrompt.transform.Find("Image").GetComponent<Animator>();
-        updateBoxAnimator = updateBox.transform.Find("Image").GetComponent<Animator>();
-        errorBoxAnimator = errorBox.transform.Find("Image").GetComponent<Animator>();
-        rebindPromptAnimator = rebindPrompt.transform.Find("Image").GetComponent<Animator>();
-        newRuleS1PromptAnimator = newRuleS1Prompt.transform.Find("Image").GetComponent<Animator>();
-        newRuleS2PromptAnimator = newRuleS2Prompt.transform.Find("Image").GetComponent<Animator>();
-        emoteListPromptAnimator = emoteListPrompt.transform.Find("Image").GetComponent<Animator>();
-        RNGRulesBoxAnimator = RNGRulesBox.transform.Find("Image").GetComponent<Animator>();
 
         //Photon stuff.
         if (!PhotonNetwork.IsConnected) {
@@ -569,8 +561,9 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
                 updateText.text = $"You're running an old version of this mod. Latest: {latestVersion}";
                 updateBox.SetActive(true);
-                if (updateBoxAnimator != null)
-                    updateBoxAnimator.SetBool("open", updateBox.activeSelf);
+                var boxChild = updateBox.transform.GetChild(0).transform;
+                boxChild.localScale = new Vector3(0, 0, 1);
+                DOTween.To(() => boxChild.localScale, s => boxChild.localScale = s, new Vector3(1, 1, 1), PROMPT_ANIM_DURATION);
                 EventSystem.current.SetSelectedGameObject(updateBoxSelected);
             });
             GlobalController.Instance.checkedForVersion = true;
@@ -879,16 +872,18 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
         privateToggle.isOn = false;
 
-        if (createLobbyPromptAnimator != null)
-            createLobbyPromptAnimator.SetBool("open", createLobbyPrompt.activeSelf);
+        var boxChild = createLobbyPrompt.transform.GetChild(0).transform;
+        boxChild.localScale = new Vector3(0, 0, 1);
+        DOTween.To(() => boxChild.localScale, s => boxChild.localScale = s, new Vector3(1, 1, 1), PROMPT_ANIM_DURATION);
 
         EventSystem.current.SetSelectedGameObject(createLobbySelected);
     }
     
     public void OpenEmoteList() {
         emoteListPrompt.SetActive(true);
-        if (emoteListPromptAnimator != null)
-            emoteListPromptAnimator.SetBool("open", emoteListPrompt.activeSelf);
+        var boxChild = emoteListPrompt.transform.GetChild(0).transform;
+        boxChild.localScale = new Vector3(0, 0, 1);
+        DOTween.To(() => boxChild.localScale, s => boxChild.localScale = s, new Vector3(1, 1, 1), PROMPT_ANIM_DURATION);
         
         EventSystem.current.SetSelectedGameObject(emoteListSelected);
     }
@@ -917,18 +912,14 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         PhotonNetwork.CurrentRoom.SetCustomProperties(table);
         RNGRulesBox.SetActive(false);
     }
-    /*public void OpenNewRule()
-    {
-        newRulePrompt.SetActive(true);
-        if (newRulePromptAnimator != null)
-            newRulePromptAnimator.SetBool("open", newRulePrompt.activeSelf);
-        
-        EventSystem.current.SetSelectedGameObject(newRuleSelected);
-    }*/
 
     public void OpenNewRuleS1()
     {
         newRuleS1Prompt.SetActive(true);
+        var boxChild = newRuleS1Prompt.transform.GetChild(0).transform;
+        boxChild.localScale = new Vector3(0, 0, 1);
+        DOTween.To(() => boxChild.localScale, s => boxChild.localScale = s, new Vector3(1, 1, 1), PROMPT_ANIM_DURATION);
+        
         EventSystem.current.SetSelectedGameObject(newRuleS1Selected);
     }
 
@@ -938,6 +929,9 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         
         aboutToAddCond = condition;
         newRuleS2Prompt.SetActive(true);
+        var boxChild = newRuleS2Prompt.transform.GetChild(0).transform;
+        boxChild.localScale = new Vector3(0, 0, 1);
+        DOTween.To(() => boxChild.localScale, s => boxChild.localScale = s, new Vector3(1, 1, 1), PROMPT_ANIM_DURATION);
         
         EventSystem.current.SetSelectedGameObject(newRuleS2Selected);
         newRuleS2Prompt.transform.Find("Image/LblExplain").GetComponent<TMP_Text>().text =
@@ -947,24 +941,40 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     public void OpenSpecialRule()
     {
         specialPrompt.SetActive(true);
+        var boxChild = specialPrompt.transform.GetChild(0).transform;
+        boxChild.localScale = new Vector3(0, 0, 1);
+        DOTween.To(() => boxChild.localScale, s => boxChild.localScale = s, new Vector3(1, 1, 1), PROMPT_ANIM_DURATION);
+        
         EventSystem.current.SetSelectedGameObject(specialSelected);
     }
     
     public void OpenMapSelector()
     {
         stagePrompt.SetActive(true);
+        var boxChild = stagePrompt.transform.GetChild(0).transform;
+        boxChild.localScale = new Vector3(0, 0, 1);
+        DOTween.To(() => boxChild.localScale, s => boxChild.localScale = s, new Vector3(1, 1, 1), PROMPT_ANIM_DURATION);
+        
         EventSystem.current.SetSelectedGameObject(stageSelected);
     }
     
     public void OpenTeams()
     {
         teamsPrompt.SetActive(true);
+        var boxChild = teamsPrompt.transform.GetChild(0).transform;
+        boxChild.localScale = new Vector3(0, 0, 1);
+        DOTween.To(() => boxChild.localScale, s => boxChild.localScale = s, new Vector3(1, 1, 1), PROMPT_ANIM_DURATION);
+        
         EventSystem.current.SetSelectedGameObject(teamsSelected);
     }
 
     public void OpenPowerups()
     {
         powerupsPrompt.SetActive(true);
+        var boxChild = powerupsPrompt.transform.GetChild(0).transform;
+        boxChild.localScale = new Vector3(0, 0, 1);
+        DOTween.To(() => boxChild.localScale, s => boxChild.localScale = s, new Vector3(1, 1, 1), PROMPT_ANIM_DURATION);
+        
         EventSystem.current.SetSelectedGameObject(powerupsSelected);
     }
 
@@ -978,8 +988,9 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     public void OpenRNGRules()
     {
         RNGRulesBox.SetActive(true);
-        if (RNGRulesBoxAnimator != null)
-            RNGRulesBoxAnimator.SetBool("open", RNGRulesBox.activeSelf);
+        var boxChild = RNGRulesBox.transform.GetChild(0).transform;
+        boxChild.localScale = new Vector3(0, 0, 1);
+        DOTween.To(() => boxChild.localScale, s => boxChild.localScale = s, new Vector3(1, 1, 1), PROMPT_ANIM_DURATION);
         
         EventSystem.current.SetSelectedGameObject(RNGRulesSelected);
     }
@@ -1043,8 +1054,9 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         privatePrompt.SetActive(true);
         lobbyJoinField.text = "";
         
-        if (privatePromptAnimator != null)
-            privatePromptAnimator.SetBool("open", privatePrompt.activeSelf);
+        var boxChild = privatePrompt.transform.GetChild(0).transform;
+        boxChild.localScale = new Vector3(0, 0, 1);
+        DOTween.To(() => boxChild.localScale, s => boxChild.localScale = s, new Vector3(1, 1, 1), PROMPT_ANIM_DURATION);
         
         EventSystem.current.SetSelectedGameObject(privateSelected);
     }
@@ -1057,8 +1069,9 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         errorText.text = NetworkUtils.disconnectMessages.GetValueOrDefault(cause, "Unknown cause");
         errorDetail.text = cause.ToString();
         
-        if (errorBoxAnimator != null)
-            errorBoxAnimator.SetBool("open", errorBox.activeSelf);
+        var boxChild = errorBox.transform.GetChild(0).transform;
+        boxChild.localScale = new Vector3(0, 0, 1);
+        DOTween.To(() => boxChild.localScale, s => boxChild.localScale = s, new Vector3(1, 1, 1), PROMPT_ANIM_DURATION);
         
         EventSystem.current.SetSelectedGameObject(errorButton);
     }
@@ -1076,8 +1089,9 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         errorText.text = text;
         errorDetail.text = whyString;
         
-        if (errorBoxAnimator != null)
-            errorBoxAnimator.SetBool("open", errorBox.activeSelf);
+        var boxChild = errorBox.transform.GetChild(0).transform;
+        boxChild.localScale = new Vector3(0, 0, 1);
+        DOTween.To(() => boxChild.localScale, s => boxChild.localScale = s, new Vector3(1, 1, 1), PROMPT_ANIM_DURATION);
         
         EventSystem.current.SetSelectedGameObject(errorButton);
     }
@@ -1264,8 +1278,9 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         };
         PhotonNetwork.CreateRoom(roomName, options, TypedLobby.Default);
         
-        if (createLobbyPromptAnimator != null)
-            createLobbyPromptAnimator.SetBool("open", false);
+        var boxChild = createLobbyPrompt.transform.GetChild(0).transform;
+        boxChild.localScale = new Vector3(0, 0, 1);
+        DOTween.To(() => boxChild.localScale, s => boxChild.localScale = s, new Vector3(1, 1, 1), PROMPT_ANIM_DURATION);
         createLobbyPrompt.SetActive(false);
         ChangeMaxPlayers(players);
     }

@@ -727,13 +727,13 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
     private IEnumerator EndGame(Player winner, String causeString = "")
     {
         gameover = true;
-        bool cancelled = causeString.Equals("DUMMY_HOST_END");
+        bool cancelled = causeString is "DUMMY_HOST_END";
         sfx.outputAudioMixerGroup.audioMixer.SetFloat("SFXReverb", 0f);
         
         PhotonNetwork.CurrentRoom.SetCustomProperties(new() { [Enums.NetRoomProperties.GameStarted] = false });
         MusicSynth.player.Pause();
 
-        if (causeString != null && causeString.Equals("DUMMY_TIMEOUT"))
+        if (causeString is "DUMMY_TIMEOUT")
         {
             sfx.PlayOneShot(Enums.Sounds.UI_Error.GetClip());
             if (PhotonNetwork.IsMasterClient)
@@ -1074,8 +1074,9 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         sfx.PlayOneShot(Enums.Sounds.UI_Pause.GetClip());
         pauseUI.SetActive(paused);
         pausePanel.SetActive(true);
-        
-        pausePanel1Animator.SetBool("open", paused);
+        var boxChild = pausePanel.transform.GetChild(0).transform;
+        boxChild.localScale = new Vector3(0, 0, 1);
+        DOTween.To(() => boxChild.localScale, s => boxChild.localScale = s, new Vector3(1, 1, 1), MainMenuManager.PROMPT_ANIM_DURATION);
         
         EventSystem.current.SetSelectedGameObject(pauseButton);
     }
