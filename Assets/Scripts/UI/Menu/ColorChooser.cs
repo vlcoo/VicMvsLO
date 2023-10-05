@@ -83,7 +83,10 @@ public class ColorChooser : MonoBehaviour, KeepChildInFocus.IFocusIgnore {
             cb.Instantiate(color);
             Button b = newButton.GetComponent<Button>();
             if (color == null)
+            {
+                cb.OnDeselect(null);
                 b.image.sprite = clearSprite;
+            }
             newButton.SetActive(true);
             buttons.Add(b);
         }

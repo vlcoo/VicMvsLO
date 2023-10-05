@@ -16,8 +16,8 @@ public class ColorButton : MonoBehaviour, ISelectHandler, IDeselectHandler {
             return;
         }
 
-        shirt.color = col.hatColor;
-        overalls.color = col.overallsColor;
+        shirt.color = col.overallsColor;
+        overalls.color = col.hatColor;
         overlay.enabled = false;
     }
 

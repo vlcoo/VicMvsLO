@@ -1603,9 +1603,16 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         colorManager.ChangeCharacter(data);
 
         Utils.GetCustomProperty(Enums.NetPlayerProperties.PlayerColor, out int index, PhotonNetwork.LocalPlayer.CustomProperties);
-        if (index < Utils.GetColorCountForPlayer(data)) return;
-        SetPlayerColor(0);
-        colorManager.selected = 0;
+        if (index > Utils.GetColorCountForPlayer(data))
+        {
+            SetPlayerColor(0);
+            colorManager.selected = 0;
+            return;
+        }
+        PlayerColors colors = index == 0 ? new PlayerColors() : GlobalController.Instance.skins[index].GetPlayerColors(data);
+        paletteDisabled.SetActive(index == 0);
+        overallColor.color = colors.hatColor;
+        shirtColor.color = colors.overallsColor;
     }
 
     public void SwapCharacter(TMP_Dropdown dropdown) {
@@ -1620,8 +1627,8 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
             ? new PlayerColors()
             : GlobalController.Instance.skins[index].GetPlayerColors(Utils.GetCharacterData());
         paletteDisabled.SetActive(index == 0);
-        overallColor.color = colors.overallsColor;
-        shirtColor.color = colors.hatColor;
+        overallColor.color = colors.hatColor;
+        shirtColor.color = colors.overallsColor;
         PhotonNetwork.LocalPlayer.SetCustomProperties(prop);
 
         Settings.Instance.skin = index;
