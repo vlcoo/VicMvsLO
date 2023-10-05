@@ -841,6 +841,19 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         EventSystem.current.SetSelectedGameObject(mainMenuSelected);
 
     }
+
+    public void ConnectOffline()
+    {
+        PhotonNetwork.OfflineMode = true;
+        PhotonNetwork.CreateRoom("Single", new() {
+            CustomRoomProperties = NetworkUtils.DefaultRoomProperties
+        });
+        
+        PhotonNetwork.NickName = nicknameField.text;
+        PhotonNetwork.JoinRoom("Single");
+        OpenInLobbyMenu();
+    }
+    
     public void OpenLobbyMenu() {
         title.SetActive(false);
         bg.SetActive(true);

@@ -593,5 +593,16 @@ namespace NSMB.Utils {
         public static TMP_ColorGradient GetRainbowColor() {
             return GlobalController.Instance.logoGradient;
         }
+        
+        public enum DeviceType
+        {
+            DESKTOP, BROWSER, MOBILE, EDITOR
+        }
+
+        public static DeviceType GetDeviceType()
+        {
+            // todo...
+            return DeviceType.DESKTOP;
+        }
     }
 }

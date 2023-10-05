@@ -75,7 +75,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
 
     public GameObject localPlayer;
     public bool paused, loaded, started;
-    public GameObject pauseUI, pausePanel, pauseButton;
+    public GameObject pauseUI, pausePanel, pauseButton, onScreenControls;
     public TMP_Text quitButtonLbl, rulesLbl, speedrunTimer;
     public GameObject resetHardButton;
     public Animator pausePanel1Animator;
@@ -444,6 +444,8 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
 
     private const float TARGET_PITCH = 1.5f;
     public void Start() {
+        onScreenControls.SetActive(Utils.GetDeviceType() == Utils.DeviceType.MOBILE);
+        
         SpectationManager = GetComponent<SpectationManager>();
         MatchConditioner = GetComponent<MatchConditioner>();
         Togglerizer = GetComponent<Togglerizer>();
@@ -591,7 +593,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
                 }
                 controllers.gameObject.SetActive(spectating);
                 
-                TeamGrouper.teams[controllers.character.prefab].Add(controllers);
+                if (TeamGrouper.teams.Count != 0) TeamGrouper.teams[controllers.character.prefab].Add(controllers);
             }
 
         try {
@@ -1074,7 +1076,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         sfx.PlayOneShot(Enums.Sounds.UI_Pause.GetClip());
         pauseUI.SetActive(paused);
         pausePanel.SetActive(true);
-        var boxChild = pausePanel.transform.GetChild(0).transform;
+        var boxChild = pausePanel.transform;
         boxChild.localScale = new Vector3(0, 0, 1);
         DOTween.To(() => boxChild.localScale, s => boxChild.localScale = s, new Vector3(1, 1, 1), MainMenuManager.PROMPT_ANIM_DURATION);
         
