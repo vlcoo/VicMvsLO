@@ -9,14 +9,13 @@ public class ColorButton : MonoBehaviour, ISelectHandler, IDeselectHandler {
 
     public PlayerColorSet palette;
 
-    public void Instantiate(PlayerData player) {
-        if (palette == null) {
+    public void Instantiate(PlayerColors col) {
+        if (col == null) {
             shirt.enabled = false;
             overalls.enabled = false;
             return;
         }
 
-        PlayerColors col = palette.GetPlayerColors(player);
         shirt.color = col.hatColor;
         overalls.color = col.overallsColor;
         overlay.enabled = false;

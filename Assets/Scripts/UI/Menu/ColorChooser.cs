@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -12,18 +13,15 @@ public class ColorChooser : MonoBehaviour, KeepChildInFocus.IFocusIgnore {
     [SerializeField] private string property;
 
     private List<ColorButton> colorButtons = new();
-    private List<Button> buttons;
-    private List<Navigation> navigations;
+    private List<Button> buttons = new();
+    private List<Navigation> navigations = new();
     private GameObject blocker;
-    private int selected;
+    [NonSerialized] public int selected;
 
     public void Start() {
         content.SetActive(false);
-        buttons = new();
-        navigations = new();
-
-        PlayerColorSet[] colors = GlobalController.Instance.skins;
-
+        /*PlayerColorSet[] colors = GlobalController.Instance.skins;
+        
         for (int i = 0; i < colors.Length; i++) {
             PlayerColorSet color = colors[i];
 
@@ -60,14 +58,35 @@ public class ColorChooser : MonoBehaviour, KeepChildInFocus.IFocusIgnore {
 
         for (int i = 0; i < buttons.Count; i++) {
             buttons[i].navigation = navigations[i];
-        }
+        }*/
 
         ChangeCharacter(Utils.GetCharacterData());
     }
 
     public void ChangeCharacter(PlayerData data) {
-        foreach (ColorButton b in colorButtons)
-            b.Instantiate(data);
+        /*foreach (ColorButton b in colorButtons)
+            b.Instantiate(data);*/
+
+        colorButtons.ForEach(button => Destroy(button.gameObject));
+        colorButtons.Clear();
+        buttons.ForEach(button => Destroy(button.gameObject));
+        buttons.Clear();
+
+        List<PlayerColors> colors = Utils.GetColorsForPlayer(data);
+        colors.Insert(0, null);
+
+        foreach (PlayerColors color in colors)
+        {
+            GameObject newButton = Instantiate(template, template.transform.parent);
+            ColorButton cb = newButton.GetComponent<ColorButton>();
+            colorButtons.Add(cb);
+            cb.Instantiate(color);
+            Button b = newButton.GetComponent<Button>();
+            if (color == null)
+                b.image.sprite = clearSprite;
+            newButton.SetActive(true);
+            buttons.Add(b);
+        }
     }
 
     public void SelectColor(Button button) {

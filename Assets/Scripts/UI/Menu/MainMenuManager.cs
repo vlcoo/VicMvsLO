@@ -1597,22 +1597,15 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         Settings.Instance.character = id;
         Settings.Instance.SaveSettingsToPreferences();
 
-        if (id > 1) return;
+        // if (id > 1) return;
         PlayerData data = GlobalController.Instance.characters[id];
         sfx.PlayOneShot(Enums.Sounds.Player_Voice_Selected.GetClip(data));
         colorManager.ChangeCharacter(data);
 
         Utils.GetCustomProperty(Enums.NetPlayerProperties.PlayerColor, out int index, PhotonNetwork.LocalPlayer.CustomProperties);
-        if (index == 0) {
-            paletteDisabled.SetActive(true);
-            palette.SetActive(false);
-        } else {
-            paletteDisabled.SetActive(false);
-            palette.SetActive(true);
-            PlayerColors colors = GlobalController.Instance.skins[index].GetPlayerColors(data);
-            overallColor.color = colors.overallsColor;
-            shirtColor.color = colors.hatColor;
-        }
+        if (index < Utils.GetColorCountForPlayer(data)) return;
+        SetPlayerColor(0);
+        colorManager.selected = 0;
     }
 
     public void SwapCharacter(TMP_Dropdown dropdown) {
@@ -1623,16 +1616,12 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         Hashtable prop = new() {
             { Enums.NetPlayerProperties.PlayerColor, index }
         };
-        if (index == 0) {
-            paletteDisabled.SetActive(true);
-            palette.SetActive(false);
-        } else {
-            paletteDisabled.SetActive(false);
-            palette.SetActive(true);
-            PlayerColors colors = GlobalController.Instance.skins[index].GetPlayerColors(Utils.GetCharacterData());
-            overallColor.color = colors.overallsColor;
-            shirtColor.color = colors.hatColor;
-        }
+        PlayerColors colors = index == 0
+            ? new PlayerColors()
+            : GlobalController.Instance.skins[index].GetPlayerColors(Utils.GetCharacterData());
+        paletteDisabled.SetActive(index == 0);
+        overallColor.color = colors.overallsColor;
+        shirtColor.color = colors.hatColor;
         PhotonNetwork.LocalPlayer.SetCustomProperties(prop);
 
         Settings.Instance.skin = index;

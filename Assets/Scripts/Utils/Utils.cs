@@ -604,5 +604,20 @@ namespace NSMB.Utils {
             // todo...
             return DeviceType.DESKTOP;
         }
+
+        public static int GetColorCountForPlayer(PlayerData player)
+        {
+            return GetColorsForPlayer(player).Count;
+        }
+
+        public static List<PlayerColors> GetColorsForPlayer(PlayerData player)
+        {
+            return (from skin in GlobalController.Instance.skins
+                where skin != null
+                select skin.colors.FirstOrDefault(color => color.player.Equals(player))
+                into color
+                where color != null
+                select color).ToList();
+        }
     }
 }
