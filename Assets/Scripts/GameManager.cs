@@ -444,7 +444,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
 
     private const float TARGET_PITCH = 1.5f;
     public void Start() {
-        onScreenControls.SetActive(Utils.GetDeviceType() == Utils.DeviceType.MOBILE);
+        onScreenControls.SetActive(Utils.GetDeviceType() == Utils.DeviceType.MOBILE || Settings.Instance.onScreenControlsAlways);
         
         SpectationManager = GetComponent<SpectationManager>();
         MatchConditioner = GetComponent<MatchConditioner>();
@@ -1076,7 +1076,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         sfx.PlayOneShot(Enums.Sounds.UI_Pause.GetClip());
         pauseUI.SetActive(paused);
         pausePanel.SetActive(true);
-        var boxChild = pausePanel.transform;
+        var boxChild = pausePanel.gameObject.transform;
         boxChild.localScale = new Vector3(0, 0, 1);
         DOTween.To(() => boxChild.localScale, s => boxChild.localScale = s, new Vector3(1, 1, 1), MainMenuManager.PROMPT_ANIM_DURATION);
         

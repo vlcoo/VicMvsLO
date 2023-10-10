@@ -45,7 +45,7 @@ public static class Enums {
     //Sound effects
     public enum Sounds : byte {
 
-        //CURRENT MAX: 104
+        //CURRENT MAX: 105
 
         //Enemy
         [SoundData("enemy/freeze")]                             Enemy_Generic_Freeze = 0,
@@ -146,6 +146,7 @@ public static class Enums {
         [SoundData("ui/match_cancelled")]                       UI_Match_Cancelled = 101,
         [SoundData("ui/match_concluded")]                       UI_Match_Concluded = 104,
         [SoundData("ui/file_select")]                           UI_Match_Starting = 103,
+        [SoundData("ui/message")]                           UI_Message = 105,
 
         //World Elements
         [SoundData("world/block_break")]                        World_Block_Break = 67,

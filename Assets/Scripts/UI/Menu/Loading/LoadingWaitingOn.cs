@@ -88,6 +88,7 @@ public class LoadingWaitingOn : MonoBehaviour
 
     public void StopLoading(bool spectating)
     {
+        waitingLastTime = 0;
         StopCoroutine(waitingCoroutine);
         GetComponent<Animator>().SetTrigger(spectating ? "spectating" : "loaded");
         DOTween.To(() => MusicSynth.player.Gain, v => MusicSynth.player.Gain = v, 0f,  2f).SetEase(Ease.Linear);

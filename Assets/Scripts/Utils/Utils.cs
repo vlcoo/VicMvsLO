@@ -1,14 +1,16 @@
-using System.Collections;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Linq;
+using System.Net.Mime;
+using System.Runtime.InteropServices;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
 using Photon.Pun;
 using Photon.Realtime;
 using TMPro;
-using UnityEngine.InputSystem;
+using Random = UnityEngine.Random;
 
 namespace NSMB.Utils {
     public class Utils {
@@ -596,13 +598,23 @@ namespace NSMB.Utils {
         
         public enum DeviceType
         {
-            DESKTOP, BROWSER, MOBILE, EDITOR
+            DESKTOP, BROWSER, MOBILE, EDITOR, OTHER
         }
 
         public static DeviceType GetDeviceType()
         {
-            // todo...
-            return DeviceType.DESKTOP;
+            if (Application.isEditor) return DeviceType.EDITOR;
+            switch (Application.platform)
+            {
+                case RuntimePlatform.WebGLPlayer:
+                    return Application.isMobilePlatform ? DeviceType.MOBILE : DeviceType.BROWSER;
+                case RuntimePlatform.LinuxPlayer:
+                case RuntimePlatform.WindowsPlayer:
+                case RuntimePlatform.OSXPlayer:
+                    return DeviceType.DESKTOP;
+                default:
+                    return DeviceType.OTHER;
+            }
         }
 
         public static int GetColorCountForPlayer(PlayerData player)
@@ -618,6 +630,33 @@ namespace NSMB.Utils {
                 into color
                 where color != null
                 select color).ToList();
+        }
+
+    #if UNITY_STANDALONE_WIN
+            [DllImport("libdlgmod.dll", CallingConvention = CallingConvention.Cdecl)]
+    #elif UNITY_STANDALONE_LINUX
+            [DllImport("libdlgmod.so", CallingConvention = CallingConvention.Cdecl)]
+    #elif UNITY_STANDALONE_OSX
+            [DllImport("libdlgmod.bundle", CallingConvention = CallingConvention.Cdecl)]
+    #endif
+        private static extern IntPtr get_open_filename(string filter, string fname);
+    #if UNITY_STANDALONE_WIN
+            [DllImport("libdlgmod.dll", CallingConvention = CallingConvention.Cdecl)]
+    #elif UNITY_STANDALONE_LINUX
+            [DllImport("libdlgmod.so", CallingConvention = CallingConvention.Cdecl)]
+    #elif UNITY_STANDALONE_OSX
+            [DllImport("libdlgmod.bundle", CallingConvention = CallingConvention.Cdecl)]
+    #endif
+        private static extern IntPtr get_save_filename(string filter, string fname);
+        
+        public static string OpenFileBrowser(string filter)
+        {
+            return System.Runtime.InteropServices.Marshal.PtrToStringAnsi(get_open_filename(filter, ""));
+        }
+        
+        public static string SaveFileBrowser(string filter, string fname)
+        {
+            return System.Runtime.InteropServices.Marshal.PtrToStringAnsi(get_save_filename(filter, fname));
         }
     }
 }

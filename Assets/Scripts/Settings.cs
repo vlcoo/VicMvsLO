@@ -45,7 +45,7 @@ public class Settings : Singleton<Settings> {
     public string nickname;
     public int character, skin;
     public bool ndsResolution = false, fireballFromSprint = true, vsync = false, fourByThreeRatio = false;
-    public bool scoreboardAlways = false, filter = true, reduceUIAnims = true;
+    public bool scoreboardAlways = false, filter = true, reduceUIAnims = true, onScreenControlsAlways;
 
     public void Awake() {
         if (!InstanceCheck())
@@ -58,7 +58,7 @@ public class Settings : Singleton<Settings> {
 
     public void LoadSettingsFromPreferences() {
         nickname = PlayerPrefs.GetString("Nickname");
-        if (nickname == null || nickname == "")
+        if (string.IsNullOrEmpty(nickname))
             nickname = "Player" + Random.Range(1000, 10000);
 
         VolumeSFX = PlayerPrefs.GetFloat("volumeSFX", 0.5f);
@@ -67,6 +67,7 @@ public class Settings : Singleton<Settings> {
         ndsResolution = PlayerPrefs.GetInt("NDSResolution", 0) == 1;
         fireballFromSprint = PlayerPrefs.GetInt("FireballFromSprint", 1) == 1;
         rumbleController = PlayerPrefs.GetInt("RumbleController", 1) == 1;
+        onScreenControlsAlways = PlayerPrefs.GetInt("ForceOnScreenControls", 0) == 1;
         vsync = PlayerPrefs.GetInt("VSync", 0) == 1;
         fourByThreeRatio = PlayerPrefs.GetInt("NDS4by3", 0) == 1;
         scoreboardAlways = PlayerPrefs.GetInt("ScoreboardAlwaysVisible", 1) == 1;
@@ -83,6 +84,7 @@ public class Settings : Singleton<Settings> {
         PlayerPrefs.SetInt("NDSResolution", ndsResolution ? 1 : 0);
         PlayerPrefs.SetInt("FireballFromSprint", fireballFromSprint ? 1 : 0);
         PlayerPrefs.SetInt("RumbleController", rumbleController ? 1 : 0);
+        PlayerPrefs.SetInt("ForceOnScreenControls", onScreenControlsAlways ? 1 : 0);
         PlayerPrefs.SetInt("VSync", vsync ? 1 : 0);
         PlayerPrefs.SetInt("NDS4by3", fourByThreeRatio ? 1 : 0);
         PlayerPrefs.SetInt("ScoreboardAlwaysVisible", scoreboardAlways ? 1 : 0);

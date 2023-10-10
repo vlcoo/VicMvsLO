@@ -130,10 +130,7 @@ public class PlayerListEntry : MonoBehaviour {
     }
 
     public void CopyPlayerId() {
-        TextEditor te = new();
-        te.text = player.UserId;
-        te.SelectAll();
-        te.Copy();
+        MainMenuManager.Instance.CopyPlayerID(player);
         HideDropdown(true);
     }
 }

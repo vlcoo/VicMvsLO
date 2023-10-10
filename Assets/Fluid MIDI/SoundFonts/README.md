@@ -1,1 +1,0 @@
-To make these SoundFont files work with Fluid MIDI, move them to the `StreamingAssets` folder. See the [Unity documentation](https://docs.unity3d.com/Manual/StreamingAssets.html) for more information on streaming assets.

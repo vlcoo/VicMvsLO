@@ -42,6 +42,12 @@ public class SettingButtonManager : MonoBehaviour {
         Settings.SaveSettingsToPreferences();
         GlobalController.Instance.rumbler.RumbleForSeconds(0.5f, 0.5f, 0.2f);
     }
+    
+    public void OnOnScreenToggle(Toggle toggle)
+    {
+        Settings.onScreenControlsAlways = toggle.isOn;
+        Settings.SaveSettingsToPreferences();
+    }
 
     public void OnScoreboardToggle(Toggle toggle) {
         Settings.scoreboardAlways = toggle.isOn;
