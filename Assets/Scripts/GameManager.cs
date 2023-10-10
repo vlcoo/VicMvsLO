@@ -452,7 +452,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         TeamGrouper = GetComponent<TeamGrouper>();
         coins = GameObject.FindGameObjectsWithTag("coin");
         levelUIColor.a = .7f;
-        if (Togglerizer.currentEffects.Contains("ReverseLoop") && !raceLevel) loopingLevel = !loopingLevel;
+        if (Togglerizer.currentEffects.Contains("ReverseLoop") && loopingLevel) loopingLevel = !loopingLevel;
         if (loopingLevel)
         {
             cameraMinX = -1000;
