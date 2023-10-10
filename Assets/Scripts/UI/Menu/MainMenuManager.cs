@@ -96,7 +96,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         new("Died", "ActFreezePlayer"),
         new("ReachedCoinLimit", "ActGiveCoin"),
     };
-    [NonSerialized] public List<MatchRuleListEntry> ruleList = new();
+    [NonSerialized] public HashSet<MatchRuleListEntry> ruleList = new();
     [NonSerialized] public List<string> specialList = new();
     public List<PowerupChanceListEntry> powerupList = new();
     
@@ -1350,6 +1350,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         text = Regex.Replace(text, ":([^:]+):", "<sprite name=\"$1\">");
         if (text == null || text == "")
             return;
+        StartCoroutine(SelectNextFrame(chatTextField));
 
         if (text.StartsWith("/")) {
             RunCommand(text[1..].Split(" "));
@@ -1357,7 +1358,6 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         }
 
         PhotonNetwork.RaiseEvent((byte) Enums.NetEventIds.PlayerChatMessage, text, NetworkUtils.EventAll, SendOptions.SendReliable);
-        StartCoroutine(SelectNextFrame(chatTextField));
     }
 
     public void Kick(Player target) {

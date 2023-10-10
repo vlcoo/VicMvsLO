@@ -15,7 +15,7 @@ public class MatchConditioner : MonoBehaviour
     // new mapping: dictionary<string*, dictionary<string**, list<string***>>> *condition, **action, ***parameter(s)
     // list<matchrulelistentry>
     // public Dictionary<string, string> currentMapping = new();
-    public List<MatchRuleDataEntry> ruleList;
+    public HashSet<MatchRuleDataEntry> ruleList;
 
     private float timer5Sec = 5;
     private float timer10Sec = 10;
@@ -29,7 +29,7 @@ public class MatchConditioner : MonoBehaviour
     void Start()
     {
         Utils.GetCustomProperty(Enums.NetRoomProperties.MatchRules, out string j);
-        ruleList = Newtonsoft.Json.JsonConvert.DeserializeObject<List<MatchRuleDataEntry>>(j);
+        ruleList = Newtonsoft.Json.JsonConvert.DeserializeObject<HashSet<MatchRuleDataEntry>>(j);
     }
 
     // Update is called once per frame

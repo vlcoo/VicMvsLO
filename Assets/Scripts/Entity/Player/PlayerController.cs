@@ -51,8 +51,9 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
 
     public bool onGround, previousOnGround, crushGround, doGroundSnap, jumping, properJump, hitRoof, skidding, turnaround, facingRight = true, singlejump, doublejump, triplejump, bounce, crouching, groundpound, groundpoundLastFrame, sliding, knockback, hitBlock, running, functionallyRunning, jumpHeld, flying, drill, inShell, hitLeft, hitRight, stuckInBlock, alreadyStuckInBlock, propeller, usedPropellerThisJump, stationaryGiantEnd, fireballKnockback, startedSliding, canShootProjectile, gotCheckpoint;
     public float jumpLandingTimer, landing, koyoteTime, groundpoundCounter, groundpoundStartTimer, pickupTimer, groundpoundDelay, hitInvincibilityCounter, powerupFlash, throwInvincibility, jumpBuffer, giantStartTimer, giantEndTimer, propellerTimer, propellerSpinTimer, fireballTimer;
-    public float invincible, giantTimer, floorAngle, knockbackTimer, pipeTimer, slowdownTimer;
+    public float invincible, giantTimer, floorAngle, knockbackTimer, pipeTimer, slowdownTimer, emoteTimer;
     public bool[] collectedStarcoins = new bool[] {false, false, false};
+    public bool isMuted = false;
 
     //MOVEMENT STAGES
     private static readonly int WALK_STAGE = 1, RUN_STAGE = 3, STAR_STAGE = 4;
@@ -297,6 +298,12 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         propellerLaunchVelocity /= GameManager.Instance.Togglerizer.currentEffects.Contains("NerfedPropeller") ? 3 : 1;
 
         body.sharedMaterial.bounciness = GameManager.Instance.Togglerizer.currentEffects.Contains("BouncyPlayer") ? 1 : 0;
+
+        if (photonView.IsMine)
+        {
+            Utils.GetCustomProperty(Enums.NetRoomProperties.Mutes, out object[] mutes);
+            isMuted = mutes.Contains(PhotonNetwork.LocalPlayer.UserId);
+        }
     }
 
     public void OnDestroy() {
@@ -2265,10 +2272,12 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
 
     void Taunt(InputAction.CallbackContext context)
     {
+        if (emoteTimer > 0 || isMuted) return;
         int emoteId = 0;
         if (context.action.name.StartsWith("!Taunt")) emoteId = GlobalController.Instance.emoteKeyMapping[Int32.Parse(context.action.name.Substring(6))];
         else return;
         photonView.RPC(nameof(SpawnEmoteWithId), RpcTarget.All, emoteId);
+        emoteTimer = 0.5f;
     }
     
     [PunRPC]
@@ -2882,6 +2891,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         Utils.TickTimer(ref pickupTimer, 0, -delta, pickupTime);
         Utils.TickTimer(ref fireballTimer, 0, delta);
         Utils.TickTimer(ref slowdownTimer, 0, delta * 0.5f);
+        Utils.TickTimer(ref emoteTimer, 0, delta);
 
         if (onGround)
             Utils.TickTimer(ref landing, 0, -delta);

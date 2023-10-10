@@ -7,14 +7,14 @@ using UnityEngine.Rendering.UI;
 
 public class Togglerizer : MonoBehaviour
 {
-    public List<string> currentEffects = new();
+    public HashSet<string> currentEffects = new();
     public Dictionary<string, int> powerupChanceMultipliers;
 
     void Start()
     {
         Utils.GetCustomProperty(Enums.NetRoomProperties.SpecialRules, out Dictionary<string, bool> currentEffectsDict);
         Utils.GetCustomProperty(Enums.NetRoomProperties.PowerupChances, out powerupChanceMultipliers);
-        if (currentEffectsDict != null) currentEffects = currentEffectsDict.Keys.ToList();
+        if (currentEffectsDict != null) currentEffects = currentEffectsDict.Keys.ToHashSet();
         if (powerupChanceMultipliers == null || powerupChanceMultipliers.All(pair => pair.Value == 3)) 
             powerupChanceMultipliers = new Dictionary<string, int>
             {

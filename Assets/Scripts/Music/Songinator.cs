@@ -18,7 +18,6 @@ public class Songinator : MonoBehaviour
     [NonSerialized] public int nextBahTick;
     
     private int nextBahIndex = -1;
-    private float globalTempoMultiplier = 1.0f;
     private readonly WeightedList<MIDISong> weightedList = new();
 
     public void Start()
