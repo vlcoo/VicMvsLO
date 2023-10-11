@@ -814,7 +814,6 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         updateBox.SetActive(false);
 
         EventSystem.current.SetSelectedGameObject(mainMenuSelected);
-
     }
 
     public void ConnectOffline()

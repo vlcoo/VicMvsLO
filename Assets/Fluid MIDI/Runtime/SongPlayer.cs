@@ -61,7 +61,6 @@ namespace FluidMidi
 
         [SerializeField] public Synthesizer synthesizer;
         [SerializeField] public StreamingAsset song = new StreamingAsset();
-        public event Api.TickEventDelegate onTick;
 
         [SerializeField] [Tooltip("Start playing after the song is loaded for the first time.")]
         bool playOnStart = true;

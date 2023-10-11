@@ -53,11 +53,11 @@ public class Songinator : MonoBehaviour
         // player.SetTickEvent(tick => OnTick(tick));
     }
 
-    IEnumerator StartSkip()
+    private IEnumerator StartSkip()
     {
         player.Channels = 0;
         player.Play();
-        yield return new WaitForSeconds(0.1f);  // wowie...
+        yield return new WaitForSeconds(0.2f);  // wowie...
         player.Seek(currentSong.startTicks);
         player.Channels = ~currentSong.mutedChannelsNormal;
     }
