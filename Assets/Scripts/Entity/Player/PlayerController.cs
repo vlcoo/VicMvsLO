@@ -3418,8 +3418,6 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
     }
 
     void HandleGroundpoundStart(bool left, bool right) {
-        if (GameManager.Instance.Togglerizer.currentEffects.Contains("LimitedMoveset")) return;
-        
         if (!photonView.IsMine)
             return;
 
@@ -3455,6 +3453,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             }
         } else {
             //start groundpound
+            if (GameManager.Instance.Togglerizer.currentEffects.Contains("LimitedMoveset")) return;
             //check if high enough above ground
             if (Physics2D.BoxCast(body.position, MainHitbox.size * Vector2.right * transform.localScale, 0, Vector2.down, 0.15f * (state == Enums.PowerupState.MegaMushroom ? 2.5f : 1), Layers.MaskAnyGround))
                 return;

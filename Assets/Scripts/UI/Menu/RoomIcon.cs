@@ -1,12 +1,10 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
 using Photon.Realtime;
 using NSMB.Utils;
 using ExitGames.Client.Photon;
-using WebSocketSharp;
 
 public class RoomIcon : MonoBehaviour {
 
@@ -44,7 +42,7 @@ public class RoomIcon : MonoBehaviour {
         bool time = ((int) prop[Enums.NetRoomProperties.Time]) >= 1;
         //bool password = ((string) prop[Enums.NetRoomProperties.Password]) != "";
 
-        if (!matchRules.Trim().IsNullOrEmpty())
+        if (!string.IsNullOrEmpty(matchRules.Trim()))
             symbols += "<sprite=56>" +
                        Utils.GetSymbolString((matchRules.Split("},{").Length).ToString(), Utils.smallSymbols);
         if (teams) symbols += "<sprite=76>";

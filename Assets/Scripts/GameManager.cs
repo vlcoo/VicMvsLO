@@ -769,9 +769,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             GlobalController.Instance.characters[winnerCharacterIndex].prefab);
         bool win = winner != null && (winner.IsLocal || teams) && !cancelled;
         bool draw = winner == null && !cancelled;
-        float secondsUntilMenu;
-        secondsUntilMenu = draw ? 5 : 4;
-        if (cancelled) secondsUntilMenu = 1.5f;
+        float secondsUntilMenu = cancelled ? 1.7f : 4;
 
         if (draw) {
             sfx.PlayOneShot(Enums.Sounds.UI_Match_Draw.GetClip());
@@ -814,7 +812,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             }
         }
 
-        //TOOD: make a results screen?
+        //TODO: make a results screen?
 
         yield return new WaitForSecondsRealtime(secondsUntilMenu);
         if (PhotonNetwork.IsMasterClient)
