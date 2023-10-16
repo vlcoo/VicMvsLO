@@ -234,6 +234,11 @@ public static class Enums {
         PlayerDamagePlayer = 40,
     }
     #endregion
+
+    public enum AuthorityLevel
+    {
+        HARD_BANNED = -2, SOFT_BANNED = -1, NORMAL = 0, SPECIAL1 = 1, SPECIAL2 = 2
+    }
 }
 
 public class SoundData : Attribute {

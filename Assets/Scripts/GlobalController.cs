@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -33,7 +34,7 @@ public class GlobalController : Singleton<GlobalController>, IInRoomCallbacks, I
     public bool joinedAsSpectator = false, checkedForVersion, fastLoad = false;
     public DisconnectCause? disconnectCause = null;
     
-    public List<string> SPECIAL_PLAYERS = new() {};
+    public List<SpecialPlayer> SPECIAL_PLAYERS = new() {};
 
     private int windowWidth, windowHeight;
 
@@ -54,11 +55,14 @@ public class GlobalController : Singleton<GlobalController>, IInRoomCallbacks, I
         if (response.StatusCode != HttpStatusCode.OK)
             return;
 
-        try {
-            string json = new StreamReader(response.GetResponseStream()).ReadToEnd();
-            var deserializedJson = JsonConvert.DeserializeObject<Dictionary<string, string>>(json);
-            if (deserializedJson != null) SPECIAL_PLAYERS = deserializedJson.Values.ToList();
-        } catch { }
+        string json = new StreamReader(response.GetResponseStream()).ReadToEnd();
+        var deserializedJson = JsonConvert.DeserializeObject<Dictionary<string, string>>(json);
+        if (deserializedJson == null) return;
+        foreach (var player in deserializedJson)
+        {
+            SpecialPlayer sp = new SpecialPlayer(player.Key.Split("|")[1], int.Parse(player.Value));
+            SPECIAL_PLAYERS.Add(sp);
+        }
     }
 
     public void Awake() {

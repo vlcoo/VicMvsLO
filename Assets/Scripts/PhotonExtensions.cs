@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -14,9 +15,15 @@ public static class PhotonExtensions
         return !view || view.IsMine;
     }
 
-    public static bool HasRainbowName(this Player player) {
-        if (player == null || player.UserId == null)
-            return false;
+    public static bool HasRainbowName(this Player player)
+    {
+        return player.GetAuthorityLevel() > Enums.AuthorityLevel.NORMAL;
+    }
+
+    public static Enums.AuthorityLevel GetAuthorityLevel(this Player player)
+    {
+        if (player?.UserId == null)
+            return Enums.AuthorityLevel.NORMAL;
 
         byte[] bytes = SHA256.Create().ComputeHash(Encoding.UTF8.GetBytes(player.UserId));
         StringBuilder sb = new();
@@ -24,7 +31,7 @@ public static class PhotonExtensions
             sb.Append(b.ToString("X2"));
 
         string hash = sb.ToString().ToLower();
-        return GlobalController.Instance.SPECIAL_PLAYERS.Contains(hash);
+        return GlobalController.Instance.SPECIAL_PLAYERS.Any(specialPlayer => specialPlayer.shaUserId.Equals(hash)) ? GlobalController.Instance.SPECIAL_PLAYERS.Find(specialPlayer => specialPlayer.shaUserId.Equals(hash)).authorityLevel : Enums.AuthorityLevel.NORMAL;
     }
 
     //public static void RPCFunc(this PhotonView view, Delegate action, RpcTarget target, params object[] parameters) {

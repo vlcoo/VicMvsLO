@@ -201,7 +201,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             tilemap.SetTilesBlock(origin, originalTiles);
 
             foreach (GameObject coin in coins) {
-                //dont use setactive cause it breaks animation cycles being syncewd
+                //dont use setactive cause it breaks animation cycles being synced
                 coin.GetComponent<SpriteRenderer>().enabled = true;
                 coin.GetComponent<BoxCollider2D>().enabled = true;
             }
@@ -1072,13 +1072,8 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
 
         paused = !paused;
         sfx.PlayOneShot(Enums.Sounds.UI_Pause.GetClip());
-        pauseUI.SetActive(paused);
-        pausePanel.SetActive(true);
-        var boxChild = pausePanel.gameObject.transform;
-        boxChild.localScale = new Vector3(0, 0, 1);
-        DOTween.To(() => boxChild.localScale, s => boxChild.localScale = s, new Vector3(1, 1, 1), MainMenuManager.PROMPT_ANIM_DURATION);
-        
-        EventSystem.current.SetSelectedGameObject(pauseButton);
+        if (paused) MainMenuManager.OpenPrompt(pauseUI, pauseButton);
+        else StartCoroutine(MainMenuManager.ClosePromptCoroutine(pauseUI));
     }
 
     public void AttemptQuit() {
@@ -1105,8 +1100,9 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         controller.photonView.RPC(nameof(PlayerController.Disqualify), RpcTarget.All);
     }
 
-    public void HostEndMatch() {
-        pauseUI.SetActive(false);
+    public void HostEndMatch()
+    {
+        Pause();
         sfx.PlayOneShot(Enums.Sounds.UI_Decide.GetClip());
         PhotonNetwork.RaiseEvent((byte) Enums.NetEventIds.EndGame, "DUMMY_HOST_END", NetworkUtils.EventAll, SendOptions.SendReliable);
     }
@@ -1115,12 +1111,6 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         sfx.PlayOneShot(Enums.Sounds.UI_Decide.GetClip());
         PhotonNetwork.LeaveRoom();
         SceneManager.LoadScene("MainMenu");
-    }
-
-    public void HostQuitCancel() {
-        pausePanel.SetActive(true);
-        sfx.PlayOneShot(Enums.Sounds.UI_Back.GetClip());
-        EventSystem.current.SetSelectedGameObject(pauseButton);
     }
 
     //lazy mofo

@@ -1,7 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-
+using System.Security.Cryptography;
+using System.Text;
 using ExitGames.Client.Photon;
 using Photon.Pun;
 using Photon.Realtime;
@@ -33,13 +34,14 @@ namespace NSMB.Utils {
 
         public static Dictionary<DisconnectCause, string> disconnectMessages = new() {
 
-            [DisconnectCause.MaxCcuReached] = "This region is full",
-            [DisconnectCause.CustomAuthenticationFailed] = "Servers might be down at this moment",
-            [DisconnectCause.DisconnectByServerLogic] = "You've been disconnected",
-            [DisconnectCause.DisconnectByClientLogic] = "You've been disconnected",
-            [DisconnectCause.DisconnectByOperationLimit] = "Spam prevention kicked in",
-            [DisconnectCause.ClientTimeout] = "Internet connection is poor",
-            [DisconnectCause.ServerTimeout] = "Internet connection is poor or servers might be down",
+            [DisconnectCause.MaxCcuReached] = "This region is full; try again later.",
+            [DisconnectCause.CustomAuthenticationFailed] = "Servers might be down; try again later.",
+            [DisconnectCause.DisconnectByServerLogic] = "You've been disconnected for cheating.",
+            [DisconnectCause.DisconnectByClientLogic] = "You've been disconnected.",
+            [DisconnectCause.DisconnectByOperationLimit] = "Spam prevention kicked in.",
+            [DisconnectCause.ClientTimeout] = "Servers might be down; try again later.",
+            [DisconnectCause.DnsExceptionOnConnect] = "Your device's internet connection is poor.",
+            [DisconnectCause.ServerTimeout] = "Your device's internet connection is poor.",
         };
 
         public static RaiseEventOptions EventOthers { get; } = new() { Receivers = ReceiverGroup.Others };
@@ -79,16 +81,16 @@ namespace NSMB.Utils {
         }
 
         public static readonly string[] LobbyVisibleRoomProperties = new string[] {
-        Enums.NetRoomProperties.Lives,
-        Enums.NetRoomProperties.StarRequirement,
-        Enums.NetRoomProperties.CoinRequirement,
-        Enums.NetRoomProperties.Time,
-        Enums.NetRoomProperties.NewPowerups,
-        Enums.NetRoomProperties.GameStarted,
-        Enums.NetRoomProperties.HostName,
-        Enums.NetRoomProperties.Teams,
-        Enums.NetRoomProperties.MatchRules,
-    };
+            Enums.NetRoomProperties.Lives,
+            Enums.NetRoomProperties.StarRequirement,
+            Enums.NetRoomProperties.CoinRequirement,
+            Enums.NetRoomProperties.Time,
+            Enums.NetRoomProperties.NewPowerups,
+            Enums.NetRoomProperties.GameStarted,
+            Enums.NetRoomProperties.HostName,
+            Enums.NetRoomProperties.Teams,
+            Enums.NetRoomProperties.MatchRules,
+        };
 
         public static readonly RegionPingComparer PingComparer = new();
         public class RegionPingComparer : IComparer<Region> {
@@ -171,6 +173,23 @@ namespace NSMB.Utils {
             outStream.Write(bytes, 0, bytes.Length);
 
             return (short) bytes.Length;
+        }
+    }
+
+    public class SpecialPlayer
+    {
+        public string shaUserId;
+        public Enums.AuthorityLevel authorityLevel;
+
+        public SpecialPlayer(string shaUserId, int authorityLevel)
+        {
+            this.shaUserId = shaUserId;
+            this.authorityLevel = (Enums.AuthorityLevel)authorityLevel;
+        }
+
+        public override string ToString()
+        {
+            return $"{shaUserId}: {authorityLevel}";
         }
     }
 }

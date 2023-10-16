@@ -28,8 +28,9 @@ public class AuthenticationHandler {
                 if (MainMenuManager.Instance)
                 {
                     MainMenuManager.Instance.OpenErrorBox(
-                        client.error.Contains("Cannot resolve") ? "Device not connected to the Internet" : "Connection failure",
-                        client.error + " - " + client.responseCode);
+                        client.error.Contains("Cannot resolve")
+                            ? "Your device's internet connection is poor."
+                            : "Servers might be down; try again later.");
                     MainMenuManager.Instance.OnDisconnected(DisconnectCause.CustomAuthenticationFailed);
                 }
                 return;

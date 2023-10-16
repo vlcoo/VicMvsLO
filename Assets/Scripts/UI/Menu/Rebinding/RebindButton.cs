@@ -27,12 +27,8 @@ public class RebindButton : MonoBehaviour {
         targetAction.actionMap.Disable();
 
         GameObject rebindPrompt = MainMenuManager.Instance.rebindPrompt;
-        rebindPrompt.SetActive(true);
+        MainMenuManager.OpenPrompt(rebindPrompt);
         MainMenuManager.Instance.rebindText.text = $"Rebinding {targetAction.name} {targetBinding.name} ({targetBinding.groups})\nPress any button or key.";
-        
-        var boxChild = rebindPrompt.transform.GetChild(0).transform;
-        boxChild.localScale = new Vector3(0, 0, 1);
-        DOTween.To(() => boxChild.localScale, s => boxChild.localScale = s, new Vector3(1, 1, 1), MainMenuManager.PROMPT_ANIM_DURATION);
 
         rebinding = targetAction
             .PerformInteractiveRebinding()
@@ -67,7 +63,7 @@ public class RebindButton : MonoBehaviour {
     private void CleanRebind(RebindingOperation operation) {
         targetAction.actionMap.Enable();
         rebinding.Dispose();
-        MainMenuManager.Instance.rebindPrompt.SetActive(false);
+        StartCoroutine(MainMenuManager.ClosePromptCoroutine(MainMenuManager.Instance.rebindPrompt));
         StopCoroutine(countdown);
     }
 
