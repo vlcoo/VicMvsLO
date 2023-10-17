@@ -494,7 +494,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
             PhotonNetwork.NetworkingClient.AppId = "40c2f241-79f7-4721-bdac-3c0366d00f58";
 
             //version separation
-            Match match = Regex.Match(Application.version, "^\\w*\\.\\w*\\.\\w*");
+            Match match = Regex.Match(Application.version, @"^\w*\.\w*\.\w*");
             PhotonNetwork.NetworkingClient.AppVersion = match.Groups[0].Value;
 
             string id = PlayerPrefs.GetString("id", null);
@@ -554,10 +554,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         exitBtn.interactable = false;
 #else
         if (!GlobalController.Instance.checkedForVersion) {
-            UpdateChecker.IsUpToDate((upToDate, latestVersion) => {
-                if (upToDate)
-                    return;
-
+            UpdateChecker.IsUpToDate((latestVersion) => {
                 updateText.text = $"You're running an old version of this mod. Latest: {latestVersion}";
                 OpenPrompt(updateBox, updateBoxSelected);
             });

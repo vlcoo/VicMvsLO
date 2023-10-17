@@ -12,7 +12,7 @@ public class UpdateChecker {
     /// <summary>
     /// Returns if we're up to date, OR newer, compared to the latest GitHub release version number
     /// </summary>
-    public static async void IsUpToDate(Action<bool, string> callback)
+    public static async void IsUpToDate(Action<string> callback)
     {
         //get http results
         HttpWebRequest request = (HttpWebRequest) WebRequest.Create(API_URL);
@@ -41,24 +41,17 @@ public class UpdateChecker {
 
             string[] splitVer = Application.version.Split(".");
 
-            Debug.Log($"[UPDATE CHECK] Local version: {Application.version} / Remote version: {tag}");
+            Debug.Log($"[UPDATE CHECK] Local version: {ver} / Remote version: {tag}");
 
             //check if we're a higher version
-            bool upToDate = true;
             for (int i = 0; i < 4; i++) {
                 int.TryParse(splitTag[i], out int remote);
                 int.TryParse(splitVer[i], out int local);
 
-                if (local > remote)
-                    break;
-                if (local == remote)
-                    continue;
-
-                upToDate = false;
-                break;
+                if (local < remote) break;
             }
 
-            callback(upToDate, tag);
+            callback(tag);
         } catch { }
     }
 }

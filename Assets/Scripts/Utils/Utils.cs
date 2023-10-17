@@ -608,6 +608,9 @@ namespace NSMB.Utils {
             {
                 case RuntimePlatform.WebGLPlayer:
                     return Application.isMobilePlatform ? DeviceType.MOBILE : DeviceType.BROWSER;
+                case RuntimePlatform.Android:
+                case RuntimePlatform.IPhonePlayer:
+                    return DeviceType.MOBILE;
                 case RuntimePlatform.LinuxPlayer:
                 case RuntimePlatform.WindowsPlayer:
                 case RuntimePlatform.OSXPlayer:
