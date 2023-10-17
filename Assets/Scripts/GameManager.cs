@@ -588,22 +588,25 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         started = true;
         
         playerCount = players.Count;
-        foreach (PlayerController controllers in players)
-            if (controllers) {
-                if (spectating && controllers.sfx) {
-                    controllers.sfxBrick.enabled = true;
-                    controllers.sfx.enabled = true;
-                }
-                controllers.gameObject.SetActive(spectating);
-                
-                if (TeamGrouper.teams.Count != 0) TeamGrouper.teams[controllers.character.prefab].Add(controllers);
+        foreach (var controllers in players.Where(controllers => controllers))
+        {
+            if (spectating && controllers.sfx) {
+                controllers.sfxBrick.enabled = true;
+                controllers.sfx.enabled = true;
             }
+            controllers.gameObject.SetActive(spectating);
+                
+            if (TeamGrouper.teams.Count != 0) TeamGrouper.teams[controllers.character.prefab].Add(controllers);
+        }
 
         try {
             ScoreboardUpdater.instance.Populate(players);
             if (Settings.Instance.scoreboardAlways)
                 ScoreboardUpdater.instance.SetEnabled();
         } catch { }
+
+        if (Togglerizer.currentEffects.Contains("HideSeek"))
+            tilemap.transform.parent.position = new Vector3(0, 0, -5);
 
         if (gameStarting) {
             if (!GlobalController.Instance.fastLoad)
@@ -693,7 +696,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
 
     public void setSpectateMusic(bool how)
     {
-        MusicSynth.SetSpectating(how);
+        MusicSynth.SetSpectating(how, !Togglerizer.currentEffects.Contains("NoBahs"));
         MusicSynthMega.SetSpectating(how);
         MusicSynthStarman.SetSpectating(how);
     }
