@@ -207,6 +207,8 @@ public static class Enums {
         public static string ChainableRules { get; } = "Cr";
         public static string SpecialRules { get; } = "Sr";
         public static string Starcoins { get; } = "Sc";
+        public static string ShowCoinCount { get; } = "Cc";
+        public static string NoMap { get; } = "Nm";
     }
     public enum NetEventIds : byte {
         // 1-9 = in-lobby events

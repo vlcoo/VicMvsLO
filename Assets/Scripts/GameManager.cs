@@ -46,10 +46,9 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
     public int levelMinTileX, levelMinTileY, levelWidthTile, levelHeightTile;
     public float cameraMinY, cameraHeightY, cameraMinX = -1000, cameraMaxX = 1000;
     public bool loopingLevel = true;
-    public bool raceLevel = false;
-    public bool reverberedSFX = false;
-    [NonSerialized] public bool teamsMatch = false;
-    [NonSerialized] public bool needsStarcoins;
+    public bool raceLevel, reverberedSFX;
+    [NonSerialized] public bool teamsMatch;
+    [NonSerialized] public bool needsStarcoins, showCoinCount, hideMap;
     public Vector3 spawnpoint;
     public Vector3 checkpoint;
     public Tilemap tilemap;
@@ -524,6 +523,10 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             goal.SetUnlocked(!needsStarcoins);
             if (!needsStarcoins) foreach(Starcoin coin in FindObjectsOfType<Starcoin>()) coin.SetDisabled();
         }
+
+        Utils.GetCustomProperty(Enums.NetRoomProperties.NoMap, out hideMap);
+        Utils.GetCustomProperty(Enums.NetRoomProperties.ShowCoinCount, out showCoinCount);
+        showCoinCount = showCoinCount && coinRequirement > 0;
 
         if (PhotonNetwork.IsMasterClient)
             quitButtonLbl.text = "End Match";

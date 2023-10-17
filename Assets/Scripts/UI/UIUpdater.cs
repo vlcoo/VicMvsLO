@@ -166,7 +166,7 @@ public class UIUpdater : MonoBehaviour {
         TrackIcon icon = trackObject.GetComponent<TrackIcon>();
         icon.target = player.gameObject;
 
-        trackObject.SetActive(true);
+        trackObject.SetActive(!GameManager.Instance.hideMap);
 
         return trackObject;
     }

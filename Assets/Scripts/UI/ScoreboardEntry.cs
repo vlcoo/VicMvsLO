@@ -14,7 +14,7 @@ public class ScoreboardEntry : MonoBehaviour {
 
     public PlayerController target;
 
-    private int playerId, currentLives, currentStars, currentLaps;
+    private int playerId, currentLives, currentStars, currentLaps, currentCoins;
     private bool rainbowEnabled;
 
     public void Start() {
@@ -45,18 +45,19 @@ public class ScoreboardEntry : MonoBehaviour {
             background.color = new(0.4f, 0.4f, 0.4f, 0.5f);
             return;
         }
-        if (target.lives == currentLives && target.stars == currentStars && target.laps == currentLaps)
+        if (target.lives == currentLives && target.stars == currentStars && target.laps == currentLaps && target.coins == currentCoins)
             // No changes.
             return;
 
         currentLives = target.lives;
         currentStars = target.stars;
         currentLaps = target.laps;
+        currentCoins = target.coins;
         UpdateText();
         ScoreboardUpdater.instance.Reposition();
     }
 
-    public void UpdateText() {
+    private void UpdateText() {
         string txt = "";
         if (currentLives >= 0)
             txt += target.character.uistring + Utils.GetSymbolString(currentLives.ToString());
@@ -64,6 +65,8 @@ public class ScoreboardEntry : MonoBehaviour {
             txt += Utils.GetSymbolString($"S{currentStars}");
         if (GameManager.Instance.raceLevel && GameManager.Instance.lapRequirement > 1)
             txt += Utils.GetSymbolString($"L{currentLaps}");
+        if (GameManager.Instance.showCoinCount)
+            txt += Utils.GetSymbolString($"C{currentCoins}");
 
         valuesText.text = txt;
     }
@@ -77,12 +80,19 @@ public class ScoreboardEntry : MonoBehaviour {
             // if race level then sort by lap
             if (GameManager.Instance.raceLevel) comparisonResult = x.currentLaps.CompareTo(y.currentLaps);
 
-            // if no race level or a tie then sort by stars, if a tie then by lives, if a tie then by id.
+            // if no race level or a tie then sort by stars, if a tie then by lives, if a tie then by coins (only if enabled), if a tie then id.
             if (comparisonResult != 0) return -comparisonResult;
             comparisonResult = x.currentStars.CompareTo(y.currentStars);
             if (comparisonResult != 0) return -comparisonResult;
             comparisonResult = x.currentLives.CompareTo(y.currentLives);
             if (comparisonResult != 0) return -comparisonResult;
+
+            if (GameManager.Instance.showCoinCount)
+            {
+                comparisonResult = x.currentCoins.CompareTo(y.currentCoins);
+                if (comparisonResult != 0) return -comparisonResult;
+            }
+
             comparisonResult = x.playerId.CompareTo(y.playerId);
             return -comparisonResult;
         }

@@ -44,7 +44,7 @@ public class ScoreboardUpdater : MonoBehaviour {
     }
 
     private void PlayAnimation(bool enabled) {
-        animator.SetFloat("speed", enabled ? 1 : -1);
+        animator.SetFloat("speed", enabled ? 1.5f : -1.5f);
         animator.Play("toggle", 0, Mathf.Clamp01(animator.GetCurrentAnimatorStateInfo(0).normalizedTime));
     }
 

@@ -43,7 +43,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     public TMP_Dropdown levelDropdown, characterDropdown;
     public RoomIcon selectedRoomIcon, privateJoinRoom;
     public Button joinRoomBtn, createRoomBtn, startGameBtn, exitBtn, backBtn;
-    public Toggle ndsResolutionToggle, fullscreenToggle, livesEnabled, powerupsEnabled, timeEnabled, starcoinsEnabled, starsEnabled, coinsEnabled, drawTimeupToggle, fireballToggle, rumbleToggle, onscreenControlsToggle, animsToggle, vsyncToggle, privateToggle, privateToggleRoom, aspectToggle, spectateToggle, scoreboardToggle, filterToggle, chainableActionsToggle, RNGClear, teamsToggle, friendlyToggle, shareToggle;
+    public Toggle ndsResolutionToggle, fullscreenToggle, livesEnabled, powerupsEnabled, timeEnabled, starcoinsEnabled, starsEnabled, coinsEnabled, drawTimeupToggle, fireballToggle, rumbleToggle, onscreenControlsToggle, animsToggle, vsyncToggle, privateToggle, privateToggleRoom, aspectToggle, spectateToggle, scoreboardToggle, filterToggle, chainableActionsToggle, RNGClear, teamsToggle, friendlyToggle, shareToggle, nomapToggle, coincountToggle;
     public GameObject playersContent, playersPrefab, chatContent, chatPrefab;
     public TMP_InputField nicknameField, starsText, lapsText, coinsText, livesField, timeField, lobbyJoinField, chatTextField;
     public Slider musicSlider, sfxSlider, masterSlider, lobbyPlayersSlider, changePlayersSlider, RNGSlider;
@@ -268,6 +268,8 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         AttemptToUpdateProperty<bool>(updatedProperties, Enums.NetRoomProperties.Teams, ChangeTeams);
         AttemptToUpdateProperty<bool>(updatedProperties, Enums.NetRoomProperties.FriendlyFire, ChangeFriendly);
         AttemptToUpdateProperty<bool>(updatedProperties, Enums.NetRoomProperties.ShareStars, ChangeShare);
+        AttemptToUpdateProperty<bool>(updatedProperties, Enums.NetRoomProperties.NoMap, ChangeNoMap);
+        AttemptToUpdateProperty<bool>(updatedProperties, Enums.NetRoomProperties.ShowCoinCount, ChangeCoinCount);
     }
 
     public void ChangeDebugState(bool enabled) {
@@ -1763,6 +1765,16 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         starcoinsEnabled.SetIsOnWithoutNotify(how);
     }
 
+    public void ChangeNoMap(bool how)
+    {
+        nomapToggle.SetIsOnWithoutNotify(how);
+    }
+    
+    public void ChangeCoinCount(bool how)
+    {
+        coincountToggle.SetIsOnWithoutNotify(how);
+    }
+
     public void ChangeCoinRequirement(int coins) {
         coinsEnabled.SetIsOnWithoutNotify(coins != -1);
         UpdateSettingEnableStates();
@@ -1945,6 +1957,23 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         };
         PhotonNetwork.CurrentRoom.SetCustomProperties(properties);
     }
+    
+    public void SetCoinCount(Toggle toggle)
+    {
+        Hashtable properties = new() {
+            [Enums.NetRoomProperties.ShowCoinCount] = toggle.isOn,
+        };
+        PhotonNetwork.CurrentRoom.SetCustomProperties(properties);
+    }
+    
+    public void SetNoMap(Toggle toggle)
+    {
+        Hashtable properties = new() {
+            [Enums.NetRoomProperties.NoMap] = toggle.isOn,
+        };
+        PhotonNetwork.CurrentRoom.SetCustomProperties(properties);
+    }
+    
     public int ParseTimeToSeconds(string time) {
 
         int minutes;

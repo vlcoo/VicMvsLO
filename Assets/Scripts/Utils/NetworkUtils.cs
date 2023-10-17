@@ -69,6 +69,8 @@ namespace NSMB.Utils {
             [Enums.NetRoomProperties.FriendlyFire] = true,
             [Enums.NetRoomProperties.LapRequirement] = 1,
             [Enums.NetRoomProperties.Starcoins] = false,
+            [Enums.NetRoomProperties.ShowCoinCount] = false,
+            [Enums.NetRoomProperties.NoMap] = false,
         };
 
         public static Hashtable DefaultRoomProperties {
