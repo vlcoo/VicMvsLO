@@ -126,7 +126,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             //even the host can't be trusted...
             if ((sender?.IsMasterClient ?? false) && (prefab.Contains("Static") || prefab.Contains("1-Up") || (musicEnabled && prefab.Contains("Player")))) {
                 //abandon ship
-                PhotonNetwork.Disconnect();
+                PhotonNetwork .Disconnect();
                 return;
             }
 
@@ -740,6 +740,8 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         
         PhotonNetwork.CurrentRoom.SetCustomProperties(new() { [Enums.NetRoomProperties.GameStarted] = false });
         MusicSynth.player.Pause();
+        MusicSynthMega.player.Pause();
+        MusicSynthStarman.player.Pause();
 
         if (causeString is "DUMMY_TIMEOUT")
         {

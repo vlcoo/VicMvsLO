@@ -20,6 +20,7 @@ using TMPro;
 public class GlobalController : Singleton<GlobalController>, IInRoomCallbacks, ILobbyCallbacks {
     public PlayerColorSet[] skins;
     public TMP_ColorGradient logoGradient;
+    public TMP_SpriteAsset emotesAsset;
 
     public GameObject ndsCanvas, fourByThreeImage, anyAspectImage;
 
@@ -35,6 +36,7 @@ public class GlobalController : Singleton<GlobalController>, IInRoomCallbacks, I
     public DisconnectCause? disconnectCause = null;
     
     public List<SpecialPlayer> SPECIAL_PLAYERS = new() {};
+    public List<string> EMOTE_NAMES = new() {};
 
     private int windowWidth, windowHeight;
 
@@ -65,6 +67,11 @@ public class GlobalController : Singleton<GlobalController>, IInRoomCallbacks, I
         }
     }
 
+    private void PopulateEmoteNames()
+    {
+        emotesAsset.spriteCharacterTable.ForEach(character => EMOTE_NAMES.Add(character.name));
+    }
+
     public void Awake() {
         if (!InstanceCheck())
             return;
@@ -74,6 +81,7 @@ public class GlobalController : Singleton<GlobalController>, IInRoomCallbacks, I
         DiscordController = GetComponent<DiscordController>();
         rumbler = GetComponent<DeviceRumbler>();
         PopulateSpecialPlayers();
+        PopulateEmoteNames();
 
         PhotonNetwork.AddCallbackTarget(this);
     }

@@ -4,6 +4,7 @@ using System.Text;
 using System.Linq;
 using System.Net.Mime;
 using System.Runtime.InteropServices;
+using System.Text.RegularExpressions;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
@@ -633,6 +634,17 @@ namespace NSMB.Utils {
                 into color
                 where color != null
                 select color).ToList();
+        }
+
+        public static string RawMessageToEmoji(string message)
+        {
+            return Regex.Replace(message, ":([^:\\s]+):", match =>
+            {
+                string capturedGroup = match.Groups[1].Value;
+                return GlobalController.Instance.EMOTE_NAMES.Contains(capturedGroup)
+                    ? $"<sprite name=\"{capturedGroup}\">"
+                    : match.Value;
+            });
         }
 
     #if UNITY_STANDALONE_WIN

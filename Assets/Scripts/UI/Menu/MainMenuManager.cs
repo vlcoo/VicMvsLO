@@ -205,12 +205,12 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
             LocalChatMessage("You have become the lobby's host.", SYSTEM_MESSAGE_COLOR);
         }
         else 
-            LocalChatMessage(newMaster.GetUniqueNickname() + " has become the lobby's host.", SYSTEM_MESSAGE_COLOR);
+            LocalChatMessage($"<i>{newMaster.GetUniqueNickname()}</i> has become the lobby's host.", SYSTEM_MESSAGE_COLOR);
         UpdateSettingEnableStates();
     }
     public void OnJoinedRoom() {
         Debug.Log($"[PHOTON] Joined Room ({PhotonNetwork.CurrentRoom.Name})");
-        LocalChatMessage(PhotonNetwork.LocalPlayer.GetUniqueNickname() + " just joined.", SYSTEM_MESSAGE_COLOR);
+        LocalChatMessage($"<i>{PhotonNetwork.LocalPlayer.GetUniqueNickname()}</i> just joined.", SYSTEM_MESSAGE_COLOR);
         EnterRoom();
     }
     IEnumerator KickPlayer(Player player) {
@@ -234,7 +234,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
                 StartCoroutine(KickPlayer(newPlayer));
             return;
         }
-        LocalChatMessage(newPlayer.GetUniqueNickname() + " just joined.", SYSTEM_MESSAGE_COLOR);
+        LocalChatMessage($"<i>{newPlayer.GetUniqueNickname()}</i> just joined.", SYSTEM_MESSAGE_COLOR);
         sfx.PlayOneShot(Enums.Sounds.UI_PlayerConnect.GetClip());
     }
     public void OnPlayerLeftRoom(Player otherPlayer) {
@@ -243,7 +243,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         if (banList.Any(nip => nip.userId == otherPlayer.UserId)) {
             return;
         }
-        LocalChatMessage(otherPlayer.GetUniqueNickname() + " just left.", SYSTEM_MESSAGE_COLOR);
+        LocalChatMessage($"<i>{otherPlayer.GetUniqueNickname()}</i> just left.", SYSTEM_MESSAGE_COLOR);
         sfx.PlayOneShot(Enums.Sounds.UI_PlayerDisconnect.GetClip());
     }
     public void OnRoomPropertiesUpdate(Hashtable updatedProperties) {
@@ -431,8 +431,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
             message = message.Substring(0, Mathf.Min(128, message.Length));
             message = message./*Replace("<", "«").Replace(">", "»").*/Replace("\n", " ").Trim();
-            message = Regex.Replace(message, ":([^:]+):", "<sprite name=\"$1\">");
-
+            message = Utils.RawMessageToEmoji(message);
             message = "<size=10><i>" + sender.GetUniqueNickname() + "</size></i>\n" + message.Filter();
 
             LocalChatMessage(message, Color.black, false);
@@ -1309,8 +1308,8 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
             return;
 
         string text = chatTextField.text.Replace("<", "«").Replace(">", "»").Trim();
-        text = Regex.Replace(text, ":([^:]+):", "<sprite name=\"$1\">");
-        if (text == null || text == "")
+        text = Utils.RawMessageToEmoji(text);
+        if (string.IsNullOrEmpty(text))
             return;
         StartCoroutine(SelectNextFrame(chatTextField));
 
@@ -1324,7 +1323,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
     public void Kick(Player target) {
         PhotonNetwork.CloseConnection(target);
-        LocalChatMessage($"{target.GetUniqueNickname()} has been kicked.", SYSTEM_MESSAGE_COLOR);
+        LocalChatMessage($"<i>{target.GetUniqueNickname()}</i> has been kicked.", SYSTEM_MESSAGE_COLOR);
     }
 
     public void Promote(Player target) {
@@ -1337,22 +1336,23 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
     public void CopyPlayerID(Player target)
     {
-        if (target.IsLocal || !target.HasRainbowName())
+        if (!target.IsLocal && (PhotonNetwork.LocalPlayer.GetAuthorityLevel() < target.GetAuthorityLevel()))
+            LocalChatMessage($"Unknown player {target.NickName}.", SYSTEM_MESSAGE_COLOR);
+        else
         {
             GUIUtility.systemCopyBuffer = target.UserId;
             LocalChatMessage($"Copied {target.NickName}'s ID: {target.UserId}", SYSTEM_MESSAGE_COLOR);
         }
-        else LocalChatMessage($"Unknown player {target.NickName}.", SYSTEM_MESSAGE_COLOR);
     }
 
     public void Mute(Player target) {
         Utils.GetCustomProperty(Enums.NetRoomProperties.Mutes, out object[] mutes);
         List<object> mutesList = new(mutes);
         if (mutes.Contains(target.UserId)) {
-            LocalChatMessage($"{target.GetUniqueNickname()} has been unmuted.", SYSTEM_MESSAGE_COLOR);
+            LocalChatMessage($"<i>{target.GetUniqueNickname()}</i> has been unmuted.", SYSTEM_MESSAGE_COLOR);
             mutesList.Remove(target.UserId);
         } else {
-            LocalChatMessage($"{target.GetUniqueNickname()} has been muted.", SYSTEM_MESSAGE_COLOR);
+            LocalChatMessage($"<i>{target.GetUniqueNickname()}</i> has been muted.", SYSTEM_MESSAGE_COLOR);
             mutesList.Add(target.UserId);
         }
         Hashtable table = new() {
@@ -1400,7 +1400,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         };
         PhotonNetwork.CurrentRoom.SetCustomProperties(table, null, NetworkUtils.forward);
         PhotonNetwork.CloseConnection(target);
-        LocalChatMessage($"{target.GetUniqueNickname()} has been banned from this lobby.", SYSTEM_MESSAGE_COLOR);
+        LocalChatMessage($"<i>{target.GetUniqueNickname()}</i> has been banned from this lobby.", SYSTEM_MESSAGE_COLOR);
     }
 
     private void Unban(NameIdPair targetPair) {
