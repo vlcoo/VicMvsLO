@@ -28,7 +28,8 @@ public class RebindButton : MonoBehaviour {
 
         GameObject rebindPrompt = MainMenuManager.Instance.rebindPrompt;
         MainMenuManager.OpenPrompt(rebindPrompt);
-        MainMenuManager.Instance.rebindText.text = $"Rebinding {targetAction.name} {targetBinding.name} ({targetBinding.groups})\nPress any button or key.";
+        MainMenuManager.Instance.ConfirmSound(true);
+        MainMenuManager.Instance.rebindText.text = $"Rebinding <i>{targetAction.name} {targetBinding.name} ({targetBinding.groups})</i>\nPress any button or key.";
 
         rebinding = targetAction
             .PerformInteractiveRebinding()
@@ -64,6 +65,7 @@ public class RebindButton : MonoBehaviour {
         targetAction.actionMap.Enable();
         rebinding.Dispose();
         StartCoroutine(MainMenuManager.ClosePromptCoroutine(MainMenuManager.Instance.rebindPrompt));
+        MainMenuManager.Instance.ConfirmSound(true);
         StopCoroutine(countdown);
     }
 

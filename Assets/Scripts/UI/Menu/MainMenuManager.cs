@@ -557,7 +557,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 #else
         if (!GlobalController.Instance.checkedForVersion) {
             UpdateChecker.IsUpToDate((latestVersion) => {
-                updateText.text = $"You're running an old version of this mod. Latest: {latestVersion}";
+                updateText.text = $"You're running an old\nversion of this mod.\n\nPlease update!\n(Latest: <i>{latestVersion}</i>)";
                 OpenPrompt(updateBox, updateBoxSelected);
             });
             GlobalController.Instance.checkedForVersion = true;
@@ -1024,7 +1024,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         if (selected != null) EventSystem.current.SetSelectedGameObject(selected);
     }
 
-    private void ClosePrompt(GameObject which)
+    public void ClosePrompt(GameObject which)
     {
         StartCoroutine(ClosePromptCoroutine(which));
     }

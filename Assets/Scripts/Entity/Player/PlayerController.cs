@@ -1198,7 +1198,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         if (knockback || hitInvincibilityCounter > 0 || invincible > 0 || Frozen ||
             state == Enums.PowerupState.MegaMushroom) return;
         GameObject cube = PhotonNetwork.Instantiate("Prefabs/FrozenCube", transform.position, Quaternion.identity, 0, new object[] { photonView.ViewID });
-        //Freeze(cube.GetPhotonView().ViewID);
+        // Freeze(cube.GetPhotonView().ViewID);
     }
 
     [PunRPC]
@@ -1333,7 +1333,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         if (dead || !spawned)
             return;
 
-        //star doesn't eixst?
+        //star doesn't exist?
         PhotonView star = PhotonView.Find(starID);
         if (!star)
             return;

@@ -12,9 +12,6 @@ using UnityEngine;
 
 public class MatchConditioner : MonoBehaviour
 {
-    // new mapping: dictionary<string*, dictionary<string**, list<string***>>> *condition, **action, ***parameter(s)
-    // list<matchrulelistentry>
-    // public Dictionary<string, string> currentMapping = new();
     public HashSet<MatchRuleDataEntry> ruleList;
 
     private float timer5Sec = 5;
@@ -78,9 +75,9 @@ public class MatchConditioner : MonoBehaviour
         ConditionActioned(player.GetComponent<PlayerController>(), condition);
     }
 
-    public void ConditionActioned(PlayerController byWhom, string condition)
+    public void ConditionActioned(PlayerController byWhom, string condition, bool ignoreMasterCheck = false)
     {
-        if (!PhotonNetwork.IsMasterClient) return;
+        if (!ignoreMasterCheck && !PhotonNetwork.IsMasterClient) return;
         if (ReferenceEquals(ruleList, null)) return;
 
         foreach (MatchRuleDataEntry rule in ruleList.Where(r => r.Condition.Equals(condition)))
@@ -88,16 +85,11 @@ public class MatchConditioner : MonoBehaviour
             MethodInfo actionMethod = GetType().GetMethod(rule.Action);
             if (actionMethod == null) return;
             if (byWhom is null)
-                DoToEveryone(actionMethod);
+                foreach (var player in GameManager.Instance.players)
+                    actionMethod.Invoke(this, new[] { player });
             else
                 actionMethod.Invoke(this, new[] { byWhom });
         }
-    }
-
-    public void DoToEveryone(MethodInfo actionFunc)
-    {
-        foreach (var player in GameManager.Instance.players)
-            actionFunc.Invoke(this, new[] { player });
     }
 
     public void ActGiveStar(PlayerController whom)
