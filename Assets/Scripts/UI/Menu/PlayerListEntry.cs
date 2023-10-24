@@ -11,7 +11,7 @@ public class PlayerListEntry : MonoBehaviour {
 
     public Player player;
 
-    [SerializeField] private TMP_Text nameText, pingText;
+    [SerializeField] private TMP_Text nameText, pingText, deviceText;
     [SerializeField] private Image colorStrip;
 
     [SerializeField] private RectTransform background, options;
@@ -37,32 +37,30 @@ public class PlayerListEntry : MonoBehaviour {
         colorStrip.color = Utils.GetPlayerColor(player, 1f, 1f);
         enabled = player.HasRainbowName();
 
-        string permissionSymbol = "";
-        if (player.IsMasterClient)
-            permissionSymbol += "<sprite=5>";
+        nameText.text = (player.IsMasterClient ? "<sprite=5> " : "") + Utils.GetCharacterData(player).uistring + player.GetUniqueNickname();
 
-        Utils.GetCustomProperty(Enums.NetPlayerProperties.Status, out bool status, player.CustomProperties);
-        if (status)
-            permissionSymbol += "<sprite=26>";
-
-        string characterSymbol = Utils.GetCharacterData(player).uistring;
         Utils.GetCustomProperty(Enums.NetPlayerProperties.Ping, out int ping, player.CustomProperties);
-
-        string signalStrength;
-        if (ping < 0) {
-            signalStrength = "52";
-        } else if (ping < 80) {
-            signalStrength = "49";
-        } else if (ping < 120) {
-            signalStrength = "50";
-        } else if (ping < 180) {
-            signalStrength = "51";
-        } else {
-            signalStrength = "52";
-        }
-
-        nameText.text = permissionSymbol + characterSymbol + player.GetUniqueNickname();
+        string signalStrength = ping switch
+        {
+            < 0 => "52",
+            < 80 => "49",
+            < 120 => "50",
+            < 180 => "51",
+            _ => "52"
+        };
         pingText.text = $"{ping} <sprite={signalStrength}>";
+
+        Utils.GetCustomProperty(Enums.NetPlayerProperties.DeviceType, out Utils.DeviceType deviceType, player.CustomProperties);
+        string deviceTypeText = deviceType switch
+        {
+            Utils.DeviceType.EDITOR => "26",
+            Utils.DeviceType.MOBILE => "79",
+            Utils.DeviceType.DESKTOP => "77",
+            Utils.DeviceType.BROWSER => "78",
+            Utils.DeviceType.OTHER => "",
+            _ => ""
+        };
+        deviceText.text = $"<sprite={deviceTypeText}>";
 
         Transform parent = transform.parent;
         int childIndex = 0;

@@ -113,6 +113,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
             { Enums.NetPlayerProperties.Ping, PhotonNetwork.GetPing() },
             { Enums.NetPlayerProperties.PlayerColor, Settings.Instance.skin },
             { Enums.NetPlayerProperties.Spectator, false },
+            { Enums.NetPlayerProperties.DeviceType, Utils.GetDeviceType() },
         };
         PhotonNetwork.LocalPlayer.SetCustomProperties(prop);
 
@@ -766,10 +767,8 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
         PhotonNetwork.LocalPlayer.SetCustomProperties(new() {
             [Enums.NetPlayerProperties.GameState] = null,
-            [Enums.NetPlayerProperties.Status] = Debug.isDebugBuild || Application.isEditor,
         });
-        if (updatePingCoroutine == null)
-            updatePingCoroutine = StartCoroutine(UpdatePing());
+        updatePingCoroutine ??= StartCoroutine(UpdatePing());
         GlobalController.Instance.DiscordController.UpdateActivity();
 
         Utils.GetCustomProperty(Enums.NetPlayerProperties.Spectator, out bool spectating, PhotonNetwork.LocalPlayer.CustomProperties);
