@@ -1363,7 +1363,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         //state
         if (newCount > stars && starView != -2)
         {
-            PlaySoundEverywhere(photonView.IsMine || (GameManager.Instance.localPlayer != null && GameManager.Instance.TeamGrouper.IsPlayerTeammate(this, GameManager.Instance.localPlayer.GetComponent<PlayerController>()))
+            PlaySoundEverywhere(photonView.IsMine || (GameManager.Instance.localPlayer != null && GameManager.Instance.TeamGrouper.IsPlayerTeammate(this, GameManager.Instance.localPlayer.GetComponent<PlayerController>(), true))
                 ? Enums.Sounds.World_Star_Collect_Self
                 : Enums.Sounds.World_Star_Collect_Enemy);
             if (photonView.IsMine) GlobalController.Instance.rumbler.RumbleForSeconds(0f, 0.8f, 0.1f);
@@ -1685,7 +1685,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         if (photonView.IsMine)
         {
             ScoreboardUpdater.instance.OnDeathToggle();
-            GameManager.Instance.fadeMusic(false);
+            GameManager.Instance.FadeMusic(false);
         }
 
         GameManager.Instance.MatchConditioner.ConditionActioned(this, "Died");
@@ -1695,7 +1695,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
     public void PreRespawn() {
 
         sfx.enabled = true;
-        if (photonView.IsMine) GameManager.Instance.fadeMusic(true);
+        if (photonView.IsMine) GameManager.Instance.FadeMusic(true);
         if (lives == 0) {
             GameManager.Instance.CheckForWinner();
             Destroy(trackIcon);
@@ -1962,7 +1962,6 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
     [PunRPC]
     public void Knockback(bool fromRight, int starsToDrop, bool fireball, int attackerView)
     {
-        if (GameManager.Instance.TeamGrouper.IsPlayerTeammate(this, attackerView)) return;
         if (fireball && fireballKnockback && knockback)
             return;
         if (knockback && !fireballKnockback)
@@ -1971,6 +1970,9 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         if (!GameManager.Instance.started || hitInvincibilityCounter > 0 || pipeEntering || Frozen || dead || giantStartTimer > 0 || giantEndTimer > 0)
             return;
 
+        PhotonView attacker = PhotonNetwork.GetPhotonView(attackerView);
+        if (GameManager.Instance.TeamGrouper.IsPlayerTeammate(this, attackerView, false)) return;
+        
         if (state == Enums.PowerupState.MiniMushroom && starsToDrop > 1) {
             SpawnStars(2, false);
             Powerdown(false);
@@ -1985,7 +1987,6 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         fireballKnockback = fireball;
         initialKnockbackFacingRight = facingRight;
 
-        PhotonView attacker = PhotonNetwork.GetPhotonView(attackerView);
         if (attackerView >= 0)
         {
             if (attacker)

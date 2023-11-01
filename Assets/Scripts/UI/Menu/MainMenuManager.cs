@@ -917,6 +917,10 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
     public void OpenPowerups()
     {
+        foreach (PowerupChanceListEntry powerupChanceListEntry in powerupList)
+        {
+            powerupChanceListEntry.Chance = powerupChanceListEntry.Chance;
+        }
         OpenPrompt(powerupsPrompt, powerupsSelected);
     }
 

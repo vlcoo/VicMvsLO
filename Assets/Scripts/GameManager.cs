@@ -16,6 +16,7 @@ using Photon.Pun;
 using Photon.Realtime;
 using ExitGames.Client.Photon;
 using ExitGames.Client.Photon.StructWrapping;
+using FluidMidi;
 using NSMB.Utils;
 using UnityEngine.UI;
 using Hashtable = ExitGames.Client.Photon.Hashtable;
@@ -689,12 +690,34 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         }
     }
 
-    public void fadeMusic(bool how)
+    public const float MAX_MUSIC_GAIN = 0.5f; 
+    public void FadeMusic(bool how)
     {
-        DOTween.To(() => MusicSynth.player.Gain, v => MusicSynth.player.Gain = v, how ? 0.5f : 0f, how ? 0.5f : 0.1f).SetEase(Ease.Linear);
+        if (!how)
+        {
+            MusicSynth.player.Stop();
+            MusicSynthMega.player.Pause();
+            MusicSynthStarman.player.Pause();
+        }
+        else
+        {
+            SongPlayer songPlayer = musicState switch
+            {
+                Enums.MusicState.Normal => MusicSynth.player,
+                Enums.MusicState.MegaMushroom => MusicSynthMega.player,
+                Enums.MusicState.Starman => MusicSynthStarman.player,
+                _ => null
+            };
+
+            if (songPlayer == null) return;
+            songPlayer.Play();
+            // songPlayer.Gain = 0f;
+            // DOTween.To(() => songPlayer.Gain, v => songPlayer.Gain = v, MAX_MUSIC_GAIN,
+            //     0.5f).SetEase(Ease.Linear);
+        }
     }
 
-    public void setSpectateMusic(bool how)
+    public void SetSpectateMusic(bool how)
     {
         MusicSynth.SetSpectating(how, !Togglerizer.currentEffects.Contains("NoBahs"));
         MusicSynthMega.SetSpectating(how);
@@ -777,7 +800,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             GlobalController.Instance.characters[winnerCharacterIndex].prefab);
         bool win = winner != null && (winner.IsLocal || teams) && !cancelled;
         bool draw = winner == null && !cancelled;
-        float secondsUntilMenu = cancelled ? 1.7f : 4;
+        float secondsUntilMenu = cancelled ? 1.7f : 4.5f;
 
         if (draw) {
             sfx.PlayOneShot(Enums.Sounds.UI_Match_Draw.GetClip());
@@ -807,11 +830,12 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             text.GetComponent<Animator>().SetTrigger("startNegative");
         }
         else {
-            if (SpectationManager.Spectating)
+            if (GlobalController.Instance.joinedAsSpectator)
             {
                 text.GetComponent<TMP_Text>().colorGradientPreset = gradientNegativeAltText;
                 sfx.PlayOneShot(Enums.Sounds.UI_Match_Concluded.GetClip());
                 text.GetComponent<Animator>().SetTrigger("start");
+                secondsUntilMenu += 0.5f;
             }
             else
             {
@@ -914,7 +938,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
     public void CreateNametag(PlayerController controller) {
         GameObject nametag = Instantiate(nametagPrefab, nametagPrefab.transform.parent);
         nametag.GetComponent<UserNametag>().parent = controller;
-        nametag.SetActive(true);
+        nametag.SetActive(!hideMap);
     }
 
     public void AllStarcoinsCollected()
@@ -984,7 +1008,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             //everyone's dead...? ok then, draw?
             PhotonNetwork.RaiseEvent((byte) Enums.NetEventIds.EndGame, null, NetworkUtils.EventAll, SendOptions.SendReliable);
             return;
-        } else if ((alivePlayers.Count == 1 || (teamsMatch && alivePlayers.Count != 0 && alivePlayers.All(controller => TeamGrouper.IsPlayerTeammate(alivePlayers[0], controller)))) && playerCount >= 2) {
+        } else if ((alivePlayers.Count == 1 || (teamsMatch && alivePlayers.Count != 0 && alivePlayers.All(controller => TeamGrouper.IsPlayerTeammate(alivePlayers[0], controller, true)))) && playerCount >= 2) {
             //one player left alive (and not in a solo game). winner!
             PhotonNetwork.RaiseEvent((byte) Enums.NetEventIds.EndGame, alivePlayers[0].photonView.Owner, NetworkUtils.EventAll, SendOptions.SendReliable);
             return;
@@ -996,7 +1020,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             if (draw)
                 // it's a draw! Thanks for playing the demo!
                 PhotonNetwork.RaiseEvent((byte) Enums.NetEventIds.EndGame, null, NetworkUtils.EventAll, SendOptions.SendReliable);
-            else if (winningPlayers.Count == 1 || (teamsMatch && winningPlayers.Count != 0 && winningPlayers.All(controller => TeamGrouper.IsPlayerTeammate(winningPlayers[0], controller))))
+            else if (winningPlayers.Count == 1 || (teamsMatch && winningPlayers.Count != 0 && winningPlayers.All(controller => TeamGrouper.IsPlayerTeammate(winningPlayers[0], controller, true))))
                 PhotonNetwork.RaiseEvent((byte) Enums.NetEventIds.EndGame, winningPlayers[0].photonView.Owner, NetworkUtils.EventAll, SendOptions.SendReliable);
 
             return;

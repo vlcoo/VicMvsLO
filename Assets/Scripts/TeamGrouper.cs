@@ -47,16 +47,16 @@ public class TeamGrouper : MonoBehaviour
         }
     }
 
-    public bool IsPlayerTeammate(PlayerController whom, PlayerController opponent)
+    public bool IsPlayerTeammate(PlayerController whom, PlayerController opponent, bool unconditionalCheck)
     {
-        if (!isTeamsMatch || !friendlyFire) return false;
+        if (!isTeamsMatch || (!unconditionalCheck && !friendlyFire)) return false;
         return whom.character.prefab.Equals(opponent.character.prefab);
     }
 
-    public bool IsPlayerTeammate(PlayerController whom, int opponentID)
+    public bool IsPlayerTeammate(PlayerController whom, int opponentID, bool unconditionalCheck)
     {
         if (opponentID < 0) return false;
-        if (!isTeamsMatch || !friendlyFire) return false;
+        if (!isTeamsMatch || (!unconditionalCheck && !friendlyFire)) return false;
         return teams[whom.character.prefab].Any(controller => controller.photonView.ViewID == opponentID);
     }
 

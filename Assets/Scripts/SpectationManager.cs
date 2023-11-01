@@ -18,7 +18,7 @@ public class SpectationManager : MonoBehaviour {
                 SpectateNextPlayer();
 
             UpdateSpectateUI();
-            GameManager.Instance.setSpectateMusic(value);
+            GameManager.Instance.SetSpectateMusic(value);
         }
     }
     private PlayerController _targetPlayer;

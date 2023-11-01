@@ -40,7 +40,7 @@ public static class Enums {
     public enum MusicState {
         Normal,
         MegaMushroom,
-        Starman,
+        Starman
     }
     //Sound effects
     public enum Sounds : byte {
