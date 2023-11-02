@@ -640,8 +640,6 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         }
         
         teamsMatch = TeamGrouper.isTeamsMatch;
-        if (Togglerizer.currentEffects.Contains("NoBahs"))
-            MusicSynth.player.DisableChannels(new []{MusicSynth.currentSong.bahChannel});
         // else {
         //     if (MusicSynth.currentSong.hasBahs) MusicSynth.player.SetTickEvent(tick =>
         // {
@@ -656,7 +654,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         yield return new WaitForSeconds(1f);
 
         musicEnabled = true;
-        MusicSynth.StartPlayback();
+        // MusicSynth.StartPlayback();
         Utils.GetCustomProperty(Enums.NetRoomProperties.Time, out timedGameDuration);
 
         startRealTime = System.DateTimeOffset.Now.ToUnixTimeMilliseconds();
@@ -701,16 +699,19 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         }
         else
         {
-            SongPlayer songPlayer = musicState switch
+            if (gameover) return;
+            switch (musicState)
             {
-                Enums.MusicState.Normal => MusicSynth.player,
-                Enums.MusicState.MegaMushroom => MusicSynthMega.player,
-                Enums.MusicState.Starman => MusicSynthStarman.player,
-                _ => null
-            };
-
-            if (songPlayer == null) return;
-            songPlayer.Play();
+                case Enums.MusicState.Normal:
+                    MusicSynth.StartPlayback();
+                    break;
+                case Enums.MusicState.Starman:
+                    MusicSynthMega.StartPlayback(false);
+                    break;
+                case Enums.MusicState.MegaMushroom:
+                    MusicSynthStarman.StartPlayback(false);
+                    break;
+            }
             // songPlayer.Gain = 0f;
             // DOTween.To(() => songPlayer.Gain, v => songPlayer.Gain = v, MAX_MUSIC_GAIN,
             //     0.5f).SetEase(Ease.Linear);
@@ -719,7 +720,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
 
     public void SetSpectateMusic(bool how)
     {
-        MusicSynth.SetSpectating(how, !Togglerizer.currentEffects.Contains("NoBahs"));
+        MusicSynth.SetSpectating(how);
         MusicSynthMega.SetSpectating(how);
         MusicSynthStarman.SetSpectating(how);
     }
@@ -1048,20 +1049,17 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         MusicSynthMega.player.Stop();
         MusicSynthStarman.player.Stop();
 
-        switch (state)
-        {
-            case Enums.MusicState.Normal:
-                MusicSynth.player.Play();
-                break;
-            case Enums.MusicState.MegaMushroom:
-                MusicSynthMega.player.Play();
-                break;
-            case Enums.MusicState.Starman:
-                MusicSynthStarman.player.Play();
-                break;
-        }
-
         musicState = state;
+        if (localPlayer != null && !localPlayer.GetComponent<PlayerController>().spawned) return;
+
+        SongPlayer songPlayer = state switch
+        {
+            Enums.MusicState.Normal => MusicSynth.player,
+            Enums.MusicState.MegaMushroom => MusicSynthMega.player,
+            Enums.MusicState.Starman => MusicSynthStarman.player,
+            _ => null
+        };
+        if (songPlayer != null) songPlayer.Play();
     }
 
     bool speedup = false;

@@ -1695,7 +1695,6 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
     public void PreRespawn() {
 
         sfx.enabled = true;
-        if (photonView.IsMine) GameManager.Instance.FadeMusic(true);
         if (lives == 0) {
             GameManager.Instance.CheckForWinner();
             Destroy(trackIcon);
@@ -1769,6 +1768,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         landing = 0f;
         ResetKnockback();
         Instantiate(Resources.Load("Prefabs/Particle/Puff"), transform.position, Quaternion.identity);
+        if (photonView.IsMine) GameManager.Instance.FadeMusic(true);
         models.transform.rotation = Quaternion.Euler(0, 180, 0);
 
         if (photonView.IsMine)

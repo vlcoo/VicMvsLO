@@ -15,10 +15,9 @@ public class Songinator : MonoBehaviour
     [SerializeField] public List<int> chances;
     
     [NonSerialized] public MIDISong currentSong;
-    [NonSerialized] public int nextBahTick;
     
-    private int nextBahIndex = -1;
     private readonly WeightedList<MIDISong> weightedList = new();
+    private int rememberedChannels;
 
     public void Start()
     {
@@ -35,8 +34,6 @@ public class Songinator : MonoBehaviour
         }
         else currentSong = songs[0];
 
-        if (currentSong.hasBahs) AdvanceBah(); 
-
         player.synthesizer.soundFont.SetFullPath(currentSong.autoSoundfont
             ? currentSong.song.GetFullPath().Replace(".mid", ".sf2")
             : currentSong.soundfont.GetFullPath());
@@ -47,6 +44,7 @@ public class Songinator : MonoBehaviour
         player.EndTicks = currentSong.endTicks;
         player.Tempo = currentSong.playbackSpeedNormal;
         player.Init();
+        rememberedChannels = ~currentSong.mutedChannelsNormal;
 
         if (autoStart) StartPlayback();
         
@@ -59,28 +57,23 @@ public class Songinator : MonoBehaviour
         player.Play();
         yield return new WaitForSeconds(0.2f);  // wowie...
         player.Seek(currentSong.startTicks);
-        player.Channels = ~currentSong.mutedChannelsNormal;
+        player.Channels = rememberedChannels;
     }
 
-    public void StartPlayback()
+    public void StartPlayback(bool fromBeginning = true)
     {
-        if (currentSong.startTicks > 0) StartCoroutine(StartSkip());
+        if (currentSong.startTicks > 0 && fromBeginning) StartCoroutine(StartSkip());
         else
         {
-            player.Channels = ~currentSong.mutedChannelsNormal;
+            if (fromBeginning) player.Seek(0);
+            player.Channels = rememberedChannels;
             player.Play();
         }
     }
 
-    public void AdvanceBah()
+    public void SetSpectating(bool how)
     {
-        nextBahIndex = (nextBahIndex + 1) % currentSong.bahTicks.Length;
-        nextBahTick = currentSong.bahTicks[nextBahIndex];
-    }
-
-    public void SetSpectating(bool how, bool bahsEnabled = true)
-    {
-        player.Channels = how ? ~currentSong.mutedChannelsSpectating : ~currentSong.mutedChannelsNormal;
-        if (!bahsEnabled) player.DisableChannels(new []{currentSong.bahChannel});
+        rememberedChannels = how ? ~currentSong.mutedChannelsSpectating : ~currentSong.mutedChannelsNormal;
+        player.Channels = rememberedChannels;
     }
 }
