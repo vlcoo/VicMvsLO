@@ -25,13 +25,21 @@ public class FadeOutManager : MonoBehaviour {
 
     public void FadeOutAndIn(float fadeTime, float blackTime)
     {
+        anim.speed = 1;
         anim.SetTrigger("FadeInAndOut");
     }
 
     public void FadeOut()
     {
+        anim.speed = 1;
         if (alreadyInitiallyFadedOut) return;
         anim.SetTrigger("FadeOut");
         alreadyInitiallyFadedOut = true;
+    }
+
+    public void FadePipe(bool direction)
+    {
+        anim.SetBool("PipeDirection", direction);
+        anim.SetTrigger("FadePipe");
     }
 }

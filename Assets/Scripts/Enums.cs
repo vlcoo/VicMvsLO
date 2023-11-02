@@ -32,15 +32,18 @@ public static class Enums {
     }
     #endregion
     #region ANIMATION & MUSIC
+
+    public enum PipeTransitionTypes
+    {
+        Cut, Pan, FadeWipe
+    }
     // Animation enums
     public enum PlayerEyeState {
         Normal, HalfBlink, FullBlink, Death
     }
     // Music Enums
     public enum MusicState {
-        Normal,
-        MegaMushroom,
-        Starman
+        Normal, MegaMushroom, Starman
     }
     //Sound effects
     public enum Sounds : byte {

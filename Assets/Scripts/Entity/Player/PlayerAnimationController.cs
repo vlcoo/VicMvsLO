@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using DG.Tweening;
 using UnityEngine;
 
 using Photon.Pun;
@@ -15,7 +16,8 @@ public class PlayerAnimationController : MonoBehaviourPun {
     [SerializeField] private Material glowMaterial;
     [SerializeField] private Color primaryColor = Color.clear, secondaryColor = Color.clear;
     [SerializeField] [ColorUsage(true, false)] private Color? _glowColor = null;
-    [SerializeField] private float blinkDuration = 0.1f, pipeDuration = 2f, deathUpTime = 0.6f, deathForce = 7f;
+    [SerializeField] private float blinkDuration = 0.1f, deathUpTime = 0.6f, deathForce = 7f;
+    public float pipeDuration = 2f;
 
     private PlayerController controller;
     private Animator animator;

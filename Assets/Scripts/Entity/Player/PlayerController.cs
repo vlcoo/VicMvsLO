@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Runtime.InteropServices;
+using DG.Tweening;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 using UnityEngine.InputSystem;
@@ -2291,7 +2292,34 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
     }
 
     #region -- PIPES --
+    private Tween cameraPanTween;
+    private readonly float cameraPipePanWaitTime = 0.5f;
 
+    IEnumerator CameraPipePanCoroutine(PipeManager pipe)
+    {
+        yield return new WaitForSeconds(cameraPipePanWaitTime);
+        cameraPanTween = DOTween.To(() => cameraController.currentPosition,
+            pos => cameraController.currentPosition = pos, pipe.otherPipe.transform.position,
+            AnimationController.pipeDuration - cameraPipePanWaitTime).SetEase(Ease.Linear);
+    }
+
+    void CameraPipeAnimation(PipeManager pipe)
+    {
+        switch (pipe.transitionType)
+        {
+            case Enums.PipeTransitionTypes.Cut:
+                return;
+            case Enums.PipeTransitionTypes.Pan:
+                if (cameraPanTween == null || !cameraPanTween.IsPlaying())
+                    StartCoroutine(CameraPipePanCoroutine(pipe));
+                break;
+            case Enums.PipeTransitionTypes.FadeWipe:
+                fadeOut.FadePipe(!pipe.fromSubarea);
+                break;
+        }
+        
+    }
+    
     void DownwardsPipeCheck() {
         if (!photonView.IsMine || joystick.y > -analogDeadzone || state == Enums.PowerupState.MegaMushroom || !onGround || knockback || inShell)
             return;
@@ -2309,6 +2337,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             //Enter pipe
             pipeEntering = pipe;
             pipeDirection = Vector2.down;
+            CameraPipeAnimation(pipe);
 
             body.velocity = Vector2.down;
             transform.position = body.position = new Vector2(obj.transform.position.x, transform.position.y);
@@ -2344,7 +2373,8 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             //pipe found
             pipeEntering = pipe;
             pipeDirection = Vector2.up;
-
+            CameraPipeAnimation(pipe);
+            
             body.velocity = Vector2.up;
             transform.position = body.position = new Vector2(obj.transform.position.x, transform.position.y);
 
