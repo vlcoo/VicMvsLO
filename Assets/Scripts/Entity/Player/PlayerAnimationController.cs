@@ -412,7 +412,7 @@ public class PlayerAnimationController : MonoBehaviourPun {
                 new Vector3(pe.otherPipe.transform.position.x, pe.otherPipe.transform.position.y, 1) -
                 (Vector3)offset;
             photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.Player_Sound_Powerdown);
-            controller.cameraController.Recenter();
+            // controller.cameraController.Recenter();
         }
         if (pipeTimer >= pipeDuration) {
             controller.pipeEntering = null;

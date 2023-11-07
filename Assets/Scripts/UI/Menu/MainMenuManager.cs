@@ -473,6 +473,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
         Instance = this;
         sfx.outputAudioMixerGroup.audioMixer.SetFloat("SFXReverb", 0f);
+        sfx.outputAudioMixerGroup.audioMixer.SetFloat("MasterPitch", -80f);
 
         //Clear game-specific settings so they don't carry over
         HorizontalCamera.OFFSET_TARGET = 0;

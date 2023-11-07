@@ -442,7 +442,6 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         Instance = this;
     }
 
-    private const float TARGET_PITCH = 1.5f;
     public void Start() {
         onScreenControls.SetActive(Utils.GetDeviceType() == Utils.DeviceType.MOBILE || Settings.Instance.onScreenControlsAlways);
         
@@ -510,11 +509,8 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
 
         if (Togglerizer.currentEffects.Contains("HeckaSpeed"))
         {
-            PlayerController controller = localPlayer.GetComponent<PlayerController>();
-            sfx.pitch = TARGET_PITCH;
-            controller.sfx.pitch = TARGET_PITCH;
-            controller.sfxBrick.pitch = TARGET_PITCH;
-            Time.timeScale = TARGET_PITCH;
+            sfx.outputAudioMixerGroup.audioMixer.SetFloat("MasterPitch", 0f);
+            Time.timeScale = 1.5f;
         }
         
         Utils.GetCustomProperty(Enums.NetRoomProperties.Starcoins, out needsStarcoins);
