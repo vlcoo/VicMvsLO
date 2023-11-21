@@ -136,7 +136,8 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         onScreenControls.SetActive(Utils.GetDeviceType() == Utils.DeviceType.MOBILE ||
                                    Settings.Instance.onScreenControlsAlways);
         foreach (var onScreenButton in onScreenControls.transform.GetComponentsInChildren<Image>())
-            onScreenButton.color = new Color(levelUIColor.r, levelUIColor.g, levelUIColor.b, .4f);
+            if (onScreenButton.transform.name != "Item") 
+                onScreenButton.color = new Color(levelUIColor.r, levelUIColor.g, levelUIColor.b, .4f);
 
         InputSystem.controls.LoadBindingOverridesFromJson(GlobalController.Instance.controlsJson);
 

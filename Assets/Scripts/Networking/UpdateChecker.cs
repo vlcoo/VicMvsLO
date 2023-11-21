@@ -32,14 +32,18 @@ public class UpdateChecker
             var tag = data.Value<string>("tag_name");
             if (tag.StartsWith("v"))
                 tag = tag[1..];
+            if (tag.Contains("-"))
+                tag = tag.Split("-")[0];
 
             var splitTag = tag.Split(".");
 
             var ver = Application.version;
             if (ver.StartsWith("v"))
                 ver = ver[1..];
+            if (ver.Contains("-"))
+                ver = ver.Split("-")[0];
 
-            var splitVer = Application.version.Split(".");
+            var splitVer = ver.Split(".");
 
             Debug.Log($"[UPDATE CHECK] Local version: {ver} / Remote version: {tag}");
 

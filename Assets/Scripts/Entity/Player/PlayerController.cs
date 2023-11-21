@@ -3417,6 +3417,8 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
 
     private void SpawnStars(int amount, bool deathplane)
     {
+        if (GameManager.Instance.Togglerizer.currentEffects.Contains("NoDropStars")) return;
+        
         if (stars > 0)
             PlaySound(Enums.Sounds.World_Star_Spawn);
 

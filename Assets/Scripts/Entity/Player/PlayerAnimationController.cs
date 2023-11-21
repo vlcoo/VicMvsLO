@@ -76,7 +76,7 @@ public class PlayerAnimationController : MonoBehaviourPun
 
         if (photonView)
         {
-            enableGlow = !photonView.IsMine;
+            enableGlow = false;
             if (!photonView.IsMine) GameManager.Instance.CreateNametag(controller);
 
             var colorSet =
