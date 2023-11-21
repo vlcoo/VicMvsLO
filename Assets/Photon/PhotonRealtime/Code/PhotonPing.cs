@@ -12,49 +12,50 @@
 // ----------------------------------------------------------------------------
 
 
+using System;
+
 namespace Photon.Realtime
 {
-    using System;
-    using System.Collections;
-    using System.Threading;
-
-    #if NETFX_CORE
+#if NETFX_CORE
     using System.Diagnostics;
     using Windows.Foundation;
     using Windows.Networking;
     using Windows.Networking.Sockets;
     using Windows.Storage.Streams;
-    #endif
+#endif
 
-    #if !NO_SOCKET && !NETFX_CORE
-    using System.Collections.Generic;
-    using System.Diagnostics;
+#if !NO_SOCKET && !NETFX_CORE
     using System.Net.Sockets;
-    #endif
+#endif
 
-    #if UNITY_WEBGL
+#if UNITY_WEBGL
     // import WWW class
     using UnityEngine;
-    #endif
+#endif
 
     /// <summary>
-    /// Abstract implementation of PhotonPing, ase for pinging servers to find the "Best Region".
+    ///     Abstract implementation of PhotonPing, ase for pinging servers to find the "Best Region".
     /// </summary>
     public abstract class PhotonPing : IDisposable
     {
+        private static readonly Random RandomIdProvider = new();
         public string DebugString = "";
-        
-        public bool Successful;
 
         protected internal bool GotResult;
 
-        protected internal int PingLength = 13;
-
-        protected internal byte[] PingBytes = new byte[] { 0x7d, 0x7d, 0x7d, 0x7d, 0x7d, 0x7d, 0x7d, 0x7d, 0x7d, 0x7d, 0x7d, 0x7d, 0x00 };
+        protected internal byte[] PingBytes =
+            { 0x7d, 0x7d, 0x7d, 0x7d, 0x7d, 0x7d, 0x7d, 0x7d, 0x7d, 0x7d, 0x7d, 0x7d, 0x00 };
 
         protected internal byte PingId;
 
-        private static readonly System.Random RandomIdProvider = new System.Random();
+        protected internal int PingLength = 13;
+
+        public bool Successful;
+
+        public virtual void Dispose()
+        {
+            throw new NotImplementedException();
+        }
 
         public virtual bool StartPing(string ip)
         {
@@ -66,21 +67,16 @@ namespace Photon.Realtime
             throw new NotImplementedException();
         }
 
-        public virtual void Dispose()
-        {
-            throw new NotImplementedException();
-        }
-
         protected internal void Init()
         {
-            this.GotResult = false;
-            this.Successful = false;
-            this.PingId = (byte)(RandomIdProvider.Next(255));
+            GotResult = false;
+            Successful = false;
+            PingId = (byte)RandomIdProvider.Next(255);
         }
     }
 
 
-    #if !NETFX_CORE && !NO_SOCKET
+#if !NETFX_CORE && !NO_SOCKET
     /// <summary>Uses C# Socket class from System.Net.Sockets (as Unity usually does).</summary>
     /// <remarks>Incompatible with Windows 8 Store/Phone API.</remarks>
     public class PingMono : PhotonPing
@@ -88,40 +84,37 @@ namespace Photon.Realtime
         private Socket sock;
 
         /// <summary>
-        /// Sends a "Photon Ping" to a server.
+        ///     Sends a "Photon Ping" to a server.
         /// </summary>
         /// <param name="ip">Address in IPv4 or IPv6 format. An address containing a '.' will be interpreted as IPv4.</param>
         /// <returns>True if the Photon Ping could be sent.</returns>
         public override bool StartPing(string ip)
         {
-            this.Init();
+            Init();
 
             try
             {
-                if (this.sock == null)
+                if (sock == null)
                 {
                     if (ip.Contains("."))
-                    {
-                        this.sock = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
-                    }
+                        sock = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
                     else
-                    {
-                        this.sock = new Socket(AddressFamily.InterNetworkV6, SocketType.Dgram, ProtocolType.Udp);
-                    }
+                        sock = new Socket(AddressFamily.InterNetworkV6, SocketType.Dgram, ProtocolType.Udp);
 
-                    this.sock.ReceiveTimeout = 5000;
-                    int port = (RegionHandler.PortToPingOverride != 0) ? RegionHandler.PortToPingOverride : 5055;
-                    this.sock.Connect(ip, port);
+                    sock.ReceiveTimeout = 5000;
+                    var port = RegionHandler.PortToPingOverride != 0 ? RegionHandler.PortToPingOverride : 5055;
+                    sock.Connect(ip, port);
                 }
 
 
-                this.PingBytes[this.PingBytes.Length - 1] = this.PingId;
-                this.sock.Send(this.PingBytes);
-                this.PingBytes[this.PingBytes.Length - 1] = (byte)(this.PingId+1);  // this buffer is re-used for the result/receive. invalidate the result now.
+                PingBytes[PingBytes.Length - 1] = PingId;
+                sock.Send(PingBytes);
+                PingBytes[PingBytes.Length - 1] =
+                    (byte)(PingId + 1); // this buffer is re-used for the result/receive. invalidate the result now.
             }
             catch (Exception e)
             {
-                this.sock = null;
+                sock = null;
                 Console.WriteLine(e);
             }
 
@@ -130,41 +123,37 @@ namespace Photon.Realtime
 
         public override bool Done()
         {
-            if (this.GotResult || this.sock == null)
-            {
-                return true;    // this just indicates the ping is no longer waiting. this.Successful value defines if the roundtrip completed
-            }
+            if (GotResult ||
+                sock == null)
+                return
+                    true; // this just indicates the ping is no longer waiting. this.Successful value defines if the roundtrip completed
 
-            int read = 0;
+            var read = 0;
             try
             {
-                if (!this.sock.Poll(0, SelectMode.SelectRead))
-                {
-                    return false;
-                }
+                if (!sock.Poll(0, SelectMode.SelectRead)) return false;
 
-                read = this.sock.Receive(this.PingBytes, SocketFlags.None);
+                read = sock.Receive(PingBytes, SocketFlags.None);
             }
             catch (Exception ex)
             {
-                if (this.sock != null)
+                if (sock != null)
                 {
-                    this.sock.Close();
-                    this.sock = null;
+                    sock.Close();
+                    sock = null;
                 }
-                this.DebugString += " Exception of socket! " + ex.GetType() + " ";
-                return true;    // this just indicates the ping is no longer waiting. this.Successful value defines if the roundtrip completed
+
+                DebugString += " Exception of socket! " + ex.GetType() + " ";
+                return
+                    true; // this just indicates the ping is no longer waiting. this.Successful value defines if the roundtrip completed
             }
 
-            bool replyMatch = this.PingBytes[this.PingBytes.Length - 1] == this.PingId && read == this.PingLength;
-            if (!replyMatch)
-            {
-                this.DebugString += " ReplyMatch is false! ";
-            }
+            var replyMatch = PingBytes[PingBytes.Length - 1] == PingId && read == PingLength;
+            if (!replyMatch) DebugString += " ReplyMatch is false! ";
 
 
-            this.Successful = replyMatch;
-            this.GotResult = true;
+            Successful = replyMatch;
+            GotResult = true;
             return true;
         }
 
@@ -172,20 +161,19 @@ namespace Photon.Realtime
         {
             try
             {
-                this.sock.Close();
+                sock.Close();
             }
             catch
             {
             }
 
-            this.sock = null;
+            sock = null;
         }
-
     }
-    #endif
+#endif
 
 
-    #if NETFX_CORE
+#if NETFX_CORE
     /// <summary>Windows store API implementation of PhotonPing, based on DatagramSocket for UDP.</summary>
     public class PingWindowsStore : PhotonPing
     {
@@ -240,14 +228,16 @@ namespace Photon.Realtime
                     DataWriterStoreOperation res = writer.StoreAsync();
                     res.AsTask().Wait(100);
 
-                    this.PingBytes[this.PingBytes.Length - 1] = (byte)(this.PingId + 1); // this buffer is re-used for the result/receive. invalidate the result now.
+                    this.PingBytes[this.PingBytes.Length - 1] =
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  (byte)(this.PingId + 1); // this buffer is re-used for the result/receive. invalidate the result now.
 
                     writer.DetachStream();
                     writer.Dispose();
                 }
                 else
                 {
-                    this.sock = null; // will cause Done() to return true but this.Successful defines if the roundtrip completed
+                    this.sock =
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   null; // will cause Done() to return true but this.Successful defines if the roundtrip completed
                 }
             }
         }
@@ -269,7 +259,8 @@ namespace Photon.Realtime
                         //TODO: check result bytes!
 
 
-                        this.Successful = receivedByteCount == this.PingLength && resultBytes[resultBytes.Length - 1] == this.PingId;
+                        this.Successful =
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       receivedByteCount == this.PingLength && resultBytes[resultBytes.Length - 1] == this.PingId;
                         this.GotResult = true;
                     }
                 }
@@ -280,10 +271,10 @@ namespace Photon.Realtime
             }
         }
     }
-    #endif
+#endif
 
 
-    #if NATIVE_SOCKETS
+#if NATIVE_SOCKETS
 	/// <summary>Abstract base class to provide proper resource management for the below native ping implementations</summary>
 	public abstract class PingNative : PhotonPing
 	{
@@ -353,7 +344,8 @@ namespace Photon.Realtime
                 }
 
                 int pingBytesLength = PingBytes.Length;
-                int bytesInRemainginDatagrams = SocketUdpNativeDynamic.egread(pConnectionHandler, PingBytes, ref pingBytesLength);
+                int bytesInRemainginDatagrams =
+																																																																														                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              SocketUdpNativeDynamic.egread(pConnectionHandler, PingBytes, ref pingBytesLength);
                 this.Successful = (PingBytes != null && PingBytes[PingBytes.Length - 1] == PingId);
                 //Debug.Log("Successful: " + this.Successful + " bytesInRemainginDatagrams: " + bytesInRemainginDatagrams + " PingId: " + PingId);
 
@@ -422,7 +414,8 @@ namespace Photon.Realtime
                 }
 
                 int pingBytesLength = PingBytes.Length;
-                int bytesInRemainginDatagrams = SocketUdpNativeStatic.egread(pConnectionHandler, PingBytes, ref pingBytesLength);
+                int bytesInRemainginDatagrams =
+																																																																																																																																								                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  SocketUdpNativeStatic.egread(pConnectionHandler, PingBytes, ref pingBytesLength);
                 this.Successful = (PingBytes != null && PingBytes[PingBytes.Length - 1] == PingId);
                 //Debug.Log("Successful: " + this.Successful + " bytesInRemainginDatagrams: " + bytesInRemainginDatagrams + " PingId: " + PingId);
 
@@ -443,10 +436,10 @@ namespace Photon.Realtime
         }
     }
     #endif
-    #endif
+#endif
 
 
-    #if UNITY_WEBGL
+#if UNITY_WEBGL
     public class PingHttp : PhotonPing
     {
         private WWW webRequest;
@@ -476,5 +469,5 @@ namespace Photon.Realtime
             this.webRequest.Dispose();
         }
     }
-    #endif
+#endif
 }

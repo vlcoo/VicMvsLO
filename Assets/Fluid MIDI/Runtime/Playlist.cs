@@ -5,25 +5,18 @@ namespace FluidMidi
 {
     public class Playlist : MonoBehaviour
     {
-        [SerializeField]
-        List<SongPlayer> songs = new List<SongPlayer>();
+        [SerializeField] private List<SongPlayer> songs = new();
 
-        int index = 0;
+        private int index;
 
-        public bool IsReady
-        {
-            get
-            {
-                return songs.Count == 0 || songs[0].IsReady;
-            }
-        }
+        public bool IsReady => songs.Count == 0 || songs[0].IsReady;
 
-        void Start()
+        private void Start()
         {
             Play();
         }
 
-        void Update()
+        private void Update()
         {
             if (songs[index].IsDone)
             {
@@ -32,7 +25,7 @@ namespace FluidMidi
             }
         }
 
-        void Play()
+        private void Play()
         {
             while (index < songs.Count)
             {
@@ -41,8 +34,10 @@ namespace FluidMidi
                     songs[index].Play();
                     return;
                 }
+
                 ++index;
             }
+
             enabled = false;
         }
     }

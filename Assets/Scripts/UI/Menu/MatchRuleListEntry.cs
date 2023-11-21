@@ -16,7 +16,7 @@ public class MatchRuleDataEntry : IEquatable<MatchRuleDataEntry>
         Action = act;
         Parameters = param;
     }
-    
+
     public bool Equals(MatchRuleDataEntry other)
     {
         if (ReferenceEquals(null, other)) return false;
@@ -36,7 +36,7 @@ public class MatchRuleDataEntry : IEquatable<MatchRuleDataEntry>
     {
         return HashCode.Combine(base.GetHashCode(), Condition, Action);
     }
-} 
+}
 
 public class MatchRuleListEntry : MonoBehaviour, IEquatable<MatchRuleListEntry>
 {
@@ -46,23 +46,29 @@ public class MatchRuleListEntry : MonoBehaviour, IEquatable<MatchRuleListEntry>
     public TMP_Text lbl;
     public Selectable removeButton;
 
+    public bool Equals(MatchRuleListEntry other)
+    {
+        if (ReferenceEquals(null, other)) return false;
+        if (ReferenceEquals(this, other)) return true;
+        return base.Equals(other) && Condition == other.Condition && Action == other.Action;
+    }
+
     public void setRules(string cond, string act)
     {
         if (cond.Equals("") || act.Equals("")) return;
-        
+
         Condition = cond;
         Action = act;
         if (lbl is not null)
         {
-            string sanitizedCond = Regex.Replace(cond, "(\\B[A-Z0-9])", " $1");
-            string sanitizedAct = Regex.Replace(act, "(\\B[A-Z0-9])", " $1").Replace("Act ", "");
+            var sanitizedCond = Regex.Replace(cond, "(\\B[A-Z0-9])", " $1");
+            var sanitizedAct = Regex.Replace(act, "(\\B[A-Z0-9])", " $1").Replace("Act ", "");
             lbl.text = sanitizedCond + " .. " + sanitizedAct;
         }
     }
 
     public void onRemoveButtonPressed()
     {
-        
     }
 
     public void Deserialize(MatchRuleDataEntry rule)
@@ -76,13 +82,6 @@ public class MatchRuleListEntry : MonoBehaviour, IEquatable<MatchRuleListEntry>
     {
         MatchRuleDataEntry rule = new(Condition, Action, Parameters);
         return rule;
-    }
-
-    public bool Equals(MatchRuleListEntry other)
-    {
-        if (ReferenceEquals(null, other)) return false;
-        if (ReferenceEquals(this, other)) return true;
-        return base.Equals(other) && Condition == other.Condition && Action == other.Action;
     }
 
     public override bool Equals(object obj)

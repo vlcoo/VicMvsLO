@@ -1,35 +1,35 @@
 using System.Collections;
-using DG.Tweening;
+using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using TMPro;
-
 using static UnityEngine.InputSystem.InputActionRebindingExtensions;
 
-public class RebindButton : MonoBehaviour {
-
+public class RebindButton : MonoBehaviour
+{
     public int timeoutTime = 6;
     public InputAction targetAction;
     public InputBinding targetBinding;
     public int index;
+    private Coroutine countdown;
     private TMP_Text ourText;
     private RebindingOperation rebinding;
-    private Coroutine countdown;
 
-    public void Start() {
+    public void Start()
+    {
         ourText = GetComponentInChildren<TMP_Text>();
         SetText();
         targetAction.actionMap.Enable();
     }
 
-    public void StartRebind() {
-
+    public void StartRebind()
+    {
         targetAction.actionMap.Disable();
 
-        GameObject rebindPrompt = MainMenuManager.Instance.rebindPrompt;
+        var rebindPrompt = MainMenuManager.Instance.rebindPrompt;
         MainMenuManager.OpenPrompt(rebindPrompt);
         MainMenuManager.Instance.ConfirmSound(true);
-        MainMenuManager.Instance.rebindText.text = $"Rebinding <i>{targetAction.name} {targetBinding.name} ({targetBinding.groups})</i>\nPress any button or key.";
+        MainMenuManager.Instance.rebindText.text =
+            $"Rebinding <i>{targetAction.name} {targetBinding.name} ({targetBinding.groups})</i>\nPress any button or key.";
 
         rebinding = targetAction
             .PerformInteractiveRebinding()
@@ -48,20 +48,24 @@ public class RebindButton : MonoBehaviour {
         countdown = StartCoroutine(TimeoutCountdown());
     }
 
-    private IEnumerator TimeoutCountdown() {
-        for (int i = timeoutTime; i > 0; i--) {
+    private IEnumerator TimeoutCountdown()
+    {
+        for (var i = timeoutTime; i > 0; i--)
+        {
             MainMenuManager.Instance.rebindCountdown.text = i.ToString();
             yield return new WaitForSecondsRealtime(1);
         }
     }
 
-    private void OnRebindComplete(RebindingOperation operation) {
+    private void OnRebindComplete(RebindingOperation operation)
+    {
         SetText();
         CleanRebind(operation);
         RebindManager.Instance.SaveRebindings();
     }
 
-    private void CleanRebind(RebindingOperation operation) {
+    private void CleanRebind(RebindingOperation operation)
+    {
         targetAction.actionMap.Enable();
         rebinding.Dispose();
         StartCoroutine(MainMenuManager.ClosePromptCoroutine(MainMenuManager.Instance.rebindPrompt));
@@ -69,10 +73,12 @@ public class RebindButton : MonoBehaviour {
         StopCoroutine(countdown);
     }
 
-    public void SetText() {
+    public void SetText()
+    {
         targetBinding = targetAction.bindings[index];
         ourText.text = InputControlPath.ToHumanReadableString(
             targetBinding.effectivePath,
-            InputControlPath.HumanReadableStringOptions.OmitDevice | InputControlPath.HumanReadableStringOptions.UseShortNames);
+            InputControlPath.HumanReadableStringOptions.OmitDevice |
+            InputControlPath.HumanReadableStringOptions.UseShortNames);
     }
 }

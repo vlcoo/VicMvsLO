@@ -8,83 +8,84 @@
 // <author>developer@photonengine.com</author>
 // ----------------------------------------------------------------------------
 
-
 #if UNITY_4_7 || UNITY_5 || UNITY_5_3_OR_NEWER
 #define SUPPORTED_UNITY
 #endif
 
+using System;
+using System.Diagnostics;
+using ExitGames.Client.Photon;
 
 namespace Photon.Realtime
 {
-    using System;
-    using System.Diagnostics;
-    using SupportClass = ExitGames.Client.Photon.SupportClass;
-
-    #if SUPPORTED_UNITY
+#if SUPPORTED_UNITY
     using UnityEngine;
-    #endif
+#endif
 
 
-    #if SUPPORTED_UNITY
+#if SUPPORTED_UNITY
     public class ConnectionHandler : MonoBehaviour
-    #else
+#else
     public class ConnectionHandler
-    #endif
+#endif
     {
         /// <summary>
-        /// Photon client to log information and statistics from.
+        ///     Photon client to log information and statistics from.
         /// </summary>
         public LoadBalancingClient Client { get; set; }
 
         /// <summary>Option to let the fallback thread call Disconnect after the KeepAliveInBackground time. Default: false.</summary>
         /// <remarks>
-        /// If set to true, the thread will disconnect the client regularly, should the client not call SendOutgoingCommands / Service.
-        /// This may happen due to an app being in background (and not getting a lot of CPU time) or when loading assets.
-        /// 
-        /// If false, a regular timeout time will have to pass (on top) to time out the client.
+        ///     If set to true, the thread will disconnect the client regularly, should the client not call SendOutgoingCommands /
+        ///     Service.
+        ///     This may happen due to an app being in background (and not getting a lot of CPU time) or when loading assets.
+        ///     If false, a regular timeout time will have to pass (on top) to time out the client.
         /// </remarks>
-        public bool DisconnectAfterKeepAlive = false;
-        
+        public bool DisconnectAfterKeepAlive;
+
         /// <summary>Defines for how long the Fallback Thread should keep the connection, before it may time out as usual.</summary>
-        /// <remarks>We want to the Client to keep it's connection when an app is in the background (and doesn't call Update / Service Clients should not keep their connection indefinitely in the background, so after some milliseconds, the Fallback Thread should stop keeping it up.</remarks>
+        /// <remarks>
+        ///     We want to the Client to keep it's connection when an app is in the background (and doesn't call Update /
+        ///     Service Clients should not keep their connection indefinitely in the background, so after some milliseconds, the
+        ///     Fallback Thread should stop keeping it up.
+        /// </remarks>
         public int KeepAliveInBackground = 60000;
 
-        /// <summary>Counts how often the Fallback Thread called SendAcksOnly, which is purely of interest to monitor if the game logic called SendOutgoingCommands as intended.</summary>
+        /// <summary>
+        ///     Counts how often the Fallback Thread called SendAcksOnly, which is purely of interest to monitor if the game
+        ///     logic called SendOutgoingCommands as intended.
+        /// </summary>
         public int CountSendAcksOnly { get; private set; }
 
         /// <summary>True if a fallback thread is running. Will call the client's SendAcksOnly() method to keep the connection up.</summary>
-        public bool FallbackThreadRunning
-        {
-            get { return this.fallbackThreadId < 255; }
-        }
-        
+        public bool FallbackThreadRunning => fallbackThreadId < 255;
+
         /// <summary>Keeps the ConnectionHandler, even if a new scene gets loaded.</summary>
         public bool ApplyDontDestroyOnLoad = true;
 
         /// <summary>Indicates that the app is closing. Set in OnApplicationQuit().</summary>
-        [NonSerialized]
-        public static bool AppQuits;
+        [NonSerialized] public static bool AppQuits;
 
 
         private byte fallbackThreadId = 255;
         private bool didSendAcks;
-        private readonly Stopwatch backgroundStopwatch = new Stopwatch();
+        private readonly Stopwatch backgroundStopwatch = new();
 
 
-        #if SUPPORTED_UNITY
+#if SUPPORTED_UNITY
 
-        #if UNITY_2019_4_OR_NEWER
+#if UNITY_2019_4_OR_NEWER
 
         /// <summary>
-        /// Resets statics for Domain Reload
+        ///     Resets statics for Domain Reload
         /// </summary>
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-        static void StaticReset()
+        private static void StaticReset()
         {
             AppQuits = false;
         }
 
-        #endif
+#endif
 
 
         /// <summary>Called by Unity when the application gets closed. The UnityEngine will also call OnDisable, which disconnects.</summary>
@@ -97,99 +98,91 @@ namespace Photon.Realtime
         /// <summary></summary>
         protected virtual void Awake()
         {
-            if (this.ApplyDontDestroyOnLoad)
-            {
-                DontDestroyOnLoad(this.gameObject);
-            }
+            if (ApplyDontDestroyOnLoad) DontDestroyOnLoad(gameObject);
         }
 
         /// <summary>Called by Unity when the application gets closed. Disconnects if OnApplicationQuit() was called before.</summary>
         protected virtual void OnDisable()
         {
-            this.StopFallbackSendAckThread();
+            StopFallbackSendAckThread();
 
             if (AppQuits)
             {
-                if (this.Client != null && this.Client.IsConnected)
+                if (Client != null && Client.IsConnected)
                 {
-                    this.Client.Disconnect();
-                    this.Client.LoadBalancingPeer.StopThread();
+                    Client.Disconnect();
+                    Client.LoadBalancingPeer.StopThread();
                 }
 
                 SupportClass.StopAllBackgroundCalls();
             }
         }
 
-        #endif
+#endif
 
 
         public void StartFallbackSendAckThread()
         {
-            #if !UNITY_WEBGL
-            if (this.FallbackThreadRunning)
-            {
-                return;
-            }
+#if !UNITY_WEBGL
+            if (FallbackThreadRunning) return;
 
-            #if UNITY_SWITCH
-            this.fallbackThreadId = SupportClass.StartBackgroundCalls(this.RealtimeFallbackThread, 50);  // as workaround, we don't name the Thread.
-            #else
-            this.fallbackThreadId = SupportClass.StartBackgroundCalls(this.RealtimeFallbackThread, 50, "RealtimeFallbackThread");
-            #endif
-            #endif
+#if UNITY_SWITCH
+            this.fallbackThreadId =
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         SupportClass.StartBackgroundCalls(this.RealtimeFallbackThread, 50);  // as workaround, we don't name the Thread.
+#else
+            fallbackThreadId = SupportClass.StartBackgroundCalls(RealtimeFallbackThread, 50, "RealtimeFallbackThread");
+#endif
+#endif
         }
 
         public void StopFallbackSendAckThread()
         {
-            #if !UNITY_WEBGL
-            if (!this.FallbackThreadRunning)
-            {
-                return;
-            }
+#if !UNITY_WEBGL
+            if (!FallbackThreadRunning) return;
 
-            SupportClass.StopBackgroundCalls(this.fallbackThreadId);
-            this.fallbackThreadId = 255;
-            #endif
+            SupportClass.StopBackgroundCalls(fallbackThreadId);
+            fallbackThreadId = 255;
+#endif
         }
 
 
-        /// <summary>A thread which runs independent from the Update() calls. Keeps connections online while loading or in background. See <see cref="KeepAliveInBackground"/>.</summary>
+        /// <summary>
+        ///     A thread which runs independent from the Update() calls. Keeps connections online while loading or in
+        ///     background. See <see cref="KeepAliveInBackground" />.
+        /// </summary>
         public bool RealtimeFallbackThread()
         {
-            if (this.Client != null)
+            if (Client != null)
             {
-                if (!this.Client.IsConnected)
+                if (!Client.IsConnected)
                 {
-                    this.didSendAcks = false;
+                    didSendAcks = false;
                     return true;
                 }
 
-                if (this.Client.LoadBalancingPeer.ConnectionTime - this.Client.LoadBalancingPeer.LastSendOutgoingTime > 100)
+                if (Client.LoadBalancingPeer.ConnectionTime - Client.LoadBalancingPeer.LastSendOutgoingTime > 100)
                 {
-                    if (!this.didSendAcks)
+                    if (!didSendAcks)
                     {
                         backgroundStopwatch.Reset();
                         backgroundStopwatch.Start();
                     }
-                    
+
                     // check if the client should disconnect after some seconds in background
-                    if (backgroundStopwatch.ElapsedMilliseconds > this.KeepAliveInBackground)
+                    if (backgroundStopwatch.ElapsedMilliseconds > KeepAliveInBackground)
                     {
-                        if (this.DisconnectAfterKeepAlive)
-                        {
-                            this.Client.Disconnect();
-                        }
+                        if (DisconnectAfterKeepAlive) Client.Disconnect();
                         return true;
                     }
-                    
 
-                    this.didSendAcks = true;
-                    this.CountSendAcksOnly++;
-                    this.Client.LoadBalancingPeer.SendAcksOnly();
+
+                    didSendAcks = true;
+                    CountSendAcksOnly++;
+                    Client.LoadBalancingPeer.SendAcksOnly();
                 }
                 else
                 {
-                    this.didSendAcks = false;
+                    didSendAcks = false;
                 }
             }
 

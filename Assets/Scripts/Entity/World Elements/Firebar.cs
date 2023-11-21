@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -8,17 +6,17 @@ public class Firebar : MonoBehaviour
     public SpriteRenderer sprite;
     public Transform spriteTform;
     [FormerlySerializedAs("collider")] public BoxCollider2D colliderBar;
-    public bool onlyOneSide = false;
+    public bool onlyOneSide;
     public int tiles = 1;
-    
-    public void Start() {
+
+    public void Start()
+    {
         Initialize();
     }
 
-    public void OnValidate() {
-        ValidationUtility.SafeOnValidate(() => {
-            Initialize();
-        });
+    public void OnValidate()
+    {
+        ValidationUtility.SafeOnValidate(() => { Initialize(); });
     }
 
     private void Initialize()

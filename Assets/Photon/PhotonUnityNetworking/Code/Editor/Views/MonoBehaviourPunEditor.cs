@@ -8,15 +8,14 @@
 // <author>developer@exitgames.com</author>
 // ----------------------------------------------------------------------------
 
+using UnityEditor;
+
 namespace Photon.Pun
 {
-    using UnityEditor;
-    using UnityEngine;
-
     [CustomEditor(typeof(MonoBehaviourPun))]
     public abstract class MonoBehaviourPunEditor : Editor
     {
-        MonoBehaviourPun mbTarget;
+        private MonoBehaviourPun mbTarget;
 
         private void OnEnable()
         {
@@ -30,11 +29,8 @@ namespace Photon.Pun
             base.OnInspectorGUI();
 
             if (mbTarget.photonView == null)
-            {
-                EditorGUILayout.HelpBox("Unable to find a PhotonView on this GameObject or on any parent GameObject.", MessageType.Warning);
-            }
+                EditorGUILayout.HelpBox("Unable to find a PhotonView on this GameObject or on any parent GameObject.",
+                    MessageType.Warning);
         }
-
-
     }
 }

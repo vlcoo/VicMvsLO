@@ -1,14 +1,18 @@
-using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class DeviceRumbler : MonoBehaviour {
-    private Gamepad pad;
+public class DeviceRumbler : MonoBehaviour
+{
+    public bool rumbleEnabled = true;
     private Coroutine currentlyRumbling;
+    private Gamepad pad;
 
-    public bool rumbleEnabled = true; 
-    
+    private void Start()
+    {
+        rumbleEnabled = GlobalController.Instance.settings.rumbleController;
+    }
+
     private void OnEnable()
     {
         UnityEngine.InputSystem.InputSystem.onDeviceChange += OnDeviceChange;
@@ -20,11 +24,6 @@ public class DeviceRumbler : MonoBehaviour {
         UnityEngine.InputSystem.InputSystem.onDeviceChange -= OnDeviceChange;
     }
 
-    private void Start()
-    {
-        rumbleEnabled = GlobalController.Instance.settings.rumbleController;
-    }
-
     private void OnDeviceChange(InputDevice device, InputDeviceChange change)
     {
         if (device is not Gamepad gamepad) return;
@@ -32,7 +31,8 @@ public class DeviceRumbler : MonoBehaviour {
         pad = gamepad;
     }
 
-    public void RumbleForSeconds(float bassStrength, float trebleStrength, float duration) {
+    public void RumbleForSeconds(float bassStrength, float trebleStrength, float duration)
+    {
 #if UNITY_ANDROID
         if (rumbleEnabled) Handheld.Vibrate();
 #else
@@ -42,7 +42,8 @@ public class DeviceRumbler : MonoBehaviour {
 #endif
     }
 
-    private IEnumerator Rumble(float lowFreq, float highFreq, float duration) {
+    private IEnumerator Rumble(float lowFreq, float highFreq, float duration)
+    {
         pad.SetMotorSpeeds(lowFreq, highFreq);
         yield return new WaitForSeconds(duration);
         pad.SetMotorSpeeds(0f, 0f);

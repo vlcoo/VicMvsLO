@@ -1,14 +1,11 @@
-using System;
 using System.Collections.Generic;
+using NSMB.Utils;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
 
-using NSMB.Utils;
-using UnityEngine.Assertions.Comparers;
-
-public class ScoreboardEntry : MonoBehaviour {
-
+public class ScoreboardEntry : MonoBehaviour
+{
     [SerializeField] private TMP_Text nameText, valuesText;
     [SerializeField] private Image background;
 
@@ -17,8 +14,10 @@ public class ScoreboardEntry : MonoBehaviour {
     private int playerId, currentLives, currentStars, currentLaps, currentCoins;
     private bool rainbowEnabled;
 
-    public void Start() {
-        if (!target) {
+    public void Start()
+    {
+        if (!target)
+        {
             enabled = false;
             return;
         }
@@ -26,26 +25,31 @@ public class ScoreboardEntry : MonoBehaviour {
         playerId = target.playerId;
         nameText.text = target.photonView.Owner.GetUniqueNickname();
 
-        Color c = target.AnimationController.GlowColor;
-        background.color = new(c.r, c.g, c.b, 0.5f);
+        var c = target.AnimationController.GlowColor;
+        background.color = new Color(c.r, c.g, c.b, 0.5f);
 
         rainbowEnabled = target.photonView.Owner.HasRainbowName();
     }
 
-    public void Update() {
+    public void Update()
+    {
         CheckForTextUpdate();
 
         if (rainbowEnabled)
             nameText.colorGradientPreset = Utils.GetRainbowColor();
     }
 
-    public void CheckForTextUpdate() {
-        if (!target) {
+    public void CheckForTextUpdate()
+    {
+        if (!target)
+        {
             // our target lost all lives (or dc'd)
-            background.color = new(0.4f, 0.4f, 0.4f, 0.5f);
+            background.color = new Color(0.4f, 0.4f, 0.4f, 0.5f);
             return;
         }
-        if (target.lives == currentLives && target.stars == currentStars && target.laps == currentLaps && target.coins == currentCoins)
+
+        if (target.lives == currentLives && target.stars == currentStars && target.laps == currentLaps &&
+            target.coins == currentCoins)
             // No changes.
             return;
 
@@ -57,8 +61,9 @@ public class ScoreboardEntry : MonoBehaviour {
         ScoreboardUpdater.instance.Reposition();
     }
 
-    private void UpdateText() {
-        string txt = "";
+    private void UpdateText()
+    {
+        var txt = "";
         if (currentLives >= 0)
             txt += target.character.uistring + Utils.GetSymbolString(currentLives.ToString());
         if (GameManager.Instance.starRequirement > 0)
@@ -71,11 +76,12 @@ public class ScoreboardEntry : MonoBehaviour {
         valuesText.text = txt;
     }
 
-    public class EntryComparer : IComparer<ScoreboardEntry> {
+    public class EntryComparer : IComparer<ScoreboardEntry>
+    {
         public int Compare(ScoreboardEntry x, ScoreboardEntry y)
         {
-            if (x.target == null ^ y.target == null) return x.target == null ? -1 : 1;
-            int comparisonResult = 0;
+            if ((x.target == null) ^ (y.target == null)) return x.target == null ? -1 : 1;
+            var comparisonResult = 0;
 
             // if race level then sort by lap
             if (GameManager.Instance.raceLevel) comparisonResult = x.currentLaps.CompareTo(y.currentLaps);

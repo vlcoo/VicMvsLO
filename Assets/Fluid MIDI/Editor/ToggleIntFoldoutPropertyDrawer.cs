@@ -8,20 +8,20 @@ namespace FluidMidi
     [CustomPropertyDrawer(typeof(ToggleIntFoldoutAttribute))]
     public class ToggleIntFoldoutPropertyDrawer : PropertyDrawer
     {
-        bool foldout;
+        private bool foldout;
 
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
-            ToggleIntFoldoutAttribute attribute = this.attribute as ToggleIntFoldoutAttribute;
+            var attribute = this.attribute as ToggleIntFoldoutAttribute;
 
             EditorGUI.BeginProperty(position, label, property);
-            SerializedProperty enabledProperty = property.FindPropertyRelative("Enabled");
-            SerializedProperty valueProperty = property.FindPropertyRelative("Value");
-            bool enabled = enabledProperty.boolValue;
-            int value = valueProperty.intValue;
+            var enabledProperty = property.FindPropertyRelative("Enabled");
+            var valueProperty = property.FindPropertyRelative("Value");
+            var enabled = enabledProperty.boolValue;
+            var value = valueProperty.intValue;
             EditorGUI.BeginChangeCheck();
             position.height = EditorGUIUtility.singleLineHeight;
-            TooltipAttribute tooltipAttribute =
+            var tooltipAttribute =
                 Attribute.GetCustomAttribute(
                     property.serializedObject.targetObject.GetType().GetField(
                         property.name, BindingFlags.NonPublic | BindingFlags.Instance),
@@ -38,21 +38,21 @@ namespace FluidMidi
                     EditorGUI.indentLevel -= 1;
                 }
             }
+
             if (EditorGUI.EndChangeCheck())
             {
                 enabledProperty.boolValue = enabled;
                 valueProperty.intValue = value;
             }
+
             EditorGUI.EndProperty();
         }
 
         public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
         {
-            float height = EditorGUIUtility.singleLineHeight;
+            var height = EditorGUIUtility.singleLineHeight;
             if (foldout && property.FindPropertyRelative("Enabled").boolValue)
-            {
                 height += EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
-            }
             return height;
         }
     }

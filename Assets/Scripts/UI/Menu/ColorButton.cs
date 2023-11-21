@@ -1,16 +1,30 @@
 using UnityEngine;
-using UnityEngine.UI;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
-public class ColorButton : MonoBehaviour, ISelectHandler, IDeselectHandler {
-
+public class ColorButton : MonoBehaviour, ISelectHandler, IDeselectHandler
+{
     [SerializeField] private Sprite overlayUnpressed, overlayPressed;
     [SerializeField] private Image shirt, overalls, overlay;
 
     public PlayerColorSet palette;
 
-    public void Instantiate(PlayerColors col) {
-        if (col == null) {
+    public void OnDeselect(BaseEventData eventData)
+    {
+        overlay.enabled = false;
+        overlay.sprite = overlayUnpressed;
+    }
+
+    public void OnSelect(BaseEventData eventData)
+    {
+        overlay.enabled = true;
+        overlay.sprite = overlayUnpressed;
+    }
+
+    public void Instantiate(PlayerColors col)
+    {
+        if (col == null)
+        {
             shirt.enabled = false;
             overalls.enabled = false;
             return;
@@ -21,17 +35,8 @@ public class ColorButton : MonoBehaviour, ISelectHandler, IDeselectHandler {
         overlay.enabled = false;
     }
 
-    public void OnSelect(BaseEventData eventData) {
-        overlay.enabled = true;
-        overlay.sprite = overlayUnpressed;
-    }
-
-    public void OnDeselect(BaseEventData eventData) {
-        overlay.enabled = false;
-        overlay.sprite = overlayUnpressed;
-    }
-
-    public void OnPress() {
+    public void OnPress()
+    {
         overlay.sprite = overlayPressed;
     }
 }

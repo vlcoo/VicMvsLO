@@ -1,16 +1,19 @@
 using UnityEngine;
 
-public class ParticleSound : MonoBehaviour {
-
-    private ParticleSystem system;
+public class ParticleSound : MonoBehaviour
+{
     private AudioSource sfx;
 
-    public void Start() {
+    private ParticleSystem system;
+
+    public void Start()
+    {
         system = GetComponent<ParticleSystem>();
         sfx = GetComponent<AudioSource>();
     }
 
-    public void Update() {
+    public void Update()
+    {
         if (system.isEmitting && !sfx.isPlaying)
             sfx.Play();
         if (!system.isEmitting && sfx.isPlaying)

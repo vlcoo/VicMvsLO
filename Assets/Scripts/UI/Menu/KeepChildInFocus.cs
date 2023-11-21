@@ -1,39 +1,56 @@
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 [RequireComponent(typeof(ScrollRect))]
-public class KeepChildInFocus : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler {
+public class KeepChildInFocus : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
+{
     public float scrollAmount = 15;
-    private bool mouseOver = false;
-    private ScrollRect rect;
-    private float scrollPos = 0;
 
-    void Awake() {
+    private readonly List<ScrollRect> components = new();
+    private bool mouseOver;
+    private ScrollRect rect;
+    private float scrollPos;
+
+    private void Awake()
+    {
         rect = GetComponent<ScrollRect>();
     }
-    void Update() {
+
+    private void Update()
+    {
         if (mouseOver || rect.content == null)
             return;
-        
-        rect.verticalNormalizedPosition = Mathf.Lerp(rect.verticalNormalizedPosition, scrollPos, scrollAmount * Time.deltaTime);
+
+        rect.verticalNormalizedPosition =
+            Mathf.Lerp(rect.verticalNormalizedPosition, scrollPos, scrollAmount * Time.deltaTime);
 
         if (!EventSystem.current.currentSelectedGameObject)
             return;
 
-        RectTransform target = EventSystem.current.currentSelectedGameObject.GetComponent<RectTransform>();
+        var target = EventSystem.current.currentSelectedGameObject.GetComponent<RectTransform>();
 
-        if (IsFirstParent(target) && target.name != "Scrollbar Vertical") {
-            scrollPos = Extensions.ScrollToCenter(rect, target, false);
-        } else {
+        if (IsFirstParent(target) && target.name != "Scrollbar Vertical")
+            scrollPos = rect.ScrollToCenter(target, false);
+        else
             scrollPos = rect.verticalNormalizedPosition;
-        }
     }
 
-    private readonly List<ScrollRect> components = new();
-    private bool IsFirstParent(Transform target) {
-        do {
+    public void OnPointerEnter(PointerEventData eventData)
+    {
+        mouseOver = true;
+    }
+
+    public void OnPointerExit(PointerEventData eventData)
+    {
+        mouseOver = false;
+    }
+
+    private bool IsFirstParent(Transform target)
+    {
+        do
+        {
             if (target.GetComponent<IFocusIgnore>() != null)
                 return false;
 
@@ -48,12 +65,7 @@ public class KeepChildInFocus : MonoBehaviour, IPointerEnterHandler, IPointerExi
         return false;
     }
 
-    public void OnPointerEnter(PointerEventData eventData) {
-        mouseOver = true;
+    public interface IFocusIgnore
+    {
     }
-    public void OnPointerExit(PointerEventData eventData) {
-        mouseOver = false;
-    }
-
-    public interface IFocusIgnore { }
 }

@@ -9,19 +9,19 @@
 // ----------------------------------------------------------------------------
 
 
+using System;
+using System.Collections.Generic;
+using Photon.Realtime;
+using UnityEngine;
+
 namespace Photon.Pun
 {
-    using System;
-    using System.Collections.Generic;
-    using ExitGames.Client.Photon;
-    using Photon.Realtime;
-    using UnityEngine;
-
     /// <summary>
-    /// Collection of connection-relevant settings, used internally by PhotonNetwork.ConnectUsingSettings.
+    ///     Collection of connection-relevant settings, used internally by PhotonNetwork.ConnectUsingSettings.
     /// </summary>
     /// <remarks>
-    /// Includes the AppSettings class from the Realtime APIs plus some other, PUN-relevant, settings.</remarks>
+    ///     Includes the AppSettings class from the Realtime APIs plus some other, PUN-relevant, settings.
+    /// </remarks>
     [Serializable]
     [HelpURL("https://doc.photonengine.com/en-us/pun/v2/getting-started/initial-setup")]
     public class ServerSettings : ScriptableObject
@@ -29,12 +29,14 @@ namespace Photon.Pun
         [Tooltip("Core Photon Server/Cloud settings.")]
         public AppSettings AppSettings;
 
-        /// <summary>Region that will be used by the Editor and Development Builds. This ensures all users will be in the same region for testing.</summary>
+        /// <summary>
+        ///     Region that will be used by the Editor and Development Builds. This ensures all users will be in the same
+        ///     region for testing.
+        /// </summary>
         [Tooltip("Developer build override for Best Region.")]
         public string DevRegion;
 
-        [Tooltip("Log output by PUN.")]
-        public PunLogLevel PunLogging = PunLogLevel.ErrorsOnly;
+        [Tooltip("Log output by PUN.")] public PunLogLevel PunLogging = PunLogLevel.ErrorsOnly;
 
         [Tooltip("Logs additional info for debugging.")]
         public bool EnableSupportLogger;
@@ -46,20 +48,18 @@ namespace Photon.Pun
         public bool StartInOfflineMode;
 
         [Tooltip("RPC name list.\nUsed as shortcut when sending calls.")]
-        public List<string> RpcList = new List<string>();   // set by scripts and or via Inspector
+        public List<string> RpcList = new(); // set by scripts and or via Inspector
 
-        #if UNITY_EDITOR
-        public bool DisableAutoOpenWizard;
-        public bool ShowSettings;
-        public bool DevRegionSetOnce;
-        #endif
+        /// <summary>Gets the "best region summary" from the preferences.</summary>
+        /// <value>The best region code in preferences.</value>
+        public static string BestRegionSummaryInPreferences => PhotonNetwork.BestRegionSummaryInPreferences;
 
         /// <summary>Sets appid and region code in the AppSettings. Used in Editor.</summary>
         public void UseCloud(string cloudAppid, string code = "")
         {
-            this.AppSettings.AppIdRealtime = cloudAppid;
-            this.AppSettings.Server = null;
-            this.AppSettings.FixedRegion = string.IsNullOrEmpty(code) ? null : code;
+            AppSettings.AppIdRealtime = cloudAppid;
+            AppSettings.Server = null;
+            AppSettings.FixedRegion = string.IsNullOrEmpty(code) ? null : code;
         }
 
         /// <summary>Checks if a string is a Guid by attempting to create one.</summary>
@@ -75,14 +75,8 @@ namespace Photon.Pun
             {
                 return false;
             }
-            return true;
-        }
 
-        /// <summary>Gets the "best region summary" from the preferences.</summary>
-        /// <value>The best region code in preferences.</value>
-        public static string BestRegionSummaryInPreferences
-        {
-            get { return PhotonNetwork.BestRegionSummaryInPreferences; }
+            return true;
         }
 
         /// <summary>Sets the "best region summary" in the preferences to null. On next start, the client will ping all available.</summary>
@@ -94,7 +88,13 @@ namespace Photon.Pun
         /// <summary>String summary of the AppSettings.</summary>
         public override string ToString()
         {
-            return "ServerSettings: " + this.AppSettings.ToStringFull();
+            return "ServerSettings: " + AppSettings.ToStringFull();
         }
+
+#if UNITY_EDITOR
+        public bool DisableAutoOpenWizard;
+        public bool ShowSettings;
+        public bool DevRegionSetOnce;
+#endif
     }
 }

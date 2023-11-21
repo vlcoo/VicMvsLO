@@ -1,13 +1,12 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace Photon.Pun
 {
-
     public static class NestedComponentUtilities
     {
-
         public static T EnsureRootComponentExists<T, NestedT>(this Transform transform)
             where T : Component
             where NestedT : Component
@@ -29,17 +28,18 @@ namespace Photon.Pun
         #region GetComponent Replacements
 
         // Recycled collections
-        private static Queue<Transform> nodesQueue = new Queue<Transform>();
-        public static Dictionary<System.Type, ICollection> searchLists = new Dictionary<System.Type, ICollection>();
-        private static Stack<Transform> nodeStack = new Stack<Transform>();
+        private static readonly Queue<Transform> nodesQueue = new();
+        public static Dictionary<Type, ICollection> searchLists = new();
+        private static readonly Stack<Transform> nodeStack = new();
 
         /// <summary>
-        /// Find T on supplied transform or any parent. Unlike GetComponentInParent, GameObjects do not need to be active to be found.
+        ///     Find T on supplied transform or any parent. Unlike GetComponentInParent, GameObjects do not need to be active to be
+        ///     found.
         /// </summary>
         public static T GetParentComponent<T>(this Transform t)
             where T : Component
         {
-            T found = t.GetComponent<T>();
+            var found = t.GetComponent<T>();
 
             if (found)
                 return found;
@@ -52,12 +52,14 @@ namespace Photon.Pun
                     return found;
                 par = par.parent;
             }
+
             return null;
         }
 
 
         /// <summary>
-        /// Returns all T found between the child transform and its root. Order in List from child to parent, with the root/parent most being last.
+        ///     Returns all T found between the child transform and its root. Order in List from child to parent, with the
+        ///     root/parent most being last.
         /// </summary>
         /// <param name="t"></param>
         /// <returns></returns>
@@ -68,7 +70,7 @@ namespace Photon.Pun
 
             while (t != null)
             {
-                T obj = t.GetComponent<T>();
+                var obj = t.GetComponent<T>();
                 if (obj)
                     list.Add(obj);
 
@@ -115,13 +117,13 @@ namespace Photon.Pun
                     // Add node to queue for next depth pass since nothing was found on this layer.
                     nodesQueue.Enqueue(child);
                 }
-
             }
+
             return found;
         }
 
         /// <summary>
-        /// Same as GetComponentInParent, but will always include inactive objects in search.
+        ///     Same as GetComponentInParent, but will always include inactive objects in search.
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <typeparam name="DontRecurseOnT"></typeparam>
@@ -133,10 +135,9 @@ namespace Photon.Pun
         {
             T found = null;
 
-            Transform node = t;
+            var node = t;
             do
             {
-
                 found = node.GetComponent<T>();
 
                 if (!ReferenceEquals(found, null))
@@ -147,14 +148,13 @@ namespace Photon.Pun
                     return null;
 
                 node = node.parent;
-            }
-            while (!ReferenceEquals(node, null));
+            } while (!ReferenceEquals(node, null));
 
             return null;
         }
 
         /// <summary>
-        /// UNTESTED
+        ///     UNTESTED
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <typeparam name="StopSearchOnT"></typeparam>
@@ -184,14 +184,17 @@ namespace Photon.Pun
                     return null;
 
                 par = par.parent;
-            };
+            }
+
+            ;
 
             return null;
         }
 
 
         /// <summary>
-        /// Finds components of type T on supplied transform, and every parent above that node, inclusively stopping on node StopSearchOnT component.
+        ///     Finds components of type T on supplied transform, and every parent above that node, inclusively stopping on node
+        ///     StopSearchOnT component.
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <typeparam name="StopSearchOnT"></typeparam>
@@ -202,7 +205,6 @@ namespace Photon.Pun
             where T : class
             where NestedT : class
         {
-
             // Get components on the starting node - this is a given.
             t.GetComponents(list);
 
@@ -238,7 +240,7 @@ namespace Photon.Pun
             if (nodeStack.Count == 0)
                 return;
 
-            System.Type type = typeof(T);
+            var type = typeof(T);
 
             // Acquire the right searchlist from our pool
             List<T> searchList;
@@ -264,16 +266,18 @@ namespace Photon.Pun
 
 
         /// <summary>
-        /// Same as GetComponentsInChildren, but will not recurse into children with component of the DontRecurseOnT type. This allows nesting of PhotonViews/NetObjects to be respected.
+        ///     Same as GetComponentsInChildren, but will not recurse into children with component of the DontRecurseOnT type. This
+        ///     allows nesting of PhotonViews/NetObjects to be respected.
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="t"></param>
         /// <param name="list">Pass null and a reused list will be used. Consume immediately.</param>
-        public static List<T> GetNestedComponentsInChildren<T, NestedT>(this Transform t, List<T> list, bool includeInactive = true)
+        public static List<T> GetNestedComponentsInChildren<T, NestedT>(this Transform t, List<T> list,
+            bool includeInactive = true)
             where T : class
             where NestedT : class
         {
-            System.Type type = typeof(T);
+            var type = typeof(T);
 
             // Temp lists are also recycled. Get/Create a reusable List of this type.
             List<T> searchList;
@@ -336,15 +340,17 @@ namespace Photon.Pun
         }
 
         /// <summary>
-        /// Same as GetComponentsInChildren, but will not recurse into children with component of the DontRecurseOnT type. This allows nesting of PhotonViews/NetObjects to be respected.
+        ///     Same as GetComponentsInChildren, but will not recurse into children with component of the DontRecurseOnT type. This
+        ///     allows nesting of PhotonViews/NetObjects to be respected.
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="t"></param>
         /// <param name="list">Pass null and a reused list will be used. Consume immediately.</param>
-        public static List<T> GetNestedComponentsInChildren<T>(this Transform t, List<T> list, bool includeInactive = true, params System.Type[] stopOn)
+        public static List<T> GetNestedComponentsInChildren<T>(this Transform t, List<T> list,
+            bool includeInactive = true, params Type[] stopOn)
             where T : class
         {
-            System.Type type = typeof(T);
+            var type = typeof(T);
 
             // Temp lists are also recycled. Get/Create a reusable List of this type.
             List<T> searchList;
@@ -368,15 +374,14 @@ namespace Photon.Pun
                     continue;
 
                 // ignore nested DontRecurseOnT
-                bool stopRecurse = false;
+                var stopRecurse = false;
                 for (int s = 0, scnt = stopOn.Length; s < scnt; ++s)
-                {
                     if (!ReferenceEquals(child.GetComponent(stopOn[s]), null))
                     {
                         stopRecurse = true;
                         break;
                     }
-                }
+
                 if (stopRecurse)
                     continue;
 
@@ -402,15 +407,13 @@ namespace Photon.Pun
                         continue;
 
                     // ignore nested NestedT
-                    bool stopRecurse = false;
+                    var stopRecurse = false;
                     for (int s = 0, scnt = stopOn.Length; s < scnt; ++s)
-                    {
                         if (!ReferenceEquals(child.GetComponent(stopOn[s]), null))
                         {
                             stopRecurse = true;
                             break;
                         }
-                    }
 
                     if (stopRecurse)
                         continue;
@@ -423,16 +426,21 @@ namespace Photon.Pun
         }
 
         /// <summary>
-        /// Same as GetComponentsInChildren, but will not recurse into children with component of the NestedT type. This allows nesting of PhotonViews/NetObjects to be respected.
+        ///     Same as GetComponentsInChildren, but will not recurse into children with component of the NestedT type. This allows
+        ///     nesting of PhotonViews/NetObjects to be respected.
         /// </summary>
-        /// <typeparam name="T">Cast found components to this type. Typically Component, but any other class/interface will work as long as they are assignable from SearchT.</typeparam>
+        /// <typeparam name="T">
+        ///     Cast found components to this type. Typically Component, but any other class/interface will work as
+        ///     long as they are assignable from SearchT.
+        /// </typeparam>
         /// <typeparam name="SearchT">Find components of this class or interface type.</typeparam>
         /// <typeparam name="DontRecurseOnT"></typeparam>
         /// <param name="t"></param>
         /// <param name="includeInactive"></param>
         /// <param name="list"></param>
         /// <returns></returns>
-        public static void GetNestedComponentsInChildren<T, SearchT, NestedT>(this Transform t, bool includeInactive, List<T> list)
+        public static void GetNestedComponentsInChildren<T, SearchT, NestedT>(this Transform t, bool includeInactive,
+            List<T> list)
             where T : class
             where SearchT : class
         {
@@ -442,7 +450,7 @@ namespace Photon.Pun
             if (!includeInactive && !t.gameObject.activeSelf)
                 return;
 
-            System.Type searchType = typeof(SearchT);
+            var searchType = typeof(SearchT);
 
             // Temp lists are also recycled. Get/Create a reusable List of this type.
             List<SearchT> searchList;
@@ -485,10 +493,8 @@ namespace Photon.Pun
                     nodesQueue.Enqueue(child);
                 }
             }
-
         }
 
         #endregion
     }
-
 }

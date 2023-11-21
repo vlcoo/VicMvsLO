@@ -1,43 +1,58 @@
 using System.Collections.Generic;
-using UnityEngine;
 using Photon.Pun;
-using NSMB.Utils;
+using UnityEngine;
 
-public class BulletBillLauncher : MonoBehaviourPun {
-
+public class BulletBillLauncher : MonoBehaviourPun
+{
     public float playerSearchRadius = 7, playerCloseCutoff = 1;
     public float initialShootTimer = 5;
-    public bool isBanzai = false;
-    private float shootTimer;
+    public bool isBanzai;
     private readonly List<GameObject> bills = new();
+    private readonly Vector2 closeSearchBox = new(1.5f, 1f);
+    private readonly Vector2 spawnOffset = new(0.25f, -0.2f);
     private string prefabPath;
 
-    private Vector2 searchBox, closeSearchBox = new(1.5f, 1f), searchOffset, spawnOffset = new(0.25f, -0.2f);
+    private Vector2 searchBox;
+    private Vector2 searchOffset;
+    private float shootTimer;
 
-    void Start() {
-        searchBox = new(playerSearchRadius, playerSearchRadius);
-        searchOffset = new(playerSearchRadius/2 + playerCloseCutoff, 0);
+    private void Start()
+    {
+        searchBox = new Vector2(playerSearchRadius, playerSearchRadius);
+        searchOffset = new Vector2(playerSearchRadius / 2 + playerCloseCutoff, 0);
 
         if (isBanzai) prefabPath = "Prefabs/Enemy/BanzaiBill";
         else prefabPath = "Prefabs/Enemy/BulletBill";
     }
-    void Update() {
+
+    private void Update()
+    {
         if (!PhotonNetwork.IsMasterClient || GameManager.Instance.gameover)
             return;
 
-        if ((shootTimer -= Time.deltaTime) <= 0) {
+        if ((shootTimer -= Time.deltaTime) <= 0)
+        {
             shootTimer = initialShootTimer;
             TryToShoot();
         }
     }
 
-    void TryToShoot() {
+    private void OnDrawGizmosSelected()
+    {
+        Gizmos.color = new Color(1, 0, 0, 0.5f);
+        Gizmos.DrawCube(transform.position + Vector3.down * 0.5f, closeSearchBox);
+        Gizmos.color = new Color(0, 0, 1, 0.5f);
+        Gizmos.DrawCube((Vector2)transform.position - searchOffset, searchBox);
+        Gizmos.DrawCube((Vector2)transform.position + searchOffset, searchBox);
+    }
+
+    private void TryToShoot()
+    {
         /*if (!Utils.IsTileSolidAtWorldLocation(transform.position))
             return;*/
-        for (int i = 0; i < bills.Count; i++) {
+        for (var i = 0; i < bills.Count; i++)
             if (bills[i] == null)
                 bills.RemoveAt(i--);
-        }
         if (bills.Count >= 3)
             return;
 
@@ -46,33 +61,30 @@ public class BulletBillLauncher : MonoBehaviourPun {
             return;
 
         //Shoot left
-        if (IntersectsPlayer((Vector2) transform.position - searchOffset, searchBox)) {
-            GameObject newBill = PhotonNetwork.InstantiateRoomObject(prefabPath, transform.position + new Vector3(-spawnOffset.x, spawnOffset.y), Quaternion.identity, 0, new object[]{ true });
+        if (IntersectsPlayer((Vector2)transform.position - searchOffset, searchBox))
+        {
+            var newBill = PhotonNetwork.InstantiateRoomObject(prefabPath,
+                transform.position + new Vector3(-spawnOffset.x, spawnOffset.y), Quaternion.identity, 0,
+                new object[] { true });
             bills.Add(newBill);
             return;
         }
 
         //Shoot right
-        if (IntersectsPlayer((Vector2) transform.position + searchOffset, searchBox)) {
-            GameObject newBill = PhotonNetwork.InstantiateRoomObject(prefabPath, transform.position + new Vector3(spawnOffset.x, spawnOffset.y), Quaternion.identity, 0, new object[]{ false });
+        if (IntersectsPlayer((Vector2)transform.position + searchOffset, searchBox))
+        {
+            var newBill = PhotonNetwork.InstantiateRoomObject(prefabPath,
+                transform.position + new Vector3(spawnOffset.x, spawnOffset.y), Quaternion.identity, 0,
+                new object[] { false });
             bills.Add(newBill);
-            return;
         }
     }
 
-    bool IntersectsPlayer(Vector2 origin, Vector2 searchBox) {
-        foreach (var hit in Physics2D.OverlapBoxAll(origin, searchBox, 0)) {
+    private bool IntersectsPlayer(Vector2 origin, Vector2 searchBox)
+    {
+        foreach (var hit in Physics2D.OverlapBoxAll(origin, searchBox, 0))
             if (hit.gameObject.CompareTag("Player"))
                 return true;
-        }
         return false;
-    }
-
-    void OnDrawGizmosSelected() {
-        Gizmos.color = new Color(1, 0, 0, 0.5f);
-        Gizmos.DrawCube(transform.position + Vector3.down * 0.5f, closeSearchBox);
-        Gizmos.color = new Color(0, 0, 1, 0.5f);
-        Gizmos.DrawCube((Vector2) transform.position - searchOffset, searchBox);
-        Gizmos.DrawCube((Vector2) transform.position + searchOffset, searchBox);
     }
 }

@@ -18,7 +18,7 @@ namespace Photon.Pun.UtilityScripts
         // Use this for initialization
         private void Start()
         {
-            Destroy(this.gameObject);
+            Destroy(gameObject);
         }
     }
 }

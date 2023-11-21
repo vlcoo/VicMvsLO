@@ -1,12 +1,13 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
+using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
-using TMPro;
 
-public class RebindManager : MonoBehaviour {
-
+public class RebindManager : MonoBehaviour
+{
     public static RebindManager Instance;
 
     public InputActionAsset controls;
@@ -15,7 +16,8 @@ public class RebindManager : MonoBehaviour {
 
     private readonly List<RebindButton> buttons = new();
 
-    public void Init() {
+    public void Init()
+    {
         Instance = this;
 
         buttonTemplate.SetActive(false);
@@ -27,30 +29,38 @@ public class RebindManager : MonoBehaviour {
         resetAll.transform.SetAsLastSibling();
     }
 
-    public void LoadBindings() {
-        string json = GlobalController.Instance.controlsJson;
+    public void LoadBindings()
+    {
+        var json = GlobalController.Instance.controlsJson;
 
-        if (json != null && json != "") {
+        if (json != null && json != "")
+        {
             // we have old bindings...
             controls.LoadBindingOverridesFromJson(json);
             Debug.Log("load from globalcontroller: " + json);
-
-        } else if (InputSystem.file.Exists) {
+        }
+        else if (InputSystem.file.Exists)
+        {
             //load bindings...
-            try {
+            try
+            {
                 Debug.Log("load from file: " + File.ReadAllText(InputSystem.file.FullName));
                 controls.LoadBindingOverridesFromJson(File.ReadAllText(InputSystem.file.FullName));
                 GlobalController.Instance.controlsJson = controls.SaveBindingOverridesAsJson();
-            } catch (System.Exception e) {
+            }
+            catch (Exception e)
+            {
                 Debug.LogError(e.Message);
             }
         }
     }
 
-    public void ResetActions() {
+    public void ResetActions()
+    {
         controls.RemoveAllBindingOverrides();
 
-        foreach (RebindButton button in buttons) {
+        foreach (var button in buttons)
+        {
             button.targetBinding = button.targetAction.bindings[button.index];
             button.SetText();
         }
@@ -61,40 +71,42 @@ public class RebindManager : MonoBehaviour {
         SaveRebindings();
     }
 
-    void CreateActions() {
-
-        foreach (InputActionMap map in controls.actionMaps) {
-
+    private void CreateActions()
+    {
+        foreach (var map in controls.actionMaps)
+        {
             if (map.name.StartsWith("!"))
                 continue;
 
-            GameObject newHeader = Instantiate(headerTemplate);
+            var newHeader = Instantiate(headerTemplate);
             newHeader.name = map.name;
             newHeader.SetActive(true);
             newHeader.transform.SetParent(transform, false);
             newHeader.GetComponentInChildren<TMP_Text>().text = map.name;
 
-            foreach (InputAction action in map.actions) {
-
+            foreach (var action in map.actions)
+            {
                 if (action.name.StartsWith("!"))
                     continue;
 
-                if (action.bindings[0].isComposite) {
+                if (action.bindings[0].isComposite)
+                {
                     //axis
-                    GameObject newTemplate = Instantiate(axisTemplate);
+                    var newTemplate = Instantiate(axisTemplate);
                     newTemplate.name = action.name;
                     newTemplate.transform.SetParent(transform, false);
                     newTemplate.SetActive(true);
-                    RebindControl control = newTemplate.GetComponent<RebindControl>();
+                    var control = newTemplate.GetComponent<RebindControl>();
                     control.text.text = action.name;
 
-                    int buttonIndex = 0;
-                    for (int i = 0; i < action.bindings.Count; i++) {
-                        InputBinding binding = action.bindings[i];
+                    var buttonIndex = 0;
+                    for (var i = 0; i < action.bindings.Count; i++)
+                    {
+                        var binding = action.bindings[i];
                         if (binding.isComposite)
                             continue;
 
-                        RebindButton button = control.buttons[buttonIndex];
+                        var button = control.buttons[buttonIndex];
                         button.targetAction = action;
                         button.targetBinding = binding;
                         button.index = i;
@@ -102,17 +114,19 @@ public class RebindManager : MonoBehaviour {
 
                         buttons.Add(button);
                     }
-
-                } else {
+                }
+                else
+                {
                     //button
-                    GameObject newTemplate = Instantiate(buttonTemplate);
+                    var newTemplate = Instantiate(buttonTemplate);
                     newTemplate.name = action.name;
                     newTemplate.transform.SetParent(transform, false);
                     newTemplate.SetActive(true);
-                    RebindControl control = newTemplate.GetComponent<RebindControl>();
+                    var control = newTemplate.GetComponent<RebindControl>();
                     control.text.text = action.name;
-                    for (int i = 0; i < control.buttons.Length; i++) {
-                        RebindButton button = control.buttons[i];
+                    for (var i = 0; i < control.buttons.Length; i++)
+                    {
+                        var button = control.buttons[i];
                         button.targetAction = action;
                         button.targetBinding = action.bindings[i];
                         button.index = i;
@@ -126,9 +140,11 @@ public class RebindManager : MonoBehaviour {
                 playerSettings.transform.SetAsLastSibling();
         }
     }
-    public void SaveRebindings() {
-        string json = controls.SaveBindingOverridesAsJson();
-        
+
+    public void SaveRebindings()
+    {
+        var json = controls.SaveBindingOverridesAsJson();
+
         if (!InputSystem.file.Exists)
             InputSystem.file.Directory.Create();
 

@@ -1,22 +1,21 @@
-using System.Collections;
-
-using UnityEngine;
 using TMPro;
+using UnityEngine;
 
-public class NumberParticle : MonoBehaviour {
-
+public class NumberParticle : MonoBehaviour
+{
     public TMP_Text text;
 
-    public void ApplyColor(Color color) {
-
+    public void ApplyColor(Color color)
+    {
         text.ForceMeshUpdate();
-        MeshRenderer mr = GetComponentsInChildren<MeshRenderer>()[1];
+        var mr = GetComponentsInChildren<MeshRenderer>()[1];
         MaterialPropertyBlock mpb = new();
         mpb.SetColor("_Color", color);
         mr.SetPropertyBlock(mpb);
     }
 
-    public void Kill() {
+    public void Kill()
+    {
         Destroy(transform.parent.gameObject);
     }
 }

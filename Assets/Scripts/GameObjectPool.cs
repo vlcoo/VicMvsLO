@@ -1,39 +1,48 @@
 using UnityEngine;
 
-public class GameObjectPool {
+public class GameObjectPool
+{
+    private readonly float[] allocations;
+    private readonly GameObject[] pool;
 
     public GameObject parent;
-    private readonly GameObject[] pool;
-    private readonly float[] allocations;
     public int size;
 
-    public GameObjectPool(GameObject prefab, int size) {
+    public GameObjectPool(GameObject prefab, int size)
+    {
         this.size = size;
-        parent = new(prefab.name + " Pool");
+        parent = new GameObject(prefab.name + " Pool");
         pool = new GameObject[size];
         allocations = new float[size];
-        for (int i = 0; i < size; i++) {
+        for (var i = 0; i < size; i++)
+        {
             pool[i] = Object.Instantiate(prefab, parent.transform);
             pool[i].name = prefab.name + " (" + (i + 1) + ")";
         }
     }
 
-    public GameObject Pop() {
-        int oldestIndex = 0;
+    public GameObject Pop()
+    {
+        var oldestIndex = 0;
         GameObject oldestObj = null;
-        float oldestObjTime = Time.time;
-        for (int i = 0; i < size; i++) {
-            GameObject obj = pool[i];
-            if (!obj.activeInHierarchy) {
+        var oldestObjTime = Time.time;
+        for (var i = 0; i < size; i++)
+        {
+            var obj = pool[i];
+            if (!obj.activeInHierarchy)
+            {
                 allocations[i] = Time.time;
                 return obj;
             }
-            if (oldestObj == null || allocations[i] < oldestObjTime) {
+
+            if (oldestObj == null || allocations[i] < oldestObjTime)
+            {
                 oldestObj = obj;
                 oldestObjTime = allocations[i];
                 oldestIndex = i;
             }
         }
+
         allocations[oldestIndex] = Time.time;
         oldestObj.SetActive(false);
         return oldestObj;

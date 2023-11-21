@@ -1,23 +1,29 @@
-using System.Linq;
 using UnityEngine;
 
-public class LoopingMusic : MonoBehaviour {
+public class LoopingMusic : MonoBehaviour
+{
+    [SerializeField] private AudioSource audioSource;
+    [SerializeField] public MusicData currentSong;
 
     private bool _fastMusic;
-    private int bahIndex = 0;
+    private int bahIndex;
     private bool needToBah = true;
-    public bool FastMusic {
+
+    public bool FastMusic
+    {
         set
         {
             if (currentSong.fastClip == null) return;
-            
-            if (_fastMusic ^ value) {
-                float scaleFactor = value ? 0.8f : 1.25f;
-                float newTime = audioSource.time * scaleFactor;
 
-                if (currentSong.loopEndSample != -1) {
-                    float songStart = currentSong.loopStartSample * (value ? 0.8f : 1f);
-                    float songEnd = currentSong.loopEndSample * (value ? 0.8f : 1f);
+            if (_fastMusic ^ value)
+            {
+                var scaleFactor = value ? 0.8f : 1.25f;
+                var newTime = audioSource.time * scaleFactor;
+
+                if (currentSong.loopEndSample != -1)
+                {
+                    var songStart = currentSong.loopStartSample * (value ? 0.8f : 1f);
+                    var songEnd = currentSong.loopEndSample * (value ? 0.8f : 1f);
 
                     if (newTime >= songEnd)
                         newTime = songStart + (newTime - songEnd);
@@ -33,9 +39,6 @@ public class LoopingMusic : MonoBehaviour {
         get => currentSong.fastClip && _fastMusic;
     }
 
-    [SerializeField] private AudioSource audioSource;
-    [SerializeField] public MusicData currentSong;
-
     public void Start()
     {
         if (currentSong)
@@ -45,18 +48,8 @@ public class LoopingMusic : MonoBehaviour {
         }
     }
 
-    public void Play(MusicData song) {
-        currentSong = song;
-        audioSource.loop = true;
-        audioSource.clip = _fastMusic && song.fastClip ? song.fastClip : song.clip;
-        audioSource.time = 0;
-        audioSource.Play();
-    }
-    public void Stop() {
-        audioSource.Stop();
-    }
-
-    public void Update() {
+    public void Update()
+    {
         if (audioSource is not { isPlaying: true })
             return;
 
@@ -67,11 +60,12 @@ public class LoopingMusic : MonoBehaviour {
             if (bahIndex == currentSong.bahTimestamps.Length) needToBah = false;
         }
 
-        if (currentSong.loopEndSample != -1) {
-            float time = audioSource.time;
-            float songStart = currentSong.loopStartSample * (FastMusic ? 0.8f : 1f);
-            float songEnd = currentSong.loopEndSample == 0
-                ? (FastMusic ? currentSong.fastClip.length : currentSong.clip.length)
+        if (currentSong.loopEndSample != -1)
+        {
+            var time = audioSource.time;
+            var songStart = currentSong.loopStartSample * (FastMusic ? 0.8f : 1f);
+            var songEnd = currentSong.loopEndSample == 0
+                ? FastMusic ? currentSong.fastClip.length : currentSong.clip.length
                 : currentSong.loopEndSample * (FastMusic ? 0.8f : 1f);
 
             if (time >= songEnd)
@@ -81,5 +75,19 @@ public class LoopingMusic : MonoBehaviour {
                 needToBah = true;
             }
         }
+    }
+
+    public void Play(MusicData song)
+    {
+        currentSong = song;
+        audioSource.loop = true;
+        audioSource.clip = _fastMusic && song.fastClip ? song.fastClip : song.clip;
+        audioSource.time = 0;
+        audioSource.Play();
+    }
+
+    public void Stop()
+    {
+        audioSource.Stop();
     }
 }

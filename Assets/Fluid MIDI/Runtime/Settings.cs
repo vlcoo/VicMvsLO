@@ -1,12 +1,12 @@
-﻿using FluidSynth;
-using System;
+﻿using System;
+using FluidSynth;
 using UnityEngine;
 
 namespace FluidMidi
 {
-    static class Settings
+    internal static class Settings
     {
-        static int count = 0;
+        private static int count;
 
         public static IntPtr Ptr { get; private set; }
 
@@ -20,6 +20,7 @@ namespace FluidMidi
                 Api.Settings.Set(Ptr, Api.Settings.KEY_SYNTH_SAMPLE_RATE, (double)AudioSettings.outputSampleRate);
                 Api.Settings.Set(Ptr, Api.Settings.KEY_AUDIO_DRIVER, Api.Settings.VALUE_AUDIO_DRIVER_UNITY);
             }
+
             ++count;
         }
 

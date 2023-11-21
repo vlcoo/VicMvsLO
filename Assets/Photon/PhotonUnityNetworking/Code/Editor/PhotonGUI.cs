@@ -9,16 +9,70 @@
 // ----------------------------------------------------------------------------
 
 
-using UnityEngine;
+using System;
 using UnityEditor;
+using UnityEngine;
 
 namespace Photon.Pun
 {
     public class PhotonGUI
     {
+        private static Texture2D m_HelpIcon;
+
+
+        private static Texture2D m_CopyIcon;
+        private static Texture2D m_CopyIconPro;
+
+        public static Texture2D HelpIcon
+        {
+            get
+            {
+                if (m_HelpIcon == null)
+                    m_HelpIcon = AssetDatabase.LoadAssetAtPath(GetIconPath("help.png"), typeof(Texture2D)) as Texture2D;
+
+
+                return m_HelpIcon;
+            }
+        }
+
+        public static Texture2D CopyIcon
+        {
+            get
+            {
+                if (EditorGUIUtility.isProSkin)
+                {
+                    if (m_CopyIconPro == null)
+                        m_CopyIconPro =
+                            AssetDatabase.LoadAssetAtPath(GetIconPath("CopyIconPro.png"), typeof(Texture2D)) as
+                                Texture2D;
+
+                    return m_CopyIconPro;
+                }
+
+                if (m_CopyIcon == null)
+                    m_CopyIcon =
+                        AssetDatabase.LoadAssetAtPath(GetIconPath("CopyIcon.png"), typeof(Texture2D)) as Texture2D;
+
+                return m_CopyIcon;
+            }
+        }
+
+
+        internal static string GetIconPath(string iconFileName)
+        {
+            var _thisIconPath = PhotonNetwork.FindAssetPath("PhotonGUI");
+
+            if (string.IsNullOrEmpty(_thisIconPath))
+                _thisIconPath = "Assets/Photon/PhotonUnityNetworking/Code/Editor/" + iconFileName;
+            else
+                _thisIconPath = _thisIconPath.Replace("PhotonGUI.cs", iconFileName);
+
+            return _thisIconPath;
+        }
+
         #region Styles
 
-        static GUIStyle m_DefaultTitleStyle;
+        private static GUIStyle m_DefaultTitleStyle;
 
         public static GUIStyle DefaultTitleStyle
         {
@@ -41,7 +95,7 @@ namespace Photon.Pun
             }
         }
 
-        static GUIStyle m_DefaultContainerStyle;
+        private static GUIStyle m_DefaultContainerStyle;
 
         public static GUIStyle DefaultContainerStyle
         {
@@ -60,7 +114,7 @@ namespace Photon.Pun
             }
         }
 
-        static GUIStyle m_DefaultAddButtonStyle;
+        private static GUIStyle m_DefaultAddButtonStyle;
 
         public static GUIStyle DefaultAddButtonStyle
         {
@@ -79,7 +133,7 @@ namespace Photon.Pun
             }
         }
 
-        static GUIStyle m_DefaultRemoveButtonStyle;
+        private static GUIStyle m_DefaultRemoveButtonStyle;
 
         public static GUIStyle DefaultRemoveButtonStyle
         {
@@ -90,7 +144,9 @@ namespace Photon.Pun
                     m_DefaultRemoveButtonStyle = new GUIStyle();
                     m_DefaultRemoveButtonStyle.fixedWidth = 30;
                     m_DefaultRemoveButtonStyle.fixedHeight = 20;
-                    m_DefaultRemoveButtonStyle.active.background = ReorderableListResources.CreatePixelTexture("Dark Pixel (List GUI)", new Color32(18, 18, 18, 255));
+                    m_DefaultRemoveButtonStyle.active.background =
+                        ReorderableListResources.CreatePixelTexture("Dark Pixel (List GUI)",
+                            new Color32(18, 18, 18, 255));
                     m_DefaultRemoveButtonStyle.imagePosition = ImagePosition.ImageOnly;
                     m_DefaultRemoveButtonStyle.alignment = TextAnchor.MiddleCenter;
                 }
@@ -99,7 +155,7 @@ namespace Photon.Pun
             }
         }
 
-        static GUIStyle m_DefaultContainerRowStyle;
+        private static GUIStyle m_DefaultContainerRowStyle;
 
         public static GUIStyle DefaultContainerRowStyle
         {
@@ -119,7 +175,7 @@ namespace Photon.Pun
             }
         }
 
-        static GUIStyle m_FoldoutBold;
+        private static GUIStyle m_FoldoutBold;
 
         public static GUIStyle FoldoutBold
         {
@@ -135,7 +191,7 @@ namespace Photon.Pun
             }
         }
 
-        static GUIStyle m_RichLabel;
+        private static GUIStyle m_RichLabel;
 
         public static GUIStyle RichLabel
         {
@@ -154,66 +210,6 @@ namespace Photon.Pun
 
         #endregion
 
-
-        internal static string GetIconPath(string iconFileName)
-        {
-            string _thisIconPath = PhotonNetwork.FindAssetPath ("PhotonGUI");
-
-            if (string.IsNullOrEmpty(_thisIconPath))
-            {
-                _thisIconPath = "Assets/Photon/PhotonUnityNetworking/Code/Editor/"+iconFileName;
-            }
-            else
-            {
-                _thisIconPath = _thisIconPath.Replace("PhotonGUI.cs", iconFileName);
-            }
-
-            return _thisIconPath;
-        }
-        
-        static Texture2D m_HelpIcon;
-
-        public static Texture2D HelpIcon
-        {
-            get
-            {
-                if (m_HelpIcon == null)
-                {
-                    m_HelpIcon = AssetDatabase.LoadAssetAtPath(GetIconPath("help.png"), typeof(Texture2D)) as Texture2D;
-                }
-
-                
-                return m_HelpIcon;
-            }
-        }
-        
-        
-        static Texture2D m_CopyIcon;
-        static Texture2D m_CopyIconPro;
-        
-        public static Texture2D CopyIcon
-        {
-            get
-            {
-                if (EditorGUIUtility.isProSkin)
-                {
-                    if (m_CopyIconPro == null)
-                    {
-                        m_CopyIconPro = AssetDatabase.LoadAssetAtPath(GetIconPath("CopyIconPro.png"), typeof(Texture2D)) as Texture2D;
-                    }
-
-                    return m_CopyIconPro;
-                }
-                
-                if (m_CopyIcon == null)
-                {
-                    m_CopyIcon = AssetDatabase.LoadAssetAtPath(GetIconPath("CopyIcon.png"), typeof(Texture2D)) as Texture2D;
-                }
-
-                return m_CopyIcon;
-            }
-        }
-
         #region Interface
 
         public static void ContainerHeader(string headline)
@@ -226,7 +222,8 @@ namespace Photon.Pun
             return DoContainerHeaderToggle(headline, toggle);
         }
 
-        public static bool ContainerHeaderFoldout(string headline, bool foldout, System.Action buttonAction = null, string buttonName = null)
+        public static bool ContainerHeaderFoldout(string headline, bool foldout, Action buttonAction = null,
+            string buttonName = null)
         {
             return DoContainerHeaderFoldout(headline, foldout, buttonAction, buttonName);
         }
@@ -238,14 +235,14 @@ namespace Photon.Pun
 
         public static bool AddButton()
         {
-            Rect controlRect = EditorGUILayout.GetControlRect(false, DefaultAddButtonStyle.fixedHeight - 5);
+            var controlRect = EditorGUILayout.GetControlRect(false, DefaultAddButtonStyle.fixedHeight - 5);
             controlRect.yMin -= 5;
             controlRect.yMax -= 5;
 
-            Rect addButtonRect = new Rect(controlRect.xMax - DefaultAddButtonStyle.fixedWidth,
-                                          controlRect.yMin,
-                                          DefaultAddButtonStyle.fixedWidth,
-                                          DefaultAddButtonStyle.fixedHeight);
+            var addButtonRect = new Rect(controlRect.xMax - DefaultAddButtonStyle.fixedWidth,
+                controlRect.yMin,
+                DefaultAddButtonStyle.fixedWidth,
+                DefaultAddButtonStyle.fixedHeight);
 
             return GUI.Button(addButtonRect, "", DefaultAddButtonStyle);
         }
@@ -263,28 +260,28 @@ namespace Photon.Pun
             SerializedProperty gizmoTypeProperty,
             SerializedProperty gizmoSizeProperty)
         {
-            float height = EditorGUIUtility.singleLineHeight;
-            float flexibleWidth = Mathf.Max(40, position.width - EditorGUIUtility.labelWidth - 20 - 75 - 5 - 40 - 5);
+            var height = EditorGUIUtility.singleLineHeight;
+            var flexibleWidth = Mathf.Max(40, position.width - EditorGUIUtility.labelWidth - 20 - 75 - 5 - 40 - 5);
 
-            Rect labelRect = new Rect(position.xMin, position.yMin, EditorGUIUtility.labelWidth, height);
+            var labelRect = new Rect(position.xMin, position.yMin, EditorGUIUtility.labelWidth, height);
             GUI.Label(labelRect, label);
 
-            Rect enabledRect = new Rect(labelRect.xMax, labelRect.yMin, 20, height);
+            var enabledRect = new Rect(labelRect.xMax, labelRect.yMin, 20, height);
             EditorGUI.PropertyField(enabledRect, gizmoEnabledProperty, GUIContent.none);
 
-            bool oldGUIEnabled = GUI.enabled;
+            var oldGUIEnabled = GUI.enabled;
             GUI.enabled = gizmoEnabledProperty.boolValue;
 
-            Rect colorRect = new Rect(enabledRect.xMax + 5, labelRect.yMin, 70, height);
+            var colorRect = new Rect(enabledRect.xMax + 5, labelRect.yMin, 70, height);
             EditorGUI.PropertyField(colorRect, gizmoColorProperty, GUIContent.none);
 
-            Rect typeRect = new Rect(colorRect.xMax + 5, labelRect.yMin, flexibleWidth * 0.7f, height);
+            var typeRect = new Rect(colorRect.xMax + 5, labelRect.yMin, flexibleWidth * 0.7f, height);
             EditorGUI.PropertyField(typeRect, gizmoTypeProperty, GUIContent.none);
 
-            Rect sizeLabelRect = new Rect(typeRect.xMax + 10, labelRect.yMin, 30, height);
+            var sizeLabelRect = new Rect(typeRect.xMax + 10, labelRect.yMin, 30, height);
             GUI.Label(sizeLabelRect, "Size");
 
-            Rect sizeRect = new Rect(sizeLabelRect.xMax + 5, labelRect.yMin, flexibleWidth * 0.3f, height);
+            var sizeRect = new Rect(sizeLabelRect.xMax + 5, labelRect.yMin, flexibleWidth * 0.3f, height);
             EditorGUI.PropertyField(sizeRect, gizmoSizeProperty, GUIContent.none);
 
             GUI.enabled = oldGUIEnabled;
@@ -294,64 +291,63 @@ namespace Photon.Pun
 
         #region Implementation
 
-        static Rect DoContainerBody(float height)
+        private static Rect DoContainerBody(float height)
         {
-            Rect controlRect = EditorGUILayout.GetControlRect(false, height);
+            var controlRect = EditorGUILayout.GetControlRect(false, height);
             controlRect.yMin -= 3;
             controlRect.yMax -= 2;
 
-            int controlID = GUIUtility.GetControlID(FocusType.Passive, controlRect);
+            var controlID = GUIUtility.GetControlID(FocusType.Passive, controlRect);
 
             if (Event.current.type == EventType.Repaint)
-            {
-                PhotonGUI.DefaultContainerStyle.Draw(controlRect, GUIContent.none, controlID);
-            }
+                DefaultContainerStyle.Draw(controlRect, GUIContent.none, controlID);
 
             return controlRect;
         }
 
-        static bool DoContainerHeaderToggle(string headline, bool toggle)
+        private static bool DoContainerHeaderToggle(string headline, bool toggle)
         {
-            Rect rect = DoContainerHeader(headline, 27, 15);
-            Rect toggleRect = new Rect(rect.xMin + 5, rect.yMin + 5, EditorGUIUtility.labelWidth, rect.height);
+            var rect = DoContainerHeader(headline, 27, 15);
+            var toggleRect = new Rect(rect.xMin + 5, rect.yMin + 5, EditorGUIUtility.labelWidth, rect.height);
 
             return EditorGUI.Toggle(toggleRect, toggle);
         }
 
 
-        static bool DoContainerHeaderFoldout(string headline, bool foldout, System.Action buttonAction = null, string buttonLabel = null, float buttonWidth = 48)
+        private static bool DoContainerHeaderFoldout(string headline, bool foldout, Action buttonAction = null,
+            string buttonLabel = null, float buttonWidth = 48)
         {
-            bool showButton = buttonAction != null;
+            var showButton = buttonAction != null;
 
-            Rect rect = DoContainerHeader("", 27, 0f);
+            var rect = DoContainerHeader("", 27, 0f);
 
             // Shorten foldout label if button is present, so it doesn't interfere with clicking.
-            float foldoutWidth = rect.width - (showButton ? 15 + buttonWidth: 15);
-            Rect foldoutRect = new Rect(rect.xMin + 15, rect.yMin + 5, foldoutWidth, 16);
+            var foldoutWidth = rect.width - (showButton ? 15 + buttonWidth : 15);
+            var foldoutRect = new Rect(rect.xMin + 15, rect.yMin + 5, foldoutWidth, 16);
 
-            bool expanded = EditorGUI.Foldout(foldoutRect, foldout, headline, FoldoutBold);
+            var expanded = EditorGUI.Foldout(foldoutRect, foldout, headline, FoldoutBold);
 
             // If a button is defined show it, and invoke action on click.
-            if (showButton && GUI.Button(new Rect(foldoutRect) { x = foldoutRect.xMax, height = 17, width = buttonWidth - 4 }, buttonLabel == null ? "" : buttonLabel))
-            {
-                buttonAction.Invoke();
-            }
+            if (showButton &&
+                GUI.Button(new Rect(foldoutRect) { x = foldoutRect.xMax, height = 17, width = buttonWidth - 4 },
+                    buttonLabel == null ? "" : buttonLabel)) buttonAction.Invoke();
 
             return expanded;
         }
 
-        static Rect DoContainerHeader(string headline, float height, float contentOffset)
+        private static Rect DoContainerHeader(string headline, float height, float contentOffset)
         {
             GUILayout.Space(5);
-            Rect controlRect = EditorGUILayout.GetControlRect(false, height);
+            var controlRect = EditorGUILayout.GetControlRect(false, height);
 
-            int controlID = GUIUtility.GetControlID(FocusType.Passive, controlRect);
+            var controlID = GUIUtility.GetControlID(FocusType.Passive, controlRect);
 
             if (Event.current.type == EventType.Repaint)
             {
-                PhotonGUI.DefaultTitleStyle.Draw(controlRect, GUIContent.none, controlID);
+                DefaultTitleStyle.Draw(controlRect, GUIContent.none, controlID);
 
-                Rect labelRect = new Rect(controlRect.xMin + 5 + contentOffset, controlRect.yMin + 5, controlRect.width, controlRect.height);
+                var labelRect = new Rect(controlRect.xMin + 5 + contentOffset, controlRect.yMin + 5, controlRect.width,
+                    controlRect.height);
                 GUI.Label(labelRect, headline, EditorStyles.boldLabel);
             }
 

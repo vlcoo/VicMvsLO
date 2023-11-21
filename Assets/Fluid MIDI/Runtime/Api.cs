@@ -5,12 +5,13 @@ namespace FluidSynth
 {
     public static class Api
     {
-        private const string LibraryName = "audioplugin-fluidsynth-3";
-
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate int MidiEventDelegate(IntPtr data, IntPtr midiEvent);
+
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate int TickEventDelegate(IntPtr data, int tick);
+
+        private const string LibraryName = "audioplugin-fluidsynth-3";
 
         public static class Settings
         {
@@ -82,22 +83,6 @@ namespace FluidSynth
 
         public static class Player
         {
-            public static class Status
-            {
-                public const int Ready = 0;
-                public const int Playing = 1;
-                public const int Stopping = 2;
-                public const int Done = 3;
-            }
-
-            public static class TempoType
-            {
-                public const int Internal = 0;
-                public const int Bpm = 1;
-                public const int Midi = 2;
-                public const int Nbr = 3;
-            }
-
             public const double TEMPO_MIN = 0.001;
             public const double TEMPO_MAX = 1000;
 
@@ -130,6 +115,7 @@ namespace FluidSynth
 
             [DllImport(LibraryName, EntryPoint = "fluid_player_set_playback_callback")]
             public static extern int SetPlaybackCallback(IntPtr player, MidiEventDelegate callback, IntPtr data);
+
             [DllImport(LibraryName, EntryPoint = "fluid_player_set_tick_callback")]
             public static extern int SetTickCallback(IntPtr player, TickEventDelegate callback, IntPtr data);
 
@@ -150,6 +136,22 @@ namespace FluidSynth
 
             [DllImport(LibraryName, EntryPoint = "fluid_player_set_active_channels")]
             public static extern void SetActiveChannels(IntPtr player, int channels);
+
+            public static class Status
+            {
+                public const int Ready = 0;
+                public const int Playing = 1;
+                public const int Stopping = 2;
+                public const int Done = 3;
+            }
+
+            public static class TempoType
+            {
+                public const int Internal = 0;
+                public const int Bpm = 1;
+                public const int Midi = 2;
+                public const int Nbr = 3;
+            }
         }
 
         public static class Driver
@@ -163,15 +165,6 @@ namespace FluidSynth
 
         public static class Log
         {
-            public static class Level
-            {
-                public const int Panic = 0;
-                public const int Error = 1;
-                public const int Warn = 2;
-                public const int Info = 3;
-                public const int Debug = 4;
-            }
-
             public delegate void FunctionDelegate(int level, string message, IntPtr data);
 
             [DllImport(LibraryName, EntryPoint = "fluid_set_log_function", CallingConvention = CallingConvention.Cdecl)]
@@ -185,11 +178,21 @@ namespace FluidSynth
                 SetFunction(Level.Info, function, data);
                 SetFunction(Level.Debug, function, data);
             }
+
+            public static class Level
+            {
+                public const int Panic = 0;
+                public const int Error = 1;
+                public const int Warn = 2;
+                public const int Info = 3;
+                public const int Debug = 4;
+            }
         }
 
         public static class Unity
         {
-            [DllImport(LibraryName, EntryPoint = "fluid_unity_set_log_function", CallingConvention = CallingConvention.Cdecl)]
+            [DllImport(LibraryName, EntryPoint = "fluid_unity_set_log_function",
+                CallingConvention = CallingConvention.Cdecl)]
             public static extern IntPtr SetLogFunction(Log.FunctionDelegate function, IntPtr data);
 
             [DllImport(LibraryName, EntryPoint = "fluid_unity_clear_log_function")]

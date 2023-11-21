@@ -12,22 +12,18 @@
 
 using UnityEngine;
 
-using Photon.Pun;
-using Photon.Realtime;
-using ExitGames.Client.Photon;
-
 namespace Photon.Pun.UtilityScripts
 {
     /// <summary>
-    /// Basic GUI to show traffic and health statistics of the connection to Photon,
-    /// toggled by shift+tab.
+    ///     Basic GUI to show traffic and health statistics of the connection to Photon,
+    ///     toggled by shift+tab.
     /// </summary>
     /// <remarks>
-    /// The shown health values can help identify problems with connection losses or performance.
-    /// Example:
-    /// If the time delta between two consecutive SendOutgoingCommands calls is a second or more,
-    /// chances rise for a disconnect being caused by this (because acknowledgements to the server
-    /// need to be sent in due time).
+    ///     The shown health values can help identify problems with connection losses or performance.
+    ///     Example:
+    ///     If the time delta between two consecutive SendOutgoingCommands calls is a second or more,
+    ///     chances rise for a disconnect being caused by this (because acknowledgements to the server
+    ///     need to be sent in due time).
     /// </remarks>
     /// \ingroup optionalGui
     public class PhotonStatsGui : MonoBehaviour
@@ -48,7 +44,7 @@ namespace Photon.Pun.UtilityScripts
         public bool buttonsOn;
 
         /// <summary>Positioning rect for window.</summary>
-        public Rect statsRect = new Rect(0, 100, 200, 50);
+        public Rect statsRect = new(0, 100, 200, 50);
 
         /// <summary>Unity GUI Window ID (must be unique or will cause issues).</summary>
         public int WindowId = 100;
@@ -56,10 +52,7 @@ namespace Photon.Pun.UtilityScripts
 
         public void Start()
         {
-            if (this.statsRect.x <= 0)
-            {
-                this.statsRect.x = Screen.width - this.statsRect.width;
-            }
+            if (statsRect.x <= 0) statsRect.x = Screen.width - statsRect.width;
         }
 
         /// <summary>Checks for shift+tab input combination (to toggle statsOn).</summary>
@@ -67,75 +60,71 @@ namespace Photon.Pun.UtilityScripts
         {
             if (Input.GetKeyDown(KeyCode.Tab) && Input.GetKey(KeyCode.LeftShift))
             {
-                this.statsWindowOn = !this.statsWindowOn;
-                this.statsOn = true;    // enable stats when showing the window
+                statsWindowOn = !statsWindowOn;
+                statsOn = true; // enable stats when showing the window
             }
         }
 
         public void OnGUI()
         {
             if (PhotonNetwork.NetworkingClient.LoadBalancingPeer.TrafficStatsEnabled != statsOn)
-            {
-                PhotonNetwork.NetworkingClient.LoadBalancingPeer.TrafficStatsEnabled = this.statsOn;
-            }
+                PhotonNetwork.NetworkingClient.LoadBalancingPeer.TrafficStatsEnabled = statsOn;
 
-            if (!this.statsWindowOn)
-            {
-                return;
-            }
+            if (!statsWindowOn) return;
 
-            this.statsRect = GUILayout.Window(this.WindowId, this.statsRect, this.TrafficStatsWindow, "Messages (shift+tab)");
+            statsRect = GUILayout.Window(WindowId, statsRect, TrafficStatsWindow, "Messages (shift+tab)");
         }
 
         public void TrafficStatsWindow(int windowID)
         {
-            bool statsToLog = false;
-            TrafficStatsGameLevel gls = PhotonNetwork.NetworkingClient.LoadBalancingPeer.TrafficStatsGameLevel;
-            long elapsedMs = PhotonNetwork.NetworkingClient.LoadBalancingPeer.TrafficStatsElapsedMs / 1000;
-            if (elapsedMs == 0)
-            {
-                elapsedMs = 1;
-            }
+            var statsToLog = false;
+            var gls = PhotonNetwork.NetworkingClient.LoadBalancingPeer.TrafficStatsGameLevel;
+            var elapsedMs = PhotonNetwork.NetworkingClient.LoadBalancingPeer.TrafficStatsElapsedMs / 1000;
+            if (elapsedMs == 0) elapsedMs = 1;
 
             GUILayout.BeginHorizontal();
-            this.buttonsOn = GUILayout.Toggle(this.buttonsOn, "buttons");
-            this.healthStatsVisible = GUILayout.Toggle(this.healthStatsVisible, "health");
-            this.trafficStatsOn = GUILayout.Toggle(this.trafficStatsOn, "traffic");
+            buttonsOn = GUILayout.Toggle(buttonsOn, "buttons");
+            healthStatsVisible = GUILayout.Toggle(healthStatsVisible, "health");
+            trafficStatsOn = GUILayout.Toggle(trafficStatsOn, "traffic");
             GUILayout.EndHorizontal();
 
-            string total = string.Format("Out {0,4} | In {1,4} | Sum {2,4}", gls.TotalOutgoingMessageCount, gls.TotalIncomingMessageCount, gls.TotalMessageCount);
-            string elapsedTime = string.Format("{0}sec average:", elapsedMs);
-            string average = string.Format("Out {0,4} | In {1,4} | Sum {2,4}", gls.TotalOutgoingMessageCount / elapsedMs, gls.TotalIncomingMessageCount / elapsedMs, gls.TotalMessageCount / elapsedMs);
+            var total = string.Format("Out {0,4} | In {1,4} | Sum {2,4}", gls.TotalOutgoingMessageCount,
+                gls.TotalIncomingMessageCount, gls.TotalMessageCount);
+            var elapsedTime = string.Format("{0}sec average:", elapsedMs);
+            var average = string.Format("Out {0,4} | In {1,4} | Sum {2,4}", gls.TotalOutgoingMessageCount / elapsedMs,
+                gls.TotalIncomingMessageCount / elapsedMs, gls.TotalMessageCount / elapsedMs);
             GUILayout.Label(total);
             GUILayout.Label(elapsedTime);
             GUILayout.Label(average);
 
-            if (this.buttonsOn)
+            if (buttonsOn)
             {
                 GUILayout.BeginHorizontal();
-                this.statsOn = GUILayout.Toggle(this.statsOn, "stats on");
+                statsOn = GUILayout.Toggle(statsOn, "stats on");
                 if (GUILayout.Button("Reset"))
                 {
                     PhotonNetwork.NetworkingClient.LoadBalancingPeer.TrafficStatsReset();
                     PhotonNetwork.NetworkingClient.LoadBalancingPeer.TrafficStatsEnabled = true;
                 }
+
                 statsToLog = GUILayout.Button("To Log");
                 GUILayout.EndHorizontal();
             }
 
-            string trafficStatsIn = string.Empty;
-            string trafficStatsOut = string.Empty;
-            if (this.trafficStatsOn)
+            var trafficStatsIn = string.Empty;
+            var trafficStatsOut = string.Empty;
+            if (trafficStatsOn)
             {
                 GUILayout.Box("Traffic Stats");
-                trafficStatsIn = "Incoming: \n" + PhotonNetwork.NetworkingClient.LoadBalancingPeer.TrafficStatsIncoming.ToString();
-                trafficStatsOut = "Outgoing: \n" + PhotonNetwork.NetworkingClient.LoadBalancingPeer.TrafficStatsOutgoing.ToString();
+                trafficStatsIn = "Incoming: \n" + PhotonNetwork.NetworkingClient.LoadBalancingPeer.TrafficStatsIncoming;
+                trafficStatsOut =
+                    "Outgoing: \n" + PhotonNetwork.NetworkingClient.LoadBalancingPeer.TrafficStatsOutgoing;
                 GUILayout.Label(trafficStatsIn);
                 GUILayout.Label(trafficStatsOut);
             }
 
-            string healthStats = string.Empty;
-            if (this.healthStatsVisible)
+            var healthStats = string.Empty;
+            if (healthStatsVisible)
             {
                 GUILayout.Box("Health Stats");
                 healthStats = string.Format(
@@ -154,15 +143,13 @@ namespace Photon.Pun.UtilityScripts
 
             if (statsToLog)
             {
-                string complete = string.Format("{0}\n{1}\n{2}\n{3}\n{4}\n{5}", total, elapsedTime, average, trafficStatsIn, trafficStatsOut, healthStats);
+                var complete = string.Format("{0}\n{1}\n{2}\n{3}\n{4}\n{5}", total, elapsedTime, average,
+                    trafficStatsIn, trafficStatsOut, healthStats);
                 Debug.Log(complete);
             }
 
             // if anything was clicked, the height of this window is likely changed. reduce it to be layouted again next frame
-            if (GUI.changed)
-            {
-                this.statsRect.height = 100;
-            }
+            if (GUI.changed) statsRect.height = 100;
 
             GUI.DragWindow();
         }

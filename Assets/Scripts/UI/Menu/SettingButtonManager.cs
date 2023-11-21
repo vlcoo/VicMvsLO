@@ -1,60 +1,71 @@
-using NSMB.Utils;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class SettingButtonManager : MonoBehaviour {
+public class SettingButtonManager : MonoBehaviour
+{
+    private int prevHeight = 720;
 
     private int prevWidth = 1280;
-    private int prevHeight = 720;
 
     private Settings Settings => Settings.Instance;
 
-    public void SetVolumeMusic(Slider slider) {
+    public void SetVolumeMusic(Slider slider)
+    {
         Settings.VolumeMusic = slider.value;
         Settings.SaveSettingsToPreferences();
     }
-    public void SetVolumeSFX(Slider slider) {
+
+    public void SetVolumeSFX(Slider slider)
+    {
         Settings.VolumeSFX = slider.value;
         Settings.SaveSettingsToPreferences();
     }
-    public void SetVolumeMaster(Slider slider) {
+
+    public void SetVolumeMaster(Slider slider)
+    {
         Settings.VolumeMaster = slider.value;
         Settings.SaveSettingsToPreferences();
     }
-    public void OnNdsResolutionToggle(Toggle toggle) {
+
+    public void OnNdsResolutionToggle(Toggle toggle)
+    {
         MainMenuManager.Instance.aspectToggle.interactable = Settings.ndsResolution = toggle.isOn;
         Settings.SaveSettingsToPreferences();
     }
 
-    public void OnAspectToggle(Toggle toggle) {
+    public void OnAspectToggle(Toggle toggle)
+    {
         Settings.fourByThreeRatio = toggle.isOn;
         Settings.SaveSettingsToPreferences();
     }
 
-    public void OnFireballToggle(Toggle toggle) {
+    public void OnFireballToggle(Toggle toggle)
+    {
         Settings.fireballFromSprint = toggle.isOn;
         Settings.SaveSettingsToPreferences();
     }
-    
+
     public void OnRumbleToggle(Toggle toggle)
     {
         Settings.rumbleController = toggle.isOn;
         Settings.SaveSettingsToPreferences();
         GlobalController.Instance.rumbler.RumbleForSeconds(0.5f, 0.5f, 0.2f);
     }
-    
+
     public void OnOnScreenToggle(Toggle toggle)
     {
         Settings.onScreenControlsAlways = toggle.isOn;
         Settings.SaveSettingsToPreferences();
     }
 
-    public void OnScoreboardToggle(Toggle toggle) {
+    public void OnScoreboardToggle(Toggle toggle)
+    {
         Settings.scoreboardAlways = toggle.isOn;
         Settings.SaveSettingsToPreferences();
     }
 
-    public void OnChatFilterToggle(Toggle toggle) {
+    public void OnChatFilterToggle(Toggle toggle)
+    {
         Settings.filter = toggle.isOn;
         Settings.SaveSettingsToPreferences();
     }
@@ -66,20 +77,26 @@ public class SettingButtonManager : MonoBehaviour {
     }
 
 
-    public void OnFullscreenToggle(Toggle toggle) {
-        bool value = toggle.isOn;
+    public void OnFullscreenToggle(Toggle toggle)
+    {
+        var value = toggle.isOn;
 
-        if (value) {
+        if (value)
+        {
             prevWidth = Screen.width;
             prevHeight = Screen.height;
-            Screen.SetResolution(Screen.mainWindowDisplayInfo.width, Screen.mainWindowDisplayInfo.height, FullScreenMode.FullScreenWindow);
-        } else {
+            Screen.SetResolution(Screen.mainWindowDisplayInfo.width, Screen.mainWindowDisplayInfo.height,
+                FullScreenMode.FullScreenWindow);
+        }
+        else
+        {
             Screen.SetResolution(prevWidth, prevHeight, FullScreenMode.Windowed);
         }
     }
 
-        public void OnVsyncToggle(Toggle toggle) {
-        Settings settings = Settings.Instance;
+    public void OnVsyncToggle(Toggle toggle)
+    {
+        var settings = Settings.Instance;
         settings.vsync = toggle.isOn;
         QualitySettings.vSyncCount = toggle.isOn ? 1 : 0;
         settings.SaveSettingsToPreferences();

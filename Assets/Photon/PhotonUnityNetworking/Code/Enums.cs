@@ -12,11 +12,23 @@
 namespace Photon.Pun
 {
     /// <summary>Which PhotonNetwork method was called to connect (which influences the regions we want pinged).</summary>
-    /// <remarks>PhotonNetwork.ConnectUsingSettings will call either ConnectToMaster, ConnectToRegion or ConnectToBest, depending on the settings.</remarks>
-    public enum ConnectMethod { NotCalled, ConnectToMaster, ConnectToRegion, ConnectToBest }
+    /// <remarks>
+    ///     PhotonNetwork.ConnectUsingSettings will call either ConnectToMaster, ConnectToRegion or ConnectToBest,
+    ///     depending on the settings.
+    /// </remarks>
+    public enum ConnectMethod
+    {
+        NotCalled,
+        ConnectToMaster,
+        ConnectToRegion,
+        ConnectToBest
+    }
 
 
-    /// <summary>Used to define the level of logging output created by the PUN classes. Either log errors, info (some more) or full.</summary>
+    /// <summary>
+    ///     Used to define the level of logging output created by the PUN classes. Either log errors, info (some more) or
+    ///     full.
+    /// </summary>
     /// \ingroup publicApi
     public enum PunLogLevel
     {
@@ -35,58 +47,82 @@ namespace Photon.Pun
     /// \ingroup publicApi
     public enum RpcTarget
     {
-        /// <summary>Sends the RPC to everyone else and executes it immediately on this client. Player who join later will not execute this RPC.</summary>
+        /// <summary>
+        ///     Sends the RPC to everyone else and executes it immediately on this client. Player who join later will not
+        ///     execute this RPC.
+        /// </summary>
         All,
 
-        /// <summary>Sends the RPC to everyone else. This client does not execute the RPC. Player who join later will not execute this RPC.</summary>
+        /// <summary>
+        ///     Sends the RPC to everyone else. This client does not execute the RPC. Player who join later will not execute
+        ///     this RPC.
+        /// </summary>
         Others,
 
-        /// <summary>Sends the RPC to MasterClient only. Careful: The MasterClient might disconnect before it executes the RPC and that might cause dropped RPCs.</summary>
+        /// <summary>
+        ///     Sends the RPC to MasterClient only. Careful: The MasterClient might disconnect before it executes the RPC and
+        ///     that might cause dropped RPCs.
+        /// </summary>
         MasterClient,
 
-        /// <summary>Sends the RPC to everyone else and executes it immediately on this client. New players get the RPC when they join as it's buffered (until this client leaves).</summary>
+        /// <summary>
+        ///     Sends the RPC to everyone else and executes it immediately on this client. New players get the RPC when they
+        ///     join as it's buffered (until this client leaves).
+        /// </summary>
         AllBuffered,
 
-        /// <summary>Sends the RPC to everyone. This client does not execute the RPC. New players get the RPC when they join as it's buffered (until this client leaves).</summary>
+        /// <summary>
+        ///     Sends the RPC to everyone. This client does not execute the RPC. New players get the RPC when they join as
+        ///     it's buffered (until this client leaves).
+        /// </summary>
         OthersBuffered,
 
         /// <summary>Sends the RPC to everyone (including this client) through the server.</summary>
         /// <remarks>
-        /// This client executes the RPC like any other when it received it from the server.
-        /// Benefit: The server's order of sending the RPCs is the same on all clients.
+        ///     This client executes the RPC like any other when it received it from the server.
+        ///     Benefit: The server's order of sending the RPCs is the same on all clients.
         /// </remarks>
         AllViaServer,
 
         /// <summary>Sends the RPC to everyone (including this client) through the server and buffers it for players joining later.</summary>
         /// <remarks>
-        /// This client executes the RPC like any other when it received it from the server.
-        /// Benefit: The server's order of sending the RPCs is the same on all clients.
+        ///     This client executes the RPC like any other when it received it from the server.
+        ///     Benefit: The server's order of sending the RPCs is the same on all clients.
         /// </remarks>
         AllBufferedViaServer
     }
 
 
-    public enum ViewSynchronization { Off, ReliableDeltaCompressed, Unreliable, UnreliableOnChange }
+    public enum ViewSynchronization
+    {
+        Off,
+        ReliableDeltaCompressed,
+        Unreliable,
+        UnreliableOnChange
+    }
 
 
     /// <summary>
-    /// Options to define how Ownership Transfer is handled per PhotonView.
+    ///     Options to define how Ownership Transfer is handled per PhotonView.
     /// </summary>
     /// <remarks>
-    /// This setting affects how RequestOwnership and TransferOwnership work at runtime.
+    ///     This setting affects how RequestOwnership and TransferOwnership work at runtime.
     /// </remarks>
     public enum OwnershipOption
     {
         /// <summary>
-        /// Ownership is fixed. Instantiated objects stick with their creator, room objects always belong to the Master Client.
+        ///     Ownership is fixed. Instantiated objects stick with their creator, room objects always belong to the Master Client.
         /// </summary>
         Fixed,
+
         /// <summary>
-        /// Ownership can be taken away from the current owner who can't object.
+        ///     Ownership can be taken away from the current owner who can't object.
         /// </summary>
         Takeover,
+
         /// <summary>
-        /// Ownership can be requested with PhotonView.RequestOwnership but the current owner has to agree to give up ownership.
+        ///     Ownership can be requested with PhotonView.RequestOwnership but the current owner has to agree to give up
+        ///     ownership.
         /// </summary>
         /// <remarks>The current owner has to implement IPunCallbacks.OnOwnershipRequest to react to the ownership request.</remarks>
         Request

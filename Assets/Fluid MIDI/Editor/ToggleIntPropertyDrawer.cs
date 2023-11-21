@@ -11,14 +11,14 @@ namespace FluidMidi
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
             EditorGUI.BeginProperty(position, label, property);
-            SerializedProperty enabledProperty = property.FindPropertyRelative("Enabled");
-            SerializedProperty valueProperty = property.FindPropertyRelative("Value");
-            bool enabled = enabledProperty.boolValue;
-            int value = valueProperty.intValue;
+            var enabledProperty = property.FindPropertyRelative("Enabled");
+            var valueProperty = property.FindPropertyRelative("Value");
+            var enabled = enabledProperty.boolValue;
+            var value = valueProperty.intValue;
             EditorGUI.BeginChangeCheck();
-            float oldMax = position.xMax;
+            var oldMax = position.xMax;
             position.xMax = position.xMin + EditorGUIUtility.labelWidth + 21;
-            TooltipAttribute tooltipAttribute =
+            var tooltipAttribute =
                 Attribute.GetCustomAttribute(
                     property.serializedObject.targetObject.GetType().GetField(
                         property.name, BindingFlags.NonPublic | BindingFlags.Instance),
@@ -34,12 +34,13 @@ namespace FluidMidi
                 enabledProperty.boolValue = enabled;
                 valueProperty.intValue = value;
             }
+
             EditorGUI.EndProperty();
         }
 
         public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
         {
-            float height = EditorGUIUtility.singleLineHeight;
+            var height = EditorGUIUtility.singleLineHeight;
             return height;
         }
     }

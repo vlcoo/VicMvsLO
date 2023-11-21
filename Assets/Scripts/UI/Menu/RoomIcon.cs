@@ -1,50 +1,50 @@
-﻿using UnityEngine;
-using UnityEngine.UI;
-using TMPro;
-
+﻿using NSMB.Utils;
 using Photon.Realtime;
-using NSMB.Utils;
-using ExitGames.Client.Photon;
+using TMPro;
+using UnityEngine;
+using UnityEngine.UI;
 
-public class RoomIcon : MonoBehaviour {
-
+public class RoomIcon : MonoBehaviour
+{
     [SerializeField] private Color defaultColor, highlightColor, selectedColor;
     [SerializeField] private TMP_Text playersText, nameText, inProgressText, symbolsText;
-
-    public RoomInfo room;
     public bool joinPrivate;
 
     private Image icon;
 
-    public void Start() {
+    public RoomInfo room;
+
+    public void Start()
+    {
         icon = GetComponent<Image>();
         Unselect();
     }
 
-    public void UpdateUI(RoomInfo newRoom) {
+    public void UpdateUI(RoomInfo newRoom)
+    {
         if (joinPrivate)
             return;
 
         room = newRoom;
-        Hashtable prop = room.CustomProperties;
+        var prop = room.CustomProperties;
 
-        nameText.text = $"{((string) prop[Enums.NetRoomProperties.HostName]).ToValidUsername()}'s Lobby";
+        nameText.text = $"{((string)prop[Enums.NetRoomProperties.HostName]).ToValidUsername()}'s Lobby";
         playersText.text = $"{room.PlayerCount}/{room.MaxPlayers} players";
-        inProgressText.text = (bool) prop[Enums.NetRoomProperties.GameStarted] ? "In Progress" : "Not Started";
+        inProgressText.text = (bool)prop[Enums.NetRoomProperties.GameStarted] ? "In Progress" : "Not Started";
 
-        string symbols = "";
+        var symbols = "";
         Utils.GetCustomProperty(Enums.NetRoomProperties.StarRequirement, out int stars, newRoom.CustomProperties);
         Utils.GetCustomProperty(Enums.NetRoomProperties.CoinRequirement, out int coins, newRoom.CustomProperties);
         Utils.GetCustomProperty(Enums.NetRoomProperties.Lives, out int lives, newRoom.CustomProperties);
         Utils.GetCustomProperty(Enums.NetRoomProperties.Teams, out bool teams, newRoom.CustomProperties);
         Utils.GetCustomProperty(Enums.NetRoomProperties.MatchRules, out string matchRules, newRoom.CustomProperties);
-        bool powerups = (bool) prop[Enums.NetRoomProperties.NewPowerups];
-        bool time = ((int) prop[Enums.NetRoomProperties.Time]) >= 1;
+        var powerups = (bool)prop[Enums.NetRoomProperties.NewPowerups];
+        var time = (int)prop[Enums.NetRoomProperties.Time] >= 1;
         //bool password = ((string) prop[Enums.NetRoomProperties.Password]) != "";
 
         if (!string.IsNullOrEmpty(matchRules.Trim()))
             symbols += "<sprite=56>" +
-                       Utils.GetSymbolString((matchRules.Split("},{").Length).ToString(), Utils.smallSymbols);
+                       Utils.GetSymbolString(matchRules.Split("},{").Length.ToString(), Utils.smallSymbols);
         if (teams) symbols += "<sprite=76>";
         if (powerups) symbols += "<sprite=8>";
         if (time) symbols += "<sprite=6>";
@@ -57,23 +57,26 @@ public class RoomIcon : MonoBehaviour {
         symbolsText.text = symbols;
     }
 
-    public void Select() {
+    public void Select()
+    {
         icon.color = selectedColor;
     }
 
-    public void Unselect() {
+    public void Unselect()
+    {
         icon.color = defaultColor;
     }
 
-    public void Hover() {
+    public void Hover()
+    {
         icon.color = highlightColor;
     }
 
-    public void Unhover() {
-        if (MainMenuManager.Instance.selectedRoomIcon == this) {
+    public void Unhover()
+    {
+        if (MainMenuManager.Instance.selectedRoomIcon == this)
             Select();
-        } else {
+        else
             Unselect();
-        }
     }
 }

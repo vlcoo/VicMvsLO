@@ -12,103 +12,76 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-
 using UnityEngine;
-using UnityEngine.UI;
 using UnityEngine.Events;
+using UnityEngine.UI;
 
 namespace Photon.Pun.UtilityScripts
 {
     /// <summary>
-    /// Tab view manager. Handles Tab views activation and deactivation, and provides a Unity Event Callback when a tab was selected.
+    ///     Tab view manager. Handles Tab views activation and deactivation, and provides a Unity Event Callback when a tab was
+    ///     selected.
     /// </summary>
     public class TabViewManager : MonoBehaviour
     {
-
         /// <summary>
-        /// Tab change event.
-        /// </summary>
-        [System.Serializable]
-        public class TabChangeEvent : UnityEvent<string> { }
-
-        [Serializable]
-        public class Tab
-        {
-            public string ID = "";
-            public Toggle Toggle;
-            public RectTransform View;
-        }
-
-        /// <summary>
-        /// The toggle group component target.
+        ///     The toggle group component target.
         /// </summary>
         public ToggleGroup ToggleGroup;
 
         /// <summary>
-        /// all the tabs for this group
+        ///     all the tabs for this group
         /// </summary>
         public Tab[] Tabs;
 
         /// <summary>
-        /// The on tab changed Event.
+        ///     The on tab changed Event.
         /// </summary>
         public TabChangeEvent OnTabChanged;
 
         protected Tab CurrentTab;
 
-        Dictionary<Toggle, Tab> Tab_lut;
+        private Dictionary<Toggle, Tab> Tab_lut;
 
-        void Start()
+        private void Start()
         {
-
             Tab_lut = new Dictionary<Toggle, Tab>();
 
-            foreach (Tab _tab in this.Tabs)
+            foreach (var _tab in Tabs)
             {
-
                 Tab_lut[_tab.Toggle] = _tab;
 
                 _tab.View.gameObject.SetActive(_tab.Toggle.isOn);
 
-                if (_tab.Toggle.isOn)
+                if (_tab.Toggle.isOn) CurrentTab = _tab;
+                _tab.Toggle.onValueChanged.AddListener(isSelected =>
                 {
-                    CurrentTab = _tab;
-                }
-                _tab.Toggle.onValueChanged.AddListener((isSelected) =>
-                {
-                    if (!isSelected)
-                    {
-                        return;
-                    }
+                    if (!isSelected) return;
                     OnTabSelected(_tab);
                 });
             }
-
-
         }
 
         /// <summary>
-        /// Selects a given tab.
+        ///     Selects a given tab.
         /// </summary>
         /// <param name="id">Tab Id</param>
         public void SelectTab(string id)
         {
-            foreach (Tab _t in Tabs)
-            {
+            foreach (var _t in Tabs)
                 if (_t.ID == id)
                 {
                     _t.Toggle.isOn = true;
                     return;
                 }
-            }
         }
 
 
         /// <summary>
-        /// final method for a tab selection routine
+        ///     final method for a tab selection routine
         /// </summary>
         /// <param name="tab">Tab.</param>
-        void OnTabSelected(Tab tab)
+        private void OnTabSelected(Tab tab)
         {
             CurrentTab.View.gameObject.SetActive(false);
 
@@ -117,7 +90,22 @@ namespace Photon.Pun.UtilityScripts
             CurrentTab.View.gameObject.SetActive(true);
 
             OnTabChanged.Invoke(CurrentTab.ID);
+        }
 
+        /// <summary>
+        ///     Tab change event.
+        /// </summary>
+        [Serializable]
+        public class TabChangeEvent : UnityEvent<string>
+        {
+        }
+
+        [Serializable]
+        public class Tab
+        {
+            public string ID = "";
+            public Toggle Toggle;
+            public RectTransform View;
         }
     }
 }

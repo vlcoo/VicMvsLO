@@ -8,25 +8,22 @@
 // <author>developer@exitgames.com</author>
 // --------------------------------------------------------------------------------------------------------------------
 
-using UnityEngine;
-using System.Collections;
 using System.Diagnostics;
+using UnityEngine;
 
 namespace Photon.Pun.UtilityScripts
 {
     /// <summary>
-    /// This component will quit the application when escape key is pressed
+    ///     This component will quit the application when escape key is pressed
     /// </summary>
     public class OnEscapeQuit : MonoBehaviour
     {
-        [Conditional("UNITY_ANDROID"), Conditional("UNITY_IOS")]
+        [Conditional("UNITY_ANDROID")]
+        [Conditional("UNITY_IOS")]
         public void Update()
         {
             // "back" button of phone equals "Escape". quit app if that's pressed
-            if (Input.GetKeyDown(KeyCode.Escape))
-            {
-                Application.Quit();
-            }
+            if (Input.GetKeyDown(KeyCode.Escape)) Application.Quit();
         }
     }
 }

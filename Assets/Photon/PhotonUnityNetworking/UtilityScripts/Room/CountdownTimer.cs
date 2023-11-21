@@ -22,15 +22,13 @@ namespace Photon.Pun.UtilityScripts
 {
     /// <summary>This is a basic, network-synced CountdownTimer based on properties.</summary>
     /// <remarks>
-    /// In order to start the timer, the MasterClient can call SetStartTime() to set the timestamp for the start.
-    /// The property 'StartTime' then contains the server timestamp when the timer has been started.
-    /// 
-    /// In order to subscribe to the CountdownTimerHasExpired event you can call CountdownTimer.OnCountdownTimerHasExpired
-    /// += OnCountdownTimerIsExpired;
-    /// from Unity's OnEnable function for example. For unsubscribing simply call CountdownTimer.OnCountdownTimerHasExpired
-    /// -= OnCountdownTimerIsExpired;.
-    /// 
-    /// You can do this from Unity's OnEnable and OnDisable functions.
+    ///     In order to start the timer, the MasterClient can call SetStartTime() to set the timestamp for the start.
+    ///     The property 'StartTime' then contains the server timestamp when the timer has been started.
+    ///     In order to subscribe to the CountdownTimerHasExpired event you can call CountdownTimer.OnCountdownTimerHasExpired
+    ///     += OnCountdownTimerIsExpired;
+    ///     from Unity's OnEnable function for example. For unsubscribing simply call CountdownTimer.OnCountdownTimerHasExpired
+    ///     -= OnCountdownTimerIsExpired;.
+    ///     You can do this from Unity's OnEnable and OnDisable functions.
     /// </remarks>
     public class CountdownTimer : MonoBehaviourPunCallbacks
     {
@@ -41,26 +39,32 @@ namespace Photon.Pun.UtilityScripts
 
         public const string CountdownStartTime = "StartTime";
 
-        [Header("Countdown time in seconds")] 
-        public float Countdown = 5.0f;
+        [Header("Countdown time in seconds")] public float Countdown = 5.0f;
+
+        [Header("Reference to a Text component for visualizing the countdown")]
+        public Text Text;
 
         private bool isTimerRunning;
 
         private int startTime;
 
-        [Header("Reference to a Text component for visualizing the countdown")]
-        public Text Text;
-
-
-        /// <summary>
-        ///     Called when the timer has expired.
-        /// </summary>
-        public static event CountdownTimerHasExpired OnCountdownTimerHasExpired;
-
 
         public void Start()
         {
-            if (this.Text == null) Debug.LogError("Reference to 'Text' is not set. Please set a valid reference.", this);
+            if (Text == null) Debug.LogError("Reference to 'Text' is not set. Please set a valid reference.", this);
+        }
+
+
+        public void Update()
+        {
+            if (!isTimerRunning) return;
+
+            var countdown = TimeRemaining();
+            Text.text = string.Format("Game starts in {0} seconds", countdown.ToString("n0"));
+
+            if (countdown > 0.0f) return;
+
+            OnTimerEnds();
         }
 
         public override void OnEnable()
@@ -79,32 +83,25 @@ namespace Photon.Pun.UtilityScripts
         }
 
 
-        public void Update()
-        {
-            if (!this.isTimerRunning) return;
-
-            float countdown = TimeRemaining();
-            this.Text.text = string.Format("Game starts in {0} seconds", countdown.ToString("n0"));
-
-            if (countdown > 0.0f) return;
-
-            OnTimerEnds();
-        }
+        /// <summary>
+        ///     Called when the timer has expired.
+        /// </summary>
+        public static event CountdownTimerHasExpired OnCountdownTimerHasExpired;
 
 
         private void OnTimerRuns()
         {
-            this.isTimerRunning = true;
-            this.enabled = true;
+            isTimerRunning = true;
+            enabled = true;
         }
 
         private void OnTimerEnds()
         {
-            this.isTimerRunning = false;
-            this.enabled = false;
+            isTimerRunning = false;
+            enabled = false;
 
-            Debug.Log("Emptying info text.", this.Text);
-            this.Text.text = string.Empty;
+            Debug.Log("Emptying info text.", Text);
+            Text.text = string.Empty;
 
             if (OnCountdownTimerHasExpired != null) OnCountdownTimerHasExpired();
         }
@@ -122,13 +119,14 @@ namespace Photon.Pun.UtilityScripts
             int propStartTime;
             if (TryGetStartTime(out propStartTime))
             {
-                this.startTime = propStartTime;
-                Debug.Log("Initialize sets StartTime " + this.startTime + " server time now: " + PhotonNetwork.ServerTimestamp + " remain: " + TimeRemaining());
+                startTime = propStartTime;
+                Debug.Log("Initialize sets StartTime " + startTime + " server time now: " +
+                          PhotonNetwork.ServerTimestamp + " remain: " + TimeRemaining());
 
 
-                this.isTimerRunning = TimeRemaining() > 0;
+                isTimerRunning = TimeRemaining() > 0;
 
-                if (this.isTimerRunning)
+                if (isTimerRunning)
                     OnTimerRuns();
                 else
                     OnTimerEnds();
@@ -138,8 +136,8 @@ namespace Photon.Pun.UtilityScripts
 
         private float TimeRemaining()
         {
-            int timer = PhotonNetwork.ServerTimestamp - this.startTime;
-            return this.Countdown - timer / 1000f;
+            var timer = PhotonNetwork.ServerTimestamp - startTime;
+            return Countdown - timer / 1000f;
         }
 
 
@@ -160,17 +158,17 @@ namespace Photon.Pun.UtilityScripts
 
         public static void SetStartTime()
         {
-            int startTime = 0;
-            bool wasSet = TryGetStartTime(out startTime);
+            var startTime = 0;
+            var wasSet = TryGetStartTime(out startTime);
 
-            Hashtable props = new Hashtable
+            var props = new Hashtable
             {
-                {CountdownTimer.CountdownStartTime, (int)PhotonNetwork.ServerTimestamp}
+                { CountdownStartTime, PhotonNetwork.ServerTimestamp }
             };
             PhotonNetwork.CurrentRoom.SetCustomProperties(props);
 
 
-            Debug.Log("Set Custom Props for Time: "+ props.ToStringFull() + " wasSet: "+wasSet);
+            Debug.Log("Set Custom Props for Time: " + props.ToStringFull() + " wasSet: " + wasSet);
         }
     }
 }

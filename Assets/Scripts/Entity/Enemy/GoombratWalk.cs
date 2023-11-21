@@ -1,22 +1,26 @@
-using UnityEngine;
-using Photon.Pun;
 using NSMB.Utils;
+using Photon.Pun;
+using UnityEngine;
 
-public class GoombratWalk : KillableEntity {
-    [SerializeField] float speed, deathTimer = -1, terminalVelocity = -8;
-    private Vector2 blockOffset = new(0, 0.05f), velocityLastFrame;
+public class GoombratWalk : KillableEntity
+{
+    [SerializeField] private float speed, deathTimer = -1, terminalVelocity = -8;
     public bool stationary;
+    private Vector2 blockOffset = new(0, 0.05f), velocityLastFrame;
     public bool IsStationary => stationary;
 
 
-    public new void Start() {
+    public new void Start()
+    {
         base.Start();
         body.velocity = new Vector2(speed * (left ? -1 : 1), body.velocity.y);
         animator.SetBool("dead", false);
     }
 
-    public new void FixedUpdate() {
-        if (GameManager.Instance && GameManager.Instance.gameover) {
+    public new void FixedUpdate()
+    {
+        if (GameManager.Instance && GameManager.Instance.gameover)
+        {
             body.velocity = Vector2.zero;
             body.angularVelocity = 0;
             animator.enabled = false;
@@ -25,12 +29,15 @@ public class GoombratWalk : KillableEntity {
         }
 
         base.FixedUpdate();
-        if (dead) {
-            if (deathTimer >= 0 && (photonView?.IsMine ?? true)) {
+        if (dead)
+        {
+            if (deathTimer >= 0 && (photonView?.IsMine ?? true))
+            {
                 Utils.TickTimer(ref deathTimer, 0, Time.fixedDeltaTime);
                 if (deathTimer == 0)
                     PhotonNetwork.Destroy(gameObject);
             }
+
             return;
         }
 
@@ -57,7 +64,8 @@ public class GoombratWalk : KillableEntity {
             }
         }*/
 
-        if (physics.onGround || Physics2D.Raycast(body.position + Vector2.up * 0.2f, Vector2.down, 0.5f, Layers.MaskAnyGround))
+        if (physics.onGround ||
+            Physics2D.Raycast(body.position + Vector2.up * 0.2f, Vector2.down, 0.5f, Layers.MaskAnyGround))
         {
             Vector3 bratCheckPos = body.position + new Vector2(0.1f * (left ? -1 : 1), 0.2f);
             if (GameManager.Instance)
@@ -66,27 +74,22 @@ public class GoombratWalk : KillableEntity {
             if (!Physics2D.Raycast(bratCheckPos, Vector2.down, 0.5f, Layers.MaskAnyGround))
             {
                 if (photonView && photonView.IsMine)
-                {
                     photonView.RPC(nameof(Turnaround), RpcTarget.All, left, velocityLastFrame.x);
-                }
                 else
-                {
                     Turnaround(left, velocityLastFrame.x);
-                }
             }
         }
 
 
         physics.UpdateCollisions();
-        if (physics.hitLeft || physics.hitRight) {
-            left = physics.hitRight;
-        }
+        if (physics.hitLeft || physics.hitRight) left = physics.hitRight;
         body.velocity = new Vector2(speed * (left ? -1 : 1), Mathf.Max(terminalVelocity, body.velocity.y));
         sRenderer.flipX = !left;
     }
 
     [PunRPC]
-    public override void Kill() {
+    public override void Kill()
+    {
         body.velocity = Vector2.zero;
         body.isKinematic = true;
         speed = 0;
@@ -105,5 +108,4 @@ public class GoombratWalk : KillableEntity {
         left = !hitWallOnLeft;
         body.velocity = new Vector2((x > 0.5f ? Mathf.Abs(x) : speed) * (left ? -1 : 1), body.velocity.y);
     }
-
 }

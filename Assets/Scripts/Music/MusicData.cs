@@ -1,13 +1,12 @@
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "MusicData", menuName = "ScriptableObjects/MusicData")]
-public class MusicData : ScriptableObject {
-
+public class MusicData : ScriptableObject
+{
     public AudioClip clip, fastClip;
     public float loopStartSample, loopEndSample;
 
     public float[] bahTimestamps;
-    public bool hasBahs => bahTimestamps != null && bahTimestamps.Length != 0;
 
     public MusicData(AudioClip audio, float start, float end)
     {
@@ -15,4 +14,6 @@ public class MusicData : ScriptableObject {
         loopStartSample = start;
         loopEndSample = end;
     }
+
+    public bool hasBahs => bahTimestamps != null && bahTimestamps.Length != 0;
 }

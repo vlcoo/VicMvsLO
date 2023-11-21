@@ -1,7 +1,4 @@
-using System;
-using System.Runtime.InteropServices;
 using System.Collections.Generic;
-using System.Text;
 
 namespace Discord
 {
@@ -11,10 +8,7 @@ namespace Discord
         {
             var count = CountEntitlements();
             var entitlements = new List<Entitlement>();
-            for (var i = 0; i < count; i++)
-            {
-                entitlements.Add(GetEntitlementAt(i));
-            }
+            for (var i = 0; i < count; i++) entitlements.Add(GetEntitlementAt(i));
             return entitlements;
         }
 
@@ -22,10 +16,7 @@ namespace Discord
         {
             var count = CountSkus();
             var skus = new List<Sku>();
-            for (var i = 0; i < count; i++)
-            {
-                skus.Add(GetSkuAt(i));
-            }
+            for (var i = 0; i < count; i++) skus.Add(GetSkuAt(i));
             return skus;
         }
     }

@@ -9,18 +9,17 @@
 // ----------------------------------------------------------------------------
 
 
+using UnityEditor;
+using UnityEngine;
+
 namespace Photon.Pun
 {
-    using UnityEditor;
-    using UnityEngine;
-
-
     [CustomEditor(typeof(PhotonTransformView))]
     public class PhotonTransformViewEditor : Editor
     {
-        private bool helpToggle = false;
+        private bool helpToggle;
 
-        SerializedProperty pos, rot, scl, lcl;
+        private SerializedProperty pos, rot, scl, lcl;
 
         public void OnEnable()
         {
@@ -38,7 +37,7 @@ namespace Photon.Pun
                 return;
             }
 
-            PhotonTransformView view = (PhotonTransformView)target;
+            var view = (PhotonTransformView)target;
 
 
             EditorGUILayout.LabelField("Synchronize Options");
@@ -57,16 +56,13 @@ namespace Photon.Pun
                 EditorGUILayout.PropertyField(lcl, new GUIContent("Use Local", lcl.tooltip));
             }
 
-            if (EditorGUI.EndChangeCheck())
-            {
-                serializedObject.ApplyModifiedProperties();
-            }
+            if (EditorGUI.EndChangeCheck()) serializedObject.ApplyModifiedProperties();
 
-            this.helpToggle = EditorGUILayout.Foldout(this.helpToggle, "Info");
-            if (this.helpToggle)
-            {
-                EditorGUILayout.HelpBox("The Photon Transform View of PUN 2 is simple by design.\nReplace it with the Photon Transform View Classic if you want the old options.\nThe best solution is a custom IPunObservable implementation.", MessageType.Info, true);
-            }
+            helpToggle = EditorGUILayout.Foldout(helpToggle, "Info");
+            if (helpToggle)
+                EditorGUILayout.HelpBox(
+                    "The Photon Transform View of PUN 2 is simple by design.\nReplace it with the Photon Transform View Classic if you want the old options.\nThe best solution is a custom IPunObservable implementation.",
+                    MessageType.Info, true);
         }
     }
 }

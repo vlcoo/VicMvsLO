@@ -9,47 +9,46 @@
 // ----------------------------------------------------------------------------
 
 
+using UnityEngine;
+
 namespace Photon.Pun
 {
-    using UnityEngine;
-
-
     [RequireComponent(typeof(Rigidbody2D))]
     [AddComponentMenu("Photon Networking/Photon Rigidbody 2D View")]
     public class PhotonRigidbody2DView : MonoBehaviourPun, IPunObservable
     {
-        private float m_Distance;
+        [HideInInspector] public bool m_SynchronizeVelocity = true;
+
+        [HideInInspector] public bool m_SynchronizeAngularVelocity;
+
+        [HideInInspector] public bool m_TeleportEnabled;
+
+        [HideInInspector] public float m_TeleportIfDistanceGreaterThan = 3.0f;
+
         private float m_Angle;
 
         private Rigidbody2D m_Body;
+        private float m_Distance;
 
         private Vector2 m_NetworkPosition;
 
         private float m_NetworkRotation;
 
-        [HideInInspector]
-        public bool m_SynchronizeVelocity = true;
-        [HideInInspector]
-        public bool m_SynchronizeAngularVelocity = false;
-
-        [HideInInspector]
-        public bool m_TeleportEnabled = false;
-        [HideInInspector]
-        public float m_TeleportIfDistanceGreaterThan = 3.0f;
-
         public void Awake()
         {
-            this.m_Body = GetComponent<Rigidbody2D>();
+            m_Body = GetComponent<Rigidbody2D>();
 
-            this.m_NetworkPosition = new Vector2();
+            m_NetworkPosition = new Vector2();
         }
 
         public void FixedUpdate()
         {
-            if (!this.photonView.IsMine)
+            if (!photonView.IsMine)
             {
-                this.m_Body.position = Vector2.MoveTowards(this.m_Body.position, this.m_NetworkPosition, this.m_Distance * (1.0f / PhotonNetwork.SerializationRate));
-                this.m_Body.rotation = Mathf.MoveTowards(this.m_Body.rotation, this.m_NetworkRotation, this.m_Angle * (1.0f / PhotonNetwork.SerializationRate));
+                m_Body.position = Vector2.MoveTowards(m_Body.position, m_NetworkPosition,
+                    m_Distance * (1.0f / PhotonNetwork.SerializationRate));
+                m_Body.rotation = Mathf.MoveTowards(m_Body.rotation, m_NetworkRotation,
+                    m_Angle * (1.0f / PhotonNetwork.SerializationRate));
             }
         }
 
@@ -57,52 +56,42 @@ namespace Photon.Pun
         {
             if (stream.IsWriting)
             {
-                stream.SendNext(this.m_Body.position);
-                stream.SendNext(this.m_Body.rotation);
+                stream.SendNext(m_Body.position);
+                stream.SendNext(m_Body.rotation);
 
-                if (this.m_SynchronizeVelocity)
-                {
-                    stream.SendNext(this.m_Body.velocity);
-                }
+                if (m_SynchronizeVelocity) stream.SendNext(m_Body.velocity);
 
-                if (this.m_SynchronizeAngularVelocity)
-                {
-                    stream.SendNext(this.m_Body.angularVelocity);
-                }
+                if (m_SynchronizeAngularVelocity) stream.SendNext(m_Body.angularVelocity);
             }
             else
             {
-                this.m_NetworkPosition = (Vector2)stream.ReceiveNext();
-                this.m_NetworkRotation = (float)stream.ReceiveNext();
+                m_NetworkPosition = (Vector2)stream.ReceiveNext();
+                m_NetworkRotation = (float)stream.ReceiveNext();
 
-                if (this.m_TeleportEnabled)
-                {
-                    if (Vector3.Distance(this.m_Body.position, this.m_NetworkPosition) > this.m_TeleportIfDistanceGreaterThan)
-                    {
-                        this.m_Body.position = this.m_NetworkPosition;
-                    }
-                }
+                if (m_TeleportEnabled)
+                    if (Vector3.Distance(m_Body.position, m_NetworkPosition) > m_TeleportIfDistanceGreaterThan)
+                        m_Body.position = m_NetworkPosition;
 
-                if (this.m_SynchronizeVelocity || this.m_SynchronizeAngularVelocity)
+                if (m_SynchronizeVelocity || m_SynchronizeAngularVelocity)
                 {
-                    float lag = Mathf.Abs((float)(PhotonNetwork.Time - info.SentServerTime));
+                    var lag = Mathf.Abs((float)(PhotonNetwork.Time - info.SentServerTime));
 
                     if (m_SynchronizeVelocity)
                     {
-                        this.m_Body.velocity = (Vector2)stream.ReceiveNext();
+                        m_Body.velocity = (Vector2)stream.ReceiveNext();
 
-                        this.m_NetworkPosition += this.m_Body.velocity * lag;
+                        m_NetworkPosition += m_Body.velocity * lag;
 
-                        this.m_Distance = Vector2.Distance(this.m_Body.position, this.m_NetworkPosition);
+                        m_Distance = Vector2.Distance(m_Body.position, m_NetworkPosition);
                     }
 
-                    if (this.m_SynchronizeAngularVelocity)
+                    if (m_SynchronizeAngularVelocity)
                     {
-                        this.m_Body.angularVelocity = (float)stream.ReceiveNext();
+                        m_Body.angularVelocity = (float)stream.ReceiveNext();
 
-                        this.m_NetworkRotation += this.m_Body.angularVelocity * lag;
+                        m_NetworkRotation += m_Body.angularVelocity * lag;
 
-                        this.m_Angle = Mathf.Abs(this.m_Body.rotation - this.m_NetworkRotation);
+                        m_Angle = Mathf.Abs(m_Body.rotation - m_NetworkRotation);
                     }
                 }
             }

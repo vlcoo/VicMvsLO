@@ -1,23 +1,20 @@
-using System.Collections;
-using System.Collections.Generic;
 using Photon.Pun;
 using UnityEngine;
 
 public class BahableEntity : MonoBehaviour
 {
-    private KillableEntity child;
     public static int BAH_STRENGTH = 3;
-    
+    private KillableEntity child;
+
     // Start is called before the first frame update
-    void Start()
+    private void Start()
     {
         child = GetComponent<KillableEntity>();
     }
 
     // Update is called once per frame
-    void Update()
+    private void Update()
     {
-        
     }
 
     public void bah()
@@ -28,7 +25,11 @@ public class BahableEntity : MonoBehaviour
             if (koopa.shell && child.body.velocity.x != 0) return;
             if (!koopa.shell) child.photonView.RPC(nameof(child.SetLeft), RpcTarget.All, !child.left);
         }
-        else child.photonView.RPC(nameof(child.SetLeft), RpcTarget.All, !child.left);
+        else
+        {
+            child.photonView.RPC(nameof(child.SetLeft), RpcTarget.All, !child.left);
+        }
+
         child.body.velocity = new Vector2(child.body.velocity.x, BAH_STRENGTH);
     }
 }

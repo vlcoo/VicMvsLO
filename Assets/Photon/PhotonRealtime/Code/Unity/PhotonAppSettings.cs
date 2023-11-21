@@ -10,7 +10,6 @@
 
 
 #if !PHOTON_UNITY_NETWORKING
-
 namespace Photon.Realtime
 {
     using System;

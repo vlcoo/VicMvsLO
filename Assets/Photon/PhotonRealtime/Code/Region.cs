@@ -12,19 +12,27 @@
 #define SUPPORTED_UNITY
 #endif
 
-
 namespace Photon.Realtime
 {
-    using ExitGames.Client.Photon;
-
-    #if SUPPORTED_UNITY || NETFX_CORE
-    using Hashtable = ExitGames.Client.Photon.Hashtable;
-    using SupportClass = ExitGames.Client.Photon.SupportClass;
-    #endif
+#if SUPPORTED_UNITY || NETFX_CORE
+#endif
 
 
     public class Region
     {
+        public Region(string code, string address)
+        {
+            SetCodeAndCluster(code);
+            HostAndPort = address;
+            Ping = int.MaxValue;
+        }
+
+        public Region(string code, int ping)
+        {
+            SetCodeAndCluster(code);
+            Ping = ping;
+        }
+
         public string Code { get; private set; }
 
         /// <summary>Unlike the CloudRegionCode, this may contain cluster information.</summary>
@@ -34,57 +42,36 @@ namespace Photon.Realtime
 
         public int Ping { get; set; }
 
-        public bool WasPinged { get { return this.Ping != int.MaxValue; } }
-
-        public Region(string code, string address)
-        {
-            this.SetCodeAndCluster(code);
-            this.HostAndPort = address;
-            this.Ping = int.MaxValue;
-        }
-
-        public Region(string code, int ping)
-        {
-            this.SetCodeAndCluster(code);
-            this.Ping = ping;
-        }
+        public bool WasPinged => Ping != int.MaxValue;
 
         private void SetCodeAndCluster(string codeAsString)
         {
             if (codeAsString == null)
             {
-                this.Code = "";
-                this.Cluster = "";
+                Code = "";
+                Cluster = "";
                 return;
             }
 
             codeAsString = codeAsString.ToLower();
-            int slash = codeAsString.IndexOf('/');
-            this.Code = slash <= 0 ? codeAsString : codeAsString.Substring(0, slash);
-            this.Cluster = slash <= 0 ? "" : codeAsString.Substring(slash+1, codeAsString.Length-slash-1);
+            var slash = codeAsString.IndexOf('/');
+            Code = slash <= 0 ? codeAsString : codeAsString.Substring(0, slash);
+            Cluster = slash <= 0 ? "" : codeAsString.Substring(slash + 1, codeAsString.Length - slash - 1);
         }
 
         public override string ToString()
         {
-            return this.ToString(false);
+            return ToString();
         }
 
         public string ToString(bool compact = false)
         {
-            string regionCluster = this.Code;
-            if (!string.IsNullOrEmpty(this.Cluster))
-            {
-                regionCluster += "/" + this.Cluster;
-            }
+            var regionCluster = Code;
+            if (!string.IsNullOrEmpty(Cluster)) regionCluster += "/" + Cluster;
 
             if (compact)
-            {
-                return string.Format("{0}:{1}", regionCluster, this.Ping);
-            }
-            else
-            {
-                return string.Format("{0}[{2}]: {1}ms", regionCluster, this.Ping, this.HostAndPort);
-            }
+                return string.Format("{0}:{1}", regionCluster, Ping);
+            return string.Format("{0}[{2}]: {1}ms", regionCluster, Ping, HostAndPort);
         }
     }
 }

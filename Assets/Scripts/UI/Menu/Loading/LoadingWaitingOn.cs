@@ -3,14 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using DG.Tweening;
 using ExitGames.Client.Photon;
-using UnityEngine;
-using TMPro;
-
-using Photon.Realtime;
 using NSMB.Utils;
 using Photon.Pun;
+using Photon.Realtime;
+using TMPro;
+using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityEngine.Serialization;
 
 public class LoadingWaitingOn : MonoBehaviour
 {
@@ -18,47 +16,57 @@ public class LoadingWaitingOn : MonoBehaviour
     public GameObject koopaLoadingScene;
     public Songinator MusicSynth;
     public Songinator MusicSynthIdle;
-    public Coroutine waitingCoroutine;
 
     [SerializeField] private TMP_Text infoText;
     [SerializeField] private TMP_Text playerList, highPingAlert, waitingTimer;
-    [SerializeField] private string emptyText = "Loading...", iveLoadedText = "Wait...", readyToStartText = "OK!", spectatorText = "Joining as Spectator...";
-    [SerializeField] private int waitingTime, waitingLastTime;
-    private float waitingLastTimer = 0;
 
-    public void Start() {
+    [SerializeField] private string emptyText = "Loading...",
+        iveLoadedText = "Wait...",
+        readyToStartText = "OK!",
+        spectatorText = "Joining as Spectator...";
+
+    [SerializeField] private int waitingTime, waitingLastTime;
+    public Coroutine waitingCoroutine;
+    private float waitingLastTimer;
+
+    public void Start()
+    {
         if (PhotonNetwork.GetPing() < 180)
             highPingAlert.fontSize = 0;
 
-        bool isBowsers = Utils.GetCharacterData().isBowsers;
+        var isBowsers = Utils.GetCharacterData().isBowsers;
         marioLoadingScene.SetActive(!isBowsers);
         koopaLoadingScene.SetActive(isBowsers);
 
         waitingCoroutine = StartCoroutine(WaitForEveryone());
     }
 
-    public void Update() {
+    public void Update()
+    {
         if (waitingLastTimer > 0)
         {
             Utils.TickTimer(ref waitingLastTimer, 0, Time.deltaTime);
             waitingTimer.text = (int)waitingLastTimer + "s...";
         }
-        
+
         if (!GameManager.Instance)
             return;
-        
-        if (GlobalController.Instance.joinedAsSpectator) {
+
+        if (GlobalController.Instance.joinedAsSpectator)
+        {
             infoText.text = spectatorText;
             return;
         }
 
-        if (GameManager.Instance.loaded) {
+        if (GameManager.Instance.loaded)
+        {
             infoText.text = readyToStartText;
             playerList.text = "";
             return;
         }
 
-        if (GameManager.Instance.loadedPlayers.Count == 0) {
+        if (GameManager.Instance.loadedPlayers.Count == 0)
+        {
             infoText.text = emptyText;
             return;
         }
@@ -67,18 +75,24 @@ public class LoadingWaitingOn : MonoBehaviour
 
         HashSet<Player> waitingFor = new(GameManager.Instance.nonSpectatingPlayers);
         waitingFor.ExceptWith(GameManager.Instance.loadedPlayers);
-        playerList.text = (waitingFor.Count) == 0 ? "" : "- Waiting for -\n" + string.Join("\n", waitingFor.Select(pl => pl.GetUniqueNickname()));
+        playerList.text = waitingFor.Count == 0
+            ? ""
+            : "- Waiting for -\n" + string.Join("\n", waitingFor.Select(pl => pl.GetUniqueNickname()));
     }
 
-    IEnumerator WaitForEveryone()
+    private IEnumerator WaitForEveryone()
     {
         yield return new WaitForSeconds(waitingTime);
-        yield return DOTween.To(() => MusicSynth.player.Gain, v => MusicSynth.player.Gain = v, 0, 1f).WaitForCompletion();
+        yield return DOTween.To(() => MusicSynth.player.Gain, v => MusicSynth.player.Gain = v, 0, 1f)
+            .WaitForCompletion();
         MusicSynthIdle.StartPlayback();
         waitingLastTimer = waitingLastTime;
         yield return new WaitForSeconds(waitingLastTime);
         if (PhotonNetwork.IsMasterClient)
-            PhotonNetwork.RaiseEvent((byte) Enums.NetEventIds.EndGame, "DUMMY_TIMEOUT", NetworkUtils.EventAll, SendOptions.SendReliable);
+        {
+            PhotonNetwork.RaiseEvent((byte)Enums.NetEventIds.EndGame, "DUMMY_TIMEOUT", NetworkUtils.EventAll,
+                SendOptions.SendReliable);
+        }
         else
         {
             PhotonNetwork.LeaveRoom();
@@ -91,6 +105,6 @@ public class LoadingWaitingOn : MonoBehaviour
         waitingLastTime = 0;
         StopCoroutine(waitingCoroutine);
         GetComponent<Animator>().SetTrigger(spectating ? "spectating" : "loaded");
-        DOTween.To(() => MusicSynth.player.Gain, v => MusicSynth.player.Gain = v, 0f,  2f).SetEase(Ease.Linear);
+        DOTween.To(() => MusicSynth.player.Gain, v => MusicSynth.player.Gain = v, 0f, 2f).SetEase(Ease.Linear);
     }
 }

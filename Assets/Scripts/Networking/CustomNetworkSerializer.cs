@@ -1,24 +1,25 @@
 using System.Collections.Generic;
 using System.Linq;
+using NSMB.Utils;
+using Photon.Pun;
 using UnityEngine;
 
-using Photon.Pun;
-using NSMB.Utils;
-
-public class CustomNetworkSerializer : MonoBehaviour, IPunObservable {
-
-    [SerializeField]
-    private List<Component> serializableViews;
-    private List<ICustomSerializeView> views;
+public class CustomNetworkSerializer : MonoBehaviour, IPunObservable
+{
+    [SerializeField] private List<Component> serializableViews;
 
     private readonly List<byte> buffer = new();
     private int lastReceivedTimestamp;
+    private List<ICustomSerializeView> views;
 
-    public void Awake() {
-        views = serializableViews.Where((view) => view as ICustomSerializeView is not null).Cast<ICustomSerializeView>().ToList();
+    public void Awake()
+    {
+        views = serializableViews.Where(view => view as ICustomSerializeView is not null).Cast<ICustomSerializeView>()
+            .ToList();
     }
 
-    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info) {
+    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+    {
         //dont serialize when game is over
         if (!GameManager.Instance || (GameManager.Instance && GameManager.Instance.gameover))
             return;
@@ -26,15 +27,17 @@ public class CustomNetworkSerializer : MonoBehaviour, IPunObservable {
         //clear byte buffer
         buffer.Clear();
 
-        if (stream.IsWriting) {
+        if (stream.IsWriting)
+        {
             //write to buffer
 
-            for (byte i = 0; i < views.Count; i++) {
+            for (byte i = 0; i < views.Count; i++)
+            {
                 var view = views[i];
                 if (!view.Active)
                     continue;
 
-                int bufferSize = buffer.Count;
+                var bufferSize = buffer.Count;
 
                 view.Serialize(buffer);
                 //Debug.Log(view.GetType().Name + " = " + string.Join(",", buffer.Skip(bufferSize)));
@@ -44,7 +47,7 @@ public class CustomNetworkSerializer : MonoBehaviour, IPunObservable {
                     buffer.Insert(bufferSize, i);
             }
 
-            byte[] uncompressed = buffer.ToArray();
+            var uncompressed = buffer.ToArray();
             /*
             //compression
             buffer.Insert(0, 0);
@@ -58,17 +61,18 @@ public class CustomNetworkSerializer : MonoBehaviour, IPunObservable {
             }
             */
             stream.SendNext(uncompressed);
-
-        } else if (stream.IsReading) {
+        }
+        else if (stream.IsReading)
+        {
             //check that packet is coming in order
-            int oldTimestamp = lastReceivedTimestamp;
+            var oldTimestamp = lastReceivedTimestamp;
             lastReceivedTimestamp = info.SentServerTimestamp;
 
             if (info.SentServerTimestamp - oldTimestamp < 0)
                 return;
 
             //incoming bytes
-            byte[] bytes = (byte[]) stream.ReceiveNext();
+            var bytes = (byte[])stream.ReceiveNext();
             /*
             byte compressed = bytes[0];
             if (bytes[0] == 1)
@@ -77,11 +81,12 @@ public class CustomNetworkSerializer : MonoBehaviour, IPunObservable {
 
             buffer.AddRange(bytes);
 
-            int index = 0;
+            var index = 0;
 
             //deserialize
-            while (index < buffer.Count) {
-                SerializationUtils.ReadByte(buffer, ref index, out byte view);
+            while (index < buffer.Count)
+            {
+                SerializationUtils.ReadByte(buffer, ref index, out var view);
                 views[view].Deserialize(buffer, ref index, info);
             }
         }

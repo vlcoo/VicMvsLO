@@ -1,6 +1,4 @@
-using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace Discord
 {
@@ -10,10 +8,7 @@ namespace Discord
         {
             var fileCount = Count();
             var files = new List<FileStat>();
-            for (var i = 0; i < fileCount; i++)
-            {
-                files.Add(StatAt(i));
-            }
+            for (var i = 0; i < fileCount; i++) files.Add(StatAt(i));
             return files;
         }
     }

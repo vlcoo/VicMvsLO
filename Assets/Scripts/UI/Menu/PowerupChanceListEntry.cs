@@ -2,11 +2,15 @@ using System;
 using Photon.Pun;
 using TMPro;
 using UnityEngine;
-using Button = UnityEngine.UI.Button;
+using UnityEngine.UI;
 
 public class PowerupChanceListEntry : MonoBehaviour
 {
+    public string powerup;
+    public TMP_Text textField;
+    public Button upBtn, downBtn;
     private int _chance = 1;
+
     public int Chance
     {
         set
@@ -24,8 +28,4 @@ public class PowerupChanceListEntry : MonoBehaviour
         }
         get => _chance;
     }
-    
-    public String powerup;
-    public TMP_Text textField;
-    public Button upBtn, downBtn;
 }

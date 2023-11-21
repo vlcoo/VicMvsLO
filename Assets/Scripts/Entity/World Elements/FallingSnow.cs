@@ -1,19 +1,17 @@
-using System;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class FallingSnow : MonoBehaviour
 {
     public Sprite fallingSprite;
-    
+    public bool isActive;
+
     private Rigidbody2D body;
     private BoxCollider2D proximityCast;
-    public bool isActive = false;
-    private float wakeupTimer = 1f;
     private AudioSource sfx;
-    
-    void Start()
+    private float wakeupTimer = 1f;
+
+    private void Start()
     {
         body = GetComponent<Rigidbody2D>();
         proximityCast = GetComponent<BoxCollider2D>();
@@ -21,7 +19,7 @@ public class FallingSnow : MonoBehaviour
     }
 
     // Update is called once per frame
-    void FixedUpdate()
+    private void FixedUpdate()
     {
         if (isActive)
         {
@@ -36,7 +34,7 @@ public class FallingSnow : MonoBehaviour
     private void OnTriggerEnter2D(Collider2D col)
     {
         if (wakeupTimer < 1f) return;
-        PlayerController player = col.gameObject.GetComponent<PlayerController>();
+        var player = col.gameObject.GetComponent<PlayerController>();
         if (player is null) return;
 
         isActive = true;

@@ -1,30 +1,29 @@
 using System.Collections.Generic;
+using NSMB.Utils;
+using Photon.Pun;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
 
-using Photon.Pun;
-using NSMB.Utils;
-
-
-public class UIUpdater : MonoBehaviour {
-
+public class UIUpdater : MonoBehaviour
+{
     public static UIUpdater Instance;
     public GameObject playerTrackTemplate, starTrackTemplate;
     public PlayerController player;
     public Sprite storedItemNull;
     public TMP_Text uiStars, uiCoins, uiDebug, uiLives, uiCountdown, uiLaps;
     public Image itemReserve, itemColor;
-    public float pingSample = 0;
-
-    private Material timerMaterial;
-    private GameObject starsParent, coinsParent, livesParent, timerParent, lapsParent;
+    public float pingSample;
     private readonly List<Image> backgrounds = new();
-    private bool uiHidden, invis;
 
     private int coins = -1, stars = -1, lives = -1, timer = -1, laps = -1;
+    private GameObject starsParent, coinsParent, livesParent, timerParent, lapsParent;
 
-    public void Start() {
+    private Material timerMaterial;
+    private bool uiHidden, invis;
+
+    public void Start()
+    {
         Instance = this;
         pingSample = PhotonNetwork.GetPing();
 
@@ -40,36 +39,40 @@ public class UIUpdater : MonoBehaviour {
         backgrounds.Add(timerParent.GetComponentInChildren<Image>());
         backgrounds.Add(lapsParent.GetComponentInChildren<Image>());
 
-        foreach (Image bg in backgrounds)
+        foreach (var bg in backgrounds)
             bg.color = GameManager.Instance.levelUIColor;
-        itemColor.color = new(GameManager.Instance.levelUIColor.r - 0.2f, GameManager.Instance.levelUIColor.g - 0.2f, GameManager.Instance.levelUIColor.b - 0.2f, GameManager.Instance.levelUIColor.a);
+        itemColor.color = new Color(GameManager.Instance.levelUIColor.r - 0.2f,
+            GameManager.Instance.levelUIColor.g - 0.2f, GameManager.Instance.levelUIColor.b - 0.2f,
+            GameManager.Instance.levelUIColor.a);
     }
 
-    public void Update() {
+    public void Update()
+    {
         pingSample = Mathf.Lerp(pingSample, PhotonNetwork.GetPing(), Mathf.Clamp01(Time.unscaledDeltaTime * 0.5f));
         if (pingSample == float.NaN)
             pingSample = 0;
-        
-        string signalStrength;
-        if (pingSample < 0) {
-            signalStrength = "52";
-        } else if (pingSample < 80) {
-            signalStrength = "49";
-        } else if (pingSample < 120) {
-            signalStrength = "50";
-        } else if (pingSample < 180) {
-            signalStrength = "51";
-        } else {
-            signalStrength = "52";
-        }
 
-        uiDebug.text = "<mark=#000000b0 padding=\"20, 20, 20, 20\">" + (int) pingSample + " <sprite=" + signalStrength + ">";
+        string signalStrength;
+        if (pingSample < 0)
+            signalStrength = "52";
+        else if (pingSample < 80)
+            signalStrength = "49";
+        else if (pingSample < 120)
+            signalStrength = "50";
+        else if (pingSample < 180)
+            signalStrength = "51";
+        else
+            signalStrength = "52";
+
+        uiDebug.text = "<mark=#000000b0 padding=\"20, 20, 20, 20\">" + (int)pingSample + " <sprite=" + signalStrength +
+                       ">";
 
         //Player stuff update.
         if (!player && GameManager.Instance.localPlayer)
             player = GameManager.Instance.localPlayer.GetComponent<PlayerController>();
 
-        if (!player) {
+        if (!player)
+        {
             if (!uiHidden)
                 ToggleUI(true);
 
@@ -83,7 +86,8 @@ public class UIUpdater : MonoBehaviour {
         UpdateTextUI();
     }
 
-    private void ToggleUI(bool hidden) {
+    private void ToggleUI(bool hidden)
+    {
         uiHidden = hidden;
 
         starsParent.SetActive(!hidden);
@@ -93,7 +97,8 @@ public class UIUpdater : MonoBehaviour {
         lapsParent.SetActive(!hidden);
     }
 
-    private void UpdateStoredItemUI() {
+    private void UpdateStoredItemUI()
+    {
         if (GameManager.Instance.Togglerizer.currentEffects.Contains("NoReserve"))
         {
             itemReserve.gameObject.SetActive(false);
@@ -103,67 +108,94 @@ public class UIUpdater : MonoBehaviour {
         itemReserve.sprite = player.storedPowerup != null ? player.storedPowerup.reserveSprite : storedItemNull;
     }
 
-    private void UpdateTextUI() {
+    private void UpdateTextUI()
+    {
         if (!player || GameManager.Instance.gameover)
             return;
-        
-        if (GameManager.Instance.starRequirement > 0) {
-            if (player.stars != stars) {
+
+        if (GameManager.Instance.starRequirement > 0)
+        {
+            if (player.stars != stars)
+            {
                 stars = player.stars;
                 uiStars.text = Utils.GetSymbolString("Sx" + stars + "/" + GameManager.Instance.starRequirement);
             }
         }
-        else starsParent.SetActive(false);
-        
-        if (GameManager.Instance.raceLevel && GameManager.Instance.lapRequirement > 1) {
-            if (player.laps != laps) {
+        else
+        {
+            starsParent.SetActive(false);
+        }
+
+        if (GameManager.Instance.raceLevel && GameManager.Instance.lapRequirement > 1)
+        {
+            if (player.laps != laps)
+            {
                 laps = player.laps;
                 uiLaps.text = Utils.GetSymbolString("Lx" + laps + "/" + GameManager.Instance.lapRequirement);
             }
         }
-        else lapsParent.SetActive(false);
-        
-        if (player.coins != coins) {
-            coins = player.coins;
-            uiCoins.text = Utils.GetSymbolString("Cx" + coins + (GameManager.Instance.coinRequirement > 0 ? "/" + GameManager.Instance.coinRequirement : ""));
+        else
+        {
+            lapsParent.SetActive(false);
         }
 
-        if (player.lives >= 0) {
-            if (player.lives != lives) {
+        if (player.coins != coins)
+        {
+            coins = player.coins;
+            uiCoins.text = Utils.GetSymbolString("Cx" + coins + (GameManager.Instance.coinRequirement > 0
+                ? "/" + GameManager.Instance.coinRequirement
+                : ""));
+        }
+
+        if (player.lives >= 0)
+        {
+            if (player.lives != lives)
+            {
                 lives = player.lives;
-                uiLives.text = Utils.GetCharacterData(player.photonView.Owner).uistring + Utils.GetSymbolString("x" + lives);
+                uiLives.text = Utils.GetCharacterData(player.photonView.Owner).uistring +
+                               Utils.GetSymbolString("x" + lives);
             }
-        } else {
+        }
+        else
+        {
             livesParent.SetActive(false);
         }
 
-        if (GameManager.Instance.timedGameDuration > 0) {
-            int seconds = Mathf.CeilToInt((GameManager.Instance.endServerTime - PhotonNetwork.ServerTimestamp) / 1000f);
+        if (GameManager.Instance.timedGameDuration > 0)
+        {
+            var seconds = Mathf.CeilToInt((GameManager.Instance.endServerTime - PhotonNetwork.ServerTimestamp) / 1000f);
             seconds = Mathf.Clamp(seconds, 0, GameManager.Instance.timedGameDuration);
-            if (seconds != timer) {
+            if (seconds != timer)
+            {
                 timer = seconds;
-                uiCountdown.text = Utils.GetSymbolString("cx" + (timer / 60) + ":" + (seconds % 60).ToString("00"));
+                uiCountdown.text = Utils.GetSymbolString("cx" + timer / 60 + ":" + (seconds % 60).ToString("00"));
             }
+
             timerParent.SetActive(true);
 
-            if (GameManager.Instance.endServerTime - PhotonNetwork.ServerTimestamp < 0) {
-                if (timerMaterial == null) {
-                    CanvasRenderer cr = uiCountdown.transform.GetChild(0).GetComponent<CanvasRenderer>();
-                    cr.SetMaterial(timerMaterial = new(cr.GetMaterial()), 0);
+            if (GameManager.Instance.endServerTime - PhotonNetwork.ServerTimestamp < 0)
+            {
+                if (timerMaterial == null)
+                {
+                    var cr = uiCountdown.transform.GetChild(0).GetComponent<CanvasRenderer>();
+                    cr.SetMaterial(timerMaterial = new Material(cr.GetMaterial()), 0);
                 }
 
-                float partialSeconds = (GameManager.Instance.endServerTime - PhotonNetwork.ServerTimestamp) / 1000f % 2f;
-                byte gb = (byte) (Mathf.PingPong(partialSeconds, 1f) * 255);
+                var partialSeconds = (GameManager.Instance.endServerTime - PhotonNetwork.ServerTimestamp) / 1000f % 2f;
+                var gb = (byte)(Mathf.PingPong(partialSeconds, 1f) * 255);
                 timerMaterial.SetColor("_Color", new Color32(255, gb, gb, 255));
             }
-        } else {
+        }
+        else
+        {
             timerParent.SetActive(false);
         }
     }
 
-    public GameObject CreatePlayerIcon(PlayerController player) {
-        GameObject trackObject = Instantiate(playerTrackTemplate, playerTrackTemplate.transform.parent);
-        TrackIcon icon = trackObject.GetComponent<TrackIcon>();
+    public GameObject CreatePlayerIcon(PlayerController player)
+    {
+        var trackObject = Instantiate(playerTrackTemplate, playerTrackTemplate.transform.parent);
+        var icon = trackObject.GetComponent<TrackIcon>();
         icon.target = player.gameObject;
 
         trackObject.SetActive(!GameManager.Instance.hideMap);

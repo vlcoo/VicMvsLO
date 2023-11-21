@@ -1,27 +1,28 @@
 using System;
 using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.UI;
-using UnityEngine.EventSystems;
 using NSMB.Utils;
+using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
-public class ColorChooser : MonoBehaviour, KeepChildInFocus.IFocusIgnore {
-
+public class ColorChooser : MonoBehaviour, KeepChildInFocus.IFocusIgnore
+{
     [SerializeField] private Canvas baseCanvas;
     [SerializeField] private GameObject template, blockerTemplate, content;
     [SerializeField] private Sprite clearSprite;
     [SerializeField] private string property;
+    private readonly List<Button> buttons = new();
 
-    private List<ColorButton> colorButtons = new();
-    private List<Button> buttons = new();
-    private List<Navigation> navigations = new();
+    private readonly List<ColorButton> colorButtons = new();
     private GameObject blocker;
+    private List<Navigation> navigations = new();
     [NonSerialized] public int selected;
 
-    public void Start() {
+    public void Start()
+    {
         content.SetActive(false);
         /*PlayerColorSet[] colors = GlobalController.Instance.skins;
-        
+
         for (int i = 0; i < colors.Length; i++) {
             PlayerColorSet color = colors[i];
 
@@ -63,7 +64,8 @@ public class ColorChooser : MonoBehaviour, KeepChildInFocus.IFocusIgnore {
         ChangeCharacter(Utils.GetCharacterData());
     }
 
-    public void ChangeCharacter(PlayerData data) {
+    public void ChangeCharacter(PlayerData data)
+    {
         /*foreach (ColorButton b in colorButtons)
             b.Instantiate(data);*/
 
@@ -72,39 +74,45 @@ public class ColorChooser : MonoBehaviour, KeepChildInFocus.IFocusIgnore {
         buttons.ForEach(button => Destroy(button.gameObject));
         buttons.Clear();
 
-        List<PlayerColors> colors = Utils.GetColorsForPlayer(data);
+        var colors = Utils.GetColorsForPlayer(data);
         colors.Insert(0, null);
 
-        foreach (PlayerColors color in colors)
+        foreach (var color in colors)
         {
-            GameObject newButton = Instantiate(template, template.transform.parent);
-            ColorButton cb = newButton.GetComponent<ColorButton>();
+            var newButton = Instantiate(template, template.transform.parent);
+            var cb = newButton.GetComponent<ColorButton>();
             colorButtons.Add(cb);
             cb.Instantiate(color);
-            Button b = newButton.GetComponent<Button>();
+            var b = newButton.GetComponent<Button>();
             if (color == null)
             {
                 cb.OnDeselect(null);
                 b.image.sprite = clearSprite;
             }
+
             newButton.SetActive(true);
             buttons.Add(b);
         }
     }
 
-    public void SelectColor(Button button) {
+    public void SelectColor(Button button)
+    {
         selected = buttons.IndexOf(button);
         MainMenuManager.Instance.SetPlayerColor(buttons.IndexOf(button));
         Close();
     }
-    public void Open() {
+
+    public void Open()
+    {
         blocker = Instantiate(blockerTemplate, baseCanvas.transform);
         blocker.SetActive(true);
         content.SetActive(true);
 
         EventSystem.current.SetSelectedGameObject(buttons[selected].gameObject);
     }
-    public void Close() {
+
+    public void Close()
+    {
         Destroy(blocker);
         EventSystem.current.SetSelectedGameObject(gameObject);
         content.SetActive(false);

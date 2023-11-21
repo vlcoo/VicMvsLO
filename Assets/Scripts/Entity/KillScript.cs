@@ -1,10 +1,11 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
-public class KillScript : MonoBehaviour {
+public class KillScript : MonoBehaviour
+{
     public string spawnAfter;
-    public void Kill() {
+
+    public void Kill()
+    {
         Destroy(gameObject);
         if (transform.parent != null)
             Destroy(transform.parent.gameObject);

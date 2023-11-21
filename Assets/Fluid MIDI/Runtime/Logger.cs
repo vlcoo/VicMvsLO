@@ -1,33 +1,27 @@
-﻿using AOT;
+﻿using System;
+using AOT;
 using FluidSynth;
-using System;
 using UnityEngine;
 
 namespace FluidMidi
 {
-    static class Logger
+    internal static class Logger
     {
-        static readonly Api.Log.FunctionDelegate logFunction = Log;
+        private static readonly Api.Log.FunctionDelegate logFunction = Log;
 
-        static IntPtr handle;
+        private static IntPtr handle;
 
-        static int count = 0;
+        private static int count;
 
         public static void AddReference()
         {
-            if (count == 0)
-            {
-                handle = Api.Unity.SetLogFunction(logFunction, IntPtr.Zero);
-            }
+            if (count == 0) handle = Api.Unity.SetLogFunction(logFunction, IntPtr.Zero);
             ++count;
         }
 
         public static void RemoveReference()
         {
-            if (--count == 0)
-            {
-                Api.Unity.ClearLogFunction(handle);
-            }
+            if (--count == 0) Api.Unity.ClearLogFunction(handle);
         }
 
         public static void Log(string message)
@@ -45,13 +39,13 @@ namespace FluidMidi
             Debug.LogError(FormatMessage(message));
         }
 
-        static string FormatMessage(string message)
+        private static string FormatMessage(string message)
         {
             return "Fluid MIDI: " + message;
         }
 
         [MonoPInvokeCallback(typeof(Api.Log.FunctionDelegate))]
-        static void Log(int level, string message, IntPtr data)
+        private static void Log(int level, string message, IntPtr data)
         {
             switch (level)
             {
