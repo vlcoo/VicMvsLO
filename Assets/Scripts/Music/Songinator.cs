@@ -71,6 +71,12 @@ public class Songinator : MonoBehaviour
         }
     }
 
+    public void StopPlayback()
+    {
+        player.Pause();
+        player.Seek(currentSong.startTicks);
+    }
+
     public void SetSpectating(bool how)
     {
         rememberedChannels = how ? ~currentSong.mutedChannelsSpectating : ~currentSong.mutedChannelsNormal;

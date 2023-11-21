@@ -14,6 +14,7 @@ using Photon.Pun;
 using ExitGames.Client.Photon;
 using NSMB.Utils;
 using Photon.Realtime;
+using UnityEditor;
 using Hashtable = ExitGames.Client.Photon.Hashtable;
 using Random = UnityEngine.Random;
 

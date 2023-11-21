@@ -33,9 +33,13 @@ public class DeviceRumbler : MonoBehaviour {
     }
 
     public void RumbleForSeconds(float bassStrength, float trebleStrength, float duration) {
+#if UNITY_ANDROID
+        if (rumbleEnabled) Handheld.Vibrate();
+#else
         if (!rumbleEnabled || pad == null) return;
         if (currentlyRumbling != null) StopCoroutine(currentlyRumbling);
         currentlyRumbling = StartCoroutine(Rumble(bassStrength, trebleStrength, duration));
+#endif
     }
 
     private IEnumerator Rumble(float lowFreq, float highFreq, float duration) {

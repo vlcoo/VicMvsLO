@@ -131,7 +131,6 @@ public static class Enums {
         [SoundData("ui/match_win")]                             UI_Match_Win = 63,
         [SoundData("ui/pause")]                                 UI_Pause = 64,
         [SoundData("ui/quit")]                                  UI_Quit = 65,
-        [SoundData("ui/start_game")]                            UI_StartGame = 66,
         [SoundData("ui/player_connect")]                        UI_PlayerConnect = 79,
         [SoundData("ui/player_disconnect")]                     UI_PlayerDisconnect = 80,
         [SoundData("ui/decide")]                                UI_Decide = 81,

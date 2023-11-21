@@ -1,4 +1,5 @@
 using System.Text.RegularExpressions;
+using NSMB.Utils;
 using UnityEngine;
 using UnityEngine.Audio;
 
@@ -65,9 +66,9 @@ public class Settings : Singleton<Settings> {
         VolumeMusic = PlayerPrefs.GetFloat("volumeMusic", 0.25f);
         VolumeMaster = PlayerPrefs.GetFloat("volumeMaster", 1);
         ndsResolution = PlayerPrefs.GetInt("NDSResolution", 0) == 1;
-        fireballFromSprint = PlayerPrefs.GetInt("FireballFromSprint", 1) == 1;
+        fireballFromSprint = PlayerPrefs.GetInt("FireballFromSprint", 1) == 1 && Utils.GetDeviceType() != Utils.DeviceType.MOBILE;
         rumbleController = PlayerPrefs.GetInt("RumbleController", 1) == 1;
-        onScreenControlsAlways = PlayerPrefs.GetInt("ForceOnScreenControls", 0) == 1;
+        onScreenControlsAlways = PlayerPrefs.GetInt("ForceOnScreenControls", 0) == 1 || Utils.GetDeviceType() == Utils.DeviceType.MOBILE;
         vsync = PlayerPrefs.GetInt("VSync", 0) == 1;
         fourByThreeRatio = PlayerPrefs.GetInt("NDS4by3", 0) == 1;
         scoreboardAlways = PlayerPrefs.GetInt("ScoreboardAlwaysVisible", 1) == 1;

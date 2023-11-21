@@ -443,14 +443,12 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
     }
 
     public void Start() {
-        onScreenControls.SetActive(Utils.GetDeviceType() == Utils.DeviceType.MOBILE || Settings.Instance.onScreenControlsAlways);
-        
         SpectationManager = GetComponent<SpectationManager>();
         MatchConditioner = GetComponent<MatchConditioner>();
         Togglerizer = GetComponent<Togglerizer>();
         TeamGrouper = GetComponent<TeamGrouper>();
-        coins = GameObject.FindGameObjectsWithTag("coin");
         levelUIColor.a = .7f;
+        coins = GameObject.FindGameObjectsWithTag("coin");
         if (Togglerizer.currentEffects.Contains("ReverseLoop") && loopingLevel) loopingLevel = !loopingLevel;
         if (loopingLevel)
         {
@@ -458,10 +456,11 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             cameraMaxX = 1000;
         }
 
-        if (reverberedSFX)
-        {
-            sfx.outputAudioMixerGroup.audioMixer.SetFloat("SFXReverb", 0.35f);
-        }
+        if (reverberedSFX) sfx.outputAudioMixerGroup.audioMixer.SetFloat("SFXReverb", 0.35f);
+        
+        onScreenControls.SetActive(Utils.GetDeviceType() == Utils.DeviceType.MOBILE || Settings.Instance.onScreenControlsAlways);
+        foreach (Image onScreenButton in onScreenControls.transform.GetComponentsInChildren<Image>())
+            onScreenButton.color = new(levelUIColor.r, levelUIColor.g, levelUIColor.b, .4f);
 
         InputSystem.controls.LoadBindingOverridesFromJson(GlobalController.Instance.controlsJson);
 
@@ -503,9 +502,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
 
             RaiseEventOptions options = new() { Receivers = ReceiverGroup.Others, CachingOption = EventCaching.AddToRoomCache };
             SendAndExecuteEvent(Enums.NetEventIds.PlayerFinishedLoading, null, SendOptions.SendReliable, options);
-        } else {
-            SpectationManager.Spectating = true;
-        }
+        } else SpectationManager.Spectating = true;
 
         if (Togglerizer.currentEffects.Contains("HeckaSpeed"))
         {
@@ -525,8 +522,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         Utils.GetCustomProperty(Enums.NetRoomProperties.ShowCoinCount, out showCoinCount);
         showCoinCount = showCoinCount && coinRequirement > 0;
 
-        if (PhotonNetwork.IsMasterClient)
-            quitButtonLbl.text = "End Match";
+        if (PhotonNetwork.IsMasterClient) quitButtonLbl.text = "End Match";
         if (MatchConditioner.ruleList is not null && MatchConditioner.ruleList.Count > 0) 
         {
             rulesLbl.text = "";
@@ -611,7 +607,6 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
                 yield return new WaitForSeconds(3.5f);
                 fader.FadeOut();
             }
-            sfx.PlayOneShot(Enums.Sounds.UI_StartGame.GetClip());
 
             if (PhotonNetwork.IsMasterClient && !Togglerizer.currentEffects.Contains("NoEnemies"))
                 foreach (EnemySpawnpoint point in FindObjectsOfType<EnemySpawnpoint>())
@@ -699,7 +694,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             switch (musicState)
             {
                 case Enums.MusicState.Normal:
-                    MusicSynth.StartPlayback();
+                    MusicSynth.player.Play();
                     break;
                 case Enums.MusicState.Starman:
                     MusicSynthMega.StartPlayback(false);
@@ -719,6 +714,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         MusicSynth.SetSpectating(how);
         MusicSynthMega.SetSpectating(how);
         MusicSynthStarman.SetSpectating(how);
+        if (musicState == Enums.MusicState.Normal) MusicSynth.player.Play();
     }
 
     public void SetStartSpeedrunTimer(PlayerController byWhom)

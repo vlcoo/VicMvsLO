@@ -578,7 +578,13 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
         aspectToggle.interactable = ndsResolutionToggle.isOn = Settings.Instance.ndsResolution;
         aspectToggle.isOn = Settings.Instance.fourByThreeRatio;
+#if !UNITY_ANDROID
         fullscreenToggle.isOn = Screen.fullScreenMode == FullScreenMode.FullScreenWindow;
+#else
+        fullscreenToggle.interactable = false;
+        onscreenControlsToggle.interactable = false;
+        fireballToggle.interactable = false;
+#endif
         fireballToggle.isOn = Settings.Instance.fireballFromSprint;
         rumbleToggle.isOn = Settings.Instance.rumbleController;
         onscreenControlsToggle.isOn = Settings.Instance.onScreenControlsAlways;
