@@ -856,6 +856,10 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
     public void saveMatchRules()
     {
+#if UNITY_ANDROID
+        sfx.PlayOneShot(Enums.Sounds.UI_Error.GetClip());
+        return;
+#endif
         var path = Utils.SaveFileBrowser("Ruleset files (JSON)|*.json", "vcmiRuleset.json");
         if (path is null or "") return;
 
@@ -864,6 +868,10 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
     public void loadMatchRules()
     {
+#if UNITY_ANDROID
+        sfx.PlayOneShot(Enums.Sounds.UI_Error.GetClip());
+        return;
+#endif
         var path = Utils.OpenFileBrowser("Ruleset files (JSON)|*.json");
         if (path is null or "") return;
 

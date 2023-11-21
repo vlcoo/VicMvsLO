@@ -126,12 +126,6 @@ MonoBehaviour:
     type: 2
     objectTypeName: UnityEngine.Font, UnityEngine.TextRenderingModule, Version=0.0.0.0,
       Culture=neutral, PublicKeyToken=null
-  - name: SuperMarioDsRegular-Ea4R8 Blue Outline
-    ext: mat
-    path: Fonts
-    type: 2
-    objectTypeName: UnityEngine.Material, UnityEngine.CoreModule, Version=0.0.0.0,
-      Culture=neutral, PublicKeyToken=null
   - name: SuperMarioDsRegular-Ea4R8 CheckMark
     ext: mat
     path: Fonts
@@ -168,6 +162,12 @@ MonoBehaviour:
     type: 2
     objectTypeName: TMPro.TMP_FontAsset, Unity.TextMeshPro, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
+  - name: SuperMarioDsRegular-Ea4R8 White Outline
+    ext: mat
+    path: Fonts
+    type: 2
+    objectTypeName: UnityEngine.Material, UnityEngine.CoreModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
   - name: SuperMarioDsRegular-Ea4R8
     ext: ttf
     path: Fonts
@@ -457,6 +457,12 @@ MonoBehaviour:
     type: 2
     objectTypeName: UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0,
       Culture=neutral, PublicKeyToken=null
+  - name: PlayerBully
+    ext: prefab
+    path: Prefabs/Players
+    type: 2
+    objectTypeName: UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
   - name: PlayerGoombud
     ext: prefab
     path: Prefabs/Players
@@ -582,6 +588,12 @@ MonoBehaviour:
     objectTypeName: UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0,
       Culture=neutral, PublicKeyToken=null
   - name: ExpandableMountainPlatform
+    ext: prefab
+    path: Prefabs/Static
+    type: 2
+    objectTypeName: UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - name: Exploder
     ext: prefab
     path: Prefabs/Static
     type: 2
@@ -889,6 +901,23 @@ MonoBehaviour:
     path: Scriptables
     type: 1
     objectTypeName: 
+  - name: Thematic
+    ext: 
+    path: Scriptables/MIDISongs
+    type: 1
+    objectTypeName: 
+  - name: Spooky-MainMenu1
+    ext: asset
+    path: Scriptables/MIDISongs/Thematic
+    type: 2
+    objectTypeName: MIDISong, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - name: Spooky-MainMenu2
+    ext: asset
+    path: Scriptables/MIDISongs/Thematic
+    type: 2
+    objectTypeName: MIDISong, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
   - name: Athletic
     ext: asset
     path: Scriptables/MIDISongs
@@ -919,13 +948,25 @@ MonoBehaviour:
     type: 2
     objectTypeName: MIDISong, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
-  - name: Desert
+  - name: Desert1
+    ext: asset
+    path: Scriptables/MIDISongs
+    type: 2
+    objectTypeName: MIDISong, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - name: Desert2
     ext: asset
     path: Scriptables/MIDISongs
     type: 2
     objectTypeName: MIDISong, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
   - name: Ghost
+    ext: asset
+    path: Scriptables/MIDISongs
+    type: 2
+    objectTypeName: MIDISong, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - name: Jungle
     ext: asset
     path: Scriptables/MIDISongs
     type: 2
@@ -973,6 +1014,18 @@ MonoBehaviour:
     type: 2
     objectTypeName: MIDISong, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
+  - name: MKDS1
+    ext: asset
+    path: Scriptables/MIDISongs
+    type: 2
+    objectTypeName: MIDISong, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - name: MKDS2
+    ext: asset
+    path: Scriptables/MIDISongs
+    type: 2
+    objectTypeName: MIDISong, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
   - name: Overworld
     ext: asset
     path: Scriptables/MIDISongs
@@ -1014,119 +1067,6 @@ MonoBehaviour:
     path: Scriptables/MIDISongs
     type: 2
     objectTypeName: MIDISong, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
-      PublicKeyToken=null
-  - name: Music
-    ext: 
-    path: Scriptables
-    type: 1
-    objectTypeName: 
-  - name: MusicLevelAthletic
-    ext: asset
-    path: Scriptables/Music
-    type: 2
-    objectTypeName: MusicData, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
-      PublicKeyToken=null
-  - name: MusicLevelAutumn
-    ext: asset
-    path: Scriptables/Music
-    type: 2
-    objectTypeName: MusicData, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
-      PublicKeyToken=null
-  - name: MusicLevelBeach
-    ext: asset
-    path: Scriptables/Music
-    type: 2
-    objectTypeName: MusicData, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
-      PublicKeyToken=null
-  - name: MusicLevelBonus
-    ext: asset
-    path: Scriptables/Music
-    type: 2
-    objectTypeName: MusicData, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
-      PublicKeyToken=null
-  - name: MusicLevelCastle
-    ext: asset
-    path: Scriptables/Music
-    type: 2
-    objectTypeName: MusicData, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
-      PublicKeyToken=null
-  - name: MusicLevelDesert
-    ext: asset
-    path: Scriptables/Music
-    type: 2
-    objectTypeName: MusicData, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
-      PublicKeyToken=null
-  - name: MusicLevelGhost
-    ext: asset
-    path: Scriptables/Music
-    type: 2
-    objectTypeName: MusicData, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
-      PublicKeyToken=null
-  - name: MusicLevelMario4
-    ext: asset
-    path: Scriptables/Music
-    type: 2
-    objectTypeName: MusicData, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
-      PublicKeyToken=null
-  - name: MusicLevelOverworld
-    ext: asset
-    path: Scriptables/Music
-    type: 2
-    objectTypeName: MusicData, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
-      PublicKeyToken=null
-  - name: MusicLevelOverworldCampaign
-    ext: asset
-    path: Scriptables/Music
-    type: 2
-    objectTypeName: MusicData, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
-      PublicKeyToken=null
-  - name: MusicLevelSky
-    ext: asset
-    path: Scriptables/Music
-    type: 2
-    objectTypeName: MusicData, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
-      PublicKeyToken=null
-  - name: MusicLevelSnow
-    ext: asset
-    path: Scriptables/Music
-    type: 2
-    objectTypeName: MusicData, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
-      PublicKeyToken=null
-  - name: MusicLevelUnderground
-    ext: asset
-    path: Scriptables/Music
-    type: 2
-    objectTypeName: MusicData, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
-      PublicKeyToken=null
-  - name: MusicLevelVolcano
-    ext: asset
-    path: Scriptables/Music
-    type: 2
-    objectTypeName: MusicData, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
-      PublicKeyToken=null
-  - name: MusicLoading
-    ext: asset
-    path: Scriptables/Music
-    type: 2
-    objectTypeName: MusicData, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
-      PublicKeyToken=null
-  - name: MusicMainMenu
-    ext: asset
-    path: Scriptables/Music
-    type: 2
-    objectTypeName: MusicData, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
-      PublicKeyToken=null
-  - name: MusicMegaMushroom
-    ext: asset
-    path: Scriptables/Music
-    type: 2
-    objectTypeName: MusicData, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
-      PublicKeyToken=null
-  - name: MusicStar
-    ext: asset
-    path: Scriptables/Music
-    type: 2
-    objectTypeName: MusicData, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
   - name: PlayerColors
     ext: 
@@ -1691,227 +1631,6 @@ MonoBehaviour:
     type: 2
     objectTypeName: UnityEngine.AudioClip, UnityEngine.AudioModule, Version=0.0.0.0,
       Culture=neutral, PublicKeyToken=null
-  - name: music
-    ext: 
-    path: Sound
-    type: 1
-    objectTypeName: 
-  - name: athletic-b
-    ext: ogg
-    path: Sound/music
-    type: 2
-    objectTypeName: UnityEngine.AudioClip, UnityEngine.AudioModule, Version=0.0.0.0,
-      Culture=neutral, PublicKeyToken=null
-  - name: athletic
-    ext: ogg
-    path: Sound/music
-    type: 2
-    objectTypeName: UnityEngine.AudioClip, UnityEngine.AudioModule, Version=0.0.0.0,
-      Culture=neutral, PublicKeyToken=null
-  - name: autumn-f
-    ext: ogg
-    path: Sound/music
-    type: 2
-    objectTypeName: UnityEngine.AudioClip, UnityEngine.AudioModule, Version=0.0.0.0,
-      Culture=neutral, PublicKeyToken=null
-  - name: autumn
-    ext: ogg
-    path: Sound/music
-    type: 2
-    objectTypeName: UnityEngine.AudioClip, UnityEngine.AudioModule, Version=0.0.0.0,
-      Culture=neutral, PublicKeyToken=null
-  - name: beach-b
-    ext: ogg
-    path: Sound/music
-    type: 2
-    objectTypeName: UnityEngine.AudioClip, UnityEngine.AudioModule, Version=0.0.0.0,
-      Culture=neutral, PublicKeyToken=null
-  - name: beach
-    ext: ogg
-    path: Sound/music
-    type: 2
-    objectTypeName: UnityEngine.AudioClip, UnityEngine.AudioModule, Version=0.0.0.0,
-      Culture=neutral, PublicKeyToken=null
-  - name: bonus-f
-    ext: ogg
-    path: Sound/music
-    type: 2
-    objectTypeName: UnityEngine.AudioClip, UnityEngine.AudioModule, Version=0.0.0.0,
-      Culture=neutral, PublicKeyToken=null
-  - name: bonus
-    ext: ogg
-    path: Sound/music
-    type: 2
-    objectTypeName: UnityEngine.AudioClip, UnityEngine.AudioModule, Version=0.0.0.0,
-      Culture=neutral, PublicKeyToken=null
-  - name: castle
-    ext: ogg
-    path: Sound/music
-    type: 2
-    objectTypeName: UnityEngine.AudioClip, UnityEngine.AudioModule, Version=0.0.0.0,
-      Culture=neutral, PublicKeyToken=null
-  - name: desert-b
-    ext: ogg
-    path: Sound/music
-    type: 2
-    objectTypeName: UnityEngine.AudioClip, UnityEngine.AudioModule, Version=0.0.0.0,
-      Culture=neutral, PublicKeyToken=null
-  - name: desert
-    ext: ogg
-    path: Sound/music
-    type: 2
-    objectTypeName: UnityEngine.AudioClip, UnityEngine.AudioModule, Version=0.0.0.0,
-      Culture=neutral, PublicKeyToken=null
-  - name: eggs
-    ext: ogg
-    path: Sound/music
-    type: 2
-    objectTypeName: UnityEngine.AudioClip, UnityEngine.AudioModule, Version=0.0.0.0,
-      Culture=neutral, PublicKeyToken=null
-  - name: ghos
-    ext: ogg
-    path: Sound/music
-    type: 2
-    objectTypeName: UnityEngine.AudioClip, UnityEngine.AudioModule, Version=0.0.0.0,
-      Culture=neutral, PublicKeyToken=null
-  - name: loading-drop
-    ext: ogg
-    path: Sound/music
-    type: 2
-    objectTypeName: UnityEngine.AudioClip, UnityEngine.AudioModule, Version=0.0.0.0,
-      Culture=neutral, PublicKeyToken=null
-  - name: loading
-    ext: ogg
-    path: Sound/music
-    type: 2
-    objectTypeName: UnityEngine.AudioClip, UnityEngine.AudioModule, Version=0.0.0.0,
-      Culture=neutral, PublicKeyToken=null
-  - name: loading2-drop
-    ext: ogg
-    path: Sound/music
-    type: 2
-    objectTypeName: UnityEngine.AudioClip, UnityEngine.AudioModule, Version=0.0.0.0,
-      Culture=neutral, PublicKeyToken=null
-  - name: loading2
-    ext: ogg
-    path: Sound/music
-    type: 2
-    objectTypeName: UnityEngine.AudioClip, UnityEngine.AudioModule, Version=0.0.0.0,
-      Culture=neutral, PublicKeyToken=null
-  - name: mainmenu
-    ext: ogg
-    path: Sound/music
-    type: 2
-    objectTypeName: UnityEngine.AudioClip, UnityEngine.AudioModule, Version=0.0.0.0,
-      Culture=neutral, PublicKeyToken=null
-  - name: mainmenu2
-    ext: wav
-    path: Sound/music
-    type: 2
-    objectTypeName: UnityEngine.AudioClip, UnityEngine.AudioModule, Version=0.0.0.0,
-      Culture=neutral, PublicKeyToken=null
-  - name: mapno4
-    ext: ogg
-    path: Sound/music
-    type: 2
-    objectTypeName: UnityEngine.AudioClip, UnityEngine.AudioModule, Version=0.0.0.0,
-      Culture=neutral, PublicKeyToken=null
-  - name: megamushroom-f
-    ext: ogg
-    path: Sound/music
-    type: 2
-    objectTypeName: UnityEngine.AudioClip, UnityEngine.AudioModule, Version=0.0.0.0,
-      Culture=neutral, PublicKeyToken=null
-  - name: megamushroom
-    ext: ogg
-    path: Sound/music
-    type: 2
-    objectTypeName: UnityEngine.AudioClip, UnityEngine.AudioModule, Version=0.0.0.0,
-      Culture=neutral, PublicKeyToken=null
-  - name: overworld-campaign-b
-    ext: ogg
-    path: Sound/music
-    type: 2
-    objectTypeName: UnityEngine.AudioClip, UnityEngine.AudioModule, Version=0.0.0.0,
-      Culture=neutral, PublicKeyToken=null
-  - name: overworld-campaign
-    ext: ogg
-    path: Sound/music
-    type: 2
-    objectTypeName: UnityEngine.AudioClip, UnityEngine.AudioModule, Version=0.0.0.0,
-      Culture=neutral, PublicKeyToken=null
-  - name: overworld-f
-    ext: ogg
-    path: Sound/music
-    type: 2
-    objectTypeName: UnityEngine.AudioClip, UnityEngine.AudioModule, Version=0.0.0.0,
-      Culture=neutral, PublicKeyToken=null
-  - name: overworld
-    ext: ogg
-    path: Sound/music
-    type: 2
-    objectTypeName: UnityEngine.AudioClip, UnityEngine.AudioModule, Version=0.0.0.0,
-      Culture=neutral, PublicKeyToken=null
-  - name: sky-f
-    ext: ogg
-    path: Sound/music
-    type: 2
-    objectTypeName: UnityEngine.AudioClip, UnityEngine.AudioModule, Version=0.0.0.0,
-      Culture=neutral, PublicKeyToken=null
-  - name: sky
-    ext: ogg
-    path: Sound/music
-    type: 2
-    objectTypeName: UnityEngine.AudioClip, UnityEngine.AudioModule, Version=0.0.0.0,
-      Culture=neutral, PublicKeyToken=null
-  - name: snow-f
-    ext: ogg
-    path: Sound/music
-    type: 2
-    objectTypeName: UnityEngine.AudioClip, UnityEngine.AudioModule, Version=0.0.0.0,
-      Culture=neutral, PublicKeyToken=null
-  - name: snow
-    ext: ogg
-    path: Sound/music
-    type: 2
-    objectTypeName: UnityEngine.AudioClip, UnityEngine.AudioModule, Version=0.0.0.0,
-      Culture=neutral, PublicKeyToken=null
-  - name: starman-f
-    ext: ogg
-    path: Sound/music
-    type: 2
-    objectTypeName: UnityEngine.AudioClip, UnityEngine.AudioModule, Version=0.0.0.0,
-      Culture=neutral, PublicKeyToken=null
-  - name: starman
-    ext: ogg
-    path: Sound/music
-    type: 2
-    objectTypeName: UnityEngine.AudioClip, UnityEngine.AudioModule, Version=0.0.0.0,
-      Culture=neutral, PublicKeyToken=null
-  - name: underground-b
-    ext: ogg
-    path: Sound/music
-    type: 2
-    objectTypeName: UnityEngine.AudioClip, UnityEngine.AudioModule, Version=0.0.0.0,
-      Culture=neutral, PublicKeyToken=null
-  - name: underground
-    ext: ogg
-    path: Sound/music
-    type: 2
-    objectTypeName: UnityEngine.AudioClip, UnityEngine.AudioModule, Version=0.0.0.0,
-      Culture=neutral, PublicKeyToken=null
-  - name: volcano-b
-    ext: ogg
-    path: Sound/music
-    type: 2
-    objectTypeName: UnityEngine.AudioClip, UnityEngine.AudioModule, Version=0.0.0.0,
-      Culture=neutral, PublicKeyToken=null
-  - name: volcano
-    ext: ogg
-    path: Sound/music
-    type: 2
-    objectTypeName: UnityEngine.AudioClip, UnityEngine.AudioModule, Version=0.0.0.0,
-      Culture=neutral, PublicKeyToken=null
   - name: player
     ext: 
     path: Sound
@@ -2025,18 +1744,6 @@ MonoBehaviour:
     objectTypeName: UnityEngine.AudioClip, UnityEngine.AudioModule, Version=0.0.0.0,
       Culture=neutral, PublicKeyToken=null
   - name: lava_hiss
-    ext: ogg
-    path: Sound/player
-    type: 2
-    objectTypeName: UnityEngine.AudioClip, UnityEngine.AudioModule, Version=0.0.0.0,
-      Culture=neutral, PublicKeyToken=null
-  - name: og-death
-    ext: ogg
-    path: Sound/player
-    type: 2
-    objectTypeName: UnityEngine.AudioClip, UnityEngine.AudioModule, Version=0.0.0.0,
-      Culture=neutral, PublicKeyToken=null
-  - name: og-death_others
     ext: ogg
     path: Sound/player
     type: 2
@@ -2316,6 +2023,12 @@ MonoBehaviour:
     type: 2
     objectTypeName: UnityEngine.AudioClip, UnityEngine.AudioModule, Version=0.0.0.0,
       Culture=neutral, PublicKeyToken=null
+  - name: match_concluded
+    ext: ogg
+    path: Sound/ui
+    type: 2
+    objectTypeName: UnityEngine.AudioClip, UnityEngine.AudioModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
   - name: match_draw
     ext: wav
     path: Sound/ui
@@ -2340,6 +2053,12 @@ MonoBehaviour:
     type: 2
     objectTypeName: UnityEngine.AudioClip, UnityEngine.AudioModule, Version=0.0.0.0,
       Culture=neutral, PublicKeyToken=null
+  - name: message
+    ext: ogg
+    path: Sound/ui
+    type: 2
+    objectTypeName: UnityEngine.AudioClip, UnityEngine.AudioModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
   - name: pause
     ext: ogg
     path: Sound/ui
@@ -2359,12 +2078,6 @@ MonoBehaviour:
     objectTypeName: UnityEngine.AudioClip, UnityEngine.AudioModule, Version=0.0.0.0,
       Culture=neutral, PublicKeyToken=null
   - name: quit
-    ext: ogg
-    path: Sound/ui
-    type: 2
-    objectTypeName: UnityEngine.AudioClip, UnityEngine.AudioModule, Version=0.0.0.0,
-      Culture=neutral, PublicKeyToken=null
-  - name: start_game
     ext: ogg
     path: Sound/ui
     type: 2
@@ -7009,6 +6722,12 @@ MonoBehaviour:
     type: 2
     objectTypeName: TMPro.TMP_ColorGradient, Unity.TextMeshPro, Version=0.0.0.0,
       Culture=neutral, PublicKeyToken=null
+  - name: MetallicGradient
+    ext: asset
+    path: Fonts & Materials
+    type: 2
+    objectTypeName: TMPro.TMP_ColorGradient, Unity.TextMeshPro, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
   - name: NegativeAlternativeTextGradient
     ext: asset
     path: Fonts & Materials
@@ -7066,6 +6785,6 @@ MonoBehaviour:
     type: 2
     objectTypeName: TMPro.TMP_Settings, Unity.TextMeshPro, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
-  m_FileCount: 1122
-  m_FolderCount: 66
+  m_FileCount: 1076
+  m_FolderCount: 65
   UpdateAutomatically: 0

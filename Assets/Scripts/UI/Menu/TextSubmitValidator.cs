@@ -8,7 +8,7 @@ public class TextSubmitValidator : TMP_InputValidator
     {
         if (ch == '\n' || ch == '\xB')
         {
-            //submit
+            //submit if enter pressed
             MainMenuManager.Instance.SendChat();
             return '\0';
         }
@@ -16,6 +16,8 @@ public class TextSubmitValidator : TMP_InputValidator
         if (text.Length >= 128)
             return '\0';
 
+        // Ensure pos is within the valid range
+        pos = Mathf.Clamp(pos, 0, text.Length);
         text = text.Insert(pos, ch.ToString());
         pos++;
         return ch;
