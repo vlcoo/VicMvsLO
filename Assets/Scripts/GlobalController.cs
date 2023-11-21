@@ -62,7 +62,7 @@ public class GlobalController : Singleton<GlobalController>, IInRoomCallbacks, I
         PhotonNetwork.SendRate = 30;
         PhotonNetwork.MaxResendsBeforeDisconnect = 15;
 
-#if PLATFORM_STANDALONE_WIN && !UNITY_EDITOR
+#if UNITY_STANDALONE_WIN && !UNITY_EDITOR
         try {
             ReplaceWinProc();
         } catch {}
@@ -182,7 +182,7 @@ public class GlobalController : Singleton<GlobalController>, IInRoomCallbacks, I
         emotesAsset.spriteCharacterTable.ForEach(character => EMOTE_NAMES.Add(character.name));
     }
 
-#if PLATFORM_STANDALONE_WIN
+#if UNITY_STANDALONE_WIN
     [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
     internal static extern int SendMessage(IntPtr hWnd, int uMsg, int wParam, int lParam);
 

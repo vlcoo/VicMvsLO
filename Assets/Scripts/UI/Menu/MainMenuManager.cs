@@ -298,7 +298,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         GlobalController.Instance.DiscordController.UpdateActivity();
         EventSystem.current.SetSelectedGameObject(title);
 
-#if PLATFORM_WEBGL
+#if UNITY_WEBGL
         fullscreenToggle.interactable = false;
         exitBtn.interactable = false;
 #else
@@ -856,7 +856,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
     public void saveMatchRules()
     {
-#if UNITY_ANDROID
+#if UNITY_ANDROID || UNITY_WEBGL
         sfx.PlayOneShot(Enums.Sounds.UI_Error.GetClip());
         return;
 #endif
@@ -868,7 +868,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
     public void loadMatchRules()
     {
-#if UNITY_ANDROID
+#if UNITY_ANDROID || UNITY_WEBGL
         sfx.PlayOneShot(Enums.Sounds.UI_Error.GetClip());
         return;
 #endif

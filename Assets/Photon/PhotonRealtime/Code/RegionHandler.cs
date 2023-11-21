@@ -13,6 +13,10 @@
 #define SUPPORTED_UNITY
 #endif
 
+#if UNITY_WEBGL
+#define PING_VIA_COROUTINE
+#endif
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -22,10 +26,6 @@ using System.Text;
 using System.Threading;
 using ExitGames.Client.Photon;
 using Debug = UnityEngine.Debug;
-
-#if UNITY_WEBGL
-#define PING_VIA_COROUTINE
-#endif
 
 namespace Photon.Realtime
 {

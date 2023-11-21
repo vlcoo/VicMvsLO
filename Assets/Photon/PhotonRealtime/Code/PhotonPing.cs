@@ -12,10 +12,10 @@
 // ----------------------------------------------------------------------------
 
 
-using System;
 
 namespace Photon.Realtime
 {
+    using System;
 #if NETFX_CORE
     using System.Diagnostics;
     using Windows.Foundation;
@@ -38,7 +38,7 @@ namespace Photon.Realtime
     /// </summary>
     public abstract class PhotonPing : IDisposable
     {
-        private static readonly Random RandomIdProvider = new();
+        private static readonly System.Random RandomIdProvider = new();
         public string DebugString = "";
 
         protected internal bool GotResult;
