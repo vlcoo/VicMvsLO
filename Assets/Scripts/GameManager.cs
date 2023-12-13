@@ -931,10 +931,10 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
                     MusicSynth.player.Play();
                     break;
                 case Enums.MusicState.Starman:
-                    MusicSynthMega.StartPlayback(false);
+                    MusicSynthStarman.StartPlayback(false);
                     break;
                 case Enums.MusicState.MegaMushroom:
-                    MusicSynthStarman.StartPlayback(false);
+                    MusicSynthMega.StartPlayback(false);
                     break;
             }
             // songPlayer.Gain = 0f;
