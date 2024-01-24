@@ -31,7 +31,7 @@ public class PiranhaPlantController : KillableEntity
                 return;
         }
 
-        left = false;
+        FacingLeftTween = false;
 
         if (!dead && photonView && photonView.IsMine &&
             Utils.GetTileAtWorldLocation(transform.position + (upsideDown ? Vector3.up : Vector3.down * 0.1f)) == null)

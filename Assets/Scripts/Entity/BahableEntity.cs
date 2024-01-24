@@ -23,11 +23,11 @@ public class BahableEntity : MonoBehaviour
         if (child.TryGetComponent(out KoopaWalk koopa))
         {
             if (koopa.shell && child.body.velocity.x != 0) return;
-            if (!koopa.shell) child.photonView.RPC(nameof(child.SetLeft), RpcTarget.All, !child.left);
+            if (!koopa.shell) child.photonView.RPC(nameof(child.SetLeft), RpcTarget.All, !child.FacingLeftTween);
         }
         else
         {
-            child.photonView.RPC(nameof(child.SetLeft), RpcTarget.All, !child.left);
+            child.photonView.RPC(nameof(child.SetLeft), RpcTarget.All, !child.FacingLeftTween);
         }
 
         child.body.velocity = new Vector2(child.body.velocity.x, BAH_STRENGTH);

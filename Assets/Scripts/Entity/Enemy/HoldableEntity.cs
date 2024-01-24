@@ -32,7 +32,7 @@ public abstract class HoldableEntity : KillableEntity
     public abstract void Kick(bool fromLeft, float kickFactor, bool groundpound);
 
     [PunRPC]
-    public abstract void Throw(bool facingLeft, bool crouching, Vector2 pos);
+    public abstract void Throw(bool fromLeft, bool crouching, Vector2 pos);
 
     [PunRPC]
     public virtual void Pickup(int view)

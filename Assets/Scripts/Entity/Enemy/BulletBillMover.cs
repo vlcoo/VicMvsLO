@@ -11,13 +11,13 @@ public class BulletBillMover : KillableEntity
     {
         base.Start();
         searchVector = new Vector2(playerSearchRadius * 2, 100);
-        left = photonView && photonView.InstantiationData != null && (bool)photonView.InstantiationData[0];
-        body.velocity = new Vector2(speed * (left ? -1 : 1), body.velocity.y);
+        FacingLeftTween = photonView && photonView.InstantiationData != null && (bool)photonView.InstantiationData[0];
+        body.velocity = new Vector2(speed * (FacingLeftTween ? -1 : 1), body.velocity.y);
 
         var t = transform.GetChild(1);
         var ps = t.GetComponent<ParticleSystem>();
         var shape = ps.shape;
-        if (!left)
+        if (!FacingLeftTween)
         {
             var tf = transform.GetChild(0);
             tf.localPosition *= new Vector2(-1, 1);
@@ -25,7 +25,7 @@ public class BulletBillMover : KillableEntity
         }
 
         ps.Play();
-        sRenderer.flipX = !left;
+        sRenderer.flipX = !FacingLeftTween;
     }
 
     public new void FixedUpdate()
@@ -42,7 +42,7 @@ public class BulletBillMover : KillableEntity
         if (Frozen)
             body.velocity = Vector2.zero;
         else
-            body.velocity = new Vector2(speed * (left ? -1 : 1), body.velocity.y);
+            body.velocity = new Vector2(speed * (FacingLeftTween ? -1 : 1), body.velocity.y);
 
         if (!Frozen && photonView.IsMine)
             DespawnCheck();
@@ -122,7 +122,7 @@ public class BulletBillMover : KillableEntity
     [PunRPC]
     public override void Kill()
     {
-        SpecialKill(!left, false, 0);
+        SpecialKill(!FacingLeftTween, false, 0);
     }
 
     [PunRPC]

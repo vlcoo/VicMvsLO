@@ -9,7 +9,7 @@ public class GoombaWalk : KillableEntity
     public new void Start()
     {
         base.Start();
-        body.velocity = new Vector2(speed * (left ? -1 : 1), body.velocity.y);
+        body.velocity = new Vector2(speed * (FacingLeftTween ? -1 : 1), body.velocity.y);
         animator.SetBool("dead", false);
     }
 
@@ -39,9 +39,9 @@ public class GoombaWalk : KillableEntity
 
 
         physics.UpdateCollisions();
-        if (physics.hitLeft || physics.hitRight) left = physics.hitRight;
-        body.velocity = new Vector2(speed * (left ? -1 : 1), Mathf.Max(terminalVelocity, body.velocity.y));
-        sRenderer.flipX = !left;
+        if (physics.hitLeft || physics.hitRight) FacingLeftTween = physics.hitRight;
+        body.velocity = new Vector2(speed * (FacingLeftTween ? -1 : 1), Mathf.Max(terminalVelocity, body.velocity.y));
+        sRenderer.flipX = !FacingLeftTween;
     }
 
     [PunRPC]

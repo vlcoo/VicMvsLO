@@ -13,7 +13,7 @@ public class GoombratWalk : KillableEntity
     public new void Start()
     {
         base.Start();
-        body.velocity = new Vector2(speed * (left ? -1 : 1), body.velocity.y);
+        body.velocity = new Vector2(speed * (FacingLeftTween ? -1 : 1), body.velocity.y);
         animator.SetBool("dead", false);
     }
 
@@ -67,24 +67,24 @@ public class GoombratWalk : KillableEntity
         if (physics.onGround ||
             Physics2D.Raycast(body.position + Vector2.up * 0.2f, Vector2.down, 0.5f, Layers.MaskAnyGround))
         {
-            Vector3 bratCheckPos = body.position + new Vector2(0.1f * (left ? -1 : 1), 0.2f);
+            Vector3 bratCheckPos = body.position + new Vector2(0.1f * (FacingLeftTween ? -1 : 1), 0.2f);
             if (GameManager.Instance)
                 Utils.WrapWorldLocation(ref bratCheckPos);
 
             if (!Physics2D.Raycast(bratCheckPos, Vector2.down, 0.5f, Layers.MaskAnyGround))
             {
                 if (photonView && photonView.IsMine)
-                    photonView.RPC(nameof(Turnaround), RpcTarget.All, left, velocityLastFrame.x);
+                    photonView.RPC(nameof(Turnaround), RpcTarget.All, FacingLeftTween, velocityLastFrame.x);
                 else
-                    Turnaround(left, velocityLastFrame.x);
+                    Turnaround(FacingLeftTween, velocityLastFrame.x);
             }
         }
 
 
         physics.UpdateCollisions();
-        if (physics.hitLeft || physics.hitRight) left = physics.hitRight;
-        body.velocity = new Vector2(speed * (left ? -1 : 1), Mathf.Max(terminalVelocity, body.velocity.y));
-        sRenderer.flipX = !left;
+        if (physics.hitLeft || physics.hitRight) FacingLeftTween = physics.hitRight;
+        body.velocity = new Vector2(speed * (FacingLeftTween ? -1 : 1), Mathf.Max(terminalVelocity, body.velocity.y));
+        sRenderer.flipX = !FacingLeftTween;
     }
 
     [PunRPC]
@@ -105,7 +105,7 @@ public class GoombratWalk : KillableEntity
         if (IsStationary)
             return;
 
-        left = !hitWallOnLeft;
-        body.velocity = new Vector2((x > 0.5f ? Mathf.Abs(x) : speed) * (left ? -1 : 1), body.velocity.y);
+        FacingLeftTween = !hitWallOnLeft;
+        body.velocity = new Vector2((x > 0.5f ? Mathf.Abs(x) : speed) * (FacingLeftTween ? -1 : 1), body.velocity.y);
     }
 }

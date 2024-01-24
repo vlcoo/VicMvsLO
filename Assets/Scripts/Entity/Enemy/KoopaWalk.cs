@@ -8,6 +8,7 @@ public class KoopaWalk : HoldableEntity
     [SerializeField] private Vector2 outShellHitboxOffset, inShellHitboxOffset;
     [SerializeField] protected float walkSpeed, kickSpeed, wakeup = 15;
     public bool red, blue, shell, stationary, upsideDown, canBeFlipped = true, flipXFlip, putdown;
+
     private readonly Vector2 blockOffset = new(0, 0.05f);
     protected int combo;
     private float dampVelocity, currentSpeed;
@@ -108,7 +109,7 @@ public class KoopaWalk : HoldableEntity
             {
                 player.photonView.RPC(nameof(PlayerController.Powerdown), RpcTarget.All, false);
                 if (!shell)
-                    photonView.RPC(nameof(SetLeft), RpcTarget.All, damageDirection.x < 0);
+                    photonView.RPC(nameof(SetLeft), RpcTarget.All, damageDirection.x > 0);
             }
         }
     }
@@ -182,7 +183,7 @@ public class KoopaWalk : HoldableEntity
         if (Frozen || dead)
             return;
 
-        sRenderer.flipX = !left ^ flipXFlip;
+        sRenderer.flipX = !FacingLeftTween ^ flipXFlip;
 
         if (upsideDown)
         {
@@ -226,14 +227,14 @@ public class KoopaWalk : HoldableEntity
             worldHitbox.offset = hitbox.offset = outShellHitboxOffset;
         }
 
-        if (physics.hitRight && !left)
+        if (physics.hitRight && !FacingLeftTween)
         {
             if (photonView && photonView.IsMine)
                 photonView.RPC(nameof(Turnaround), RpcTarget.All, false, velocityLastFrame.x);
             else
                 Turnaround(false, velocityLastFrame.x);
         }
-        else if (physics.hitLeft && left)
+        else if (physics.hitLeft && FacingLeftTween)
         {
             if (photonView && photonView.IsMine)
                 photonView.RPC(nameof(Turnaround), RpcTarget.All, true, velocityLastFrame.x);
@@ -244,16 +245,16 @@ public class KoopaWalk : HoldableEntity
         if (physics.onGround && Physics2D.Raycast(body.position, Vector2.down, 0.5f, Layers.MaskAnyGround) && red &&
             !shell)
         {
-            Vector3 redCheckPos = body.position + new Vector2(0.1f * (left ? -1 : 1), 0);
+            Vector3 redCheckPos = body.position + new Vector2(0.1f * (FacingLeftTween ? -1 : 1), 0);
             if (GameManager.Instance)
                 Utils.WrapWorldLocation(ref redCheckPos);
 
             if (!Physics2D.Raycast(redCheckPos, Vector2.down, 0.5f, Layers.MaskAnyGround))
             {
                 if (photonView && photonView.IsMine)
-                    photonView.RPC(nameof(Turnaround), RpcTarget.All, left, velocityLastFrame.x);
+                    photonView.RPC(nameof(Turnaround), RpcTarget.All, FacingLeftTween, velocityLastFrame.x);
                 else
-                    Turnaround(left, velocityLastFrame.x);
+                    Turnaround(FacingLeftTween, velocityLastFrame.x);
             }
         }
 
@@ -265,7 +266,8 @@ public class KoopaWalk : HoldableEntity
             }
             else
             {
-                body.velocity = new Vector2((shell ? currentSpeed : walkSpeed) * (left ? -1 : 1), body.velocity.y);
+                if (isRotating) body.velocity = new Vector2(0, 0);
+                else body.velocity = new Vector2((shell ? currentSpeed : walkSpeed) * (FacingLeftTween ? -1 : 1), body.velocity.y);
             }
         }
 
@@ -276,7 +278,7 @@ public class KoopaWalk : HoldableEntity
 
         HandleTile();
         animator.SetBool("shell", shell || holder != null);
-        animator.SetFloat("xVel", Mathf.Abs(body.velocity.x));
+        animator.SetFloat("xVel", -body.velocity.x * (upsideDown ? -1 : 1));
     }
 
     public new void OnTriggerEnter2D(Collider2D collider)
@@ -344,15 +346,15 @@ public class KoopaWalk : HoldableEntity
     [PunRPC]
     public override void Kick(bool fromLeft, float kickFactor, bool groundpound)
     {
-        left = !fromLeft;
+        facingLeft = !fromLeft;
         stationary = false;
         currentSpeed = kickSpeed + 1.5f * kickFactor;
-        body.velocity = new Vector2(currentSpeed * (left ? -1 : 1), groundpound ? 3.5f : 0);
+        body.velocity = new Vector2(currentSpeed * (FacingLeftTween ? -1 : 1), groundpound ? 3.5f : 0);
         PlaySound(Enums.Sounds.Enemy_Shell_Kick);
     }
 
     [PunRPC]
-    public override void Throw(bool facingLeft, bool crouch, Vector2 pos)
+    public override void Throw(bool fromLeft, bool crouch, Vector2 pos)
     {
         if (holder == null)
             return;
@@ -370,15 +372,15 @@ public class KoopaWalk : HoldableEntity
         holder = null;
         shell = true;
         photonView.TransferOwnership(PhotonNetwork.MasterClient);
-        left = facingLeft;
+        facingLeft = fromLeft;
         if (crouch)
         {
-            body.velocity = new Vector2(2f * (facingLeft ? -1 : 1), body.velocity.y);
+            body.velocity = new Vector2(2f * (fromLeft ? -1 : 1), body.velocity.y);
             putdown = true;
         }
         else
         {
-            body.velocity = new Vector2(currentSpeed * (facingLeft ? -1 : 1), body.velocity.y);
+            body.velocity = new Vector2(currentSpeed * (fromLeft ? -1 : 1), body.velocity.y);
         }
     }
 
@@ -387,7 +389,7 @@ public class KoopaWalk : HoldableEntity
     {
         shell = false;
         body.velocity = new Vector2(-walkSpeed, 0);
-        left = true;
+        FacingLeftTween = true;
         upsideDown = false;
         stationary = false;
         if (holder && photonView.IsMine)
@@ -429,13 +431,17 @@ public class KoopaWalk : HoldableEntity
         if (IsStationary)
             return;
 
-        if (shell && hitWallOnLeft != left)
+        if (shell && hitWallOnLeft != FacingLeftTween)
             PlaySound(Enums.Sounds.World_Block_Bump);
 
-        left = !hitWallOnLeft;
-        body.velocity = new Vector2((x > 0.5f ? Mathf.Abs(x) : currentSpeed) * (left ? -1 : 1), body.velocity.y);
         if (shell)
+        {
             PlaySound(Enums.Sounds.World_Block_Bump);
+            facingLeft = !hitWallOnLeft;
+        }
+        else
+            FacingLeftTween = !hitWallOnLeft;
+        body.velocity = new Vector2((x > 0.5f ? Mathf.Abs(x) : currentSpeed) * (FacingLeftTween ? -1 : 1), body.velocity.y);
     }
 
     [PunRPC]

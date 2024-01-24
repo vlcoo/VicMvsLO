@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using DG.Tweening;
 using NSMB.Utils;
 using Photon.Pun;
 using UnityEngine;
@@ -21,11 +22,13 @@ public abstract class KillableEntity : MonoBehaviourPun, IFreezableEntity, ICust
 
     public bool shielded;
 
-    public bool dead, left = true, collide = true, iceCarryable = true, flying;
+    public bool dead, collide = true, iceCarryable = true, flying, tweenableRotation = false, isRotating;
+    public float offsetRotation;
     public Rigidbody2D body;
     public BoxCollider2D hitbox;
     protected Animator animator;
     protected AudioSource audioSource;
+    protected bool facingLeft;
     private double lastSendTimestamp;
     protected PhysicsEntity physics;
 
@@ -54,6 +57,34 @@ public abstract class KillableEntity : MonoBehaviourPun, IFreezableEntity, ICust
     public bool Frozen { get; set; }
     public bool IsCarryable => iceCarryable;
     public bool IsFlying => flying;
+    
+    public bool FacingLeftTween
+    {
+        get => facingLeft;
+        protected set
+        {
+            facingLeft = value;
+            
+            var newRotation = value ? -offsetRotation + 360 : offsetRotation;
+
+            if (tweenableRotation)
+            {
+                isRotating = true;
+                DOTween.To(() => transform.rotation.eulerAngles.y, newValue =>
+                {
+                    var currentRotation = transform.rotation.eulerAngles;
+                    currentRotation.y = newValue;
+                    transform.rotation = Quaternion.Euler(currentRotation);
+                }, newRotation, 0.15f).SetEase(Ease.Linear).onComplete += () => isRotating = false;
+            }
+            else
+            {
+                var currentRotation = transform.rotation.eulerAngles;
+                currentRotation.y = newRotation;
+                transform.rotation = Quaternion.Euler(currentRotation);
+            }
+        }
+    }
 
     #region Helper Methods
 
@@ -112,7 +143,7 @@ public abstract class KillableEntity : MonoBehaviourPun, IFreezableEntity, ICust
 
     public void Serialize(List<byte> buffer)
     {
-        SerializationUtils.PackToByte(out var flags, dead, left);
+        SerializationUtils.PackToByte(out var flags, dead, FacingLeftTween);
 
         var forceResend = PhotonNetwork.Time - lastSendTimestamp > RESEND_RATE;
 
@@ -130,7 +161,7 @@ public abstract class KillableEntity : MonoBehaviourPun, IFreezableEntity, ICust
         SerializationUtils.UnpackFromByte(buffer, ref index, out var flags);
 
         //dead = flags[0]; //synchronizing dead state causes issues with laggy players dying to dead enemies on their screen
-        left = flags[1];
+        FacingLeftTween = flags[1];
     }
 
     #endregion
@@ -145,6 +176,7 @@ public abstract class KillableEntity : MonoBehaviourPun, IFreezableEntity, ICust
         audioSource = GetComponent<AudioSource>();
         sRenderer = GetComponent<SpriteRenderer>();
         physics = GetComponent<PhysicsEntity>();
+        FacingLeftTween = true;
     }
 
     public virtual void FixedUpdate()
@@ -155,7 +187,7 @@ public abstract class KillableEntity : MonoBehaviourPun, IFreezableEntity, ICust
         var loc = body.position + hitbox.offset * transform.lossyScale;
         if (body && !dead && !Frozen && !body.isKinematic &&
             Utils.IsTileSolidAtTileLocation(Utils.WorldToTilemapPosition(loc)) && Utils.IsTileSolidAtWorldLocation(loc))
-            photonView.RPC(nameof(SpecialKill), RpcTarget.All, left, false, 0);
+            photonView.RPC(nameof(SpecialKill), RpcTarget.All, FacingLeftTween, false, 0);
     }
 
     #endregion
@@ -165,7 +197,7 @@ public abstract class KillableEntity : MonoBehaviourPun, IFreezableEntity, ICust
     [PunRPC]
     public void SetLeft(bool left)
     {
-        this.left = left;
+        FacingLeftTween = left;
         body.velocity = new Vector2(Mathf.Abs(body.velocity.x) * (left ? -1 : 1), body.velocity.y);
     }
 
