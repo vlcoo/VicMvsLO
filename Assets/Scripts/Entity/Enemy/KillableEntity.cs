@@ -22,13 +22,13 @@ public abstract class KillableEntity : MonoBehaviourPun, IFreezableEntity, ICust
 
     public bool shielded;
 
-    public bool dead, collide = true, iceCarryable = true, flying, tweenableRotation = false, isRotating;
+    public bool dead, collide = true, iceCarryable = true, flying, tweenableRotation = false;
     public float offsetRotation;
     public Rigidbody2D body;
     public BoxCollider2D hitbox;
     protected Animator animator;
     protected AudioSource audioSource;
-    protected bool facingLeft;
+    protected bool facingLeft, isRotating;
     private double lastSendTimestamp;
     protected PhysicsEntity physics;
 

@@ -179,6 +179,9 @@ public class KoopaWalk : HoldableEntity
         }
 
         base.FixedUpdate();
+        
+        animator.SetBool("shell", shell || holder != null);
+        animator.SetFloat("xVel", -body.velocity.x * (upsideDown ? -1 : 1));
 
         if (Frozen || dead)
             return;
@@ -277,8 +280,6 @@ public class KoopaWalk : HoldableEntity
             return;
 
         HandleTile();
-        animator.SetBool("shell", shell || holder != null);
-        animator.SetFloat("xVel", -body.velocity.x * (upsideDown ? -1 : 1));
     }
 
     public new void OnTriggerEnter2D(Collider2D collider)
