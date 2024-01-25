@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel;
 using DG.Tweening;
 using NSMB.Utils;
 using Photon.Pun;
@@ -22,10 +23,11 @@ public abstract class KillableEntity : MonoBehaviourPun, IFreezableEntity, ICust
 
     public bool shielded;
 
-    public bool dead, collide = true, iceCarryable = true, flying, tweenableRotation = false;
-    public float offsetRotation;
+    public bool dead, collide = true, iceCarryable = true, flying;
     public Rigidbody2D body;
     public BoxCollider2D hitbox;
+    public float offsetRotation;
+    public bool tweenableRotation;
     protected Animator animator;
     protected AudioSource audioSource;
     protected bool facingLeft, isRotating;
@@ -82,6 +84,7 @@ public abstract class KillableEntity : MonoBehaviourPun, IFreezableEntity, ICust
                 var currentRotation = transform.rotation.eulerAngles;
                 currentRotation.y = newRotation;
                 transform.rotation = Quaternion.Euler(currentRotation);
+                Debug.Log("rot is now " + transform.rotation.eulerAngles.y);
             }
         }
     }
