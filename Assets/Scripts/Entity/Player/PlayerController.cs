@@ -1432,6 +1432,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         else
             holding.holderOffset = new Vector3((facingRight ? 1 : -1) * 0.25f,
                 state >= Enums.PowerupState.Mushroom ? 0.5f : 0.25f, !facingRight ? -0.09f : 0f);
+        holding.FacingLeftTween = !facingRight;
     }
 
     private void ThrowHeldItem(bool left, bool right, bool crouch)

@@ -27,10 +27,10 @@ public abstract class KillableEntity : MonoBehaviourPun, IFreezableEntity, ICust
     public Rigidbody2D body;
     public BoxCollider2D hitbox;
     public float offsetRotation;
-    public bool tweenableRotation;
+    public bool tweenableRotation, facingLeft;
     protected Animator animator;
     protected AudioSource audioSource;
-    protected bool facingLeft, isRotating;
+    protected bool isRotating;
     private double lastSendTimestamp;
     protected PhysicsEntity physics;
 
@@ -63,7 +63,7 @@ public abstract class KillableEntity : MonoBehaviourPun, IFreezableEntity, ICust
     public bool FacingLeftTween
     {
         get => facingLeft;
-        protected set
+        set
         {
             facingLeft = value;
             
@@ -84,7 +84,6 @@ public abstract class KillableEntity : MonoBehaviourPun, IFreezableEntity, ICust
                 var currentRotation = transform.rotation.eulerAngles;
                 currentRotation.y = newRotation;
                 transform.rotation = Quaternion.Euler(currentRotation);
-                Debug.Log("rot is now " + transform.rotation.eulerAngles.y);
             }
         }
     }
@@ -201,7 +200,7 @@ public abstract class KillableEntity : MonoBehaviourPun, IFreezableEntity, ICust
     public void SetLeft(bool left)
     {
         FacingLeftTween = left;
-        body.velocity = new Vector2(Mathf.Abs(body.velocity.x) * (left ? -1 : 1), body.velocity.y);
+        // body.velocity = new Vector2(Mathf.Abs(body.velocity.x) * (left ? -1 : 1), body.velocity.y);
     }
 
     [PunRPC]

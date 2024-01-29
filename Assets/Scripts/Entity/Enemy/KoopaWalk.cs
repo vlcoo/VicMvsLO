@@ -373,7 +373,7 @@ public class KoopaWalk : HoldableEntity
         holder = null;
         shell = true;
         photonView.TransferOwnership(PhotonNetwork.MasterClient);
-        facingLeft = fromLeft;
+        // facingLeft = fromLeft;
         if (crouch)
         {
             body.velocity = new Vector2(2f * (fromLeft ? -1 : 1), body.velocity.y);
@@ -390,6 +390,7 @@ public class KoopaWalk : HoldableEntity
     {
         shell = false;
         body.velocity = new Vector2(-walkSpeed, 0);
+        tweenableRotation = true;
         FacingLeftTween = true;
         upsideDown = false;
         stationary = false;
@@ -413,6 +414,7 @@ public class KoopaWalk : HoldableEntity
         combo = 0;
         shell = true;
         stationary = true;
+        tweenableRotation = false;
     }
 
     [PunRPC]

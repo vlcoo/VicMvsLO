@@ -16,13 +16,6 @@ public class BobombWalk : HoldableEntity
 
     #region Unity Methods
 
-    public override void Start()
-    {
-        base.Start();
-
-        body.velocity = new Vector2(walkSpeed * (FacingLeftTween ? -1 : 1), body.velocity.y);
-    }
-
     public override void FixedUpdate()
     {
         if (GameManager.Instance && GameManager.Instance.gameover)
@@ -48,19 +41,30 @@ public class BobombWalk : HoldableEntity
 
         sRenderer.flipX = FacingLeftTween;
 
-        if (lit && !detonated)
+        switch (lit)
         {
-            if ((detonateCount -= Time.fixedDeltaTime) < 0)
+            case true when !detonated:
             {
-                if (photonView.IsMine)
-                    photonView.RPC("Detonate", RpcTarget.All);
-                return;
-            }
+                if ((detonateCount -= Time.fixedDeltaTime) < 0)
+                {
+                    if (photonView.IsMine)
+                        photonView.RPC("Detonate", RpcTarget.All);
+                    return;
+                }
 
-            var redOverlayPercent = 5.39f / (detonateCount + 2.695f) * 10f % 1f;
-            MaterialPropertyBlock block = new();
-            block.SetFloat("FlashAmount", redOverlayPercent);
-            sRenderer.SetPropertyBlock(block);
+                var redOverlayPercent = 5.39f / (detonateCount + 2.695f) * 10f % 1f;
+                MaterialPropertyBlock block = new();
+                block.SetFloat("FlashAmount", redOverlayPercent);
+                sRenderer.SetPropertyBlock(block);
+                animator.SetBool("carrying", holder != null);
+                break;
+            }
+            case false when isRotating:
+                body.velocity = new Vector2(0, 0);
+                break;
+            case false:
+                body.velocity = new Vector2(walkSpeed * (FacingLeftTween ? -1 : 1), body.velocity.y);
+                break;
         }
 
         previousFrameVelocity = body.velocity;
@@ -262,6 +266,7 @@ public class BobombWalk : HoldableEntity
     public void Light()
     {
         animator.SetTrigger("lit");
+        tweenableRotation = false;
         detonateCount = hasBigExplosion ? 0 : detonationTime;
         body.velocity = Vector2.zero;
         lit = true;
@@ -271,6 +276,8 @@ public class BobombWalk : HoldableEntity
     [PunRPC]
     public override void Throw(bool fromLeft, bool crouch, Vector2 pos)
     {
+        animator.SetBool("carrying", holder != null);
+        
         if (!holder)
             return;
 
@@ -280,7 +287,7 @@ public class BobombWalk : HoldableEntity
 
         holder = null;
         photonView.TransferOwnership(PhotonNetwork.MasterClient);
-        FacingLeftTween = fromLeft;
+        // FacingLeftTween = fromLeft;
         sRenderer.flipX = FacingLeftTween;
         if (crouch)
             body.velocity = new Vector2(2f * (fromLeft ? -1 : 1), body.velocity.y);
@@ -302,8 +309,8 @@ public class BobombWalk : HoldableEntity
     {
         FacingLeftTween = !hitWallOnLeft;
         sRenderer.flipX = FacingLeftTween;
-        body.velocity = new Vector2((lit ? -previousFrameVelocity.x : walkSpeed) * (FacingLeftTween ? -1 : 1), body.velocity.y);
-        animator.SetTrigger("turnaround");
+        body.velocity = new Vector2(lit ? -previousFrameVelocity.x : walkSpeed, body.velocity.y);
+        if (lit) PlaySound(Enums.Sounds.World_Block_Bump);
     }
 
     #endregion
