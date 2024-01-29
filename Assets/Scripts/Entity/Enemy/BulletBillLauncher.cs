@@ -7,9 +7,10 @@ public class BulletBillLauncher : MonoBehaviourPun
     public float playerSearchRadius = 7, playerCloseCutoff = 1;
     public float initialShootTimer = 5;
     public bool isBanzai;
+    public Animator animator;
     private readonly List<GameObject> bills = new();
     private readonly Vector2 closeSearchBox = new(1.5f, 1f);
-    private readonly Vector2 spawnOffset = new(0.25f, -0.2f);
+    private Vector2 spawnOffset;
     private string prefabPath;
 
     private Vector2 searchBox;
@@ -21,8 +22,16 @@ public class BulletBillLauncher : MonoBehaviourPun
         searchBox = new Vector2(playerSearchRadius, playerSearchRadius);
         searchOffset = new Vector2(playerSearchRadius / 2 + playerCloseCutoff, 0);
 
-        if (isBanzai) prefabPath = "Prefabs/Enemy/BanzaiBill";
-        else prefabPath = "Prefabs/Enemy/BulletBill";
+        if (isBanzai)
+        {
+            prefabPath = "Prefabs/Enemy/BanzaiBill";
+            spawnOffset = new Vector2(0.25f, 0.2f);
+        }
+        else
+        {
+            prefabPath = "Prefabs/Enemy/BulletBill";
+            spawnOffset = new Vector2(0.25f, -0.2f);
+        }
     }
 
     private void Update()
@@ -67,6 +76,7 @@ public class BulletBillLauncher : MonoBehaviourPun
                 transform.position + new Vector3(-spawnOffset.x, spawnOffset.y), Quaternion.identity, 0,
                 new object[] { true });
             bills.Add(newBill);
+            animator.SetTrigger("launch");
             return;
         }
 
@@ -77,6 +87,7 @@ public class BulletBillLauncher : MonoBehaviourPun
                 transform.position + new Vector3(spawnOffset.x, spawnOffset.y), Quaternion.identity, 0,
                 new object[] { false });
             bills.Add(newBill);
+            animator.SetTrigger("launch");
         }
     }
 
