@@ -1974,7 +1974,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         noPlayerCollisions = GameManager.Instance.Togglerizer.currentEffects.Contains("NoCollisions");
 
         LoadFromGameState();
-        spawned = true;
+        // spawned = true;
         cameraController.Recenter();
 
         normalGravity /= GameManager.Instance.Togglerizer.currentEffects.Contains("LowGravity") ? 4 : 1;
@@ -4114,8 +4114,6 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
     {
         switch (pipe.transitionType)
         {
-            case Enums.PipeTransitionTypes.Cut:
-                return;
             case Enums.PipeTransitionTypes.Pan:
                 if (cameraPanTween == null || !cameraPanTween.IsPlaying())
                     StartCoroutine(CameraPipePanCoroutine(pipe));
@@ -4123,6 +4121,9 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             case Enums.PipeTransitionTypes.FadeWipe:
                 fadeOut.FadePipe(!pipe.fromSubarea);
                 break;
+            case Enums.PipeTransitionTypes.Cut:
+            default:
+                return;
         }
     }
 
@@ -4152,7 +4153,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             transform.position = body.position = new Vector2(obj.transform.position.x, transform.position.y);
 
             photonView.RPC(nameof(PlaySound), RpcTarget.All, Enums.Sounds.Player_Sound_Powerdown);
-            GameManager.Instance.MatchConditioner.ConditionActioned(this, "EnteredPipe");
+            GameManager.Instance.PlayerEnteredPipe(this, pipe);
             crouching = false;
             sliding = false;
             propeller = false;

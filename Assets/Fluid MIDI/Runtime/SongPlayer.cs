@@ -27,7 +27,7 @@ namespace FluidMidi
         [SerializeField]
         [Tooltip("Play again when the song reaches the end.")]
         [ToggleIntFoldout(name = "Start Ticks", tooltip = "Position to start playing again.")]
-        private ToggleInt loop = new(false, 0);
+        private ToggleInt loop = new(true, 0);
 
         [SerializeField] [Tooltip("Make the song end early.")]
         private ToggleInt endTicks = new(false, 0);

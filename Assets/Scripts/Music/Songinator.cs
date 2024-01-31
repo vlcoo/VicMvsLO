@@ -75,7 +75,7 @@ public class Songinator : MonoBehaviour
         }
     }
 
-    public void SwitchToSong(MIDISong newSong)
+    public void SwitchToSong(MIDISong newSong, bool startPlayback = false)
     {
         player.Stop();
         Destroy(player.synthesizer);
@@ -98,7 +98,7 @@ public class Songinator : MonoBehaviour
         player.Init();
         rememberedChannels = ~currentSong.mutedChannelsNormal;
 
-        player.Play();
+        if (startPlayback) StartPlayback();
     }
 
     public void StopPlayback()

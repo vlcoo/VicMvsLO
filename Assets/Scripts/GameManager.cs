@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using DG.Tweening;
 using ExitGames.Client.Photon;
 using NSMB.Utils;
 using Photon.Pun;
@@ -978,6 +979,14 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         GlobalController.Instance.fastLoad = true;
         Utils.GetCustomProperty(Enums.NetRoomProperties.Level, out int level);
         SceneManager.LoadSceneAsync(level + 2, LoadSceneMode.Single);
+    }
+
+    public void PlayerEnteredPipe(PlayerController whom, PipeManager pipe)
+    {
+        MatchConditioner.ConditionActioned(whom, "EnteredPipe");
+        if (pipe.fadeOutMusic)
+            DOTween.To(() => MusicSynth.player.Gain, v => MusicSynth.player.Gain = v, 0f, 0.5f)
+                .SetEase(Ease.Linear);
     }
 
     private IEnumerator EndGame(Player winner, string causeString = "")
