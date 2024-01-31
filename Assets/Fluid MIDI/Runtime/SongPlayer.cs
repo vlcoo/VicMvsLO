@@ -17,12 +17,12 @@ namespace FluidMidi
         [SerializeField] public StreamingAsset song = new();
 
         [SerializeField] [Tooltip("Start playing after the song is loaded for the first time.")]
-        private bool playOnStart = true;
+        public bool playOnStart = true;
 
         [SerializeField]
         [Tooltip("Automatically unload the song when it is stopped.")]
         [ToggleIntFoldout(name = "Delay", tooltip = "Seconds to wait for notes to finish playing.")]
-        private ToggleInt unloadOnStop = new(true, 3);
+        private ToggleInt unloadOnStop = new(false, 3);
 
         [SerializeField]
         [Tooltip("Play again when the song reaches the end.")]

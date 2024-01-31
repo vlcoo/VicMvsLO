@@ -7,6 +7,8 @@ using UnityEngine;
 
 public class Songinator : MonoBehaviour
 {
+    public const float MAX_GAIN = 0.5f;
+    
     [SerializeField] public bool autoStart = true;
     [SerializeField] public SongPlayer player;
     [SerializeField] public List<MIDISong> songs;
@@ -41,6 +43,7 @@ public class Songinator : MonoBehaviour
         player.StartTicks = currentSong.startLoopTicks;
         player.EndTicks = currentSong.endTicks;
         player.Tempo = currentSong.playbackSpeedNormal;
+        player.Gain = MAX_GAIN;
         player.Init();
         rememberedChannels = ~currentSong.mutedChannelsNormal;
 
@@ -70,6 +73,32 @@ public class Songinator : MonoBehaviour
             player.Channels = rememberedChannels;
             player.Play();
         }
+    }
+
+    public void SwitchToSong(MIDISong newSong)
+    {
+        player.Stop();
+        Destroy(player.synthesizer);
+        Destroy(player);
+        player = gameObject.AddComponent<SongPlayer>();
+        player.playOnStart = false;
+        player.synthesizer = gameObject.AddComponent<Synthesizer>();
+        
+        currentSong = newSong;
+        player.synthesizer.soundFont.SetFullPath(currentSong.autoSoundfont
+            ? currentSong.song.GetFullPath().Replace(".mid", ".sf2")
+            : currentSong.soundfont.GetFullPath());
+        player.synthesizer.Init();
+
+        player.song = currentSong.song;
+        player.StartTicks = currentSong.startLoopTicks;
+        player.EndTicks = currentSong.endTicks;
+        player.Tempo = currentSong.playbackSpeedNormal;
+        player.Gain = MAX_GAIN;
+        player.Init();
+        rememberedChannels = ~currentSong.mutedChannelsNormal;
+
+        player.Play();
     }
 
     public void StopPlayback()

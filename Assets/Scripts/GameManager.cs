@@ -19,8 +19,6 @@ using Random = UnityEngine.Random;
 public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IConnectionCallbacks,
     IMatchmakingCallbacks
 {
-    public const float MAX_MUSIC_GAIN = 0.5f;
-
     private static GameManager _instance;
 
     public Songinator MusicSynth, MusicSynthMega, MusicSynthStarman;
@@ -938,7 +936,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
                     break;
             }
             // songPlayer.Gain = 0f;
-            // DOTween.To(() => songPlayer.Gain, v => songPlayer.Gain = v, MAX_MUSIC_GAIN,
+            // DOTween.To(() => songPlayer.Gain, v => songPlayer.Gain = v, Songinator.MAX_GAIN,
             //     0.5f).SetEase(Ease.Linear);
         }
     }
