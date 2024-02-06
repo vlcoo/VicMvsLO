@@ -1335,6 +1335,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         sfx.PlayOneShot(Enums.Sounds.UI_Match_Starting.GetClip());
         MusicSynth.player.Pause();
         fader.SetInvisible(GlobalController.Instance.settings.reduceUIAnims);
+        fader.anim.speed = 1.5f;
         fader.anim.SetTrigger("out");
         StartCoroutine(WaitForMusicFadeStartGame());
     }

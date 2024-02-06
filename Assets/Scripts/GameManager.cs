@@ -988,6 +988,14 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             DOTween.To(() => MusicSynth.player.Gain, v => MusicSynth.player.Gain = v, 0f, 0.5f)
                 .SetEase(Ease.Linear);
     }
+    
+    public void PlayerEnteredDoor(PlayerController whom, DoorManager door)
+    {
+        MatchConditioner.ConditionActioned(whom, "EnteredDoor");
+        if (door.fadeOutMusic)
+            DOTween.To(() => MusicSynth.player.Gain, v => MusicSynth.player.Gain = v, 0f, 0.5f)
+                .SetEase(Ease.Linear);
+    }
 
     private IEnumerator EndGame(Player winner, string causeString = "")
     {
