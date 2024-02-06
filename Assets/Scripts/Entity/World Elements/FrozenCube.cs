@@ -237,6 +237,8 @@ public class FrozenCube : HoldableEntity
 
     public override void InteractWithPlayer(PlayerController player)
     {
+        if (entity is PlayerController && ReferenceEquals(player, entity)) return;
+        
         var damageDirection = (player.body.position - body.position).normalized;
         var attackedFromAbove = damageDirection.y > -0.4f;
         if (previousHolder == player && throwTimer > 0)
