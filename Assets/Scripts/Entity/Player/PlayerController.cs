@@ -3497,12 +3497,19 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
     private IEnumerator GoalAnimReachBottom()
     {
         yield return new WaitForSecondsRealtime(0.6f);
+        PlaySoundEverywhere(Enums.Sounds.World_Pole_Down);
         while (!goalReachedBottom)
         {
             transform.position -= new Vector3(0, 2.5f * Time.deltaTime, 0);
             yield return null;
         }
 
+        DOTween.To(() => GameManager.Instance.sfx.volume, x => GameManager.Instance.sfx.volume = x, 0, 0.2f).onComplete +=
+            () =>
+            {
+                GameManager.Instance.sfx.Stop();
+                GameManager.Instance.sfx.volume = 1;
+            };
         yield return new WaitForSecondsRealtime(0.4f);
         animator.SetBool("goalAnimReachedBottom", true);
         PlaySoundEverywhere(Enums.Sounds.Player_Voice_GoalCeleb);

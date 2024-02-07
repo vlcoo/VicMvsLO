@@ -89,7 +89,7 @@ public static class Enums
     //Sound effects
     public enum Sounds : byte
     {
-        //CURRENT MAX: 107 (incl.)
+        //CURRENT MAX: 108 (incl.)
 
         //Enemy
         [SoundData("enemy/freeze")] Enemy_Generic_Freeze = 0,
@@ -271,6 +271,7 @@ public static class Enums
         [SoundData("world/starcoin_collect")] World_Starcoin = 102,
         [SoundData("world/door_open")] World_Door_Open = 106,
         [SoundData("world/door_close")] World_Door_Close = 107,
+        [SoundData("world/flag_down")] World_Pole_Down = 108,
     }
 
     #endregion

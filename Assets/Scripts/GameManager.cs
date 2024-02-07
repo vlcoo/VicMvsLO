@@ -1004,9 +1004,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         sfx.outputAudioMixerGroup.audioMixer.SetFloat("SFXReverb", 0f);
 
         PhotonNetwork.CurrentRoom.SetCustomProperties(new Hashtable { [Enums.NetRoomProperties.GameStarted] = false });
-        MusicSynth.player.Pause();
-        MusicSynthMega.player.Pause();
-        MusicSynthStarman.player.Pause();
+        FadeMusic(false);
 
         if (causeString is "DUMMY_TIMEOUT")
         {
@@ -1165,6 +1163,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         if (!PhotonNetwork.IsMasterClient) return;
         foreach (var player in players.Where(player => player != null && player != whom))
             player.photonView.RPC("Disqualify", RpcTarget.All);
+        FadeMusic(false);
     }
 
     public void CheckForWinner()
