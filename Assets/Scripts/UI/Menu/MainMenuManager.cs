@@ -147,7 +147,7 @@ namespace NSMB.UI.MainMenu {
                         return;
                     }
 
-                    updateText.text = GlobalController.Instance.translationManager.GetTranslationWithReplacements("ui.update.prompt", "newversion", latestVersion, "currentversion", Application.version);
+                    updateText.text = GlobalController.Instance.translationManager.GetTranslationWithReplacements("ui.update.prompt", "newversion", latestVersion, "currentversion", BuildInfo.VCMI_VERSION);
                     updateBox.SetActive(true);
                     EventSystem.current.SetSelectedGameObject(updateBoxSelected);
                 });

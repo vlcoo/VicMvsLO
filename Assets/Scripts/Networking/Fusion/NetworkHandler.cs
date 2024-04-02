@@ -445,7 +445,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
         // Version separation
         FusionAppSettings appSettings = new() {
             AppIdFusion = PhotonAppSettings.Global.AppSettings.AppIdFusion,
-            AppVersion = Regex.Match(Application.version, "^\\w*\\.\\w*\\.\\w*").Groups[0].Value,
+            AppVersion = Regex.Match(BuildInfo.VCMI_VERSION, "^\\w*\\.\\w*\\.\\w*").Groups[0].Value,
             EnableLobbyStatistics = true,
             UseNameServer = true,
             FixedRegion = region,

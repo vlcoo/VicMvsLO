@@ -36,13 +36,13 @@ public class UpdateChecker {
 
             string[] splitTag = tag.Split(".");
 
-            string ver = Application.version;
+            string ver = BuildInfo.VCMI_VERSION;
             if (ver.StartsWith("v"))
                 ver = ver[1..];
 
-            string[] splitVer = Application.version.Split(".");
+            string[] splitVer = ver.Split(".");
 
-            Debug.Log($"[Updater] Local version: {Application.version} / Remote version: {tag}");
+            Debug.Log($"[Updater] Local version: {ver} / Remote version: {tag}");
 
             // Check if we're a higher version
             bool upToDate = true;
