@@ -32,13 +32,13 @@ namespace NSMB.Translation {
         }
 
         private void OnLanguageChanged(TranslationManager tm) {
-            text.text = tm.GetSubTranslations(originalText);
-
-            if (originalTextAlignment == HorizontalAlignmentOptions.Left) {
-                text.horizontalAlignment = tm.RightToLeft ? HorizontalAlignmentOptions.Right : HorizontalAlignmentOptions.Left;
-            } else if (originalTextAlignment == HorizontalAlignmentOptions.Right) {
-                text.horizontalAlignment = tm.RightToLeft ? HorizontalAlignmentOptions.Left : HorizontalAlignmentOptions.Right;
-            }
+            // text.text = tm.GetSubTranslations(originalText);
+            //
+            // if (originalTextAlignment == HorizontalAlignmentOptions.Left) {
+            //     text.horizontalAlignment = tm.RightToLeft ? HorizontalAlignmentOptions.Right : HorizontalAlignmentOptions.Left;
+            // } else if (originalTextAlignment == HorizontalAlignmentOptions.Right) {
+            //     text.horizontalAlignment = tm.RightToLeft ? HorizontalAlignmentOptions.Left : HorizontalAlignmentOptions.Right;
+            // }
         }
     }
 }

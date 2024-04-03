@@ -838,6 +838,18 @@ namespace NSMB.UI.MainMenu {
         }
 
         public class RegionOption : TMP_Dropdown.OptionData, IComparable {
+            public static readonly Dictionary<string, string> regionFullNames = new()
+            {
+                {"eu", "Europe"},
+                {"us", "USA, East"},
+                {"usw", "USA, West"},
+                {"jp", "Japan"},
+                {"kr", "South Korea"},
+                {"hk", "Hong Kong"},
+                {"sa", "South America"},
+                {"asia", "Asia"},
+            };
+
             public string Region { get; private set; }
             private int _ping = -1;
             public int Ping {
@@ -848,7 +860,7 @@ namespace NSMB.UI.MainMenu {
                     }
 
                     _ping = value;
-                    text = "<align=left>" + Region + "<line-height=0>\n<align=right>" + Utils.Utils.GetPingSymbol(_ping);
+                    text = "<align=left>" + regionFullNames[Region] + "<line-height=0>\n<align=right>" + Utils.Utils.GetPingSymbol(_ping);
                 }
             }
 
