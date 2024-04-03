@@ -323,9 +323,9 @@ namespace NSMB.UI.MainMenu {
             Camera.main.transform.position = maps[levelIndex].levelPreviewPosition.transform.position;
         }
 
-        private void DisableAllMenus() {
+        private void DisableAllMenus(bool includeBG = false) {
             title.SetActive(false);
-            bg.SetActive(false);
+            if (includeBG) bg.SetActive(false);
             mainMenu.SetActive(false);
             lobbyMenu.SetActive(false);
             createLobbyPrompt.SetActive(false);
@@ -337,7 +337,7 @@ namespace NSMB.UI.MainMenu {
         }
 
         public void OpenTitleScreen() {
-            DisableAllMenus();
+            DisableAllMenus(true);
             title.SetActive(true);
 
             EventSystem.current.SetSelectedGameObject(titleSelected);
