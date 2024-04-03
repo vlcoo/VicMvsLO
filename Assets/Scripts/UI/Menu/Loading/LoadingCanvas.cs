@@ -42,6 +42,7 @@ namespace NSMB.Loading {
             readyGroup.alpha = 0;
             readyBackground.color = Color.clear;
 
+            if (GlobalController.Instance.debugQuickstart) animator.speed = 16;
             animator.Play("waiting");
 
             audioSource.volume = 0;

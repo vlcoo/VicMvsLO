@@ -275,7 +275,8 @@ namespace NSMB.Game {
                 break;
             }
             case Enums.GameState.Starting: {
-                if (GameStartTimer.Expired(Runner)) {
+                if (GameStartTimer.Expired(Runner) || GlobalController.Instance.debugQuickstart) {
+                    GlobalController.Instance.debugQuickstart = false;
                     GameStartTimer = TickTimer.None;
                     Host_StartGame();
                 }

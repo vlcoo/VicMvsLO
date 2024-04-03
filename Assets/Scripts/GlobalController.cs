@@ -33,7 +33,7 @@ public class GlobalController : Singleton<GlobalController> {
 
     public RenderTexture ndsTexture;
 
-    public bool checkedForVersion = false, firstConnection = true;
+    public bool checkedForVersion = false, firstConnection = true, debugQuickstart = false;
     public int windowWidth = 1280, windowHeight = 720;
 
     public ConnectionToken connectionToken;

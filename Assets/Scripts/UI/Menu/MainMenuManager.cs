@@ -48,7 +48,7 @@ namespace NSMB.UI.MainMenu {
         [SerializeField] private GameObject bg, mainMenu, lobbyMenu, createLobbyPrompt, webglCreateLobbyPrompt, privateRoomIdPrompt, inLobbyMenu, creditsMenu, updateBox;
         [SerializeField] private GameObject sliderText, currentMaxPlayers, settingsPanel;
         [SerializeField] private TMP_Dropdown levelDropdown, characterDropdown, regionDropdown;
-        [SerializeField] private Button createRoomBtn, joinRoomBtn, joinPrivateRoomBtn, reconnectBtn, startGameBtn;
+        [SerializeField] private Button createRoomBtn, joinRoomBtn, joinPrivateRoomBtn, reconnectBtn, startGameBtn, debugQuickstartBtn;
         [SerializeField] private TMP_InputField nicknameField, chatTextField;
         [SerializeField] private TMP_Text lobbyHeaderText, updateText, startGameButtonText;
         [SerializeField] private ScrollRect settingsScroll;
@@ -67,6 +67,26 @@ namespace NSMB.UI.MainMenu {
         private Coroutine playerPingUpdateCoroutine, quitCoroutine, fadeMusicCoroutine;
         private bool validName;
         private bool wasSettingsOpen;
+
+        #region Debug
+
+        private Action<PlayerData> immediateStartDelegate = delegate {
+            SessionData.Instance.SetLevel(5);
+            Instance.StartCountdown(0);
+        };
+        public void QuickstartMatch() {
+            GlobalController.Instance.debugQuickstart = true;
+            debugQuickstartBtn.interactable = false;
+            debugQuickstartBtn.GetComponentInChildren<TMP_Text>().text = "connecting";
+            PlayerData.OnPlayerDataReady += immediateStartDelegate;
+
+            NetworkHandler.ConnectToSameRegion().GetAwaiter().OnCompleted(async () => {
+                await NetworkHandler.CreateRoom(new StartGameArgs { IsVisible = false }, players: 2);
+            });
+
+        }
+
+        #endregion
 
         public void Awake() {
             Set(this, false);
@@ -133,6 +153,11 @@ namespace NSMB.UI.MainMenu {
             nicknameField.text = Settings.Instance.generalNickname;
             nicknameField.characterLimit = NicknameMax;
             UpdateNickname();
+#if DEVELOPMENT_BUILD || UNITY_EDITOR
+            debugQuickstartBtn.gameObject.SetActive(true);
+            PlayerData.OnPlayerDataReady -= immediateStartDelegate;
+            GlobalController.Instance.debugQuickstart = false;
+#endif
 
             // Discord RPC
             GlobalController.Instance.discordController.UpdateActivity();
@@ -450,7 +475,7 @@ namespace NSMB.UI.MainMenu {
             GlobalController.Instance.discordController.UpdateActivity();
         }
 
-        public void StartCountdown() {
+        public void StartCountdown(float delay = 3f) {
 
             PlayerData data = Runner.GetLocalPlayerData();
             if (!data.IsRoomOwner) {
@@ -471,7 +496,7 @@ namespace NSMB.UI.MainMenu {
                 }
 
                 // Actually start the game.
-                SessionData.Instance.GameStartTimer = TickTimer.CreateFromSeconds(Runner, 3f);
+                SessionData.Instance.GameStartTimer = TickTimer.CreateFromSeconds(Runner, delay);
             }
         }
 
