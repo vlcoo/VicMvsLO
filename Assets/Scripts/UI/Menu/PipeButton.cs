@@ -61,8 +61,8 @@ namespace NSMB.UI.MainMenu {
 
             currentlyPressed = true;
 
-            SetAnchor(adjustedAnchor, true);
-            image.color = selectedColor;
+            // SetAnchor(adjustedAnchor, true);
+            // image.color = selectedColor;
         }
 
         public void OnPointerUp(PointerEventData eventData) {
