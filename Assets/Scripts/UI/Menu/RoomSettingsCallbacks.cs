@@ -13,7 +13,7 @@ namespace NSMB.UI.MainMenu {
         [SerializeField] private TMP_InputField starsInputField, coinsInputField, livesInputField, timerInputField;
         [SerializeField] private TMP_Text playersCount, roomIdText, roomIdToggleButtonText;
         [SerializeField] private Slider playersSlider;
-        [SerializeField] private Toggle privateEnabledToggle, timerEnabledToggle, livesEnabledToggle, drawEnabledToggle, teamsEnabledToggle, customPowerupsEnabledToggle;
+        [SerializeField] private Toggle privateEnabledToggle, timerEnabledToggle, livesEnabledToggle, drawEnabledToggle, teamsEnabledToggle, customPowerupsEnabledToggle, starsEnabledToggle, coinsEnabledToggle;
         [SerializeField] private TeamChooser teamSelectorButton;
 
         //---Properties
@@ -102,8 +102,25 @@ namespace NSMB.UI.MainMenu {
 
             Room.SetStarRequirement((sbyte) newValue);
         }
+
+        public void EnableStars() {
+            if (!Room.HasStateAuthority) {
+                return;
+            }
+
+            int newValue = starsEnabledToggle.isOn ? int.Parse(starsInputField.text) : 0;
+
+            Room.SetStarRequirement((sbyte) newValue);
+        }
+
         private void ChangeStarRequirement(int stars) {
-            starsInputField.SetTextWithoutNotify(stars.ToString());
+            bool enabled = stars > 0;
+            starsEnabledToggle.SetIsOnWithoutNotify(enabled);
+            starsInputField.interactable = enabled;
+
+            if (enabled) {
+                starsInputField.SetTextWithoutNotify(stars.ToString());
+            }
         }
         #endregion
 
@@ -127,8 +144,25 @@ namespace NSMB.UI.MainMenu {
 
             Room.SetCoinRequirement((byte) newValue);
         }
+
+        public void EnableCoins() {
+            if (!Room.HasStateAuthority) {
+                return;
+            }
+
+            int newValue = coinsEnabledToggle.isOn ? int.Parse(coinsInputField.text) : 0;
+
+            Room.SetCoinRequirement((byte) newValue);
+        }
+
         private void ChangeCoinRequirement(int coins) {
-            coinsInputField.SetTextWithoutNotify(coins.ToString());
+            bool enabled = coins > 0;
+            coinsEnabledToggle.SetIsOnWithoutNotify(enabled);
+            coinsInputField.interactable = enabled;
+
+            if (enabled) {
+                coinsInputField.SetTextWithoutNotify(coins.ToString());
+            }
         }
         #endregion
 

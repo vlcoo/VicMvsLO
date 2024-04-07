@@ -95,7 +95,9 @@ public class ScoreboardEntry : MonoBehaviour, IComparable {
             txt += target.Data.GetCharacterData().uistring + Utils.GetSymbolString(currentLives.ToString());
         }
 
-        txt += Utils.GetSymbolString("S" + currentStars);
+        if (target.StarsEnabled) {
+            txt += Utils.GetSymbolString("S" + currentStars);
+        }
 
         valuesText.text = txt;
     }

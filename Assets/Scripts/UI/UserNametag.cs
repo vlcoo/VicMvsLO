@@ -82,7 +82,9 @@ public class UserNametag : MonoBehaviour {
                 newText += character.uistring + Utils.GetSymbolString("x" + parent.Lives + " ");
             }
 
-            newText += Utils.GetSymbolString("Sx" + parent.Stars);
+            if (parent.StarsEnabled) {
+                newText += Utils.GetSymbolString("Sx" + parent.Stars);
+            }
 
             text.text = newText;
 

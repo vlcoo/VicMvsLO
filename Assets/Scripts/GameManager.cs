@@ -466,9 +466,9 @@ namespace NSMB.Game {
             }
 
             int requiredStars = SessionData.Instance.StarRequirement;
-            bool starGame = requiredStars != -1;
+            bool starGame = requiredStars != 0;
 
-            bool hasFirstPlace = teamManager.HasFirstPlaceTeam(out int firstPlaceTeam, out int firstPlaceStars);
+            bool hasFirstPlaceStars = teamManager.HasFirstPlaceTeam(out int firstPlaceTeam, out int firstPlaceStars);
             int aliveTeams = teamManager.GetAliveTeamCount();
             bool timeUp = SessionData.Instance.Timer > 0 && GameEndTimer.ExpiredOrNotRunning(Runner);
 
@@ -484,7 +484,7 @@ namespace NSMB.Game {
                 return true;
             }
 
-            if (hasFirstPlace) {
+            if (hasFirstPlaceStars) {
                 // We have a team that's clearly in first...
                 if (starGame && (firstPlaceStars >= requiredStars || timeUp)) {
                     // And they have enough stars.
@@ -503,7 +503,7 @@ namespace NSMB.Game {
                 }
 
                 if (RealPlayerCount <= 1) {
-                    // One player, no overtime.
+                    // Solo game, no overtime.
                     Rpc_EndGame(firstPlaceTeam);
                     return true;
                 }
@@ -714,7 +714,7 @@ namespace NSMB.Game {
             ForceUnpause();
             musicManager.Stop();
 
-            yield return new WaitForSecondsRealtime(1);
+            yield return new WaitForSecondsRealtime(0.3f);
 
             PlaySounds = false;
 
@@ -830,7 +830,7 @@ namespace NSMB.Game {
             }
 
             speedup |= SessionData.Instance.Timer > 0 && ((GameEndTimer.RemainingTime(Runner) ?? 0f) < 60f);
-            speedup |= teamManager.GetFirstPlaceStars() + 1 >= SessionData.Instance.StarRequirement;
+            speedup |= SessionData.Instance.StarRequirement > 0 && teamManager.GetFirstPlaceStars() + 1 >= SessionData.Instance.StarRequirement;
 
             if (!speedup && SessionData.Instance.Lives > 0) {
                 int playersWithOneLife = 0;
@@ -870,7 +870,7 @@ namespace NSMB.Game {
         /// <returns>If the star successfully spawned</returns>
         private bool AttemptSpawnBigStar() {
 
-            if (!HasStateAuthority) {
+            if (!HasStateAuthority || SessionData.Instance.StarRequirement <= 0) {
                 return true;
             }
 

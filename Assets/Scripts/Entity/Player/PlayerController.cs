@@ -209,6 +209,8 @@ namespace NSMB.Entities.Player {
 
         public bool LivesEnabled => SessionData.Instance.Lives > 0;
         public bool OutOfLives => Disconnected || (LivesEnabled && Lives == 0);
+        public bool StarsEnabled => SessionData.Instance.StarRequirement > 0;
+        public bool CoinsEnabled => SessionData.Instance.CoinRequirement > 0;
 
         //---Components
         [SerializeField] public CameraController cameraController;

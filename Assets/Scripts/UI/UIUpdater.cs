@@ -124,18 +124,24 @@ public class UIUpdater : MonoBehaviour {
             Team team = ScriptableManager.Instance.teams[teamIndex];
             uiTeamStars.text = (Settings.Instance.GraphicsColorblind ? team.textSpriteColorblind : team.textSpriteNormal) + Utils.GetSymbolString("x" + teamStars + "/" + SessionData.Instance.StarRequirement);
         }
-        if (player.Stars != stars) {
-            stars = player.Stars;
-            string starString = "Sx" + stars;
-            if (!teams) {
-                starString += "/" + SessionData.Instance.StarRequirement;
-            }
 
-            uiStars.text = Utils.GetSymbolString(starString);
+        if (player.StarsEnabled) {
+            if (player.Stars != stars) {
+                stars = player.Stars;
+                string starString = "Sx" + stars;
+                if (!teams) {
+                    starString += "/" + SessionData.Instance.StarRequirement;
+                }
+
+                uiStars.text = Utils.GetSymbolString(starString);
+            }
+        } else {
+            starsParent.SetActive(false);
         }
+
         if (player.Coins != coins) {
             coins = player.Coins;
-            uiCoins.text = Utils.GetSymbolString("Cx" + coins + "/" + SessionData.Instance.CoinRequirement);
+            uiCoins.text = Utils.GetSymbolString("Cx" + coins + (player.CoinsEnabled ? "/" + SessionData.Instance.CoinRequirement : ""));
         }
 
         if (player.LivesEnabled) {

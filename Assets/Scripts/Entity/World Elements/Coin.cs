@@ -18,7 +18,7 @@ namespace NSMB.Entities.Collectable {
 
         public static void GivePlayerCoin(PlayerController player, Vector3 position) {
             byte newCoins = (byte) (player.Coins + 1);
-            bool item = newCoins >= SessionData.Instance.CoinRequirement;
+            bool item = SessionData.Instance.CoinRequirement > 0 && newCoins >= SessionData.Instance.CoinRequirement;
 
             if (player.Object.HasStateAuthority) {
                 player.Rpc_SpawnCoinEffects(position, newCoins, item);
