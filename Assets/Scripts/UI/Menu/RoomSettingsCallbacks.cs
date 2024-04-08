@@ -10,7 +10,7 @@ namespace NSMB.UI.MainMenu {
 
         //---Serailized Variables
         [SerializeField] private TMP_Dropdown levelDropdown;
-        [SerializeField] private TMP_InputField starsInputField, coinsInputField, livesInputField, timerInputField;
+        [SerializeField] private TMP_InputField starsInputField, coinsInputField, livesInputField, timerInputField, lapsInputField;
         [SerializeField] private TMP_Text playersCount, roomIdText, roomIdToggleButtonText;
         [SerializeField] private Slider playersSlider;
         [SerializeField] private Toggle privateEnabledToggle, timerEnabledToggle, livesEnabledToggle, drawEnabledToggle, teamsEnabledToggle, customPowerupsEnabledToggle, starsEnabledToggle, coinsEnabledToggle;
@@ -38,6 +38,7 @@ namespace NSMB.UI.MainMenu {
 
             ChangePrivate(roomData.PrivateRoom);
             ChangeMaxPlayers(roomData.MaxPlayers);
+            ChangeLapRequirement(roomData.LapRequirement);
             ChangeLevelIndex(roomData.Level, level);
             ChangeStarRequirement(roomData.StarRequirement);
             ChangeCoinRequirement(roomData.CoinRequirement);
@@ -57,6 +58,32 @@ namespace NSMB.UI.MainMenu {
                 Runner.PushHostMigrationSnapshot();
             }
         }
+        
+        #region Laps
+        public void SetLapRequirement() {
+            if (!Room.HasStateAuthority) {
+                return;
+            }
+
+            int oldValue = Room.LapRequirement;
+            if (!int.TryParse(lapsInputField.text, out int newValue)) {
+                return;
+            }
+
+            newValue = Mathf.Clamp(newValue, 1, 25);
+
+            if (oldValue == newValue) {
+                ChangeLapRequirement(oldValue);
+                return;
+            }
+
+            Room.SetLapRequirement((byte) newValue);
+        }
+
+        private void ChangeLapRequirement(int laps) {
+            lapsInputField.SetTextWithoutNotify(laps.ToString());
+        }
+        #endregion
 
         #region Level Index
         public void SetLevelIndex() {

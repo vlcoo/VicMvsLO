@@ -34,26 +34,31 @@ namespace NSMB.Utils {
         };
 
         public class IntegerProperties {
-            // Level :: Value ranges from 0-63: 6 bits
-            // Timer :: Value ranges from 0-99: 7 bits
-            // Lives :: Value ranges from 1-25: 5 bits
-            // CoinRequirement :: Value ranges from 3-25: 5 bits
-            // StarRequirement :: Value ranges from 1-25: 5 bits
+            // Extra vcmi props from 36 onwards
+            // Laps :: Value ranges from 1-64: 6 bits
+
+            // Level :: Value ranges from 0-127: 7 bits
+            // Timer :: Value ranges from 0-127: 7 bits
+            // Lives :: Value ranges from 0-63: 6 bits
+            // CoinRequirement :: Value ranges from 0-63: 6 bits
+            // StarRequirement :: Value ranges from 0-63: 6 bits
             // MaxPlayers :: Value ranges from 1-10: 4 bits
 
-            // 31....26   25.....19   18...14   13...9   8...4   3..0
-            // Level      Timer       Lives     Coins    Stars   Players
+            // 63*42     41....36     35.....29     28.....22     21....16     15....10     9....4     3..0
+            // Unused    Laps         Level         Timer        Lives        Coins        Stars      MaxPly
 
-            public int level = 0, timer = 0, lives = 0, coinRequirement = 8, starRequirement = 10, maxPlayers = 10;
+
+            public int laps = 1, level = 0, timer = 0, lives = 0, coinRequirement = 8, starRequirement = 10, maxPlayers = 10;
 
             public static implicit operator int(IntegerProperties props) {
                 int value = 0;
 
-                value |= (props.level & 0b111111) << 26;
-                value |= (props.timer & 0b1111111) << 19;
-                value |= (props.lives & 0b11111) << 14;
-                value |= (props.coinRequirement & 0b11111) << 9;
-                value |= (props.starRequirement & 0b11111) << 4;
+                value |= (props.laps & 0b111111) << 36;
+                value |= (props.level & 0b1111111) << 29;
+                value |= (props.timer & 0b1111111) << 22;
+                value |= (props.lives & 0b111111) << 16;
+                value |= (props.coinRequirement & 0b111111) << 10;
+                value |= (props.starRequirement & 0b111111) << 4;
                 value |= (props.maxPlayers & 0b1111) << 0;
 
                 return value;
@@ -61,18 +66,19 @@ namespace NSMB.Utils {
 
             public static explicit operator IntegerProperties(int bits) {
                 IntegerProperties ret = new() {
-                    level = (bits >> 26) & 0b111111,
-                    timer = (bits >> 19) & 0b1111111,
-                    lives = (bits >> 14) & 0b11111,
-                    coinRequirement = (bits >> 9) & 0b11111,
-                    starRequirement = (bits >> 4) & 0b11111,
+                    laps = (bits >> 36) & 0b111111,
+                    level = (bits >> 29) & 0b1111111,
+                    timer = (bits >> 22) & 0b1111111,
+                    lives = (bits >> 16) & 0b111111,
+                    coinRequirement = (bits >> 10) & 0b111111,
+                    starRequirement = (bits >> 4) & 0b111111,
                     maxPlayers = (bits >> 0) & 0b1111,
                 };
                 return ret;
             }
 
             public override string ToString() {
-                return $"Level: {level}, Timer: {timer}, Lives: {lives}, CoinRequirement: {coinRequirement}, StarRequirement: {starRequirement}, MaxPlayers: {maxPlayers}";
+                return $"Laps: {laps}, Level: {level}, Timer: {timer}, Lives: {lives}, CoinRequirement: {coinRequirement}, StarRequirement: {starRequirement}, MaxPlayers: {maxPlayers}";
             }
         };
 

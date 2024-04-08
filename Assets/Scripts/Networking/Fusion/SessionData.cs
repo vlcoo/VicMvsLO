@@ -18,6 +18,7 @@ public class SessionData : NetworkBehaviour, IStateAuthorityChanged {
     //---Default values
     private readonly sbyte defaultStarRequirement = 10;
     private readonly byte defaultCoinRequirement = 8;
+    private readonly byte defaultLapRequirement = 1;
     private readonly NetworkBool defaultCustomPowerups = true;
 #pragma warning restore CS0414
 
@@ -29,6 +30,7 @@ public class SessionData : NetworkBehaviour, IStateAuthorityChanged {
     [Networked] public byte Level { get; set; }
     [Networked(Default = nameof(defaultStarRequirement))] public sbyte StarRequirement { get; set; }
     [Networked(Default = nameof(defaultCoinRequirement))] public byte CoinRequirement { get; set; }
+    [Networked(Default = nameof(defaultLapRequirement))] public byte LapRequirement { get; set; }
     [Networked] public byte Lives { get; set; }
     [Networked] public byte Timer { get; set; }
     [Networked] public NetworkBool DrawOnTimeUp { get; set; }
@@ -212,6 +214,11 @@ public class SessionData : NetworkBehaviour, IStateAuthorityChanged {
 
     public void SetStarRequirement(sbyte value) {
         StarRequirement = value;
+        UpdateIntProperties();
+    }
+
+    public void SetLapRequirement(byte value) {
+        LapRequirement = value;
         UpdateIntProperties();
     }
 
