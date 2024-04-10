@@ -36,6 +36,7 @@ namespace NSMB.Entities.Player {
         [Networked] public byte Stars { get; set; }
         [Networked] public byte Coins { get; set; }
         [Networked] public byte Lives { get; set; }
+        [Networked] public byte Laps { get; set; }
         //-Player Movement
         //Generic
         [Networked] public PlayerNetworkInput PreviousInputs { get; set; }
@@ -211,6 +212,7 @@ namespace NSMB.Entities.Player {
         public bool OutOfLives => Disconnected || (LivesEnabled && Lives == 0);
         public bool StarsEnabled => SessionData.Instance.StarRequirement > 0;
         public bool CoinsEnabled => SessionData.Instance.CoinRequirement > 0;
+        public bool LapsEnabled => SessionData.Instance.LapRequirement > 0 && GameManager.Instance.levelType == Enums.LevelTypes.Race;
 
         //---Components
         [SerializeField] public CameraController cameraController;

@@ -7,6 +7,7 @@ using TMPro;
 using Fusion;
 using NSMB.Entities.Player;
 using NSMB.Extensions;
+using NSMB.Game;
 using NSMB.Utils;
 
 public class ScoreboardEntry : MonoBehaviour, IComparable {
@@ -23,7 +24,7 @@ public class ScoreboardEntry : MonoBehaviour, IComparable {
 
     //---Private Variables
     private NicknameColor nicknameColor;
-    private int playerId, currentLives, currentStars, currentPing;
+    private int playerId, currentLives, currentStars, currentPing, currentLaps;
     private bool disconnected, initialized = false;
     private int deathTick;
 
@@ -80,7 +81,8 @@ public class ScoreboardEntry : MonoBehaviour, IComparable {
             return;
         }
 
-        if (!initialized || target.Lives != currentLives || target.Stars != currentStars) {
+        if (!initialized || target.Lives != currentLives || target.Stars != currentStars || target.Laps != currentLaps) {
+            currentLaps = target.Laps;
             currentLives = target.Lives;
             currentStars = target.Stars;
             initialized = true;
@@ -99,6 +101,10 @@ public class ScoreboardEntry : MonoBehaviour, IComparable {
             txt += Utils.GetSymbolString("S" + currentStars);
         }
 
+        if (target.LapsEnabled) {
+            txt += Utils.GetSymbolString("L" + currentLaps);
+        }
+
         valuesText.text = txt;
     }
 
@@ -115,15 +121,19 @@ public class ScoreboardEntry : MonoBehaviour, IComparable {
             return !target ? 1 : -1;
         }
 
-        if (currentStars == other.currentStars || currentLives == 0 || other.currentLives == 0) {
-            if (Mathf.Max(0, currentLives) == Mathf.Max(0, other.currentLives)) {
-                return playerId - other.playerId;
+        if (currentLaps == other.currentLaps || GameManager.Instance.levelType != Enums.LevelTypes.Race) {
+            if (currentStars == other.currentStars || currentLives == 0 || other.currentLives == 0) {
+                if (Mathf.Max(0, currentLives) == Mathf.Max(0, other.currentLives)) {
+                    return playerId - other.playerId;
+                }
+
+                return other.currentLives - currentLives;
             }
 
-            return other.currentLives - currentLives;
+            return other.currentStars - currentStars;
         }
 
-        return other.currentStars - currentStars;
+        return other.currentLaps - currentLaps;
     }
 
     //---Callbacks

@@ -53,13 +53,25 @@ namespace NSMB.UI.MainMenu {
             if (intProperties.timer > 0) {
                 symbols += "<sprite name=room_timer>" + Utils.Utils.GetSymbolString(intProperties.timer.ToString(), Utils.Utils.smallSymbols);
             }
+            
+            // rules counter here
 
+            // TODO: Add race map condition to lap counter too
+            if (intProperties.laps > 0) {
+                symbols += "<sprite name=room_laps>" + Utils.Utils.GetSymbolString(intProperties.laps.ToString(), Utils.Utils.smallSymbols);
+            }
+
+            if (intProperties.starRequirement > 0) {
+                symbols += "<sprite name=room_stars>" + Utils.Utils.GetSymbolString(intProperties.starRequirement.ToString(), Utils.Utils.smallSymbols);
+            }
+            
             if (intProperties.lives > 0) {
                 symbols += "<sprite name=room_lives>" + Utils.Utils.GetSymbolString(intProperties.lives.ToString(), Utils.Utils.smallSymbols);
             }
 
-            symbols += "<sprite name=room_stars>" + Utils.Utils.GetSymbolString(intProperties.starRequirement.ToString(), Utils.Utils.smallSymbols);
-            symbols += "<sprite name=room_coins>" + Utils.Utils.GetSymbolString(intProperties.coinRequirement.ToString(), Utils.Utils.smallSymbols);
+            if (intProperties.coinRequirement > 0) {
+                symbols += "<sprite name=room_coins>" + Utils.Utils.GetSymbolString(intProperties.coinRequirement.ToString(), Utils.Utils.smallSymbols);
+            }
 
             symbolsText.text = symbols;
         }

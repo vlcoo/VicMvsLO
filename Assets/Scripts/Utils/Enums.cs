@@ -5,6 +5,9 @@ using System.Reflection;
 using UnityEngine;
 
 public static class Enums {
+    public enum LevelTypes : byte {
+        Versus, Race
+    }
 
     public enum PowerupState : byte {
         NoPowerup,

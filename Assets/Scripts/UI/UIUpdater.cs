@@ -22,7 +22,7 @@ public class UIUpdater : MonoBehaviour {
     //---Serialized Variables
     [SerializeField] private TrackIcon playerTrackTemplate, starTrackTemplate;
     [SerializeField] private Sprite storedItemNull;
-    [SerializeField] private TMP_Text uiTeamStars, uiStars, uiCoins, uiDebug, uiLives, uiCountdown;
+    [SerializeField] private TMP_Text uiTeamStars, uiStars, uiCoins, uiDebug, uiLives, uiCountdown, uiLaps;
     [SerializeField] private Image itemReserve, itemColor;
     [SerializeField] private GameObject boos;
 
@@ -31,14 +31,14 @@ public class UIUpdater : MonoBehaviour {
 
     //---Private Variables
     private readonly List<Image> backgrounds = new();
-    private GameObject teamsParent, starsParent, coinsParent, livesParent, timerParent;
+    private GameObject teamsParent, starsParent, coinsParent, livesParent, timerParent, lapsParent;
     private Material timerMaterial;
     private PlayerRef localPlayer;
     private bool uiHidden;
 
     private TeamManager teamManager;
     private bool teams;
-    private int coins = -1, teamStars = -1, stars = -1, lives = -1, timer = -1;
+    private int coins = -1, teamStars = -1, stars = -1, lives = -1, timer = -1, laps = -1;
 
     public void Awake() {
         Instance = this;
@@ -61,12 +61,14 @@ public class UIUpdater : MonoBehaviour {
         coinsParent = uiCoins.transform.parent.gameObject;
         livesParent = uiLives.transform.parent.gameObject;
         timerParent = uiCountdown.transform.parent.gameObject;
+        lapsParent = uiLaps.transform.parent.gameObject;
 
         backgrounds.Add(teamsParent.GetComponentInChildren<Image>());
         backgrounds.Add(starsParent.GetComponentInChildren<Image>());
         backgrounds.Add(coinsParent.GetComponentInChildren<Image>());
         backgrounds.Add(livesParent.GetComponentInChildren<Image>());
         backgrounds.Add(timerParent.GetComponentInChildren<Image>());
+        backgrounds.Add(lapsParent.GetComponentInChildren<Image>());
     }
 
     public void Update() {
@@ -97,6 +99,7 @@ public class UIUpdater : MonoBehaviour {
         livesParent.SetActive(!hidden);
         coinsParent.SetActive(!hidden);
         timerParent.SetActive(!hidden);
+        lapsParent.SetActive(!hidden);
     }
 
     private void UpdateStoredItemUI() {
@@ -137,6 +140,15 @@ public class UIUpdater : MonoBehaviour {
             }
         } else {
             starsParent.SetActive(false);
+        }
+
+        if (player.LapsEnabled) {
+            if (player.Laps != laps) {
+                laps = player.Laps;
+                uiLaps.text = Utils.GetSymbolString("Lx" + laps + "/" + SessionData.Instance.LapRequirement);
+            }
+        } else {
+            lapsParent.SetActive(false);
         }
 
         if (player.Coins != coins) {
@@ -222,10 +234,10 @@ public class UIUpdater : MonoBehaviour {
         }
 
         if (Runner.IsServer) {
-            uiDebug.text = "<mark=#000000b0 padding=\"16,16,10,10\"><font=\"MarioFont\"> <sprite name=connection_host>" + GlobalController.Instance.translationManager.GetTranslation("ui.game.ping.hosting");
+            uiDebug.text = "<mark=#000000b0 padding=\"16,16,10,10\"> <sprite name=connection_host>" + GlobalController.Instance.translationManager.GetTranslation("ui.game.ping.hosting");
         } else {
             int ping = GetCurrentPing();
-            uiDebug.text = "<mark=#000000b0 padding=\"16,16,10,10\"><font=\"MarioFont\">" + Utils.GetPingSymbol(ping) + ping;
+            uiDebug.text = "<mark=#000000b0 padding=\"16,16,10,10\">" + Utils.GetPingSymbol(ping) + ping + "ms";
         }
         //uiDebug.isRightToLeftText = GlobalController.Instance.translationManager.RightToLeft;
     }

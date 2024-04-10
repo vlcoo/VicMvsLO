@@ -77,6 +77,7 @@ namespace NSMB.Game {
         public int levelMinTileY;
         public int levelWidthTile;
         public int levelHeightTile;
+        public Enums.LevelTypes levelType = Enums.LevelTypes.Versus;
         public bool loopingLevel = true, spawnBigPowerups = true, spawnVerticalPowerups = true;
         public string levelDesigner = "", richPresenceId = "", levelTranslationKey = "";
         public Vector3 spawnpoint;

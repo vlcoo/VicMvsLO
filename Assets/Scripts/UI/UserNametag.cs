@@ -86,6 +86,10 @@ public class UserNametag : MonoBehaviour {
                 newText += Utils.GetSymbolString("Sx" + parent.Stars);
             }
 
+            if (parent.LapsEnabled) {
+                newText += Utils.GetSymbolString("Lx" + parent.Laps);
+            }
+
             text.text = newText;
 
             nicknameColor = Data.NicknameColor;

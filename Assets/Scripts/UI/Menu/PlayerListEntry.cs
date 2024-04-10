@@ -79,7 +79,7 @@ namespace NSMB.UI.MainMenu {
             if (ping == 0) {
                 pingText.text = "";
             } else {
-                pingText.text = ping + " " + Utils.Utils.GetPingSymbol(ping);
+                pingText.text = ping + "ms " + Utils.Utils.GetPingSymbol(ping);
             }
 
             string permissionSymbol = "";
