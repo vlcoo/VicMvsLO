@@ -25,6 +25,7 @@ public class UIUpdater : MonoBehaviour {
     [SerializeField] private TMP_Text uiTeamStars, uiStars, uiCoins, uiDebug, uiLives, uiCountdown, uiLaps;
     [SerializeField] private Image itemReserve, itemColor;
     [SerializeField] private GameObject boos;
+    [SerializeField] private Animation reserveAnimation;
 
     //---Properties
     private NetworkRunner Runner => NetworkHandler.Runner;
@@ -110,10 +111,12 @@ public class UIUpdater : MonoBehaviour {
         PowerupScriptable powerup = player.StoredPowerup.GetPowerupScriptable();
         if (!powerup) {
             itemReserve.sprite = storedItemNull;
+            reserveAnimation.Stop();
             return;
         }
 
         itemReserve.sprite = powerup.reserveSprite ? powerup.reserveSprite : storedItemNull;
+        reserveAnimation.Play();
     }
 
     private void UpdateTextUI() {
@@ -246,6 +249,7 @@ public class UIUpdater : MonoBehaviour {
         Color color = (SessionData.Instance && SessionData.Instance.Object && SessionData.Instance.Teams)
             ? Utils.GetTeamColor(player.Data.Team, 0.8f, 1f)
             : GameManager.Instance.levelUIColor;
+        color.a = 1f;
 
         foreach (Image bg in backgrounds) {
             bg.color = color;
