@@ -106,6 +106,7 @@ namespace NSMB.Entities.Player {
         [Networked] public float SwimLeaveForceHoldJumpTime { get; set; }
         [Networked] public NetworkBool IsSwimming { get; set; }
         [Networked] public NetworkBool IsWaterWalking { get; set; }
+
         //-Death & Respawning
         [Networked] public NetworkBool Disconnected { get; set; }
         [Networked] public NetworkBool IsDead { get; set; }
@@ -122,6 +123,7 @@ namespace NSMB.Entities.Player {
         [Networked] public float HoldStartTime { get; set; }
         [Networked] public TickTimer ShellSlowdownTimer { get; set; }
         [Networked] public TickTimer DamageInvincibilityTimer { get; set; }
+        [Networked] public NetworkBool IsGoalHanging { get; set; }
         [Networked] private byte _StarCombo { get; set; }
 
         //-Powerup Stuffs
@@ -698,7 +700,6 @@ namespace NSMB.Entities.Player {
         }
 
         private void AttemptToInteractWithObject(GameObject collidedObject, PhysicsDataStruct.IContactStruct contact = null) {
-
             if (CollidedObjects.Contains(collidedObject)) {
                 return;
             }

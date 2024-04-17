@@ -467,7 +467,9 @@ namespace NSMB.Game {
             }
 
             int requiredStars = SessionData.Instance.StarRequirement;
+            int requiredLaps = SessionData.Instance.LapRequirement;
             bool starGame = requiredStars != 0;
+            bool raceGame = requiredLaps != 0 && levelType == Enums.LevelTypes.Race;
 
             bool hasFirstPlaceStars = teamManager.HasFirstPlaceTeam(out int firstPlaceTeam, out int firstPlaceStars);
             int aliveTeams = teamManager.GetAliveTeamCount();

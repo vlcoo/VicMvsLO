@@ -9,7 +9,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 22846489251269039}
+  - component: {fileID: 8160548784545826327}
   - component: {fileID: 4937535873962057982}
+  - component: {fileID: 3191987027446272327}
   m_Layer: 10
   m_Name: Goal
   m_TagString: goal
@@ -33,6 +35,22 @@ Transform:
   - {fileID: 4348053057519898752}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &8160548784545826327
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 496843116713077488}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 692b19b7991ba089ca1baf385a71ba11, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _WinningPlayer: {fileID: 0}
+  _Collectable:
+    _value: 1
+  _HangingPlayersCount: 0
 --- !u!61 &4937535873962057982
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -78,6 +96,24 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 2.5722733, y: 217.17297}
   m_EdgeRadius: 0
+--- !u!114 &3191987027446272327
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 496843116713077488}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  SortKey: 1817021371
+  ObjectInterest: 1
+  Flags: 327681
+  NestedObjects: []
+  NetworkedBehaviours:
+  - {fileID: 8160548784545826327}
 --- !u!1 &7276757041425364195
 GameObject:
   m_ObjectHideFlags: 0

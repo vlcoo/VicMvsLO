@@ -30,6 +30,7 @@ namespace NSMB.Translation {
             TranslationManager.OnLanguageChanged -= OnLanguageChanged;
         }
 
+        // TODO vcmi: Don't forget translation server for labels is commented out.
         private void OnLanguageChanged(TranslationManager tm) {
             // text.text = tm.GetTranslation(key);
             //
