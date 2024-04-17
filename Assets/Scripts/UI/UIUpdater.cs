@@ -16,6 +16,11 @@ public class UIUpdater : MonoBehaviour {
 
     public static UIUpdater Instance { get; set; }
 
+    //---Static Variables
+    private static readonly int ParamIn = Animator.StringToHash("in");
+    private static readonly int ParamOut = Animator.StringToHash("out");
+    private static readonly int ParamHasItem = Animator.StringToHash("has-item");
+
     //---Public Variables
     public PlayerController player;
 
@@ -25,7 +30,7 @@ public class UIUpdater : MonoBehaviour {
     [SerializeField] private TMP_Text uiTeamStars, uiStars, uiCoins, uiDebug, uiLives, uiCountdown, uiLaps;
     [SerializeField] private Image itemReserve, itemColor;
     [SerializeField] private GameObject boos;
-    [SerializeField] private Animation reserveAnimation;
+    [SerializeField] private Animator reserveAnimator;
 
     //---Properties
     private NetworkRunner Runner => NetworkHandler.Runner;
@@ -40,6 +45,7 @@ public class UIUpdater : MonoBehaviour {
     private TeamManager teamManager;
     private bool teams;
     private int coins = -1, teamStars = -1, stars = -1, lives = -1, timer = -1, laps = -1;
+    private PowerupScriptable previousPowerup;
 
     public void Awake() {
         Instance = this;
@@ -109,14 +115,25 @@ public class UIUpdater : MonoBehaviour {
         }
 
         PowerupScriptable powerup = player.StoredPowerup.GetPowerupScriptable();
+        reserveAnimator.SetBool(ParamHasItem, powerup && powerup.reserveSprite);
+        
         if (!powerup) {
-            itemReserve.sprite = storedItemNull;
-            reserveAnimation.Stop();
+            if (previousPowerup != powerup) {
+                reserveAnimator.SetTrigger(ParamOut);
+                previousPowerup = powerup;
+            }
             return;
         }
 
         itemReserve.sprite = powerup.reserveSprite ? powerup.reserveSprite : storedItemNull;
-        reserveAnimation.Play();
+        if (previousPowerup != powerup) {
+            reserveAnimator.SetTrigger(ParamIn);
+            previousPowerup = powerup;
+        }
+    }
+
+    public void OnReserveItemStaticStarted() {
+        itemReserve.sprite = storedItemNull;
     }
 
     private void UpdateTextUI() {
