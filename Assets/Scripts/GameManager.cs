@@ -47,6 +47,7 @@ namespace NSMB.Game {
         [Networked] public TickTimer GameEndTimer { get; set; }
         [Networked, Capacity(10)] public NetworkLinkedList<PlayerController> AlivePlayers => default;
         [Networked, Capacity(60)] public NetworkLinkedList<Fireball> PooledFireballs => default;
+        [Networked] public float PlayerLoadingTimeoutTime { get; set; }
         [Networked] public float GameStartTime { get; set; } = -1;
         [Networked] public byte RealPlayerCount { get; set; }
         [Networked] public NetworkBool IsMusicEnabled { get; set; }
@@ -77,9 +78,8 @@ namespace NSMB.Game {
         public int levelMinTileY;
         public int levelWidthTile;
         public int levelHeightTile;
-        public Enums.LevelTypes levelType = Enums.LevelTypes.Versus;
         public bool loopingLevel = true, spawnBigPowerups = true, spawnVerticalPowerups = true;
-        public string levelDesigner = "", richPresenceId = "", levelTranslationKey = "";
+        public string levelDesigner = "", composer = "", richPresenceId = "", levelTranslationKey = "";
         public Vector3 spawnpoint;
         [FormerlySerializedAs("size")] public float spawnCircleWidth = 1.39f;
         [FormerlySerializedAs("ySize")] public float spawnCircleHeight = 0.8f;
@@ -124,8 +124,8 @@ namespace NSMB.Game {
         private bool pauseStateLastFrame, optionsWereOpenLastFrame;
         private bool hurryUpSoundPlayed, endSoundPlayed;
         private bool calledAllPlayersLoaded;
-        private float playerLoadingTimeoutTime;
         private float previousTimerRenderTime;
+        private bool calledLoadingComplete;
 
         //---Components
         [Header("Misc Components")]
@@ -187,11 +187,12 @@ namespace NSMB.Game {
 
         public override void Spawned() {
             Instance = this;
+            Runner.SetIsSimulated(Object, true);
 
             // By default, spectate. when we get assigned a player object, we disable it there.
             spectationManager.Spectating = true;
 
-            if (HasStateAuthority && Runner.IsSinglePlayer) {
+            if (Runner.IsSinglePlayer) {
                 // Handle spawning in editor by spawning the room + player data objects
                 Runner.Spawn(
                     PrefabList.Instance.PlayerDataHolder,
@@ -202,9 +203,13 @@ namespace NSMB.Game {
 
             if (GameStartTime <= 0 && !GameStartTimer.IsRunning) {
                 // The game hasn't started.
-                // Create a local player
-                TrySpawnLocalPlayer();
-
+                if (Runner.Topology == Topologies.Shared) {
+                    // Create a local player
+                    PlayerData data = Runner.GetLocalPlayerData();
+                    if (!data.IsCurrentlySpectating) {
+                        Runner.Spawn(data.GetCharacterData().prefab, spawnpoint, inputAuthority: data.Owner);
+                    }
+                }
             } else {
                 // The game HAS already started.
                 SetGameTimestamps();
@@ -219,7 +224,12 @@ namespace NSMB.Game {
             }
 
             // Default loading timeout of 30 seconds
-            playerLoadingTimeoutTime = Time.time + 30f;
+            if (!calledLoadingComplete && Runner.TryGetLocalPlayerData(out PlayerData data2)) {
+                data2.Rpc_FinishedLoading();
+                calledLoadingComplete = true;
+            }
+
+            PlayerLoadingTimeoutTime = Runner.SimulationTime + 30f;
         }
 
         public override void Render() {
@@ -264,6 +274,11 @@ namespace NSMB.Game {
         }
 
         public override void FixedUpdateNetwork() {
+            if (!calledLoadingComplete && Runner.TryGetLocalPlayerData(out PlayerData data)) {
+                data.Rpc_FinishedLoading();
+                calledLoadingComplete = true;
+            }
+
             if (!HasStateAuthority || GameEnded) {
                 return;
             }
@@ -276,8 +291,7 @@ namespace NSMB.Game {
                 break;
             }
             case Enums.GameState.Starting: {
-                if (GameStartTimer.Expired(Runner) || GlobalController.Instance.debugQuickstart) {
-                    GlobalController.Instance.debugQuickstart = false;
+                if (GameStartTimer.Expired(Runner)) {
                     GameStartTimer = TickTimer.None;
                     Host_StartGame();
                 }
@@ -393,58 +407,6 @@ namespace NSMB.Game {
             return spawn;
         }
 
-#if UNITY_EDITOR
-        //---Debug
-        [SerializeField] private int DebugSpawns = 10;
-        private static readonly Color StarSpawnTint = new(1f, 1f, 1f, 0.5f), StarSpawnBox = new(1f, 0.9f, 0.2f, 0.2f);
-        public void OnDrawGizmos() {
-            if (!tilemap) {
-                return;
-            }
-
-            for (int i = 0; i < DebugSpawns; i++) {
-                Gizmos.color = new Color((float) i / DebugSpawns, 0, 0, 0.75f);
-                Gizmos.DrawCube(GetSpawnpoint(i, DebugSpawns) + Vector3.down * 0.25f, Vector2.one * 0.5f);
-            }
-
-            Vector3 size = new(LevelWidth, LevelHeight);
-            Vector3 origin = new(LevelMinX + (LevelWidth * 0.5f), LevelMinY + (LevelHeight * 0.5f), 1);
-            Gizmos.color = Color.gray;
-            Gizmos.DrawWireCube(origin, size);
-
-            size = new Vector3(LevelWidth, cameraHeightY);
-            origin.y = cameraMinY + (cameraHeightY * 0.5f);
-            Gizmos.color = Color.red;
-            Gizmos.DrawWireCube(origin, size);
-
-            for (int x = 0; x < levelWidthTile; x++) {
-                for (int y = 0; y < levelHeightTile; y++) {
-                    Vector2Int loc = new(x + levelMinTileX, y + levelMinTileY);
-                    TileBase tile = tilemap.GetTile((Vector3Int) loc);
-
-                    if (tile is CoinTile) {
-                        Gizmos.DrawIcon(Utils.Utils.TilemapToWorldPosition(loc, this) + OneFourth, "coin");
-                    } else if (tile is PowerupTile) {
-                        Gizmos.DrawIcon(Utils.Utils.TilemapToWorldPosition(loc, this) + OneFourth, "powerup");
-                    }
-                }
-            }
-
-            Gizmos.color = StarSpawnBox;
-            foreach (GameObject starSpawn in GameObject.FindGameObjectsWithTag("StarSpawn")) {
-                Gizmos.DrawCube(starSpawn.transform.position, Vector3.one);
-                Gizmos.DrawIcon(starSpawn.transform.position, "star", true, StarSpawnTint);
-            }
-
-            Gizmos.color = Color.black;
-            for (int x = 0; x < Mathf.CeilToInt(levelWidthTile / 16f); x++) {
-                for (int y = 0; y < Mathf.CeilToInt(levelHeightTile / 16f); y++) {
-                    Gizmos.DrawWireCube(new(LevelMinX + (x * 8f) + 4f, LevelMinY + (y * 8f) + 4f), new(8, 8, 0));
-                }
-            }
-        }
-#endif
-
         public override void Despawned(NetworkRunner runner, bool hasState) {
             if (!HasStateAuthority || !hasState) {
                 return;
@@ -467,11 +429,9 @@ namespace NSMB.Game {
             }
 
             int requiredStars = SessionData.Instance.StarRequirement;
-            int requiredLaps = SessionData.Instance.LapRequirement;
-            bool starGame = requiredStars != 0;
-            bool raceGame = requiredLaps != 0 && levelType == Enums.LevelTypes.Race;
+            bool starGame = requiredStars != -1;
 
-            bool hasFirstPlaceStars = teamManager.HasFirstPlaceTeam(out int firstPlaceTeam, out int firstPlaceStars);
+            bool hasFirstPlace = teamManager.HasFirstPlaceTeam(out int firstPlaceTeam, out int firstPlaceStars);
             int aliveTeams = teamManager.GetAliveTeamCount();
             bool timeUp = SessionData.Instance.Timer > 0 && GameEndTimer.ExpiredOrNotRunning(Runner);
 
@@ -487,7 +447,7 @@ namespace NSMB.Game {
                 return true;
             }
 
-            if (hasFirstPlaceStars) {
+            if (hasFirstPlace) {
                 // We have a team that's clearly in first...
                 if (starGame && (firstPlaceStars >= requiredStars || timeUp)) {
                     // And they have enough stars.
@@ -506,7 +466,7 @@ namespace NSMB.Game {
                 }
 
                 if (RealPlayerCount <= 1) {
-                    // Solo game, no overtime.
+                    // One player, no overtime.
                     Rpc_EndGame(firstPlaceTeam);
                     return true;
                 }
@@ -527,13 +487,18 @@ namespace NSMB.Game {
                 return;
             }
 
-            if (!Runner.IsSinglePlayer) {
-                if (playerLoadingTimeoutTime < Time.time) {
-                    // It's been long enough... kick any players that didn't load in time...
+            if (Runner.IsSinglePlayer) {
+                // Waiting for our PlayerData to be valid...
+                if (SessionData.Instance.PlayerDatas.Count == 0) {
+                    return;
+                }
+            } else {
+                if (PlayerLoadingTimeoutTime < Runner.SimulationTime) {
+                    // https://youtu.be/XX5eMgeA_R4 kick any players that didn't load in time...
                     foreach ((PlayerRef player, PlayerData pd) in SessionData.Instance.PlayerDatas) {
                         if (!pd.IsCurrentlySpectating && !pd.IsLoaded) {
                             pd.IsCurrentlySpectating = true;
-                            SessionData.Instance.Rpc_Disconnect(player);
+                            SessionData.Instance.Disconnect(player);
                         }
                     }
                 } else {
@@ -571,7 +536,7 @@ namespace NSMB.Game {
                 }
             }
 
-            if (Runner.Topology == Topologies.ClientServer) {
+            if (Runner.IsSinglePlayer || Runner.Topology == Topologies.ClientServer) {
                 foreach ((PlayerRef player, PlayerData data) in SessionData.Instance.PlayerDatas) {
                     if (data.IsCurrentlySpectating) {
                         continue;
@@ -588,17 +553,6 @@ namespace NSMB.Game {
 
             // Tell everyone else to start the game
             StartCoroutine(CallLoadingComplete(2));
-        }
-
-        public void TrySpawnLocalPlayer() {
-            if (Runner.Topology != Topologies.Shared) {
-                return;
-            }
-
-            PlayerData data = Runner.GetLocalPlayerData();
-            if (!data.IsCurrentlySpectating) {
-                Runner.Spawn(data.GetCharacterData().prefab, spawnpoint, inputAuthority: data.Owner);
-            }
         }
 
         public void BumpBlock(short x, short y, TileBase oldTile, TileBase newTile, bool downwards, Vector2 offset, bool spawnCoin, NetworkPrefabRef spawnPrefab, int? tick = null, byte? counter = null) {
@@ -717,7 +671,7 @@ namespace NSMB.Game {
             ForceUnpause();
             musicManager.Stop();
 
-            yield return new WaitForSecondsRealtime(0.3f);
+            yield return new WaitForSecondsRealtime(1);
 
             PlaySounds = false;
 
@@ -768,11 +722,11 @@ namespace NSMB.Game {
             winTextAnimator.SetTrigger(resultTrigger);
 
             if (draw) {
-                ChatManager.Instance.AddSystemMessage("ui.inroom.chat.server.ended.draw");
+                ChatManager.Instance.AddSystemMessage("ui.inroom.chat.server.ended.draw", color: ChatManager.Red);
             } else if (SessionData.Instance.Teams) {
-                ChatManager.Instance.AddSystemMessage("ui.inroom.chat.server.ended.team", "team", winner);
+                ChatManager.Instance.AddSystemMessage("ui.inroom.chat.server.ended.team", color: ChatManager.Red, "team", winner);
             } else {
-                ChatManager.Instance.AddSystemMessage("ui.inroom.chat.server.ended.player", "playername", winner);
+                ChatManager.Instance.AddSystemMessage("ui.inroom.chat.server.ended.player", color: ChatManager.Red, "playername", winner);
             }
 
             // Return back to the main menu
@@ -833,7 +787,7 @@ namespace NSMB.Game {
             }
 
             speedup |= SessionData.Instance.Timer > 0 && ((GameEndTimer.RemainingTime(Runner) ?? 0f) < 60f);
-            speedup |= SessionData.Instance.StarRequirement > 0 && teamManager.GetFirstPlaceStars() + 1 >= SessionData.Instance.StarRequirement;
+            speedup |= teamManager.GetFirstPlaceStars() + 1 >= SessionData.Instance.StarRequirement;
 
             if (!speedup && SessionData.Instance.Lives > 0) {
                 int playersWithOneLife = 0;
@@ -872,8 +826,7 @@ namespace NSMB.Game {
         /// </summary>
         /// <returns>If the star successfully spawned</returns>
         private bool AttemptSpawnBigStar() {
-
-            if (!HasStateAuthority || SessionData.Instance.StarRequirement <= 0) {
+            if (!HasStateAuthority) {
                 return true;
             }
 
@@ -961,5 +914,57 @@ namespace NSMB.Game {
 
             teamScoreboardElement.OnAllPlayersLoaded();
         }
+
+#if UNITY_EDITOR
+        //---Debug
+        [SerializeField] private int DebugSpawns = 10;
+        private static readonly Color StarSpawnTint = new(1f, 1f, 1f, 0.5f), StarSpawnBox = new(1f, 0.9f, 0.2f, 0.2f);
+        public void OnDrawGizmos() {
+            if (!tilemap) {
+                return;
+            }
+
+            for (int i = 0; i < DebugSpawns; i++) {
+                Gizmos.color = new Color((float) i / DebugSpawns, 0, 0, 0.75f);
+                Gizmos.DrawCube(GetSpawnpoint(i, DebugSpawns) + Vector3.down * 0.25f, Vector2.one * 0.5f);
+            }
+
+            Vector3 size = new(LevelWidth, LevelHeight);
+            Vector3 origin = new(LevelMinX + (LevelWidth * 0.5f), LevelMinY + (LevelHeight * 0.5f), 1);
+            Gizmos.color = Color.gray;
+            Gizmos.DrawWireCube(origin, size);
+
+            size = new Vector3(LevelWidth, cameraHeightY);
+            origin.y = cameraMinY + (cameraHeightY * 0.5f);
+            Gizmos.color = Color.red;
+            Gizmos.DrawWireCube(origin, size);
+
+            for (int x = 0; x < levelWidthTile; x++) {
+                for (int y = 0; y < levelHeightTile; y++) {
+                    Vector2Int loc = new(x + levelMinTileX, y + levelMinTileY);
+                    TileBase tile = tilemap.GetTile((Vector3Int) loc);
+
+                    if (tile is CoinTile) {
+                        Gizmos.DrawIcon(Utils.Utils.TilemapToWorldPosition(loc, this) + OneFourth, "coin");
+                    } else if (tile is PowerupTile) {
+                        Gizmos.DrawIcon(Utils.Utils.TilemapToWorldPosition(loc, this) + OneFourth, "powerup");
+                    }
+                }
+            }
+
+            Gizmos.color = StarSpawnBox;
+            foreach (GameObject starSpawn in GameObject.FindGameObjectsWithTag("StarSpawn")) {
+                Gizmos.DrawCube(starSpawn.transform.position, Vector3.one);
+                Gizmos.DrawIcon(starSpawn.transform.position, "star", true, StarSpawnTint);
+            }
+
+            Gizmos.color = Color.black;
+            for (int x = 0; x < Mathf.CeilToInt(levelWidthTile / 16f); x++) {
+                for (int y = 0; y < Mathf.CeilToInt(levelHeightTile / 16f); y++) {
+                    Gizmos.DrawWireCube(new(LevelMinX + (x * 8f) + 4f, LevelMinY + (y * 8f) + 4f), new(8, 8, 0));
+                }
+            }
+        }
+#endif
     }
 }

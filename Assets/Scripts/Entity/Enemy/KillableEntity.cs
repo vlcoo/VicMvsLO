@@ -36,6 +36,7 @@ namespace NSMB.Entities {
         [Networked] protected byte ComboCounter { get; set; }
 
         //---Properties
+        public override float Height => hitbox.size.y;
         public override bool IsCarryable => iceCarryable;
         public override bool IsFlying => flying;
         public override Vector2 FrozenSize {
@@ -186,24 +187,26 @@ namespace NSMB.Entities {
                     continue;
                 }
 
-                if (obj.GetComponent<KillableEntity>() is KillableEntity killable) {
-                    if (killable.IsDead || !killable.collideWithOtherEnemies || killable is PiranhaPlant) {
-                        continue;
-                    }
-
-                    Utils.Utils.UnwrapLocations(body.Position, killable.body.Position, out Vector2 ourPos, out Vector2 theirPos);
-                    bool goRight = ourPos.x > theirPos.x;
-
-                    if (Mathf.Abs(ourPos.x - theirPos.x) < 0.015f) {
-                        if (Mathf.Abs(ourPos.y - theirPos.y) < 0.015f) {
-                            goRight = Object.Id.Raw < killable.Object.Id.Raw;
-                        } else {
-                            goRight = ourPos.y < theirPos.y;
-                        }
-                    }
-
-                    FacingRight = goRight;
+                if (obj.GetComponent<KillableEntity>() is not { } killable) {
+                    continue;
                 }
+
+                if (killable.IsDead || !killable.collideWithOtherEnemies || killable is PiranhaPlant) {
+                    continue;
+                }
+
+                Utils.Utils.UnwrapLocations(body.Position, killable.body.Position, out Vector2 ourPos, out Vector2 theirPos);
+                bool goRight = ourPos.x > theirPos.x;
+
+                if (Mathf.Abs(ourPos.x - theirPos.x) < 0.015f) {
+                    if (Mathf.Abs(ourPos.y - theirPos.y) < 0.015f) {
+                        goRight = Object.Id.Raw < killable.Object.Id.Raw;
+                    } else {
+                        goRight = ourPos.y < theirPos.y;
+                    }
+                }
+
+                FacingRight = goRight;
             }
         }
 
@@ -242,9 +245,7 @@ namespace NSMB.Entities {
                 return;
             }
 
-            IsDead = true;
-            WasSpecialKilled = false;
-            WasGroundpounded = false;
+            DespawnEntity();
             IsActive = false;
             WasCrushed = true;
             ComboCounter = 0;

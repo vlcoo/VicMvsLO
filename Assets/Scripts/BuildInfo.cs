@@ -1,7 +1,7 @@
 using UnityEngine;
 
 public static class BuildInfo {
-    public static readonly string VANILLA_BUILD_TIME = "4/9/2024 3:18:18 PM";
+    public static readonly string VANILLA_BUILD_TIME = "4/25/2024 2:45:39 AM";
     public static readonly string VANILLA_VERSION = "1.8.0.0";
 
     public static readonly string VCMI_BUILD_CODE = "dev-0";
