@@ -834,7 +834,7 @@ namespace NSMB.UI.MainMenu {
         }
 
         public class RegionOption : TMP_Dropdown.OptionData, IComparable {
-            public static readonly Dictionary<string, string> regionFullNames = new()
+            static readonly Dictionary<string, string> regionFullNames = new()
             {
                 {"eu", "Europe"},
                 {"us", "USA, East"},

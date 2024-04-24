@@ -21,9 +21,13 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
 
     //---Static Variables
     public static readonly string[] Regions = { "asia", "eu", "hk", "jp", "kr", "sa", "us", "usw" };
+    private static readonly Dictionary<string, string> RegionIDs = new()
+    {
+        {"eu", "EA"}, {"us", "UA"}, {"usw", "UE"}, {"jp", "AE"}, {"kr", "AO"}, {"hk", "AI"}, {"sa", "UI"}, {"asia", "AA"},
+    };
     public static readonly Dictionary<string, int> RegionPings = new();
-    public static readonly string RoomIdValidChars = "BCDFGHJKLMNPRQSTVWXYZ";
-    private static readonly int RoomIdLength = 8;
+    public static readonly string RoomIdValidChars = "AEIOU";
+    private static readonly int RoomIdLength = 3;
 
     private static GameObject prefab;
     private static bool reattemptCreate;
@@ -516,12 +520,11 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
             StringBuilder idBuilder = new();
 
             // First char should correspond to region.
-            int index = Array.IndexOf(Regions, CurrentRegion);
-            idBuilder.Append(RoomIdValidChars[index >= 0 ? index : 0]);
+            // idBuilder.Append(RegionIDs[CurrentRegion]);
 
             // Fill rest of the string with random chars
             UnityEngine.Random.InitState(unchecked((int) DateTime.UtcNow.Subtract(DateTime.UnixEpoch).TotalSeconds));
-            for (int i = 1; i < RoomIdLength; i++) {
+            for (int i = idBuilder.Length; i < RoomIdLength; i++) {
                 idBuilder.Append(RoomIdValidChars[UnityEngine.Random.Range(0, RoomIdValidChars.Length)]);
             }
 
