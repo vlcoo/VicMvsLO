@@ -21,6 +21,8 @@ namespace NSMB.UI.MainMenu {
         private Color disabledColor;
         private Vector2 anchor, adjustedAnchor;
         private bool currentlyPressed;
+        private static readonly Color selectedLabelColor = new(0.92f, 0.89f, 0f);
+        private static readonly Color deselectedLabelColor = new(0.57f, 0.57f, 0.57f);
 
         public void OnValidate() {
             rect = GetComponent<RectTransform>();
@@ -48,12 +50,12 @@ namespace NSMB.UI.MainMenu {
             if (EventSystem.current.currentSelectedGameObject == gameObject) {
                 SetAnchor(anchor);
                 image.color = selectedColor;
+                label.color = selectedLabelColor;
             } else {
                 SetAnchor(adjustedAnchor);
                 image.color = deselectedColor;
+                label.color = deselectedLabelColor;
             }
-
-            label.color = Color.yellow;
         }
 
         public void OnPointerDown(PointerEventData eventData) {
