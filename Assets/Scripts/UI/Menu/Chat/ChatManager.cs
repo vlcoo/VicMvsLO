@@ -83,9 +83,6 @@ public class ChatManager : MonoBehaviour {
         message = message[..Mathf.Min(128, message.Length)];
         message = message.Replace("\n", " ").Trim();
 
-        // Add username
-        message = data.GetNickname() + ": " + message.Filter();
-
         AddChatMessage(message, source);
 
         if (MainMenuManager.Instance) {
