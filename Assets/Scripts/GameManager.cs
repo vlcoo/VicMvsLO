@@ -78,6 +78,7 @@ namespace NSMB.Game {
         public int levelMinTileY;
         public int levelWidthTile;
         public int levelHeightTile;
+        public Enums.LevelTypes levelType = Enums.LevelTypes.Versus;
         public bool loopingLevel = true, spawnBigPowerups = true, spawnVerticalPowerups = true;
         public string levelDesigner = "", composer = "", richPresenceId = "", levelTranslationKey = "";
         public Vector3 spawnpoint;
@@ -291,7 +292,8 @@ namespace NSMB.Game {
                 break;
             }
             case Enums.GameState.Starting: {
-                if (GameStartTimer.Expired(Runner)) {
+                if (GameStartTimer.Expired(Runner) || GlobalController.Instance.debugQuickstart) {
+                    GlobalController.Instance.debugQuickstart = false;
                     GameStartTimer = TickTimer.None;
                     Host_StartGame();
                 }
@@ -429,9 +431,11 @@ namespace NSMB.Game {
             }
 
             int requiredStars = SessionData.Instance.StarRequirement;
-            bool starGame = requiredStars != -1;
+            int requiredLaps = SessionData.Instance.LapRequirement;
+            bool starGame = requiredStars != 0;
+            bool raceGame = requiredLaps != 0 && levelType == Enums.LevelTypes.Race;
 
-            bool hasFirstPlace = teamManager.HasFirstPlaceTeam(out int firstPlaceTeam, out int firstPlaceStars);
+            bool hasFirstPlaceStars = teamManager.HasFirstPlaceTeam(out int firstPlaceTeam, out int firstPlaceStars);
             int aliveTeams = teamManager.GetAliveTeamCount();
             bool timeUp = SessionData.Instance.Timer > 0 && GameEndTimer.ExpiredOrNotRunning(Runner);
 
@@ -447,7 +451,7 @@ namespace NSMB.Game {
                 return true;
             }
 
-            if (hasFirstPlace) {
+            if (hasFirstPlaceStars) {
                 // We have a team that's clearly in first...
                 if (starGame && (firstPlaceStars >= requiredStars || timeUp)) {
                     // And they have enough stars.
@@ -498,7 +502,7 @@ namespace NSMB.Game {
                     foreach ((PlayerRef player, PlayerData pd) in SessionData.Instance.PlayerDatas) {
                         if (!pd.IsCurrentlySpectating && !pd.IsLoaded) {
                             pd.IsCurrentlySpectating = true;
-                            SessionData.Instance.Disconnect(player);
+                            SessionData.Instance.Rpc_Disconnect(player);
                         }
                     }
                 } else {
@@ -671,7 +675,7 @@ namespace NSMB.Game {
             ForceUnpause();
             musicManager.Stop();
 
-            yield return new WaitForSecondsRealtime(1);
+            yield return new WaitForSecondsRealtime(0.3f);
 
             PlaySounds = false;
 
@@ -722,11 +726,11 @@ namespace NSMB.Game {
             winTextAnimator.SetTrigger(resultTrigger);
 
             if (draw) {
-                ChatManager.Instance.AddSystemMessage("ui.inroom.chat.server.ended.draw", color: ChatManager.Red);
+                ChatManager.Instance.AddSystemMessage("ui.inroom.chat.server.ended.draw");
             } else if (SessionData.Instance.Teams) {
-                ChatManager.Instance.AddSystemMessage("ui.inroom.chat.server.ended.team", color: ChatManager.Red, "team", winner);
+                ChatManager.Instance.AddSystemMessage("ui.inroom.chat.server.ended.team", "team", winner);
             } else {
-                ChatManager.Instance.AddSystemMessage("ui.inroom.chat.server.ended.player", color: ChatManager.Red, "playername", winner);
+                ChatManager.Instance.AddSystemMessage("ui.inroom.chat.server.ended.player", "playername", winner);
             }
 
             // Return back to the main menu
@@ -787,7 +791,7 @@ namespace NSMB.Game {
             }
 
             speedup |= SessionData.Instance.Timer > 0 && ((GameEndTimer.RemainingTime(Runner) ?? 0f) < 60f);
-            speedup |= teamManager.GetFirstPlaceStars() + 1 >= SessionData.Instance.StarRequirement;
+            speedup |= SessionData.Instance.StarRequirement > 0 && teamManager.GetFirstPlaceStars() + 1 >= SessionData.Instance.StarRequirement;
 
             if (!speedup && SessionData.Instance.Lives > 0) {
                 int playersWithOneLife = 0;
@@ -826,7 +830,7 @@ namespace NSMB.Game {
         /// </summary>
         /// <returns>If the star successfully spawned</returns>
         private bool AttemptSpawnBigStar() {
-            if (!HasStateAuthority) {
+            if (!HasStateAuthority || SessionData.Instance.StarRequirement <= 0) {
                 return true;
             }
 
