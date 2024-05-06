@@ -58,7 +58,7 @@ namespace NSMB.UI.MainMenu {
                 Runner.PushHostMigrationSnapshot();
             }
         }
-        
+
         #region Laps
         public void SetLapRequirement() {
             if (!Room.HasStateAuthority) {
@@ -103,7 +103,7 @@ namespace NSMB.UI.MainMenu {
         private void ChangeLevelIndex(int index, bool changed) {
             levelDropdown.SetValueWithoutNotify(index);
             if (changed && MainMenuManager.Instance is MainMenuManager mm) {
-                // ChatManager.Instance.AddSystemMessage("ui.inroom.chat.server.map", "map", mm.maps[index].translationKey);
+                // ChatManager.Instance.AddSystemMessage("ui.inroom.chat.server.map", ChatManager.Red, "map", mm.maps[index].translationKey);
                 mm.PreviewLevel(index);
             }
         }

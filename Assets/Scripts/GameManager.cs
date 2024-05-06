@@ -225,11 +225,6 @@ namespace NSMB.Game {
             }
 
             // Default loading timeout of 30 seconds
-            if (!calledLoadingComplete && Runner.TryGetLocalPlayerData(out PlayerData data2)) {
-                data2.Rpc_FinishedLoading();
-                calledLoadingComplete = true;
-            }
-
             PlayerLoadingTimeoutTime = Runner.SimulationTime + 30f;
         }
 
@@ -502,7 +497,7 @@ namespace NSMB.Game {
                     foreach ((PlayerRef player, PlayerData pd) in SessionData.Instance.PlayerDatas) {
                         if (!pd.IsCurrentlySpectating && !pd.IsLoaded) {
                             pd.IsCurrentlySpectating = true;
-                            SessionData.Instance.Rpc_Disconnect(player);
+                            SessionData.Instance.Disconnect(player);
                         }
                     }
                 } else {
@@ -557,6 +552,9 @@ namespace NSMB.Game {
 
             // Tell everyone else to start the game
             StartCoroutine(CallLoadingComplete(2));
+        }
+
+        public void TrySpawnLocalPlayer() {
         }
 
         public void BumpBlock(short x, short y, TileBase oldTile, TileBase newTile, bool downwards, Vector2 offset, bool spawnCoin, NetworkPrefabRef spawnPrefab, int? tick = null, byte? counter = null) {
@@ -726,11 +724,11 @@ namespace NSMB.Game {
             winTextAnimator.SetTrigger(resultTrigger);
 
             if (draw) {
-                ChatManager.Instance.AddSystemMessage("ui.inroom.chat.server.ended.draw");
+                ChatManager.Instance.AddSystemMessage("ui.inroom.chat.server.ended.draw", color: ChatManager.Red);
             } else if (SessionData.Instance.Teams) {
-                ChatManager.Instance.AddSystemMessage("ui.inroom.chat.server.ended.team", "team", winner);
+                ChatManager.Instance.AddSystemMessage("ui.inroom.chat.server.ended.team", color: ChatManager.Red, "team", winner);
             } else {
-                ChatManager.Instance.AddSystemMessage("ui.inroom.chat.server.ended.player", "playername", winner);
+                ChatManager.Instance.AddSystemMessage("ui.inroom.chat.server.ended.player", color: ChatManager.Red, "playername", winner);
             }
 
             // Return back to the main menu
