@@ -59,7 +59,7 @@ namespace NSMB.UI.Pause.Options {
         }
 
         public virtual void Selected() {
-            label.text = "» " + GetTranslatedString();
+            label.text = "Â» " + GetTranslatedString();
             IsSelected = true;
         }
 
