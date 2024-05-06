@@ -24,6 +24,7 @@ public class GlobalController : Singleton<GlobalController> {
     public Gradient rainbowGradient;
 
     public PauseOptionMenuManager optionsManager;
+    public PauseOptionMenuManager dlcManager;
 
     public ScriptableRendererFeature outlineFeature;
     public GameObject ndsCanvas, fourByThreeImage, anyAspectImage, graphy, connecting, fusionStatsTemplate;

@@ -32,7 +32,7 @@ namespace NSMB.UI.MainMenu {
         public AudioSource sfx, music;
         public Toggle spectateToggle;
         public GameObject playersContent, playersPrefab, chatContent, chatPrefab;
-        public GameObject titleSelected, mainMenuSelected, lobbySelected, currentLobbySelected, creditsSelected, updateBoxSelected, ColorName;
+        public GameObject titleSelected, mainMenuSelected, lobbySelected, currentLobbySelected, creditsSelected, extrasSelected, updateBoxSelected, ColorName;
         public byte currentSkin;
 
         //---Serialized Fields
@@ -45,7 +45,7 @@ namespace NSMB.UI.MainMenu {
 
         [Header("UI Elements")]
         [SerializeField] private GameObject title;
-        [SerializeField] private GameObject bg, mainMenu, lobbyMenu, createLobbyPrompt, webglCreateLobbyPrompt, privateRoomIdPrompt, inLobbyMenu, creditsMenu, updateBox;
+        [SerializeField] private GameObject bg, mainMenu, lobbyMenu, createLobbyPrompt, webglCreateLobbyPrompt, privateRoomIdPrompt, inLobbyMenu, creditsMenu, extrasMenu, updateBox;
         [SerializeField] private GameObject sliderText, currentMaxPlayers, settingsPanel;
         [SerializeField] private TMP_Dropdown levelDropdown, characterDropdown, regionDropdown;
         [SerializeField] private Button createRoomBtn, joinRoomBtn, joinPrivateRoomBtn, reconnectBtn, startGameBtn, debugQuickstartBtn;
@@ -329,6 +329,7 @@ namespace NSMB.UI.MainMenu {
             webglCreateLobbyPrompt.SetActive(false);
             inLobbyMenu.SetActive(false);
             creditsMenu.SetActive(false);
+            extrasMenu.SetActive(false);
             privateRoomIdPrompt.SetActive(false);
             updateBox.SetActive(false);
         }
@@ -386,12 +387,24 @@ namespace NSMB.UI.MainMenu {
             GlobalController.Instance.optionsManager.OpenMenu();
         }
 
+        public void OpenDLCenter() {
+            GlobalController.Instance.dlcManager.OpenMenu();
+        }
+
         public void OpenCredits() {
             DisableAllMenus();
             bg.SetActive(true);
             creditsMenu.SetActive(true);
 
             EventSystem.current.SetSelectedGameObject(creditsSelected);
+        }
+
+        public void OpenExtras() {
+            DisableAllMenus();
+            bg.SetActive(true);
+            extrasMenu.SetActive(true);
+
+            EventSystem.current.SetSelectedGameObject(extrasSelected);
         }
 
         public void OpenInRoomMenu() {
