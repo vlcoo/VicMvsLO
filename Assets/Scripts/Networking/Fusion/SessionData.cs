@@ -20,6 +20,7 @@ public class SessionData : NetworkBehaviour, IStateAuthorityChanged {
     private readonly byte defaultCoinRequirement = 8;
     private readonly byte defaultLapRequirement = 1;
     private readonly NetworkBool defaultCustomPowerups = true;
+    private readonly HashSet<Rule> defaultRules = new(new MatchConditioner.RuleEqualityComparer());
 #pragma warning restore CS0414
 
     //---Networked Variables
@@ -31,6 +32,8 @@ public class SessionData : NetworkBehaviour, IStateAuthorityChanged {
     [Networked(Default = nameof(defaultStarRequirement))] public sbyte StarRequirement { get; set; }
     [Networked(Default = nameof(defaultCoinRequirement))] public byte CoinRequirement { get; set; }
     [Networked(Default = nameof(defaultLapRequirement))] public byte LapRequirement { get; set; }
+    // TODO vcmi: figure out how to network this. maybe have it always serialized (in a string)?
+    /* [Networked(Default = nameof(defaultRules))] */ public HashSet<Rule> ActiveRules { get; set; }
     [Networked] public byte Lives { get; set; }
     [Networked] public byte Timer { get; set; }
     [Networked] public NetworkBool DrawOnTimeUp { get; set; }
@@ -258,6 +261,24 @@ public class SessionData : NetworkBehaviour, IStateAuthorityChanged {
         // No session property here.
     }
 
+    public bool AddRule(Rule rule) {
+        if (MatchConditioner.IsRuleForbidden(rule) || !ActiveRules.Add(rule))
+            return false;
+
+        UpdateActiveRulesProperty();
+        return true;
+    }
+
+    public void RemoveRule(Rule rule) {
+        ActiveRules.Remove(rule);
+        UpdateActiveRulesProperty();
+    }
+
+    public void ClearRules() {
+        ActiveRules.Clear();
+        UpdateActiveRulesProperty();
+    }
+
     private void UpdateIntProperties() {
         NetworkUtils.IntegerProperties properties = new() {
             level = Level,
@@ -277,6 +298,12 @@ public class SessionData : NetworkBehaviour, IStateAuthorityChanged {
             teams = Teams,
         };
         UpdateProperty(Enums.NetRoomProperties.BoolProperties, (int) properties);
+    }
+
+    private void UpdateActiveRulesProperty() {
+        string rulesJson = "";
+        // TODO vcmi: Serialize ActiveRules to JSON
+        UpdateProperty(Enums.NetRoomProperties.ActiveRulesProperty, rulesJson);
     }
 
     public void UpdateProperty(string property, SessionProperty value) {

@@ -21,13 +21,9 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
 
     //---Static Variables
     public static readonly string[] Regions = { "asia", "eu", "hk", "jp", "kr", "sa", "us", "usw" };
-    private static readonly Dictionary<string, string> RegionIDs = new()
-    {
-        {"eu", "EA"}, {"us", "UA"}, {"usw", "UE"}, {"jp", "AE"}, {"kr", "AO"}, {"hk", "AI"}, {"sa", "UI"}, {"asia", "AA"},
-    };
     public static readonly Dictionary<string, int> RegionPings = new();
     public static readonly string RoomIdValidChars = "AEIOU";
-    private static readonly int RoomIdLength = 3;
+    public static readonly int RoomIdLength = 3;
 
     private static GameObject prefab;
     private static bool reattemptCreate;
