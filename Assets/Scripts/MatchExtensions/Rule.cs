@@ -76,10 +76,14 @@ public class Rule : IEquatable<Rule> {
         RandomChance = randomChance;
     }
 
-    //---IEquatatble overrides
+    //Overrides
     public bool Equals(Rule other) {
         return Condition == other.Condition && Action == other.Action && ConditionTarget == other.ConditionTarget &&
                ActionTarget == other.ActionTarget && ConditionParameter == other.ConditionParameter &&
                ActionParameter == other.ActionParameter;
+    }
+
+    public override string ToString() {
+        return $"Rule {Condition} {ConditionParameter} .. {Action} {ActionParameter} with {ConditionTarget} on {ActionTarget} ({RandomChance:P0} chance)";
     }
 }

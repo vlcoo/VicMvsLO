@@ -283,6 +283,12 @@ namespace NSMB.UI.MainMenu {
         }
         #endregion
 
+        #region ActiveRules
+        public void AddRule() {
+            MatchConditioner.Instance.AddRule(new Rule(Rule.PossibleConditions.GrabbedStar, Rule.PossibleActions.Kill));
+        }
+        #endregion
+
         #region DrawOnTimeUp
         public void SetDrawOnTimeUp() {
             if (!Room.HasStateAuthority) {

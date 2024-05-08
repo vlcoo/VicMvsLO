@@ -38,20 +38,51 @@ public class MatchConditioner : Singleton<MatchConditioner>
                 (int) obj.ActionTarget, obj.ConditionParameter, obj.ActionParameter);
         }
     }
+    public static readonly RuleEqualityComparer RuleComparer = new();
 
     //---Private Variables
-    private HashSet<Rule> ActiveRules => SessionData.Instance.ActiveRules;
-    private static Rule[] _forbiddenRules = {
+    private HashSet<Rule> _activeRules = new(RuleComparer);
+    private static readonly Rule[] ForbiddenRules = {
         new(Rule.PossibleConditions.GrabbedStar, Rule.PossibleActions.GiveStar),
         new(Rule.PossibleConditions.GrabbedCoin, Rule.PossibleActions.GiveCoin),
     };
 
+    public void Awake() {
+        Set(this);
+    }
+
     //---Public Functions
+    public void SetActiveRules(HashSet<Rule> rules) {
+        _activeRules = rules;
+    }
+
+    public string ActiveRulesToString() {
+        return string.Join(", ", _activeRules.Select(rule => rule.ToString()));
+    }
+
+    public bool AddRule(Rule rule) {
+        if (IsRuleForbidden(rule) || !_activeRules.Add(rule))
+            return false;
+
+        SessionData.Instance.SetActiveRules(_activeRules);
+        return true;
+    }
+
+    public void RemoveRule(Rule rule) {
+        _activeRules.Remove(rule);
+        SessionData.Instance.SetActiveRules(_activeRules);
+    }
+
+    public void ClearRules() {
+        _activeRules.Clear();
+        SessionData.Instance.SetActiveRules(_activeRules);
+    }
+
     public static bool IsRuleForbidden(Rule rule) {
-        return _forbiddenRules.Contains(rule);
+        return ForbiddenRules.Contains(rule);
     }
 
     public bool IsRuleActive(Rule rule) {
-        return ActiveRules.Contains(rule);
+        return _activeRules.Contains(rule);
     }
 }
