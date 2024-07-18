@@ -112,11 +112,12 @@ namespace NSMB.UI.MainMenu {
 
                 bool valid = true;
                 valid &= session.IsVisible && session.IsOpen;
-                valid &= session.MaxPlayers > 0 && session.MaxPlayers <= 10;
-                valid &= intProperties.maxPlayers > 0 && intProperties.maxPlayers <= 10;
-                valid &= intProperties.lives <= 25;
-                valid &= intProperties.starRequirement >= 1 && intProperties.starRequirement <= 25;
-                valid &= intProperties.coinRequirement >= 3 && intProperties.coinRequirement <= 25;
+                valid &= session.MaxPlayers is > 0 and <= 10;
+                valid &= intProperties.maxPlayers is > 0 and <= 10;
+                valid &= intProperties.lives <= 99;
+                valid &= intProperties.starRequirement is >= -1 and <= 99;
+                valid &= intProperties.coinRequirement is >= -1 and <= 99;
+                valid &= intProperties.lapRequirement is >= -1 and <= 99;
                 valid &= host.IsValidUsername();
 
                 if (valid) {
@@ -126,8 +127,8 @@ namespace NSMB.UI.MainMenu {
                 }
 
                 RoomIcon roomIcon;
-                if (rooms.ContainsKey(session.Name)) {
-                    roomIcon = rooms[session.Name];
+                if (rooms.TryGetValue(session.Name, out RoomIcon room)) {
+                    roomIcon = room;
                 } else {
                     roomIcon = Instantiate(roomIconPrefab, Vector3.zero, Quaternion.identity);
                     roomIcon.name = session.Name;
@@ -142,11 +143,11 @@ namespace NSMB.UI.MainMenu {
             }
 
             foreach (string key in invalidRooms) {
-                if (!rooms.ContainsKey(key)) {
+                if (!rooms.TryGetValue(key, out RoomIcon room)) {
                     continue;
                 }
 
-                Destroy(rooms[key].gameObject);
+                Destroy(room.gameObject);
                 rooms.Remove(key);
             }
 

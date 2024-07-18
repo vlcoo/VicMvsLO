@@ -22,7 +22,6 @@ public class SessionData : NetworkBehaviour, IStateAuthorityChanged {
     private readonly byte defaultCoinRequirement = 8;
     private readonly byte defaultLapRequirement = 1;
     private readonly NetworkBool defaultCustomPowerups = true;
-    private readonly string defaultRules = "12345678901234567890123456789012345";
 #pragma warning restore CS0414
 
     //---Networked Variables
@@ -34,8 +33,6 @@ public class SessionData : NetworkBehaviour, IStateAuthorityChanged {
     [Networked(Default = nameof(defaultStarRequirement))] public sbyte StarRequirement { get; set; }
     [Networked(Default = nameof(defaultCoinRequirement))] public byte CoinRequirement { get; set; }
     [Networked(Default = nameof(defaultLapRequirement))] public byte LapRequirement { get; set; }
-    // TODO vcmi: this still isn't good enough. the string is way too big to be sent over the network
-    [Networked(Default = nameof(defaultRules))] public string ActiveRulesJson { get; set; }
     [Networked] public byte Lives { get; set; }
     [Networked] public byte Timer { get; set; }
     [Networked] public NetworkBool DrawOnTimeUp { get; set; }
@@ -136,9 +133,6 @@ public class SessionData : NetworkBehaviour, IStateAuthorityChanged {
             case nameof(GameStartTimer):
                 OnGameStartTimerChanged();
                 break;
-            case nameof(ActiveRulesJson):
-                OnActiveRulesChanged();
-                break;
             }
         }
     }
@@ -190,6 +184,8 @@ public class SessionData : NetworkBehaviour, IStateAuthorityChanged {
             return false;
         }
     }
+
+
 
     public void SaveWins(PlayerData data) {
         wins[data.UserId] = data.Wins;
@@ -268,13 +264,14 @@ public class SessionData : NetworkBehaviour, IStateAuthorityChanged {
 
     public void SetActiveRules(HashSet<Rule> value) {
         try {
-            ActiveRulesJson = JsonConvert.SerializeObject(value.ToList());
+            // TODO vcmi: figure out where to store this string.
+            string a = JsonConvert.SerializeObject(value.ToList());
+            Debug.Log("Serialized rules into " + a);
         } catch (JsonSerializationException e) {
             Debug.LogError("Failed to serialize ActiveRulesJson: " + e.Message);
             return;
         }
 
-        Debug.Log("Serialized rules into " + ActiveRulesJson);
         UpdateActiveRulesProperty();
     }
 
@@ -300,7 +297,7 @@ public class SessionData : NetworkBehaviour, IStateAuthorityChanged {
     }
 
     private void UpdateActiveRulesProperty() {
-        UpdateProperty(Enums.NetRoomProperties.ActiveRulesProperty, ActiveRulesJson);
+        // UpdateProperty(Enums.NetRoomProperties.ActiveRulesProperty, ActiveRulesJson);
     }
 
     private void UpdateProperty(string property, SessionProperty value) {
@@ -423,14 +420,14 @@ public class SessionData : NetworkBehaviour, IStateAuthorityChanged {
 
     public void OnActiveRulesChanged() {
         HashSet<Rule> rules;
-        try {
-            Debug.Log("Deserializing rules from " + ActiveRulesJson);
-            rules = JsonConvert.DeserializeObject<List<Rule>>(ActiveRulesJson).ToHashSet();
-        } catch (Exception e) when (e is JsonReaderException or JsonSerializationException) {
-            Debug.LogError("Failed to deserialize ActiveRulesJson: " + e.Message);
-            rules = new HashSet<Rule>(MatchConditioner.RuleComparer);
-        }
-
-        MatchConditioner.Instance.SetActiveRules(rules);
+        // try {
+        //     Debug.Log("Deserializing rules from " + ActiveRulesJson);
+        //     rules = JsonConvert.DeserializeObject<List<Rule>>(ActiveRulesJson).ToHashSet();
+        // } catch (Exception e) when (e is JsonReaderException or JsonSerializationException) {
+        //     Debug.LogError("Failed to deserialize ActiveRulesJson: " + e.Message);
+        //     rules = new HashSet<Rule>(MatchConditioner.RuleComparer);
+        // }
+        //
+        // MatchConditioner.Instance.SetActiveRules(rules);
     }
 }

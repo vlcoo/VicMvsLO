@@ -57,8 +57,8 @@ namespace NSMB.UI.MainMenu {
             // rules counter here
 
             // TODO: Add race map condition to lap counter too
-            if (intProperties.laps > 0) {
-                symbols += "<sprite name=room_laps>" + Utils.Utils.GetSymbolString(intProperties.laps.ToString(), Utils.Utils.smallSymbols);
+            if (intProperties.lapRequirement > 0) {
+                symbols += "<sprite name=room_laps>" + Utils.Utils.GetSymbolString(intProperties.lapRequirement.ToString(), Utils.Utils.smallSymbols);
             }
 
             if (intProperties.starRequirement > 0) {

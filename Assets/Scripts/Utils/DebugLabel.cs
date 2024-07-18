@@ -11,6 +11,6 @@ public class DebugLabel : MonoBehaviour {
     }
 
     void Update() {
-        _label.text = MatchConditioner.Instance.ActiveRulesToString() + "\n" + SessionData.Instance.ActiveRulesJson;
+        //_label.text = MatchConditioner.Instance.ActiveRulesToString() + "\n" + SessionData.Instance.ActiveRulesJson;
     }
 }

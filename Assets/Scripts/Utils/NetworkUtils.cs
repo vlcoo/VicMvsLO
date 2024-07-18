@@ -48,12 +48,12 @@ namespace NSMB.Utils {
             // Unused    Laps         Level         Timer        Lives        Coins        Stars      MaxPly
 
 
-            public int laps = 1, level = 0, timer = 0, lives = 0, coinRequirement = 8, starRequirement = 10, maxPlayers = 10;
+            public int lapRequirement = 1, level = 0, timer = 0, lives = 0, coinRequirement = 8, starRequirement = 10, maxPlayers = 10;
 
             public static implicit operator int(IntegerProperties props) {
                 int value = 0;
 
-                value |= (props.laps & 0b111111) << 36;
+                value |= (props.lapRequirement & 0b111111) << 36;
                 value |= (props.level & 0b1111111) << 29;
                 value |= (props.timer & 0b1111111) << 22;
                 value |= (props.lives & 0b111111) << 16;
@@ -66,7 +66,7 @@ namespace NSMB.Utils {
 
             public static explicit operator IntegerProperties(int bits) {
                 IntegerProperties ret = new() {
-                    laps = (bits >> 36) & 0b111111,
+                    lapRequirement = (bits >> 36) & 0b111111,
                     level = (bits >> 29) & 0b1111111,
                     timer = (bits >> 22) & 0b1111111,
                     lives = (bits >> 16) & 0b111111,
@@ -78,7 +78,7 @@ namespace NSMB.Utils {
             }
 
             public override string ToString() {
-                return $"Laps: {laps}, Level: {level}, Timer: {timer}, Lives: {lives}, CoinRequirement: {coinRequirement}, StarRequirement: {starRequirement}, MaxPlayers: {maxPlayers}";
+                return $"Laps: {lapRequirement}, Level: {level}, Timer: {timer}, Lives: {lives}, CoinRequirement: {coinRequirement}, StarRequirement: {starRequirement}, MaxPlayers: {maxPlayers}";
             }
         };
 
