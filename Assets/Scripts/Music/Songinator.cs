@@ -34,12 +34,12 @@ public class Songinator : MonoBehaviour
             currentSong = songs[0];
         }
 
-        player.synthesizer.soundFont.SetFullPath(currentSong.autoSoundfont
-            ? currentSong.song.GetFullPath().Replace(".mid", ".sf2")
-            : currentSong.soundfont.GetFullPath());
+        // player.synthesizer.soundFont.SetFullPath(currentSong.autoSoundfont
+        //     ? currentSong.songStreaming.GetFullPath().Replace(".mid", ".sf2")
+        //     : currentSong.soundfontStreaming.GetFullPath());
         player.synthesizer.Init();
 
-        player.song = currentSong.song;
+        // player.song = currentSong.song;
         player.StartTicks = currentSong.startLoopTicks;
         player.EndTicks = currentSong.endTicks;
         player.Tempo = currentSong.playbackSpeedNormal;
@@ -85,12 +85,12 @@ public class Songinator : MonoBehaviour
         player.synthesizer = gameObject.AddComponent<Synthesizer>();
         
         currentSong = newSong;
-        player.synthesizer.soundFont.SetFullPath(currentSong.autoSoundfont
-            ? currentSong.song.GetFullPath().Replace(".mid", ".sf2")
-            : currentSong.soundfont.GetFullPath());
+        // player.synthesizer.soundFont.SetFullPath(currentSong.autoSoundfont
+        //     ? currentSong.songStreaming.GetFullPath().Replace(".mid", ".sf2")
+        //     : currentSong.soundfontStreaming.GetFullPath());
         player.synthesizer.Init();
 
-        player.song = currentSong.song;
+        // player.song = currentSong.songStreaming;
         player.StartTicks = currentSong.startLoopTicks;
         player.EndTicks = currentSong.endTicks;
         player.Tempo = currentSong.playbackSpeedNormal;
