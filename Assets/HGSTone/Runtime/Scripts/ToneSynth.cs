@@ -56,7 +56,9 @@ namespace HGS.Tone
 
     void CreateSynth()
     {
-      _synthesizer = new Synthesizer(soundFont.SoundFont, AudioSettings.outputSampleRate);
+      var settings = new SynthesizerSettings(AudioSettings.outputSampleRate);
+      settings.EnableReverbAndChorus = false;
+      _synthesizer = new Synthesizer(soundFont.SoundFont, settings);
       _synthesizer.onMidiMessage = onMidiMessage;
     }
 

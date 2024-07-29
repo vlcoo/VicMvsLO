@@ -33,7 +33,9 @@ namespace HGS.Tone
     public void CreateSynth(byte[] sfBytes)
     {
       var sf = new SoundFont(new MemoryStream(sfBytes));
-      _synthesizer = new Synthesizer(sf, AudioSettings.outputSampleRate);
+      var settings = new SynthesizerSettings(AudioSettings.outputSampleRate);
+      settings.EnableReverbAndChorus = false;
+      _synthesizer = new Synthesizer(sf, settings);
       _synthesizer.onMidiMessage = onMidiMessage;
       _sequencer = new MidiFileSequencer(_synthesizer);
     }
