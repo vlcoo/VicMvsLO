@@ -20,4 +20,14 @@ public class MIDISong : ScriptableObject
     [SerializeField] [Range(-1, 15)] public int bahChannel = -1;
 
     [SerializeField] [Range(0.1f, 2.0f)] public float playbackSpeedNormal = 1.0f;
+
+    #if UNITY_EDITOR
+    private void OnValidate()
+    {
+        if (autoSoundfont)
+        {
+            soundfont = AssetDatabase.LoadAssetAtPath<SoundfontAssetData>(AssetDatabase.GetAssetPath(song).Replace(".mid", ".sf2"));
+        }
+    }
+    #endif
 }

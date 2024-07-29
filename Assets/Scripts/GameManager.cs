@@ -870,7 +870,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         yield return new WaitForSeconds(1f);
 
         musicEnabled = true;
-        // MusicSynth.StartPlayback();
+        MusicSynth.StartPlayback();
         Utils.GetCustomProperty(Enums.NetRoomProperties.Time, out timedGameDuration);
 
         startRealTime = DateTimeOffset.Now.ToUnixTimeMilliseconds();
@@ -918,8 +918,8 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         if (!how)
         {
             MusicSynth.player.Stop();
-            MusicSynthMega.player.Pause();
-            MusicSynthStarman.player.Pause();
+            // MusicSynthMega.player.Pause();
+            // MusicSynthStarman.player.Pause();
         }
         else
         {
@@ -927,7 +927,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             switch (musicState)
             {
                 case Enums.MusicState.Normal:
-                    MusicSynth.player.Play();
+                    MusicSynth.StartPlayback();
                     break;
                 case Enums.MusicState.Starman:
                     MusicSynthStarman.StartPlayback(false);
@@ -947,7 +947,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         MusicSynth.SetSpectating(how);
         MusicSynthMega.SetSpectating(how);
         MusicSynthStarman.SetSpectating(how);
-        if (musicState == Enums.MusicState.Normal) MusicSynth.player.Play();
+        if (musicState == Enums.MusicState.Normal) MusicSynth.StartPlayback();
     }
 
     public void SetStartSpeedrunTimer(PlayerController byWhom)
@@ -984,17 +984,17 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
     public void PlayerEnteredPipe(PlayerController whom, PipeManager pipe)
     {
         MatchConditioner.ConditionActioned(whom, "EnteredPipe");
-        if (pipe.fadeOutMusic)
-            DOTween.To(() => MusicSynth.player.Gain, v => MusicSynth.player.Gain = v, 0f, 0.5f)
-                .SetEase(Ease.Linear);
+        // if (pipe.fadeOutMusic)
+            // DOTween.To(() => MusicSynth.player.Gain, v => MusicSynth.player.Gain = v, 0f, 0.5f)
+                // .SetEase(Ease.Linear);
     }
     
     public void PlayerEnteredDoor(PlayerController whom, DoorManager door)
     {
         MatchConditioner.ConditionActioned(whom, "EnteredDoor");
-        if (door.fadeOutMusic)
-            DOTween.To(() => MusicSynth.player.Gain, v => MusicSynth.player.Gain = v, 0f, 0.5f)
-                .SetEase(Ease.Linear);
+        // if (door.fadeOutMusic)
+            // DOTween.To(() => MusicSynth.player.Gain, v => MusicSynth.player.Gain = v, 0f, 0.5f)
+            //     .SetEase(Ease.Linear);
     }
 
     private IEnumerator EndGame(Player winner, string causeString = "")
@@ -1288,7 +1288,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             Enums.MusicState.Starman => MusicSynthStarman.player,
             _ => null
         };
-        if (songPlayer != null) songPlayer.Play();
+        // if (songPlayer != null) songPlayer.Play();
     }
 
     private void HandleMusic()

@@ -67,7 +67,7 @@ namespace MeltySynth
                 var formType = reader.ReadFourCC();
                 if (formType != "sfbk")
                 {
-                    throw new InvalidDataException($"The type of the RIFF chunk must be 'sfbk', but was '{formType}'.");
+                    throw new InvalidDataException($"The type of the RIFF chunk must be 'sfbk', but was '{formType}' {reader.ReadFourCC()}.");
                 }
 
                 info = new SoundFontInfo(reader);

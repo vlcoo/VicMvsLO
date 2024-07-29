@@ -7,41 +7,49 @@ namespace HGS.Tone
 {
   public class ToneSequencer : MonoBehaviour
   {
-    [SerializeField] ToneSoundFont soundFont = null;
+    ToneSoundFont soundFont = null;
     [SerializeField] bool isLoop = false;
     Synthesizer _synthesizer;
     MidiFileSequencer _sequencer;
 
     bool _isPlaying = false;
+    bool _isInitialized = false;
 
     bool IsPlaying => _isPlaying;
 
     public OnMidiMessage onMidiMessage;
 
-    void Awake()
+    public void Init()
     {
-      CreateSynth();
+      if (_isInitialized)
+      {
+        Debug.LogWarning("ToneSequencer is already initialized");
+        return;
+      }
       CreateDriver();
+      _isInitialized = true;
     }
 
-    void CreateSynth()
+    public void CreateSynth(byte[] sfBytes)
     {
-      _synthesizer = new Synthesizer(soundFont.SoundFont, AudioSettings.outputSampleRate);
+      var sf = new SoundFont(new MemoryStream(sfBytes));
+      _synthesizer = new Synthesizer(sf, AudioSettings.outputSampleRate);
       _synthesizer.onMidiMessage = onMidiMessage;
       _sequencer = new MidiFileSequencer(_synthesizer);
     }
 
     public void Play(string file)
     {
+      if (!_isInitialized) Init();
+
       var asset = Resources.Load<TextAsset>(file);
-      var stream = new MemoryStream(asset.bytes);
-      Play(stream);
+      Play(asset.bytes);
     }
 
-    public void Play(Stream stream)
+    public void Play(byte[] midBytes)
     {
       _sequencer.Stop();
-      var midi = new MidiFile(stream);
+      var midi = new MidiFile(new MemoryStream(midBytes));
       _sequencer.Play(midi, isLoop);
       _isPlaying = true;
     }

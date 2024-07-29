@@ -47,6 +47,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         controlsMenu,
         privatePrompt,
         updateBox,
+        webglWarningBox,
         newRuleS1Prompt,
         newRuleS2Prompt,
         emoteListPrompt,
@@ -56,7 +57,6 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         teamsPrompt,
         powerupsPrompt;
 
-    // public Animator createLobbyPromptAnimator, privatePromptAnimator, updateBoxAnimator, errorBoxAnimator, rebindPromptAnimator, newRuleS1PromptAnimator, newRuleS2PromptAnimator, emoteListPromptAnimator, RNGRulesBoxAnimator;
     public GameObject[] levelCameraPositions;
 
     public GameObject sliderText,
@@ -122,6 +122,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         privateSelected,
         reconnectSelected,
         updateBoxSelected,
+        webglWarningBoxSelected,
         newRuleS1Selected,
         newRuleS2Selected,
         emoteListSelected,
@@ -196,6 +197,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     [NonSerialized] public List<string> POSSIBLE_ACTIONS = new();
     private bool quit, validName;
     private bool raceMapSelected;
+    private bool warningShown;
     [NonSerialized] public HashSet<MatchRuleListEntry> ruleList = new();
     [NonSerialized] public List<string> specialList = new();
 
@@ -313,6 +315,9 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
             GlobalController.Instance.checkedForVersion = true;
         }
 #endif
+
+        if (Utils.GetDeviceType() == Utils.DeviceType.MOBILE)
+            Application.targetFrameRate = 91;
     }
 
     private void Update()
@@ -1040,6 +1045,12 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         ClosePrompt(updateBox);
 
         EventSystem.current.SetSelectedGameObject(mainMenuSelected);
+
+        if (!warningShown && Utils.GetDeviceType() == Utils.DeviceType.BROWSER)
+        {
+            OpenPrompt(webglWarningBox, webglWarningBoxSelected);
+            warningShown = true;
+        }
     }
 
     public void ConnectOffline()
@@ -1333,7 +1344,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     {
         backBtn.interactable = false;
         sfx.PlayOneShot(Enums.Sounds.UI_Match_Starting.GetClip());
-        MusicSynth.player.Pause();
+        // MusicSynth.player.Pause();
         fader.SetInvisible(GlobalController.Instance.settings.reduceUIAnims);
         fader.anim.speed = 1.5f;
         fader.anim.SetTrigger("out");
