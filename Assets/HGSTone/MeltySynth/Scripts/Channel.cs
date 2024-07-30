@@ -185,6 +185,7 @@ namespace MeltySynth
         }
 
         public bool IsPercussionChannel => isPercussionChannel;
+        public bool IsMuted = false;
 
         public int BankNumber => bankNumber;
         public int PatchNumber => patchNumber;

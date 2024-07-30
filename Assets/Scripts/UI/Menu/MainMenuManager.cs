@@ -1051,6 +1051,8 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
             OpenPrompt(webglWarningBox, webglWarningBoxSelected);
             warningShown = true;
         }
+
+        // MusicSynth.player.Sequencer.Position = TimeSpan.FromSeconds(5);
     }
 
     public void ConnectOffline()

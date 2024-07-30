@@ -9,8 +9,9 @@ namespace HGS.Tone
   {
     ToneSoundFont soundFont = null;
     [SerializeField] bool isLoop = false;
-    Synthesizer _synthesizer;
-    MidiFileSequencer _sequencer;
+    
+    public Synthesizer Synthesizer;
+    public MidiFileSequencer Sequencer;
 
     bool _isPlaying = false;
     bool _isInitialized = false;
@@ -35,9 +36,9 @@ namespace HGS.Tone
       var sf = new SoundFont(new MemoryStream(sfBytes));
       var settings = new SynthesizerSettings(AudioSettings.outputSampleRate);
       settings.EnableReverbAndChorus = false;
-      _synthesizer = new Synthesizer(sf, settings);
-      _synthesizer.onMidiMessage = onMidiMessage;
-      _sequencer = new MidiFileSequencer(_synthesizer);
+      Synthesizer = new Synthesizer(sf, settings);
+      Synthesizer.onMidiMessage = onMidiMessage;
+      Sequencer = new MidiFileSequencer(Synthesizer);
     }
 
     public void Play(string file)
@@ -50,15 +51,15 @@ namespace HGS.Tone
 
     public void Play(byte[] midBytes)
     {
-      _sequencer.Stop();
+      Sequencer.Stop();
       var midi = new MidiFile(new MemoryStream(midBytes));
-      _sequencer.Play(midi, isLoop);
+      Sequencer.Play(midi, isLoop);
       _isPlaying = true;
     }
 
     public void SetInstrument(int channel, int number)
     {
-      _synthesizer.ProcessMidiMessage(channel, 0xC0, number, 0);
+      Synthesizer.ProcessMidiMessage(channel, 0xC0, number, 0);
     }
 
     public void SetInstrument(int channel, MidiInstrumentCode instrumentCode)
@@ -68,7 +69,7 @@ namespace HGS.Tone
 
     public void Stop()
     {
-      _sequencer.Stop();
+      Sequencer.Stop();
       _isPlaying = false;
     }
 
@@ -77,7 +78,7 @@ namespace HGS.Tone
       var driver = gameObject.GetComponent<ToneAudioDriver>();
       if (driver == null) driver = gameObject.AddComponent<ToneAudioDriver>();
 
-      driver.SetRenderer(_sequencer);
+      driver.SetRenderer(Sequencer);
     }
   }
 }

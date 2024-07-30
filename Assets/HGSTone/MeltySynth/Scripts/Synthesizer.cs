@@ -191,7 +191,7 @@ namespace MeltySynth
           break;
 
         case 0x90: // Note On
-          NoteOn(channel, data1, data2);
+          if (!channelInfo.IsMuted) NoteOn(channel, data1, data2);
           break;
 
         case 0xB0: // Controller
@@ -460,6 +460,24 @@ namespace MeltySynth
       }
 
       blockRead = blockSize;
+    }
+
+    public void SetChannelMuted(int channel, bool muted)
+    {
+      if (!(0 <= channel && channel < channels.Length))
+      {
+        return;
+      }
+
+      channels[channel].IsMuted = muted;
+    }
+
+    public void SetChannelsMuted(int channelBitField)
+    {
+      for (var i = 0; i < channels.Length; i++)
+      {
+        SetChannelMuted(i, (channelBitField & (1 << i)) != 0);
+      }
     }
 
     /// <inheritdoc/>

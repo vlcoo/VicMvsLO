@@ -392,13 +392,15 @@ namespace MeltySynth
             private byte command;
             private byte data1;
             private byte data2;
+            private int tick;
 
-            private Message(byte channel, byte command, byte data1, byte data2)
+            private Message(byte channel, byte command, byte data1, byte data2, int tick = 0)
             {
                 this.channel = channel;
                 this.command = command;
                 this.data1 = data1;
                 this.data2 = data2;
+                this.tick = tick;
             }
 
             public static Message Common(byte status, byte data1)

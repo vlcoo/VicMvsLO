@@ -1,5 +1,4 @@
 using System;
-using FluidMidi;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -15,8 +14,8 @@ public class MIDISong : ScriptableObject
     [SerializeField] public int startLoopTicks;
     [SerializeField] public int endTicks;
 
-    [SerializeField] [BitField] public int mutedChannelsNormal;
-    [SerializeField] [BitField] public int mutedChannelsSpectating;
+    [SerializeField] [ChannelField] public int mutedChannelsNormal;
+    [SerializeField] [ChannelField] public int mutedChannelsSpectating;
     [SerializeField] [Range(-1, 15)] public int bahChannel = -1;
 
     [SerializeField] [Range(0.1f, 2.0f)] public float playbackSpeedNormal = 1.0f;

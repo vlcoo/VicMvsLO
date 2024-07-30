@@ -2,7 +2,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using FluidMidi;
 using HGS.Tone;
 using KaimiraGames;
 using UnityEngine;
@@ -39,13 +38,6 @@ public class Songinator : MonoBehaviour
             currentSong = songs[0];
         }
 
-        // player.soundFont.SetFullPath(currentSong.autoSoundfont
-        //     ? currentSong.songStreaming.GetFullPath().Replace(".mid", ".sf2")
-        //     : currentSong.soundfontStreaming.GetFullPath());
-        // var hgsSoundfont = ScriptableObject.CreateInstance<ToneSoundFont>();
-        // hgsSoundfont.Load(currentSong.soundfont.Stream);
-        // player.soundFont = hgsSoundfont;
-        // player.CreateSynth();
         player.CreateSynth(currentSong.soundfont.Bytes);
         player.Init();
         if (autoStart) player.Play(currentSong.song.Bytes);
@@ -53,7 +45,7 @@ public class Songinator : MonoBehaviour
         // player.song = currentSong.song;
         // player.StartTicks = currentSong.startLoopTicks;
         // player.EndTicks = currentSong.endTicks;
-        // player.Tempo = currentSong.playbackSpeedNormal;
+        player.Sequencer.Speed = currentSong.playbackSpeedNormal;
         // player.Gain = MAX_GAIN;
         // player.Init();
         rememberedChannels = ~currentSong.mutedChannelsNormal;
@@ -63,28 +55,11 @@ public class Songinator : MonoBehaviour
         // player.SetTickEvent(tick => OnTick(tick));
     }
 
-    private IEnumerator StartSkip()
-    {
-        // player.Channels = 0;
-        // player.Play();
-        yield return new WaitForSeconds(0.2f); // wowie...
-        // player.Seek(currentSong.startTicks);
-        // player.Channels = rememberedChannels;
-    }
-
     public void StartPlayback(bool fromBeginning = true)
     {
-        if (currentSong.startTicks > 0 && fromBeginning)
-        {
-            StartCoroutine(StartSkip());
-        }
-        else
-        {
-            // if (fromBeginning) player.Seek(0);
-            // player.Channels = rememberedChannels;
-            // player.Play();
-            player.Play(currentSong.song.Bytes);
-        }
+        // if (fromBeginning) player.Seek(0);
+        player.Synthesizer.SetChannelsMuted(currentSong.mutedChannelsNormal);
+        player.Play(currentSong.song.Bytes);
     }
 
     public void SwitchToSong(MIDISong newSong, bool startPlayback = false)
@@ -122,6 +97,6 @@ public class Songinator : MonoBehaviour
     public void SetSpectating(bool how)
     {
         rememberedChannels = how ? ~currentSong.mutedChannelsSpectating : ~currentSong.mutedChannelsNormal;
-        // player.Channels = rememberedChannels;
+        player.Synthesizer.SetChannelsMuted(rememberedChannels);
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using UnityEngine;
 
 namespace MeltySynth
 {
@@ -140,6 +141,7 @@ namespace MeltySynth
                 {
                     break;
                 }
+                Debug.Log($"msgIndex: {msgIndex}, currentTime: {currentTime.ToString()}");
             }
 
             if (msgIndex == midiFile.Messages.Length && loop)
@@ -153,7 +155,15 @@ namespace MeltySynth
         /// <summary>
         /// Gets the current playback position.
         /// </summary>
-        public TimeSpan Position => currentTime;
+        // public TimeSpan Position => currentTime;
+        public int TickPosition
+        {
+            get
+            {
+                // to convert ticks to seconds, do (60.0 / (resolution * tempo) * ticks).
+                return 0;
+            }
+        }
 
         /// <summary>
         /// Gets a value that indicates whether the current playback position is at the end of the sequence.
