@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using UnityEngine;
 
 namespace MeltySynth
 {
@@ -13,6 +14,7 @@ namespace MeltySynth
     {
         private int trackCount;
         private int resolution;
+        private double tempo;
 
         private Message[] messages;
         private TimeSpan[] times;
@@ -191,7 +193,8 @@ namespace MeltySynth
                     }
                 }
 
-                MergeTracks(messageLists, tickLists, resolution, out messages, out times);
+                MergeTracks(messageLists, tickLists, resolution, out messages, out times, out var initialTempo);
+                this.tempo = initialTempo;
             }
         }
 
@@ -295,7 +298,7 @@ namespace MeltySynth
             }
         }
 
-        private static void MergeTracks(List<Message>[] messageLists, List<int>[] tickLists, int resolution, out Message[] messages, out TimeSpan[] times)
+        private static void MergeTracks(List<Message>[] messageLists, List<int>[] tickLists, int resolution, out Message[] messages, out TimeSpan[] times, out double initialTempo)
         {
             var mergedMessages = new List<Message>();
             var mergedTimes = new List<TimeSpan>();
@@ -306,6 +309,7 @@ namespace MeltySynth
             var currentTime = TimeSpan.Zero;
 
             var tempo = 120.0;
+            initialTempo = -1.0;
 
             while (true)
             {
@@ -340,12 +344,10 @@ namespace MeltySynth
                 if (message.Type == MessageType.TempoChange)
                 {
                     tempo = message.Tempo;
+                    if (initialTempo < 0) initialTempo = tempo;
                 }
-                else
-                {
-                    mergedMessages.Add(message);
-                    mergedTimes.Add(currentTime);
-                }
+                mergedMessages.Add(message);
+                mergedTimes.Add(currentTime);
 
                 indices[minIndex]++;
             }
@@ -378,6 +380,7 @@ namespace MeltySynth
         /// The length of the MIDI file.
         /// </summary>
         public TimeSpan Length => times.Last();
+        public double InitialTempo => tempo;
 
         internal int TrackCount => trackCount;
         internal int Resolution => resolution;

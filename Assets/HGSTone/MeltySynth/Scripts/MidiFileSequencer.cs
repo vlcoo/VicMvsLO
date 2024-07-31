@@ -25,6 +25,8 @@ namespace MeltySynth
         private TimeSpan currentTime;
         private int msgIndex;
         private int loopIndex;
+        private int startLoopTicks = 0;
+        private double currentTempo;
 
         /// <summary>
         /// Initializes a new instance of the sequencer.
@@ -60,6 +62,7 @@ namespace MeltySynth
             blockWrote = synthesizer.BlockSize;
 
             currentTime = TimeSpan.Zero;
+            currentTempo = midiFile.InitialTempo;
             msgIndex = 0;
             loopIndex = 0;
 
@@ -74,6 +77,49 @@ namespace MeltySynth
             midiFile = null;
 
             synthesizer.Reset();
+        }
+
+        // <AUTHOR> https://github.com/samhocevar/go-meltysynth/commit/6847c7aa31422948927d174434f7c75c111c9b4a
+        public TimeSpan Pos()
+        {
+            return currentTime + MidiFile.GetTimeSpanFromSeconds(blockWrote / (float)synthesizer.SampleRate);
+        }
+
+        public void Seek(TimeSpan pos)
+        {
+            // When seeking in the past, we’ll have to restart message processing from the beginning of the file
+            if (pos < currentTime)
+            {
+                synthesizer.Reset();
+                msgIndex = 0;
+            }
+
+            // When seeking in the past or far into the future, find a synchronisation block
+            // seekLookBehind seconds before the seek point, play all messages until that block,
+            // and stop all notes.
+            const double seekLookBehind = 0.15; // decided by trial and error
+            if (pos < currentTime || pos > currentTime + MidiFile.GetTimeSpanFromSeconds(seekLookBehind))
+            {
+                var syncBlock = Math.Max(0, pos.TotalSeconds - seekLookBehind) * synthesizer.SampleRate /
+                                synthesizer.BlockSize;
+                blockWrote = 0;
+                currentTime = MidiFile.GetTimeSpanFromSeconds(syncBlock * synthesizer.BlockSize / synthesizer.SampleRate);
+                ProcessEvents();
+                synthesizer.NoteOffAll(false);
+            }
+
+            // Play but discard samples up to the desired seek point
+            int skipSamples = (int)Math.Max(0, (pos - currentTime).TotalSeconds * synthesizer.SampleRate);
+            var left = new float[skipSamples];
+            var right = new float[skipSamples];
+            Render(left, right);
+        }
+        // </AUTHOR>
+
+        public void Seek(int midiTicks)
+        {
+            var seekTime = MidiFile.GetTimeSpanFromSeconds(60.0 / (float)(midiFile.Resolution * currentTempo) * midiTicks);
+            Seek(seekTime);
         }
 
         /// <inheritdoc/>
@@ -122,6 +168,10 @@ namespace MeltySynth
                     {
                         synthesizer.ProcessMidiMessage(msg.Channel, msg.Command, msg.Data1, msg.Data2);
                     }
+                    else if (msg.Type == MidiFile.MessageType.TempoChange)
+                    {
+                        currentTempo = msg.Tempo;
+                    }
                     else if (loop)
                     {
                         if (msg.Type == MidiFile.MessageType.LoopStart)
@@ -141,27 +191,14 @@ namespace MeltySynth
                 {
                     break;
                 }
-                Debug.Log($"msgIndex: {msgIndex}, currentTime: {currentTime.ToString()}");
             }
 
             if (msgIndex == midiFile.Messages.Length && loop)
             {
-                currentTime = midiFile.Times[loopIndex];
-                msgIndex = loopIndex;
-                synthesizer.NoteOffAll(false);
-            }
-        }
-
-        /// <summary>
-        /// Gets the current playback position.
-        /// </summary>
-        // public TimeSpan Position => currentTime;
-        public int TickPosition
-        {
-            get
-            {
-                // to convert ticks to seconds, do (60.0 / (resolution * tempo) * ticks).
-                return 0;
+                Seek(startLoopTicks);
+                // currentTime = midiFile.Times[loopIndex];
+                // msgIndex = loopIndex;
+                // synthesizer.NoteOffAll(false);
             }
         }
 
@@ -207,6 +244,23 @@ namespace MeltySynth
                 else
                 {
                     throw new ArgumentOutOfRangeException("The playback speed must be a positive value.");
+                }
+            }
+        }
+
+        public int StartLoopTicks
+        {
+            get => startLoopTicks;
+
+            set
+            {
+                if (value >= 0)
+                {
+                    startLoopTicks = value;
+                }
+                else
+                {
+                    throw new ArgumentOutOfRangeException("The start loop ticks must be a non-negative value.");
                 }
             }
         }
