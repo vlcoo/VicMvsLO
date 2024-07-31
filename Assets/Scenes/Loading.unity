@@ -727,12 +727,12 @@ PrefabInstance:
     - target: {fileID: 1504615058768193469, guid: fbf7edbed684f91a5af262ab11b7b0cf,
         type: 3}
       propertyPath: songs.Array.size
-      value: 2
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 1504615058768193469, guid: fbf7edbed684f91a5af262ab11b7b0cf,
         type: 3}
       propertyPath: chances.Array.size
-      value: 2
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 1504615058768193469, guid: fbf7edbed684f91a5af262ab11b7b0cf,
         type: 3}
@@ -748,13 +748,24 @@ PrefabInstance:
         type: 2}
     - target: {fileID: 1504615058768193469, guid: fbf7edbed684f91a5af262ab11b7b0cf,
         type: 3}
+      propertyPath: songs.Array.data[2]
+      value: 
+      objectReference: {fileID: 11400000, guid: bee57c2862b7be48c8798e6c439f99b0,
+        type: 2}
+    - target: {fileID: 1504615058768193469, guid: fbf7edbed684f91a5af262ab11b7b0cf,
+        type: 3}
       propertyPath: chances.Array.data[0]
-      value: 70
+      value: 1200
       objectReference: {fileID: 0}
     - target: {fileID: 1504615058768193469, guid: fbf7edbed684f91a5af262ab11b7b0cf,
         type: 3}
       propertyPath: chances.Array.data[1]
       value: 30
+      objectReference: {fileID: 0}
+    - target: {fileID: 1504615058768193469, guid: fbf7edbed684f91a5af262ab11b7b0cf,
+        type: 3}
+      propertyPath: chances.Array.data[2]
+      value: 20
       objectReference: {fileID: 0}
     - target: {fileID: 3361589158912516817, guid: fbf7edbed684f91a5af262ab11b7b0cf,
         type: 3}
@@ -2442,8 +2453,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 557273f467ae31f4b8e07bbb89e73e8e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  audioSource: {fileID: 1555839137}
-  currentSong: {fileID: 11400000, guid: 0ff1c2a692e3eb1799dfee3972360655, type: 2}
 --- !u!81 &1555839136
 AudioListener:
   m_ObjectHideFlags: 0

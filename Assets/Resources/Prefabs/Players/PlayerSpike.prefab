@@ -10570,6 +10570,7 @@ MonoBehaviour:
   wallSlideLeft: 0
   wallSlideRight: 0
   pipeDirection: {x: 0, y: 0}
+  doorDirection: 0
   stars: 0
   coins: 0
   lives: -1
@@ -10583,6 +10584,7 @@ MonoBehaviour:
   previousFramePosition: {x: 0, y: 0}
   onSpinner: {fileID: 0}
   pipeEntering: {fileID: 0}
+  doorEntering: {fileID: 0}
   step: 0
   alreadyGroundpounded: 0
   character: {fileID: 11400000, guid: 7ef34530bd6859106bfaf4ee33bea388, type: 2}
@@ -10797,7 +10799,7 @@ AudioSource:
   Spatialize: 0
   SpatializePostEffects: 0
   Priority: 0
-  DopplerLevel: 5
+  DopplerLevel: 0
   MinDistance: 1
   MaxDistance: 7.5
   Pan2D: 0
@@ -10903,7 +10905,7 @@ AudioSource:
   Spatialize: 0
   SpatializePostEffects: 0
   Priority: 0
-  DopplerLevel: 5
+  DopplerLevel: 0
   MinDistance: 1
   MaxDistance: 7.5
   Pan2D: 0

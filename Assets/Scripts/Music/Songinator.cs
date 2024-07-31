@@ -8,10 +8,8 @@ using UnityEngine;
 
 public class Songinator : MonoBehaviour
 {
-    private const float MAX_GAIN = 0.5f;
-    
-    [NonSerialized] public ToneSequencer player;
-    [NonSerialized] public AudioSource source;
+    [NonSerialized] public ToneSequencer Player;
+    [NonSerialized] public AudioSource Source;
 
     [SerializeField] public bool autoStart = true;
     [SerializeField] public List<MIDISong> songs;
@@ -19,13 +17,13 @@ public class Songinator : MonoBehaviour
 
     private readonly WeightedList<MIDISong> weightedList = new();
 
-    [NonSerialized] public MIDISong currentSong;
+    [NonSerialized] public MIDISong CurrentSong;
     private int rememberedChannels;
 
     public void Start()
     {
-        player = GetComponent<ToneSequencer>();
-        source = GetComponent<AudioSource>();
+        Player = GetComponent<ToneSequencer>();
+        Source = GetComponent<AudioSource>();
 
         if (songs.Count == 0 || chances.Count != songs.Count) return;
 
@@ -33,45 +31,44 @@ public class Songinator : MonoBehaviour
         {
             for (var i = 0; i < songs.Count; i++) weightedList.Add(songs[i], chances[i]);
 
-            currentSong = weightedList.Next();
+            CurrentSong = weightedList.Next();
         }
         else
         {
-            currentSong = songs[0];
+            CurrentSong = songs[0];
         }
 
-        player.CreateSynth(currentSong.soundfont.Bytes);
-        player.Init();
-        // player.StartTicks = currentSong.startLoopTicks;
-        // player.EndTicks = currentSong.endTicks;
-        player.Sequencer.Speed = currentSong.playbackSpeedNormal;
-        player.Sequencer.StartLoopTicks = currentSong.startLoopTicks;
-        // player.Gain = MAX_GAIN;
-        rememberedChannels = currentSong.mutedChannelsNormal;
+        Player.CreateSynth(CurrentSong.soundfont.Bytes);
+        Player.Init();
+        Player.Sequencer.Speed = CurrentSong.playbackSpeedNormal;
+        Player.Sequencer.StartLoopTicks = CurrentSong.startLoopTicks;
+        Player.Sequencer.EndLoopTicks = CurrentSong.endTicks;
+        Source.pitch += CurrentSong.pitchDeltaNormal;
+        rememberedChannels = CurrentSong.mutedChannelsNormal;
 
         if (autoStart) StartPlayback();
     }
 
     public void StartPlayback(bool fromBeginning = true)
     {
-        player.Play(currentSong.song.Bytes);
-        if (currentSong.startTicks > 0 && fromBeginning)
+        Player.Play(CurrentSong.song.Bytes);
+        if (CurrentSong.startTicks > 0 && fromBeginning)
         {
-            player.Sequencer.Seek(currentSong.startTicks);
+            Player.Sequencer.Seek(CurrentSong.startTicks);
         }
-        player.Synthesizer.SetChannelsMuted(rememberedChannels);
+        Player.Synthesizer.SetChannelsMuted(rememberedChannels);
     }
 
     public void SwitchToSong(MIDISong newSong, bool startPlayback = false)
     {
-        player.Stop();
+        Player.Stop();
         // Destroy(player.synthesizer);
         // Destroy(player);
         // player = gameObject.AddComponent<SongPlayer>();
         // player.playOnStart = false;
         // player.synthesizer = gameObject.AddComponent<Synthesizer>();
         
-        currentSong = newSong;
+        CurrentSong = newSong;
         // player.synthesizer.soundFont.SetFullPath(currentSong.autoSoundfont
         //     ? currentSong.songStreaming.GetFullPath().Replace(".mid", ".sf2")
         //     : currentSong.soundfontStreaming.GetFullPath());
@@ -83,7 +80,7 @@ public class Songinator : MonoBehaviour
         // player.Tempo = currentSong.playbackSpeedNormal;
         // player.Gain = MAX_GAIN;
         // player.Init();
-        rememberedChannels = currentSong.mutedChannelsNormal;
+        rememberedChannels = CurrentSong.mutedChannelsNormal;
 
         if (startPlayback) StartPlayback();
     }
@@ -96,7 +93,7 @@ public class Songinator : MonoBehaviour
 
     public void SetSpectating(bool how)
     {
-        rememberedChannels = how ? currentSong.mutedChannelsSpectating : currentSong.mutedChannelsNormal;
-        player.Synthesizer.SetChannelsMuted(rememberedChannels);
+        rememberedChannels = how ? CurrentSong.mutedChannelsSpectating : CurrentSong.mutedChannelsNormal;
+        Player.Synthesizer.SetChannelsMuted(rememberedChannels);
     }
 }

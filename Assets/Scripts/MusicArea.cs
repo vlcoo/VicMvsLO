@@ -11,7 +11,7 @@ public class MusicArea : MonoBehaviour
     private void OnTriggerEnter2D(Collider2D other)
     {
         if (!other.CompareTag("Player")) return;
-        if (musicSynth.currentSong == switchToSong) return;
+        if (musicSynth.CurrentSong == switchToSong) return;
         var playerController = other.GetComponent<PlayerController>();
         if (!playerController.photonView.IsMineOrLocal()) return;
         

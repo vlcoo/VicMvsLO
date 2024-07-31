@@ -26,6 +26,7 @@ namespace MeltySynth
         private int msgIndex;
         private int loopIndex;
         private int startLoopTicks = 0;
+        private int endLoopTicks = -1;
         private double currentTempo;
 
         /// <summary>
@@ -116,6 +117,11 @@ namespace MeltySynth
         }
         // </AUTHOR>
 
+        public double PosTicks()
+        {
+            return Pos().TotalSeconds * midiFile.Resolution * currentTempo / 60.0;
+        }
+
         public void Seek(int midiTicks)
         {
             var seekTime = MidiFile.GetTimeSpanFromSeconds(60.0 / (float)(midiFile.Resolution * currentTempo) * midiTicks);
@@ -180,9 +186,7 @@ namespace MeltySynth
                         }
                         else if (msg.Type == MidiFile.MessageType.LoopEnd)
                         {
-                            currentTime = midiFile.Times[loopIndex];
-                            msgIndex = loopIndex;
-                            synthesizer.NoteOffAll(false);
+                            Seek(midiFile.Times[loopIndex]);
                         }
                     }
                     msgIndex++;
@@ -193,12 +197,9 @@ namespace MeltySynth
                 }
             }
 
-            if (msgIndex == midiFile.Messages.Length && loop)
+            if ((msgIndex == midiFile.Messages.Length || (EndLoopTicks > 0 && PosTicks() >= EndLoopTicks)) && loop)
             {
                 Seek(startLoopTicks);
-                // currentTime = midiFile.Times[loopIndex];
-                // msgIndex = loopIndex;
-                // synthesizer.NoteOffAll(false);
             }
         }
 
@@ -261,6 +262,23 @@ namespace MeltySynth
                 else
                 {
                     throw new ArgumentOutOfRangeException("The start loop ticks must be a non-negative value.");
+                }
+            }
+        }
+
+        public int EndLoopTicks
+        {
+            get => endLoopTicks;
+
+            set
+            {
+                if (value >= 0)
+                {
+                    endLoopTicks = value;
+                }
+                else
+                {
+                    throw new ArgumentOutOfRangeException("The end loop ticks must be a non-negative value.");
                 }
             }
         }

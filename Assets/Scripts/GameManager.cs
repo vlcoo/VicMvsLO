@@ -917,7 +917,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
     {
         if (!how)
         {
-            MusicSynth.player.Stop();
+            MusicSynth.Player.Stop();
             // MusicSynthMega.player.Pause();
             // MusicSynthStarman.player.Pause();
         }
@@ -1274,18 +1274,18 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         if (musicState == state)
             return;
 
-        MusicSynth.player.Stop();
-        MusicSynthMega.player.Stop();
-        MusicSynthStarman.player.Stop();
+        MusicSynth.Player.Stop();
+        MusicSynthMega.Player.Stop();
+        MusicSynthStarman.Player.Stop();
 
         musicState = state;
         if (localPlayer != null && !localPlayer.GetComponent<PlayerController>().spawned) return;
 
         var songPlayer = state switch
         {
-            Enums.MusicState.Normal => MusicSynth.player,
-            Enums.MusicState.MegaMushroom => MusicSynthMega.player,
-            Enums.MusicState.Starman => MusicSynthStarman.player,
+            Enums.MusicState.Normal => MusicSynth.Player,
+            Enums.MusicState.MegaMushroom => MusicSynthMega.Player,
+            Enums.MusicState.Starman => MusicSynthStarman.Player,
             _ => null
         };
         // if (songPlayer != null) songPlayer.Play();
