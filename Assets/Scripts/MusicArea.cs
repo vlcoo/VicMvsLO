@@ -15,8 +15,8 @@ public class MusicArea : MonoBehaviour
         var playerController = other.GetComponent<PlayerController>();
         if (!playerController.photonView.IsMineOrLocal()) return;
         
-        musicSynth.SwitchToSong(switchToSong,
-            playerController.spawned && !playerController.dead && !playerController.pipeEntering &&
-            GameManager.Instance.musicState == Enums.MusicState.Normal);
+        // musicSynth.SwitchToSong(switchToSong,
+        //     playerController.spawned && !playerController.dead && !playerController.pipeEntering &&
+        //     GameManager.Instance.musicState == Enums.MusicState.Normal);
     }
 }

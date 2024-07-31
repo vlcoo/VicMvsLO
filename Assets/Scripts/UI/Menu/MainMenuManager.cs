@@ -1344,7 +1344,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     {
         backBtn.interactable = false;
         sfx.PlayOneShot(Enums.Sounds.UI_Match_Starting.GetClip());
-        // MusicSynth.player.Pause();
+        MusicSynth.SetPlaybackState(Songinator.PlaybackState.STOPPED);
         fader.SetInvisible(GlobalController.Instance.settings.reduceUIAnims);
         fader.anim.speed = 1.5f;
         fader.anim.SetTrigger("out");

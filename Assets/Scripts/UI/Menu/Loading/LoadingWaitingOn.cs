@@ -83,9 +83,8 @@ public class LoadingWaitingOn : MonoBehaviour
     private IEnumerator WaitForEveryone()
     {
         yield return new WaitForSeconds(waitingTime);
-        // yield return DOTween.To(() => MusicSynth.player.Gain, v => MusicSynth.player.Gain = v, 0, 1f)
-            // .WaitForCompletion();
-        MusicSynthIdle.StartPlayback();
+        yield return MusicSynth.SetPlaybackState(Songinator.PlaybackState.STOPPED, secondsFading: 1f);
+        MusicSynthIdle.SetPlaybackState(Songinator.PlaybackState.PLAYING);
         waitingLastTimer = waitingLastTime;
         yield return new WaitForSeconds(waitingLastTime);
         if (PhotonNetwork.IsMasterClient)
@@ -105,6 +104,6 @@ public class LoadingWaitingOn : MonoBehaviour
         waitingLastTime = 0;
         StopCoroutine(waitingCoroutine);
         GetComponent<Animator>().SetTrigger(spectating ? "spectating" : "loaded");
-        // DOTween.To(() => MusicSynth.player.Gain, v => MusicSynth.player.Gain = v, 0f, 2f).SetEase(Ease.Linear);
+        MusicSynth.SetPlaybackState(Songinator.PlaybackState.STOPPED, 2.0f);
     }
 }
