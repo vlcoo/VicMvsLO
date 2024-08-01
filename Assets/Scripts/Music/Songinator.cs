@@ -81,7 +81,19 @@ public class Songinator : MonoBehaviour
     {
         if (secondsFading > 0f)
         {
-            return FadeVolume((int)newState, secondsFading, () => SetPlaybackState(newState));
+            // Ugly! If fading to STOPPED or PAUSED, change the volume first and then actually stop.
+            // If fading from PLAYING, actually start playing at volume 0 then tween it in.
+            // This is a recursive function, so the "SetPlaybackState" calls in this if block
+            // must not have a fade so we don't fall into an infinite loop.
+            if ((int)newState > 0)
+            {
+                Source.volume = 0.0f;
+                SetPlaybackState(newState);
+            }
+            return FadeVolume((int)newState, secondsFading, () =>
+            {
+                if ((int)newState < 0) SetPlaybackState(newState);
+            });
         }
 
         state = newState;

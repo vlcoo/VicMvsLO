@@ -58,8 +58,6 @@ AudioMixerController:
     name: SoundVolume
   - guid: 671d4fcc95a82304dad7baf44d9140c6
     name: SFXReverb
-  - guid: ed415ade77281a547bdf14b36f6e5d8c
-    name: MasterPitch
   m_AudioMixerGroupViews:
   - guids:
     - 16bfe0d88f636fc44971f8a43ea8b8f4
@@ -84,7 +82,6 @@ AudioMixerGroupController:
   m_Pitch: a0ff51409e62321448b696e66e64ddbf
   m_Send: 00000000000000000000000000000000
   m_Effects:
-  - {fileID: 2721510825238146010}
   - {fileID: 24400004}
   m_UserColorIndex: 0
   m_Mute: 0
@@ -278,48 +275,11 @@ AudioMixerGroupController:
   m_Pitch: bf64fa391c953f0438846d78393f70c1
   m_Send: 00000000000000000000000000000000
   m_Effects:
-  - {fileID: 3959851591778359629}
   - {fileID: -7423277699796284261}
   m_UserColorIndex: 0
   m_Mute: 0
   m_Solo: 0
   m_BypassEffects: 0
---- !u!244 &2721510825238146010
-AudioMixerEffectController:
-  m_ObjectHideFlags: 3
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_Name: 
-  m_EffectID: 0f608b2b2fde16d43a0afef2697310af
-  m_EffectName: Pitch Shifter
-  m_MixLevel: ed415ade77281a547bdf14b36f6e5d8c
-  m_Parameters:
-  - m_ParameterName: Pitch
-    m_GUID: 405c92741283ce043911015c979e8584
-  - m_ParameterName: FFT size
-    m_GUID: 7051ba07f7a421a4b93b8d6979dc762a
-  - m_ParameterName: Overlap
-    m_GUID: c278bd0ba00dfc4489b17d6c2d701a6b
-  - m_ParameterName: Max channels
-    m_GUID: 2eab871ff6a45e14fb1fbe256f83d03c
-  m_SendTarget: {fileID: 0}
-  m_EnableWetMix: 1
-  m_Bypass: 0
---- !u!244 &3959851591778359629
-AudioMixerEffectController:
-  m_ObjectHideFlags: 3
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_Name: 
-  m_EffectID: 496d32c4a051ff14cadc11bec010c230
-  m_EffectName: FluidSynth
-  m_MixLevel: 07c1dcd10fb10004ea7c4242a75483ad
-  m_Parameters: []
-  m_SendTarget: {fileID: 0}
-  m_EnableWetMix: 0
-  m_Bypass: 0
 --- !u!244 &6502902305410984520
 AudioMixerEffectController:
   m_ObjectHideFlags: 3

@@ -3,6 +3,7 @@ using UnityEngine;
 
 namespace EditorOnly
 {
+    #if UNITY_EDITOR
     [CustomPropertyDrawer(typeof(ChannelFieldAttribute))]
     public class ChannelFieldAttributeDrawer: PropertyDrawer
     {
@@ -13,4 +14,5 @@ namespace EditorOnly
             property.intValue = EditorGUI.MaskField(position, label, property.intValue, channels);
         }
     }
+    #endif
 }
