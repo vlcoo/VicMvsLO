@@ -35,13 +35,8 @@ public class Songinator : MonoBehaviour
     public Synthesizer.OnMidiMessage OnMidiMessage;
     public delegate void OnFadingComplete();
 
-    private void OnEnable()
+    private void Start()
     {
-        var driver = gameObject.GetComponent<ToneAudioDriver>();
-        if (!driver) driver = gameObject.AddComponent<ToneAudioDriver>();
-        driver.SetRenderer(Sequencer);
-        Source = GetComponent<AudioSource>();
-
         // Load in the current song from the list of candidates.
         if (songs.Count > 1)
         {
@@ -68,6 +63,11 @@ public class Songinator : MonoBehaviour
             onMidiMessage = OnMidiMessage
         };
         Sequencer = new MidiFileSequencer(Synth);
+
+        var driver = gameObject.GetComponent<ToneAudioDriver>();
+        if (!driver) driver = gameObject.AddComponent<ToneAudioDriver>();
+        driver.SetRenderer(Sequencer);
+        Source = GetComponent<AudioSource>();
 
         // Assign to the synth and sequencer the song properties.
         Sequencer.Speed = CurrentSong.playbackSpeedNormal;

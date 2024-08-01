@@ -726,6 +726,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1504615058768193469, guid: fbf7edbed684f91a5af262ab11b7b0cf,
         type: 3}
+      propertyPath: autoStart
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1504615058768193469, guid: fbf7edbed684f91a5af262ab11b7b0cf,
+        type: 3}
       propertyPath: songs.Array.size
       value: 3
       objectReference: {fileID: 0}
@@ -771,6 +776,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Songinator
+      objectReference: {fileID: 0}
+    - target: {fileID: 3361589158912516817, guid: fbf7edbed684f91a5af262ab11b7b0cf,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7298521108150553530, guid: fbf7edbed684f91a5af262ab11b7b0cf,
         type: 3}
@@ -1063,12 +1073,17 @@ PrefabInstance:
     - target: {fileID: 1504615058768193469, guid: fbf7edbed684f91a5af262ab11b7b0cf,
         type: 3}
       propertyPath: chances.Array.data[1]
-      value: 30
+      value: 50
       objectReference: {fileID: 0}
     - target: {fileID: 3361589158912516817, guid: fbf7edbed684f91a5af262ab11b7b0cf,
         type: 3}
       propertyPath: m_Name
       value: SonginatorIdle
+      objectReference: {fileID: 0}
+    - target: {fileID: 3361589158912516817, guid: fbf7edbed684f91a5af262ab11b7b0cf,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7298521108150553530, guid: fbf7edbed684f91a5af262ab11b7b0cf,
         type: 3}
@@ -1123,7 +1138,7 @@ PrefabInstance:
     - target: {fileID: 9091574666245269655, guid: fbf7edbed684f91a5af262ab11b7b0cf,
         type: 3}
       propertyPath: m_PlayOnAwake
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -1348,7 +1363,7 @@ MonoBehaviour:
   marioLoadingScene: {fileID: 1249995677}
   koopaLoadingScene: {fileID: 1164778389}
   MusicSynth: {fileID: 529297139}
-  MusicSynthIdle: {fileID: 0}
+  MusicSynthIdle: {fileID: 1850823094}
   infoText: {fileID: 1555839132}
   playerList: {fileID: 2101240301}
   highPingAlert: {fileID: 1508836660}
@@ -2595,6 +2610,18 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1850823094 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1504615058768193469, guid: fbf7edbed684f91a5af262ab11b7b0cf,
+    type: 3}
+  m_PrefabInstance: {fileID: 902574992}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b9e79eb7bbc8db64dbe2a4253144008d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1858421150
 GameObject:
   m_ObjectHideFlags: 0

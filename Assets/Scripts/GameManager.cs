@@ -944,7 +944,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         MusicSynth.SetSpectating(how);
         MusicSynthMega.SetSpectating(how);
         MusicSynthStarman.SetSpectating(how);
-        if (musicState == Enums.MusicState.Normal) MusicSynth.SetPlaybackState(Songinator.PlaybackState.PLAYING);;
+        if (musicState == Enums.MusicState.Normal) MusicSynth.SetPlaybackState(Songinator.PlaybackState.PLAYING);
     }
 
     public void SetStartSpeedrunTimer(PlayerController byWhom)
@@ -1283,7 +1283,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             Enums.MusicState.Starman => MusicSynthStarman,
             _ => null
         };
-        // if (songPlayer != null) songPlayer.SetPlaybackState(Songinator.PlaybackState.PLAYING);
+        if (songPlayer != null) songPlayer.SetPlaybackState(Songinator.PlaybackState.PLAYING);
     }
 
     private void HandleMusic()
