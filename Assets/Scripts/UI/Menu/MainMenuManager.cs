@@ -33,6 +33,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     private static readonly Random rng = new();
     public AudioSource sfx, music;
     public Songinator MusicSynth;
+    public MenuWorldSongPlayer worldSongPlayer;
     public GameObject lobbiesContent, lobbyPrefab;
     public GameObject connecting;
 
@@ -1441,6 +1442,20 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
             [Enums.NetRoomProperties.Level] = newLevelIndex
         };
         PhotonNetwork.CurrentRoom.SetCustomProperties(table);
+
+        var worldId = worldSongPlayer.levelWorldIds[newLevelIndex];
+        worldSongPlayer.OnLevelSelected(newLevelIndex);
+        if (worldId == 0 && MusicSynth.state == Songinator.PlaybackState.PAUSED)
+        {
+            MusicSynth.SetPlaybackState(Songinator.PlaybackState.PLAYING, 0.5f);
+            return;
+        }
+
+        if (worldId > 0)
+        {
+            if (MusicSynth.state == Songinator.PlaybackState.PLAYING)
+                MusicSynth.SetPlaybackState(Songinator.PlaybackState.PAUSED, 0.5f);
+        }
     }
 
     public void SelectRoom(GameObject room)

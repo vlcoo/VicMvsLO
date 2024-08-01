@@ -34,6 +34,9 @@ public class Songinator : MonoBehaviour
 
     public Synthesizer.OnMidiMessage OnMidiMessage;
     public delegate void OnFadingComplete();
+    private Coroutine switchToSongCoroutine;
+
+    private MidiFile _currentMidiFile;
 
     private void Start()
     {
@@ -69,6 +72,8 @@ public class Songinator : MonoBehaviour
         driver.SetRenderer(Sequencer);
         Source = GetComponent<AudioSource>();
 
+        _currentMidiFile = new MidiFile(new MemoryStream(CurrentSong.song.Bytes));
+
         // Assign to the synth and sequencer the song properties.
         Sequencer.Speed = CurrentSong.playbackSpeedNormal;
         Sequencer.StartLoopTicks = CurrentSong.startLoopTicks;
@@ -102,16 +107,19 @@ public class Songinator : MonoBehaviour
             case PlaybackState.STOPPED:
                 timeAtPause = TimeSpan.Zero;
                 Sequencer.Stop();
+                Source.enabled = false;
                 break;
             case PlaybackState.PAUSED:
                 timeAtPause = Sequencer.Pos();
                 Sequencer.Stop();
+                Source.enabled = false;
                 break;
             case PlaybackState.PLAYING:
-                Sequencer.Play(new MidiFile(new MemoryStream(CurrentSong.song.Bytes)), true);
+                Sequencer.Play(_currentMidiFile, true);
                 Synth.SetChannelsMuted(currentlyMutedChannels);
                 if (timeAtPause != TimeSpan.Zero) Sequencer.Seek(timeAtPause);
                 else if (CurrentSong.startTicks > 0) Sequencer.Seek(CurrentSong.startTicks);
+                Source.enabled = true;
                 break;
             default:
                 throw new ArgumentOutOfRangeException();
@@ -134,17 +142,30 @@ public class Songinator : MonoBehaviour
 
     public void SwitchToSong(int index, bool startPlayback = false, float secondsFading = 0f)
     {
+        if (switchToSongCoroutine != null)
+        {
+            StopCoroutine(switchToSongCoroutine);
+            switchToSongCoroutine = null;
+            SetPlaybackState(PlaybackState.STOPPED);
+        }
+        switchToSongCoroutine = StartCoroutine(SwitchToSongCoroutine(index, startPlayback, secondsFading));
+    }
+
+    private IEnumerator SwitchToSongCoroutine(int index, bool startPlayback = false, float secondsFading = 0f)
+    {
         if (index < 0 || index >= songs.Count)
         {
             Debug.LogWarning("Invalid song index (out of bounds).");
-            return;
+            yield return null;
         }
 
-        SetPlaybackState(PlaybackState.STOPPED, secondsFading);
+        timeAtPause = TimeSpan.Zero;
+        yield return SetPlaybackState(PlaybackState.STOPPED, secondsFading);
         CurrentSong = songs[index];
         InitializeMeltySynth();
         autoStart = startPlayback;
-        if (autoStart) SetPlaybackState(PlaybackState.PLAYING, secondsFading);
+        if (autoStart) yield return SetPlaybackState(PlaybackState.PLAYING, secondsFading);
+        switchToSongCoroutine = null;
     }
 
     public void SetSpectating(bool how)
