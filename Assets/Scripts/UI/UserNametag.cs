@@ -16,7 +16,7 @@ public class UserNametag : MonoBehaviour
 
     public void Start()
     {
-        rainbowName = parent.photonView.Owner.HasRainbowName();
+        rainbowName = parent.photonView.Owner.HasSpecialName();
         if (rainbowName) text.colorGradientPreset = Utils.GetRainbowColor();
     }
 
@@ -69,7 +69,7 @@ public class UserNametag : MonoBehaviour
 
         transform.position = screenPoint;
 
-        text.text = (parent.photonView.Owner.IsMasterClient ? "<sprite=5>" : "") +
+        text.text = (parent.photonView.Owner.IsMasterClient ? "<sprite name=room_host>" : "") +
                     parent.photonView.Owner.GetUniqueNickname();
 
         /*text.text += "\n";

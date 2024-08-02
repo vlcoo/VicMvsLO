@@ -28,7 +28,7 @@ public class ScoreboardEntry : MonoBehaviour
         var c = target.AnimationController.GlowColor;
         background.color = new Color(c.r, c.g, c.b, 0.5f);
 
-        rainbowEnabled = target.photonView.Owner.HasRainbowName();
+        rainbowEnabled = target.photonView.Owner.HasSpecialName();
     }
 
     public void Update()

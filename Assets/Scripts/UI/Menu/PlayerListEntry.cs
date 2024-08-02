@@ -37,7 +37,7 @@ public class PlayerListEntry : MonoBehaviour
     public void UpdateText()
     {
         colorStrip.color = Utils.GetPlayerColor(player);
-        enabled = player.HasRainbowName();
+        enabled = player.HasSpecialName();
 
         nameText.text = (player.IsMasterClient ? "<sprite name=\"room_host\">" : "") + Utils.GetCharacterData(player).uistring +
                         player.GetUniqueNickname();

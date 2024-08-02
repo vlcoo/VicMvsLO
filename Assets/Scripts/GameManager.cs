@@ -870,7 +870,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         yield return new WaitForSeconds(1f);
 
         musicEnabled = true;
-        MusicSynth.SetPlaybackState(Songinator.PlaybackState.PLAYING);
+        // MusicSynth.SetPlaybackState(Songinator.PlaybackState.PLAYING);
         Utils.GetCustomProperty(Enums.NetRoomProperties.Time, out timedGameDuration);
 
         startRealTime = DateTimeOffset.Now.ToUnixTimeMilliseconds();
@@ -913,30 +913,24 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         }
     }
 
-    public void FadeMusic(bool how)
+    public void SetAllMusicPlaybackState(Songinator.PlaybackState state, float secondsFading = 0.0f)
     {
-        if (!how)
+        MusicSynth.SetPlaybackState(state, secondsFading);
+        MusicSynthMega.SetPlaybackState(state, secondsFading);
+        MusicSynthStarman.SetPlaybackState(state, secondsFading);
+    }
+
+    public void StartMusicConditionally()
+    {
+        if (gameover) return;
+        var songPlayer = musicState switch
         {
-            MusicSynth.SetPlaybackState(Songinator.PlaybackState.STOPPED);
-            // MusicSynthMega.player.Pause();
-            // MusicSynthStarman.player.Pause();
-        }
-        else
-        {
-            if (gameover) return;
-            switch (musicState)
-            {
-                case Enums.MusicState.Normal:
-                    MusicSynth.SetPlaybackState(Songinator.PlaybackState.PLAYING, secondsFading: 0.5f);
-                    break;
-                case Enums.MusicState.Starman:
-                    MusicSynthStarman.SetPlaybackState(Songinator.PlaybackState.PLAYING, secondsFading: 0.5f);
-                    break;
-                case Enums.MusicState.MegaMushroom:
-                    MusicSynthMega.SetPlaybackState(Songinator.PlaybackState.PLAYING, secondsFading: 0.5f);
-                    break;
-            }
-        }
+            Enums.MusicState.Normal => MusicSynth,
+            Enums.MusicState.MegaMushroom => MusicSynthMega,
+            Enums.MusicState.Starman => MusicSynthStarman,
+            _ => null
+        };
+        if (songPlayer) songPlayer.SetPlaybackState(Songinator.PlaybackState.PLAYING);
     }
 
     public void SetSpectateMusic(bool how)
@@ -944,7 +938,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         MusicSynth.SetSpectating(how);
         MusicSynthMega.SetSpectating(how);
         MusicSynthStarman.SetSpectating(how);
-        if (musicState == Enums.MusicState.Normal) MusicSynth.SetPlaybackState(Songinator.PlaybackState.PLAYING);
+        if (how) StartMusicConditionally();
     }
 
     public void SetStartSpeedrunTimer(PlayerController byWhom)
@@ -999,7 +993,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         sfx.outputAudioMixerGroup.audioMixer.SetFloat("SFXReverb", 0f);
 
         PhotonNetwork.CurrentRoom.SetCustomProperties(new Hashtable { [Enums.NetRoomProperties.GameStarted] = false });
-        FadeMusic(false);
+        SetAllMusicPlaybackState(Songinator.PlaybackState.STOPPED);
 
         if (causeString is "DUMMY_TIMEOUT")
         {
@@ -1158,7 +1152,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         if (!PhotonNetwork.IsMasterClient) return;
         foreach (var player in players.Where(player => player != null && player != whom))
             player.photonView.RPC("Disqualify", RpcTarget.All);
-        FadeMusic(false);
+        SetAllMusicPlaybackState(Songinator.PlaybackState.STOPPED, 1f);
     }
 
     public void CheckForWinner()
@@ -1264,26 +1258,17 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         MatchConditioner.ConditionActioned(null, "Bah‘d");
     }
 
-    private void PlaySong(Enums.MusicState state)
+    private void SetMusicState(Enums.MusicState state)
     {
         if (musicState == state)
             return;
 
-        MusicSynth.SetPlaybackState(Songinator.PlaybackState.STOPPED);
-        MusicSynthMega.SetPlaybackState(Songinator.PlaybackState.STOPPED);
-        MusicSynthStarman.SetPlaybackState(Songinator.PlaybackState.STOPPED);
+        SetAllMusicPlaybackState(Songinator.PlaybackState.STOPPED);
 
         musicState = state;
         if (localPlayer != null && !localPlayer.GetComponent<PlayerController>().spawned) return;
 
-        var songPlayer = state switch
-        {
-            Enums.MusicState.Normal => MusicSynth,
-            Enums.MusicState.MegaMushroom => MusicSynthMega,
-            Enums.MusicState.Starman => MusicSynthStarman,
-            _ => null
-        };
-        if (songPlayer != null) songPlayer.SetPlaybackState(Songinator.PlaybackState.PLAYING);
+        StartMusicConditionally();
     }
 
     private void HandleMusic()
@@ -1309,11 +1294,11 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         speedup |= players.All(pl => !pl || pl.lives == 1 || pl.lives == 0);
 
         if (mega)
-            PlaySong(Enums.MusicState.MegaMushroom);
+            SetMusicState(Enums.MusicState.MegaMushroom);
         else if (invincible)
-            PlaySong(Enums.MusicState.Starman);
+            SetMusicState(Enums.MusicState.Starman);
         else
-            PlaySong(Enums.MusicState.Normal);
+            SetMusicState(Enums.MusicState.Normal);
     }
 
     public void OnPause(InputAction.CallbackContext context)

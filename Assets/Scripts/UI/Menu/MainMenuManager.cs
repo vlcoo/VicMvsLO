@@ -1339,6 +1339,12 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     {
         noUpdateNetRoom = true;
         PhotonNetwork.LeaveRoom();
+
+        worldSongPlayer.OnLevelSelected(0);
+        if (MusicSynth.state == Songinator.PlaybackState.PAUSED)
+        {
+            MusicSynth.SetPlaybackState(Songinator.PlaybackState.PLAYING, 0.5f);
+        }
     }
 
     public void StartGame()

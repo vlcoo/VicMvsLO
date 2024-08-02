@@ -3585,7 +3585,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         if (photonView.IsMine)
         {
             ScoreboardUpdater.instance.OnDeathToggle();
-            GameManager.Instance.FadeMusic(false);
+            GameManager.Instance.SetAllMusicPlaybackState(Songinator.PlaybackState.STOPPED);
         }
 
         GameManager.Instance.MatchConditioner.ConditionActioned(this, "Died");
@@ -3673,7 +3673,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         landing = 0f;
         ResetKnockback();
         Instantiate(Resources.Load("Prefabs/Particle/Puff"), transform.position, Quaternion.identity);
-        if (photonView.IsMine) GameManager.Instance.FadeMusic(true);
+        if (photonView.IsMine) GameManager.Instance.StartMusicConditionally();
         models.transform.rotation = Quaternion.Euler(0, 180, 0);
 
         if (photonView.IsMine)

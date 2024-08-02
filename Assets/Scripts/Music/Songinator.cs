@@ -84,6 +84,8 @@ public class Songinator : MonoBehaviour
 
     public YieldInstruction SetPlaybackState(PlaybackState newState, float secondsFading = 0f)
     {
+        if (newState == state) return null;
+
         if (secondsFading > 0f)
         {
             // Ugly! If fading to STOPPED or PAUSED, change the volume first and then actually stop.
