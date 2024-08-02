@@ -3500,7 +3500,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         PlaySoundEverywhere(Enums.Sounds.World_Pole_Down);
         while (!goalReachedBottom)
         {
-            transform.position -= new Vector3(0, 2.5f * Time.deltaTime, 0);
+            transform.position -= new Vector3(0, 3.0f * Time.deltaTime, 0);
             yield return null;
         }
 

@@ -27,7 +27,8 @@ public class LoadingWaitingOn : MonoBehaviour
 
     [SerializeField] private int waitingTime, waitingLastTime;
     public Coroutine waitingCoroutine;
-    private float waitingLastTimer;
+    private float waitingLastTimer = -1;
+    private bool timedOut = false;
 
     public void Start()
     {
@@ -43,6 +44,12 @@ public class LoadingWaitingOn : MonoBehaviour
 
     public void Update()
     {
+        if (timedOut)
+        {
+            infoText.text = "Timed out!";
+            return;
+        }
+
         if (waitingLastTimer > 0)
         {
             Utils.TickTimer(ref waitingLastTimer, 0, Time.deltaTime);
@@ -77,7 +84,7 @@ public class LoadingWaitingOn : MonoBehaviour
         waitingFor.ExceptWith(GameManager.Instance.loadedPlayers);
         playerList.text = waitingFor.Count == 0
             ? ""
-            : "- Waiting for -\n" + string.Join("\n", waitingFor.Select(pl => pl.GetUniqueNickname()));
+            : "<font=\"NSMBStrongFont\">- Waiting for -</font>\n<size=8> </size>\n" + string.Join("\n", waitingFor.Select(pl => pl.GetUniqueNickname()));
     }
 
     private IEnumerator WaitForEveryone()
@@ -87,6 +94,7 @@ public class LoadingWaitingOn : MonoBehaviour
         MusicSynthIdle.SetPlaybackState(Songinator.PlaybackState.PLAYING);
         waitingLastTimer = waitingLastTime;
         yield return new WaitForSeconds(waitingLastTime);
+        timedOut = true;
         if (PhotonNetwork.IsMasterClient)
         {
             PhotonNetwork.RaiseEvent((byte)Enums.NetEventIds.EndGame, "DUMMY_TIMEOUT", NetworkUtils.EventAll,

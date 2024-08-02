@@ -43,16 +43,16 @@ public class RoomIcon : MonoBehaviour
         //bool password = ((string) prop[Enums.NetRoomProperties.Password]) != "";
 
         if (!string.IsNullOrEmpty(matchRules.Trim()))
-            symbols += "<sprite=56>" +
-                       Utils.GetSymbolString(matchRules.Split("},{").Length.ToString(), Utils.smallSymbols);
-        if (teams) symbols += "<sprite=76>";
-        if (powerups) symbols += "<sprite=8>";
-        if (time) symbols += "<sprite=6>";
-        if (lives >= 1) symbols += "<sprite=9>" + Utils.GetSymbolString(lives.ToString(), Utils.smallSymbols);
-        if (stars >= 1) symbols += "<sprite=38>" + Utils.GetSymbolString(stars.ToString(), Utils.smallSymbols);
-        if (coins >= 1) symbols += "<sprite=37>" + Utils.GetSymbolString(coins.ToString(), Utils.smallSymbols);
+            symbols += "<sprite name=\"room_rules\">" +
+                       Utils.GetNumberString(matchRules.Split("},{").Length.ToString(), "room_smallnumber");
+        if (teams) symbols += "<sprite name=\"room_teams\">";
+        if (powerups) symbols += "<sprite name=\"room_powerups\">";
+        if (time) symbols += "<sprite name=\"room_timer\">";
+        if (lives >= 1) symbols += "<sprite name=\"room_lives\">" + Utils.GetNumberString(lives.ToString(), "room_smallnumber");
+        if (stars >= 1) symbols += "<sprite name=\"room_stars\">" + Utils.GetNumberString(stars.ToString(), "room_smallnumber");
+        if (coins >= 1) symbols += "<sprite name=\"room_coins\">" + Utils.GetNumberString(coins.ToString(), "room_smallnumber");
         //if (password)
-        //    symbols += "<sprite=7>";
+        //    symbols += "<sprite name=\"room_privae\">";
 
         symbolsText.text = symbols;
     }

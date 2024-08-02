@@ -39,32 +39,32 @@ public class PlayerListEntry : MonoBehaviour
         colorStrip.color = Utils.GetPlayerColor(player);
         enabled = player.HasRainbowName();
 
-        nameText.text = (player.IsMasterClient ? "<sprite=5> " : "") + Utils.GetCharacterData(player).uistring +
+        nameText.text = (player.IsMasterClient ? "<sprite name=\"room_host\">" : "") + Utils.GetCharacterData(player).uistring +
                         player.GetUniqueNickname();
 
         Utils.GetCustomProperty(Enums.NetPlayerProperties.Ping, out int ping, player.CustomProperties);
         var signalStrength = ping switch
         {
-            < 0 => "52",
-            < 80 => "49",
-            < 120 => "50",
-            < 180 => "51",
-            _ => "52"
+            < 0 => "connection_great",
+            < 80 => "connection_good",
+            < 120 => "connection_fair",
+            < 180 => "connection_bad",
+            _ => "connection_disconnectd"
         };
-        pingText.text = $"{ping} <sprite={signalStrength}>";
+        pingText.text = $"{ping}ms <sprite name=\"{signalStrength}\">";
 
         Utils.GetCustomProperty(Enums.NetPlayerProperties.DeviceType, out Utils.DeviceType deviceType,
             player.CustomProperties);
         var deviceTypeText = deviceType switch
         {
-            Utils.DeviceType.EDITOR => "26",
-            Utils.DeviceType.MOBILE => "79",
-            Utils.DeviceType.DESKTOP => "77",
-            Utils.DeviceType.BROWSER => "78",
-            Utils.DeviceType.OTHER => "",
+            Utils.DeviceType.EDITOR => "platform_editor",
+            Utils.DeviceType.MOBILE => "platform_mobile",
+            Utils.DeviceType.DESKTOP => "platform_desktop",
+            Utils.DeviceType.BROWSER => "platform_browser",
+            Utils.DeviceType.OTHER => "platform_unknown",
             _ => ""
         };
-        deviceText.text = $"<sprite={deviceTypeText}>";
+        deviceText.text = $"<sprite name=\"{deviceTypeText}\">";
 
         var parent = transform.parent;
         var childIndex = 0;

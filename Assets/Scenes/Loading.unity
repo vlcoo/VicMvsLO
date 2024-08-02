@@ -616,8 +616,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -40, y: 0}
-  m_SizeDelta: {x: 40, y: 40}
+  m_AnchoredPosition: {x: -56.0808, y: 0}
+  m_SizeDelta: {x: 72.1616, y: 40}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!114 &358556076
 MonoBehaviour:
@@ -641,15 +641,15 @@ MonoBehaviour:
       m_Calls: []
   m_text: 
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 522514f262cfca40a9b87f18cf110877, type: 2}
-  m_sharedMaterial: {fileID: 2100000, guid: 7ba57f53c954184109b3acfaf738fbfb, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 521bb99aa9816882db6f41d88dfd003c, type: 2}
+  m_sharedMaterial: {fileID: 2100000, guid: fe1157d2bb7be6511bf03a02e4071fed, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4278190080
-  m_fontColor: {r: 0, g: 0, b: 0, a: 1}
+    rgba: 4294967295
+  m_fontColor: {r: 0.54901963, g: 0.54901963, b: 0.54901963, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -1137,7 +1137,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 9091574666245269655, guid: fbf7edbed684f91a5af262ab11b7b0cf,
         type: 3}
-      propertyPath: m_PlayOnAwake
+      propertyPath: m_Pitch
       value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
@@ -1369,7 +1369,7 @@ MonoBehaviour:
   highPingAlert: {fileID: 1508836660}
   waitingTimer: {fileID: 358556076}
   emptyText: Loading...
-  iveLoadedText: Hold On...
+  iveLoadedText: Wait Up...
   readyToStartText: OK!
   spectatorText: Joining as Spectator...
   waitingTime: 35
@@ -1449,7 +1449,7 @@ MonoBehaviour:
   m_fontColor32:
     serializedVersion: 2
     rgba: 4283716692
-  m_fontColor: {r: 0.3301887, g: 0.3301887, b: 0.3301887, a: 1}
+  m_fontColor: {r: 0.54901963, g: 0.54901963, b: 0.54901963, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -1466,10 +1466,10 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 36
-  m_fontSizeBase: 36
+  m_fontSize: 16
+  m_fontSizeBase: 16
   m_fontWeight: 400
-  m_enableAutoSizing: 1
+  m_enableAutoSizing: 0
   m_fontSizeMin: 0
   m_fontSizeMax: 72
   m_fontStyle: 0
@@ -2212,9 +2212,9 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'Your current latency is high, so
+  m_text: 'Your ping is quite high, so you
 
-    this match may perform poorly.'
+    might face issues this match.'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 38e8769007229044bb229d69f8cbae74, type: 2}
   m_sharedMaterial: {fileID: 2100000, guid: d2973aa339cb2d800ab344b22e1abd7a, type: 2}
@@ -2223,8 +2223,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4284177243
-  m_fontColor: {r: 0.3584906, g: 0.3584906, b: 0.3584906, a: 1}
+    rgba: 4287401100
+  m_fontColor: {r: 0.54901963, g: 0.54901963, b: 0.54901963, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -2779,8 +2779,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4284177243
-  m_fontColor: {r: 0.3584906, g: 0.3584906, b: 0.3584906, a: 1}
+    rgba: 4287401100
+  m_fontColor: {r: 0.54750144, g: 0.54750144, b: 0.54750144, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:

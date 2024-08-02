@@ -32,4 +32,9 @@ public class MenuWorldSongPlayer : MonoBehaviour
             currentWorldId = worldId;
         }
     }
+
+    public void Stop()
+    {
+        worldsSonginator.SetPlaybackState(Songinator.PlaybackState.STOPPED);
+    }
 }

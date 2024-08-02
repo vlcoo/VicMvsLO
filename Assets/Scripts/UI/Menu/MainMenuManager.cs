@@ -214,7 +214,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
         Instance = this;
         sfx.outputAudioMixerGroup.audioMixer.SetFloat("SFXReverb", 0f);
-        sfx.outputAudioMixerGroup.audioMixer.SetFloat("MasterPitch", -80f);
+        // sfx.outputAudioMixerGroup.audioMixer.SetFloat("MasterPitch", -80f);
 
         //Clear game-specific settings so they don't carry over
         HorizontalCamera.OFFSET_TARGET = 0;
@@ -1346,6 +1346,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         backBtn.interactable = false;
         sfx.PlayOneShot(Enums.Sounds.UI_Match_Starting.GetClip());
         MusicSynth.SetPlaybackState(Songinator.PlaybackState.STOPPED);
+        worldSongPlayer.Stop();
         fader.SetInvisible(GlobalController.Instance.settings.reduceUIAnims);
         fader.anim.speed = 1.5f;
         fader.anim.SetTrigger("out");

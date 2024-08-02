@@ -63,7 +63,7 @@ public class MatchRuleListEntry : MonoBehaviour, IEquatable<MatchRuleListEntry>
         {
             var sanitizedCond = Regex.Replace(cond, "(\\B[A-Z0-9])", " $1");
             var sanitizedAct = Regex.Replace(act, "(\\B[A-Z0-9])", " $1").Replace("Act ", "");
-            lbl.text = sanitizedCond + " .. " + sanitizedAct;
+            lbl.text = sanitizedCond + " -> " + sanitizedAct;
         }
     }
 
