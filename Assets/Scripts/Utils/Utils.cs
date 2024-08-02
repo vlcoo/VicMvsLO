@@ -622,8 +622,13 @@ namespace NSMB.Utils
         {
             StringBuilder ret = new();
             foreach (var c in str)
-                ret.Append($"<sprite name=\"{prefix}_\"").Append(c).Append(">");
+                ret.Append($"<sprite name=\"{prefix}_").Append(c).Append("\">");
             return ret.ToString();
+        }
+
+        public static string GetNumberString(int str, string prefix = "hudnumber")
+        {
+            return GetNumberString(str.ToString());
         }
 
         public static Color GetPlayerColor(Player player, float s = 1, float v = 1)

@@ -29,8 +29,8 @@ public class RoomIcon : MonoBehaviour
         var prop = room.CustomProperties;
 
         nameText.text = $"{((string)prop[Enums.NetRoomProperties.HostName]).ToValidUsername()}'s Lobby";
-        playersText.text = $"{room.PlayerCount}/{room.MaxPlayers} players";
-        inProgressText.text = (bool)prop[Enums.NetRoomProperties.GameStarted] ? "In Progress" : "Not Started";
+        playersText.text = $"{room.PlayerCount}/{room.MaxPlayers} - " + ((bool)prop[Enums.NetRoomProperties.GameStarted] ? "Ongoing..." : "Not Started");
+        // inProgressText.text = (bool)prop[Enums.NetRoomProperties.GameStarted] ? "In Progress" : "Not Started";
 
         var symbols = "";
         Utils.GetCustomProperty(Enums.NetRoomProperties.StarRequirement, out int stars, newRoom.CustomProperties);
@@ -60,16 +60,19 @@ public class RoomIcon : MonoBehaviour
     public void Select()
     {
         icon.color = selectedColor;
+        playersText.color = Color.black;
     }
 
     public void Unselect()
     {
         icon.color = defaultColor;
+        playersText.color = new Color(0.75f, 0.75f, 0.75f);
     }
 
     public void Hover()
     {
         icon.color = highlightColor;
+        playersText.color = Color.black;
     }
 
     public void Unhover()

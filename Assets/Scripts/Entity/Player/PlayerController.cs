@@ -3323,7 +3323,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
                 var num =
                     ((GameObject)Instantiate(Resources.Load("Prefabs/Particle/Number"), position, Quaternion.identity))
                     .GetComponentInChildren<NumberParticle>();
-                num.text.text = Utils.GetSymbolString(coins.ToString(), Utils.numberSymbols);
+                num.text.text = coins.ToString();
                 num.ApplyColor(AnimationController.GlowColor);
             }
 

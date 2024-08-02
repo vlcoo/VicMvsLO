@@ -216,12 +216,12 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             {
                 var sanitizedCond = Regex.Replace(entry.Condition, "(\\B[A-Z0-9])", " $1");
                 var sanitizedAct = Regex.Replace(entry.Action, "(\\B[A-Z0-9])", " $1").Replace("Act ", "");
-                rulesLbl.text += sanitizedCond + " .. " + sanitizedAct +
+                rulesLbl.text += sanitizedCond + " -> " + sanitizedAct +
                                  (MatchConditioner.ruleList.Last().Equals(entry) ? "" : "\n");
             }
         }
 
-        rulesLbl.text += "\n& " + Togglerizer.currentEffects.Count + " special effects";
+        rulesLbl.text += "\n& " + Togglerizer.currentEffects.Count + " Specials";
 
         brickBreak = ((GameObject)Instantiate(Resources.Load("Prefabs/Particle/BrickBreak")))
             .GetComponent<ParticleSystem>();
@@ -1026,9 +1026,9 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         }
 
         text.GetComponent<TMP_Text>().text = cancelled
-            ? "No contest"
+            ? "No Contest"
             : winner == null
-                ? "It's a tie..."
+                ? "Draw..."
                 : $"{uniqueName} Wins!";
 
         if (!cancelled) yield return new WaitForSecondsRealtime(0.2f);

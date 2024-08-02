@@ -278,7 +278,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
             {
                 var r = pingSortedRegions[i];
                 newRegions.Add(
-                    $"{NetworkUtils.regionsFullNames.GetValueOrDefault(r.Code, r.Code)} <color=#bbbbbb>({(r.Ping == 4000 ? "?" : r.Ping)} ms)");
+                    $"{NetworkUtils.regionsFullNames.GetValueOrDefault(r.Code, r.Code.ToUpper())} <color=#bbbbbb>({(r.Ping == 4000 ? "?" : r.Ping)} ms)");
                 if (r.Code == lastRegion)
                     index = i;
             }
@@ -405,7 +405,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
             foreach (var r in pingSortedRegions)
                 formattedRegions.Add(
-                    $"{NetworkUtils.regionsFullNames.GetValueOrDefault(r.Code, r.Code)} <color=#bbbbbb>({(r.Ping == 4000 ? "?" : r.Ping)} ms)");
+                    $"{NetworkUtils.regionsFullNames.GetValueOrDefault(r.Code, r.Code.ToUpper())} <color=#bbbbbb>({(r.Ping == 4000 ? "?" : r.Ping)}ms)");
 
             lastRegion = pingSortedRegions[0].Code;
             pingsReceived = true;
@@ -1423,7 +1423,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     {
         levelDropdown.SetValueWithoutNotify(index);
         stageText.text = "Map: " + levelDropdown.options[index].text;
-        raceMapSelected = levelDropdown.options[index].text.Contains("!ui_flag");
+        raceMapSelected = levelDropdown.options[index].text.Contains("hudnumber_laps");
         UpdateSettingEnableStates();
         Camera.main.transform.position = levelCameraPositions[index].transform.position;
     }

@@ -11,19 +11,21 @@ namespace NSMB.Utils
     {
         public static WebFlags forward = new(WebFlags.HttpForwardConst);
 
-        public static Dictionary<string, string> regionsFullNames = new()
+        public static readonly Dictionary<string, string> regionsFullNames = new()
         {
             ["asia"] = "Asia",
             ["au"] = "Australia",
             ["cae"] = "Canada",
             ["cn"] = "Mainland China",
             ["eu"] = "Europe",
+            ["hk"] = "Hong Kong",
             ["in"] = "India",
             ["jp"] = "Japan",
             ["za"] = "South Africa",
             ["sa"] = "South America",
             ["kr"] = "South Korea",
             ["tr"] = "Turkey",
+            ["uae"] = "United Arab Emirates",
             ["us"] = "USA",
             ["usw"] = "USA, West",
             ["ussc"] = "USA, Central",
