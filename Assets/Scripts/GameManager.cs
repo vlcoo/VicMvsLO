@@ -67,6 +67,8 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
 
     [Range(1, 10)] public int playersToVisualize = 10;
     private readonly List<BahableEntity> bahableEntities = new();
+    private bool bahRequested = false;
+    private float bahCooldownTimer = 0;
 
     public readonly HashSet<Player> loadedPlayers = new();
     private readonly List<GameObject> remainingSpawns = new();
@@ -856,12 +858,24 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         }
 
         teamsMatch = TeamGrouper.isTeamsMatch;
-        // else {
-        //     if (MusicSynth.currentSong.hasBahs) MusicSynth.player.SetTickEvent(tick =>
-        // {
-        //     if (MusicSynth.nextBahTick == tick) BahAllEnemies();
-        //     MusicSynth.AdvanceBah();
-        // });}
+
+        if (Togglerizer.currentEffects.Contains("NoBahs"))
+        {
+            MusicSynth.CurrentSong.mutedChannelsNormal |= 1 << MusicSynth.CurrentSong.bahChannel;
+            MusicSynth.CurrentSong.mutedChannelsSpectating |= 1 << MusicSynth.CurrentSong.bahChannel;
+            MusicSynth.SetSpectating(SpectationManager.Spectating);     // force a refresh of the currently muted channels.
+        }
+        else
+        if (MusicSynth.CurrentSong.bahChannel >= 0)
+        {
+            MusicSynth.SetOnMidiMessage((int channel, int command, int data1, int data2) =>
+            {
+                if (channel == MusicSynth.CurrentSong.bahChannel && command == 0x90 && data2 > 0)
+                {
+                    bahRequested = true;
+                }
+            });
+        }
 
         startServerTime = startTimestamp + 3500;
         foreach (var wfgs in FindObjectsOfType<WaitForGameStart>())
@@ -1152,7 +1166,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         if (!PhotonNetwork.IsMasterClient) return;
         foreach (var player in players.Where(player => player != null && player != whom))
             player.photonView.RPC("Disqualify", RpcTarget.All);
-        SetAllMusicPlaybackState(Songinator.PlaybackState.STOPPED, 1f);
+        SetAllMusicPlaybackState(Songinator.PlaybackState.STOPPED, 0.5f);
     }
 
     public void CheckForWinner()
@@ -1252,12 +1266,6 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
                     NetworkUtils.EventAll, SendOptions.SendReliable);
     }
 
-    public void BahAllEnemies()
-    {
-        foreach (var enemy in bahableEntities) enemy.bah();
-        MatchConditioner.ConditionActioned(null, "Bah‘d");
-    }
-
     private void SetMusicState(Enums.MusicState state)
     {
         if (musicState == state)
@@ -1273,14 +1281,26 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
 
     private void HandleMusic()
     {
+        Utils.TickTimer(ref bahCooldownTimer, 0, Time.fixedDeltaTime);
+
+        if (bahRequested)
+        {
+            if (bahCooldownTimer <= 0)
+            {
+                bahRequested = false;
+                foreach (var enemy in bahableEntities) enemy.Bah();
+                MatchConditioner.ConditionActioned(null, "Bah'd");
+                bahCooldownTimer = 0.2f;
+            }
+            else
+                bahRequested = false;
+        }
+
         var invincible = false;
         var mega = false;
 
-        foreach (var player in players)
+        foreach (var player in players.Where(player => player))
         {
-            if (!player)
-                continue;
-
             if (player.state == Enums.PowerupState.MegaMushroom && player.giantTimer != 15)
                 mega = true;
             if (player.invincible > 0)

@@ -18,9 +18,9 @@ public class Songinator : MonoBehaviour
         PLAYING = 1
     }
 
-    [NonSerialized] public Synthesizer Synth;
-    [NonSerialized] public MidiFileSequencer Sequencer;
-    [NonSerialized] public AudioSource Source;
+    [NonSerialized] private Synthesizer Synth;
+    [NonSerialized] private MidiFileSequencer Sequencer;
+    [NonSerialized] private AudioSource Source;
 
     [SerializeField] public bool autoStart = true;
     [SerializeField] public List<MIDISong> songs;
@@ -32,7 +32,6 @@ public class Songinator : MonoBehaviour
     private TimeSpan timeAtPause = TimeSpan.Zero;
     private int currentlyMutedChannels;
 
-    public Synthesizer.OnMidiMessage OnMidiMessage;
     public delegate void OnFadingComplete();
     private Coroutine switchToSongCoroutine;
 
@@ -61,10 +60,7 @@ public class Songinator : MonoBehaviour
         var settings = new SynthesizerSettings(AudioSettings.outputSampleRate);
         settings.EnableReverbAndChorus = false;
         settings.BlockSize = 64;
-        Synth = new Synthesizer(sf, settings)
-        {
-            onMidiMessage = OnMidiMessage
-        };
+        Synth = new Synthesizer(sf, settings);
         Sequencer = new MidiFileSequencer(Synth);
 
         var driver = gameObject.GetComponent<ToneAudioDriver>();
@@ -174,5 +170,10 @@ public class Songinator : MonoBehaviour
     {
         currentlyMutedChannels = how ? CurrentSong.mutedChannelsSpectating : CurrentSong.mutedChannelsNormal;
         Synth.SetChannelsMuted(currentlyMutedChannels);
+    }
+
+    public void SetOnMidiMessage(Synthesizer.OnMidiMessage func)
+    {
+        Synth.onMidiMessage += func;
     }
 }
