@@ -11,6 +11,9 @@ public class DeviceRumbler : MonoBehaviour
     private void Start()
     {
         rumbleEnabled = GlobalController.Instance.settings.rumbleController;
+#if UNITY_ANDROID
+        Vibration.Init();
+#endif
     }
 
     private void OnEnable()
@@ -33,10 +36,11 @@ public class DeviceRumbler : MonoBehaviour
 
     public void RumbleForSeconds(float bassStrength, float trebleStrength, float duration)
     {
+        if (!rumbleEnabled || pad == null || duration <= 0f) return;
+
 #if UNITY_ANDROID
-        if (rumbleEnabled) Handheld.Vibrate();
+        Vibration.VibrateAndroid(duration * 1000);
 #else
-        if (!rumbleEnabled || pad == null) return;
         if (currentlyRumbling != null) StopCoroutine(currentlyRumbling);
         currentlyRumbling = StartCoroutine(Rumble(bassStrength, trebleStrength, duration));
 #endif

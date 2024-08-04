@@ -3478,9 +3478,9 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
 
         PlaySound(Enums.Sounds.Player_Sound_DeathOthers);
         GameManager.Instance.MatchConditioner.ConditionActioned(this, "Disqualified");
-        GameManager.Instance.CheckForWinner();
 
         Destroy(gameObject);
+        GameManager.Instance.CheckForWinner();
     }
 
     public bool goalReachedBottom;

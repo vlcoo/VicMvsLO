@@ -113,5 +113,6 @@ public class LoadingWaitingOn : MonoBehaviour
         StopCoroutine(waitingCoroutine);
         GetComponent<Animator>().SetTrigger(spectating ? "spectating" : "loaded");
         MusicSynth.SetPlaybackState(Songinator.PlaybackState.STOPPED, 2.0f);
+        MusicSynthIdle.SetPlaybackState(Songinator.PlaybackState.STOPPED, 2.0f);
     }
 }

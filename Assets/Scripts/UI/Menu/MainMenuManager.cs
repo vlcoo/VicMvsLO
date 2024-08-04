@@ -186,7 +186,8 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         new KeyValuePair<string, string>("KnockedBack", "ActKnockbackPlayer"),
         new KeyValuePair<string, string>("Frozen", "ActFreezePlayer"),
         new KeyValuePair<string, string>("Died", "ActFreezePlayer"),
-        new KeyValuePair<string, string>("ReachedCoinLimit", "ActGiveCoin")
+        new KeyValuePair<string, string>("ReachedCoinLimit", "ActGiveCoin"),
+        new KeyValuePair<string, string>("LostPowerup", "ActHarmPlayer")
     };
 
     private List<string> formattedRegions;
