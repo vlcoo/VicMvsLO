@@ -125,6 +125,14 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         TeamGrouper = GetComponent<TeamGrouper>();
         levelUIColor.a = .7f;
         coins = GameObject.FindGameObjectsWithTag("coin");
+        if (Togglerizer.currentEffects.Contains("NoCoins"))
+        {
+            foreach (var coin in coins)
+            {
+                coin.GetComponent<SpriteRenderer>().enabled = false;
+                coin.GetComponent<BoxCollider2D>().enabled = false;
+            }
+        }
         if (Togglerizer.currentEffects.Contains("ReverseLoop") && loopingLevel) loopingLevel = !loopingLevel;
         if (loopingLevel)
         {
@@ -598,12 +606,13 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
 
                 tilemap.SetTilesBlock(origin, originalTiles);
 
-                foreach (var coin in coins)
-                {
-                    //dont use setactive cause it breaks animation cycles being synced
-                    coin.GetComponent<SpriteRenderer>().enabled = true;
-                    coin.GetComponent<BoxCollider2D>().enabled = true;
-                }
+                if (!Togglerizer.currentEffects.Contains("NoCoins"))
+                    foreach (var coin in coins)
+                    {
+                        //dont use setactive cause it breaks animation cycles being synced
+                        coin.GetComponent<SpriteRenderer>().enabled = true;
+                        coin.GetComponent<BoxCollider2D>().enabled = true;
+                    }
 
                 StartCoroutine(BigStarRespawn());
 

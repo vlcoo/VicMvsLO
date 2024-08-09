@@ -207,4 +207,9 @@ public class MatchConditioner : MonoBehaviour
     {
         whom.RandomTeleport();
     }
+
+    public void ActRemoveReserve(PlayerController whom)
+    {
+        whom.storedPowerup = null;
+    }
 }

@@ -264,7 +264,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b7d0b50aa454f0d4e9eeef5ebac67e30, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  goUpSlopes: 0
+  goUpSlopes: 1
   onGround: 0
   hitRoof: 0
   hitRight: 0
@@ -622,6 +622,16 @@ PrefabInstance:
       propertyPath: m_Name
       value: bombhei
       objectReference: {fileID: 0}
+    - target: {fileID: 3736573445715568210, guid: 47620f8f758b6abe5ad332dde97950aa,
+        type: 3}
+      propertyPath: m_Materials.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3736573445715568210, guid: 47620f8f758b6abe5ad332dde97950aa,
+        type: 3}
+      propertyPath: m_Materials.Array.data[2]
+      value: 
+      objectReference: {fileID: 2100000, guid: 68b3b6fe5730b1b1d971ad286b12121f, type: 2}
     m_RemovedComponents:
     - {fileID: 5866666021909216657, guid: 47620f8f758b6abe5ad332dde97950aa, type: 3}
     m_RemovedGameObjects: []
