@@ -80,6 +80,12 @@ public class Songinator : MonoBehaviour
 
     public YieldInstruction SetPlaybackState(PlaybackState newState, float secondsFading = 0f)
     {
+        if (Sequencer is null || Synth is null || _currentMidiFile is null)
+        {
+            CurrentSong = songs[0];
+            InitializeMeltySynth();
+        }
+
         if (newState == state) return null;
 
         if (secondsFading > 0f)

@@ -9,6 +9,7 @@ using NSMB.Utils;
 using Photon.Pun;
 using Photon.Realtime;
 using TMPro;
+using UnityEditor.PackageManager.UI;
 using UnityEngine;
 using UnityEngine.Experimental.Rendering;
 using UnityEngine.InputSystem;
@@ -47,8 +48,8 @@ public class GlobalController : Singleton<GlobalController>, IInRoomCallbacks, I
         settings = GetComponent<Settings>();
         DiscordController = GetComponent<DiscordController>();
         rumbler = GetComponent<DeviceRumbler>();
-        PopulateSpecialPlayers();
         PopulateEmoteNames();
+        PopulateSpecialPlayers();
 
         PhotonNetwork.AddCallbackTarget(this);
     }
@@ -101,7 +102,7 @@ public class GlobalController : Singleton<GlobalController>, IInRoomCallbacks, I
             (windowWidth != currentWidth || windowHeight != currentHeight))
         {
             currentHeight = (int)(currentWidth * (9f / 16f));
-            Screen.SetResolution(currentWidth, currentHeight, FullScreenMode.Windowed);
+            Screen.SetResolution(currentWidth, currentHeight, false);
         }
 
         windowWidth = currentWidth;
@@ -112,6 +113,7 @@ public class GlobalController : Singleton<GlobalController>, IInRoomCallbacks, I
     public void OnPlayerEnteredRoom(Player newPlayer)
     {
         NetworkUtils.nicknameCache.Remove(newPlayer.UserId);
+        PopulateSpecialPlayers();
     }
 
     public void OnPlayerLeftRoom(Player otherPlayer)
@@ -157,6 +159,8 @@ public class GlobalController : Singleton<GlobalController>, IInRoomCallbacks, I
 
     private async void PopulateSpecialPlayers()
     {
+        SPECIAL_PLAYERS.Clear();
+
         //get http results
         var request = (HttpWebRequest)WebRequest.Create(PhotonExtensions.SPECIALS_URL);
         request.Accept = "application/json";
@@ -167,7 +171,7 @@ public class GlobalController : Singleton<GlobalController>, IInRoomCallbacks, I
         if (response.StatusCode != HttpStatusCode.OK)
             return;
 
-        var json = new StreamReader(response.GetResponseStream()).ReadToEnd();
+        var json = await new StreamReader(response.GetResponseStream()!).ReadToEndAsync();
         var deserializedJson = JsonConvert.DeserializeObject<Dictionary<string, string>>(json);
         if (deserializedJson == null) return;
         foreach (var player in deserializedJson)

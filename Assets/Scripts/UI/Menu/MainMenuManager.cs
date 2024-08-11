@@ -1070,6 +1070,12 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
     public void OpenLobbyMenu()
     {
+        if (PhotonNetwork.LocalPlayer?.GetAuthorityLevel() < Enums.AuthorityLevel.NORMAL)
+        {
+            OpenErrorBox(NetworkUtils.banMessage);
+            return;
+        }
+
         title.SetActive(false);
         bg.SetActive(true);
         mainMenu.SetActive(false);
@@ -1265,6 +1271,12 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
     public void OpenErrorBox(string text)
     {
+        if (text == NetworkUtils.banMessage)
+        {
+            SceneManager.LoadScene(1, LoadSceneMode.Single);
+            return;
+        }
+
         if (!errorBox.activeSelf)
             sfx.PlayOneShot(Enums.Sounds.UI_Error.GetClip());
         errorText.text = text;
@@ -1489,6 +1501,12 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         if (selectedRoom == null)
             return;
 
+        if (PhotonNetwork.LocalPlayer?.GetAuthorityLevel() < Enums.AuthorityLevel.NORMAL)
+        {
+            OpenErrorBox(NetworkUtils.banMessage);
+            return;
+        }
+
         PhotonNetwork.NickName = nicknameField.text;
         PhotonNetwork.JoinRoom(selectedRoomIcon.room.Name);
     }
@@ -1501,6 +1519,12 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         if (id.Length < 8 || index < 0 || index >= allRegions.Count)
         {
             OpenErrorBox("Room doesn't exist.");
+            return;
+        }
+
+        if (PhotonNetwork.LocalPlayer?.GetAuthorityLevel() < Enums.AuthorityLevel.NORMAL)
+        {
+            OpenErrorBox(NetworkUtils.banMessage);
             return;
         }
 
@@ -1526,9 +1550,9 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
     public void CreateRoom()
     {
-        if (PhotonNetwork.LocalPlayer?.GetAuthorityLevel() < Enums.AuthorityLevel.SOFT_BANNED)
+        if (PhotonNetwork.LocalPlayer?.GetAuthorityLevel() < Enums.AuthorityLevel.NORMAL)
         {
-            OpenErrorBox("You've been banned.");
+            OpenErrorBox(NetworkUtils.banMessage);
             return;
         }
 

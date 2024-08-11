@@ -29,6 +29,7 @@ public class LoadingWaitingOn : MonoBehaviour
     public Coroutine waitingCoroutine;
     private float waitingLastTimer = -1;
     private bool timedOut = false;
+    private bool isErrorMode = false;
 
     public void Start()
     {
@@ -39,11 +40,21 @@ public class LoadingWaitingOn : MonoBehaviour
         marioLoadingScene.SetActive(!isBowsers);
         koopaLoadingScene.SetActive(isBowsers);
 
-        waitingCoroutine = StartCoroutine(WaitForEveryone());
+        isErrorMode = PhotonNetwork.LocalPlayer?.GetAuthorityLevel() < Enums.AuthorityLevel.NORMAL;
+        if (!isErrorMode) waitingCoroutine = StartCoroutine(WaitForEveryone());
     }
 
     public void Update()
     {
+        if (isErrorMode)
+        {
+            if (MusicSynth.state == Songinator.PlaybackState.PLAYING) MusicSynth.SetPlaybackState(Songinator.PlaybackState.STOPPED);
+            if (MusicSynthIdle.state == Songinator.PlaybackState.STOPPED) MusicSynthIdle.SetPlaybackState(Songinator.PlaybackState.PLAYING);
+            infoText.text = NetworkUtils.banMessage;
+            highPingAlert.text = "";
+            return;
+        }
+
         if (timedOut)
         {
             infoText.text = "Timed out!";

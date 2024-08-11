@@ -33,6 +33,8 @@ namespace NSMB.Utils
             ["rue"] = "Russia, East"
         };
 
+        public static string banMessage = "Unauthorized Access!";
+
         public static Dictionary<DisconnectCause, string> disconnectMessages = new()
         {
             [DisconnectCause.MaxCcuReached] = "This region is full; try again later.",

@@ -566,6 +566,11 @@ public class PlayerAnimationController : MonoBehaviourPun
             transform.position = body.position =
                 new Vector3(de.otherDoor.transform.position.x, de.otherDoor.transform.position.y, 1);
             animator.SetTrigger("door");
+            if (de.otherDoor.isGoal)
+            {
+                GameManager.Instance.WinByGoal(controller);
+                return;
+            }
             controller.doorDirection = false;
             de.otherDoor.photonView.RPC(nameof(DoorManager.SomeoneEntered), RpcTarget.All, true);
             photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.World_Door_Open);

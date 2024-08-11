@@ -33,7 +33,6 @@ RectTransform:
   m_Children:
   - {fileID: 3214424679001341300}
   m_Father: {fileID: 1776850482587567143}
-  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -57,6 +56,7 @@ Canvas:
   m_OverrideSorting: 0
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
+  m_VertexColorAlwaysGammaSpace: 0
   m_AdditionalShaderChannelsFlag: 0
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
@@ -133,7 +133,6 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1492364480256887555}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
@@ -207,6 +206,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1776850482587567141}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -215,7 +215,6 @@ Transform:
   - {fileID: 1492364480256887555}
   - {fileID: 8093469521220534403}
   m_Father: {fileID: 0}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1776850482587567140
 MonoBehaviour:
@@ -252,7 +251,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 3211edc9ee1951f4780bd104a9fbd597, type: 2}
   - {fileID: 11400000, guid: 245cea6ccab8e0d47a215ef6df104e09, type: 2}
   - {fileID: 11400000, guid: 2ea8c39849fd3704cb659e2d4ef905c3, type: 2}
-  logoGradient: {fileID: 11400000, guid: 160c1e5da1a19ec27955821ccf546a54, type: 2}
+  logoGradient: {fileID: 11400000, guid: 389f7e1a6a0471566a28f3878089e8bb, type: 2}
   emotesAsset: {fileID: 11400000, guid: 41dba35b2bff1014ea5dbf8b6dfc1a30, type: 2}
   ndsCanvas: {fileID: 1955773772637164072}
   fourByThreeImage: {fileID: 0}
@@ -274,7 +273,7 @@ MonoBehaviour:
   controlsJson: 
   joinedAsSpectator: 0
   checkedForVersion: 0
-  fastLoad: 0
+  fastLoad: 1
   EMOTE_NAMES: []
 --- !u!114 &1776850482587567144
 MonoBehaviour:
@@ -468,7 +467,6 @@ RectTransform:
   - {fileID: 2773169219221414458}
   - {fileID: 6408806314988168569}
   m_Father: {fileID: 1776850482587567143}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -492,6 +490,7 @@ Canvas:
   m_OverrideSorting: 0
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
+  m_VertexColorAlwaysGammaSpace: 0
   m_AdditionalShaderChannelsFlag: 0
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
@@ -570,7 +569,6 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 6408806314988168569}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -662,13 +660,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7354798521325473033}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 8093469521220534403}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1157838146283320486
 MonoBehaviour:
@@ -697,6 +695,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 01614664b831546d2ae94a42149d80ac, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_SendPointerHoverToParent: 1
   m_MoveRepeatDelay: 0.5
   m_MoveRepeatRate: 0.1
   m_XRTrackingOrigin: {fileID: 0}
@@ -755,7 +754,6 @@ RectTransform:
   m_Children:
   - {fileID: 3574729310994062265}
   m_Father: {fileID: 1492364480256887555}
-  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
