@@ -54,6 +54,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         emoteListPrompt,
         RNGRulesBox,
         specialPrompt,
+        presetPrompt,
         stagePrompt,
         teamsPrompt,
         powerupsPrompt;
@@ -129,6 +130,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         emoteListSelected,
         RNGRulesSelected,
         specialSelected,
+        presetSelected,
         stageSelected,
         teamsSelected,
         powerupsSelected;
@@ -1156,6 +1158,11 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     public void OpenSpecialRule()
     {
         OpenPrompt(specialPrompt, specialSelected);
+    }
+
+    public void OpenPresetRule()
+    {
+        OpenPrompt(presetPrompt, presetSelected);
     }
 
     public void OpenMapSelector()
