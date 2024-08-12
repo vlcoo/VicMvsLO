@@ -55,6 +55,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         RNGRulesBox,
         specialPrompt,
         presetPrompt,
+        presetHintPrompt,
         stagePrompt,
         teamsPrompt,
         powerupsPrompt;
@@ -131,6 +132,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         RNGRulesSelected,
         specialSelected,
         presetSelected,
+        presetHintSelected,
         stageSelected,
         teamsSelected,
         powerupsSelected;
@@ -837,20 +839,18 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         }
     }
 
-    public void onSetSpecialRule(GameObject element)
+    public void SetSpecialRule(string ruleName, bool how)
     {
-        var name = element.name;
         var thereWereDuplicates = false;
-        var how = element.transform.GetChild(2).GetComponent<Toggle>().isOn;
 
         if (how)
         {
-            if (!specialList.Contains(name)) specialList.Add(name);
+            if (!specialList.Contains(ruleName)) specialList.Add(ruleName);
             else thereWereDuplicates = true;
         }
         else
         {
-            specialList.Remove(name);
+            specialList.Remove(ruleName);
         }
 
         specialCountText.text = "Specials: " + specialList.Count;
@@ -861,6 +861,11 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
             [Enums.NetRoomProperties.SpecialRules] = SpecialRulesToDict()
         };
         PhotonNetwork.CurrentRoom.SetCustomProperties(table);
+    }
+
+    public void onSetSpecialRule(GameObject element)
+    {
+        SetSpecialRule(element.name, element.transform.GetChild(2).GetComponent<Toggle>().isOn);
     }
 
     public void saveMatchRules()
@@ -962,6 +967,16 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     public void onDownPowerupChance(string powerup)
     {
         powerupList.Find(entry => entry.powerup.Equals(powerup)).Chance -= 1;
+        Hashtable table = new()
+        {
+            [Enums.NetRoomProperties.PowerupChances] = PowerupChancesToDict()
+        };
+        PhotonNetwork.CurrentRoom.SetCustomProperties(table);
+    }
+
+    public void onExplicitPowerupChance(string powerup, int chance)
+    {
+        powerupList.Find(entry => entry.powerup.Equals(powerup)).Chance = chance;
         Hashtable table = new()
         {
             [Enums.NetRoomProperties.PowerupChances] = PowerupChancesToDict()
@@ -2498,6 +2513,98 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         seconds = minutes * 60 + seconds;
 
         return seconds;
+    }
+
+    public void SetRulesetPreset(RulesetData data)
+    {
+        if (!data.IsValid()) return;
+
+        if (data.description != "")
+        {
+            presetHintPrompt.transform.Find("Image/Header/NameLbl").GetComponent<TMP_Text>().text = data.legalName;
+            presetHintPrompt.transform.Find("Image/DescriptionLbl").GetComponent<TMP_Text>().text = data.description;
+            OpenPrompt(presetHintPrompt, presetHintSelected);
+        }
+
+        if (data.rulePairsConditions.Length > 0)
+        {
+            foreach (var rule in ruleList)
+                Destroy(rule.gameObject);
+            ruleList.Clear();
+            for (var i = 0; i < data.rulePairsConditions.Length; i++)
+                onAddMatchRuleExplicit(data.rulePairsConditions[i], data.rulePairsActions[i], false);
+            Hashtable table = new()
+            {
+                [Enums.NetRoomProperties.MatchRules] = MatchRulesToJson()
+            };
+            PhotonNetwork.CurrentRoom.SetCustomProperties(table);
+        }
+
+        if (data.specials.Length > 0)
+        {
+            foreach (Transform toggle in specialTogglesParent.transform.GetChild(0).transform)
+                toggle.transform.GetChild(2).GetComponent<Toggle>().isOn = data.specials.Contains(toggle.name);
+            foreach (Transform toggle in specialTogglesParent.transform.GetChild(1).transform)
+                toggle.transform.GetChild(2).GetComponent<Toggle>().isOn = data.specials.Contains(toggle.name);
+        }
+
+        // for the stars, coins, lives and time in the data:
+        // if they're -1, they don't get changed at all.
+        // if they're 0, they get disabled like with the toggle in the ui.
+        // finally, if they're 1 or more is valid and will enable them and set the value to that.
+        // exactly the same for laps, but they can't be 0.
+        if (data.stars != -1)
+        {
+            starsEnabled.isOn = data.stars != 0;
+            if (data.stars != 0)
+            {
+                starsText.text = data.stars.ToString();
+                starsText.onEndEdit.Invoke(data.stars.ToString());
+            }
+        }
+        if (data.coins != -1)
+        {
+            coinsEnabled.isOn = data.coins != 0;
+            if (data.coins != 0)
+            {
+                coinsText.text = data.coins.ToString();
+                coinsText.onEndEdit.Invoke(data.coins.ToString());
+            }
+        }
+        if (data.lives != -1)
+        {
+            livesEnabled.isOn = data.lives != 0;
+            if (data.lives != 0)
+            {
+                livesField.text = data.lives.ToString();
+                livesField.onEndEdit.Invoke(data.lives.ToString());
+            }
+        }
+        if (data.timeSeconds != -1)
+        {
+            timeEnabled.isOn = data.timeSeconds != 0;
+            if (data.timeSeconds != 0)
+            {
+                var minutes = data.timeSeconds / 60;
+                var seconds = data.timeSeconds % 60;
+                timeField.text = $"{minutes}:{seconds:D2}";
+                timeField.onEndEdit.Invoke($"{minutes}:{seconds:D2}");
+            }
+        }
+        if (data.laps != -1)
+        {
+            lapsText.text = data.laps.ToString();
+            lapsText.onEndEdit.Invoke(data.laps.ToString());
+        }
+
+        for (var i = 0; i < data.powerups.Length; i++)
+        {
+            powerupList[i].Chance = data.powerups[i];
+            onExplicitPowerupChance(powerupList[i].powerup, data.powerups[i]);
+        }
+
+        nomapToggle.isOn = data.hideTrack;
+        coincountToggle.isOn = data.showCoins;
     }
 
     public void ChangeLobbyHeader(string name)

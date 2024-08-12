@@ -14,10 +14,11 @@ public class RulesetData : ScriptableObject
     [Tooltip("Should other players, and their nametags, be hidden from the track?")] [SerializeField] public bool hideTrack;
 
     [Header("MvL settings")]
-    [Tooltip("Stars to get to win. -1 to disable or -2 to keep unchanged.")] [SerializeField] [Min(-2)] public int stars;
-    [Tooltip("Coins to grab to get powerup. -1 to disable or -2 to keep unchanged.")] [SerializeField] [Min(-2)] public int coins;
-    [Tooltip("Lives of each player. -1 to disable or -2 to keep unchanged.")] [SerializeField] [Min(-2)] public int lives;
-    [Tooltip("Time limit in seconds. -1 to disable or -2 to keep unchanged.")] [SerializeField] [Min(-2)] public int timeSeconds;
+    [Tooltip("Laps to do to win. -1 to keep unchanged.")] [SerializeField] [Min(-1)] public int laps;
+    [Tooltip("Stars to get to win. 0 to disable or -1 to keep unchanged.")] [SerializeField] [Min(-1)] public int stars;
+    [Tooltip("Coins to grab to get powerup. 0 to disable or -1 to keep unchanged.")] [SerializeField] [Min(-1)] public int coins;
+    [Tooltip("Lives of each player. 0 to disable or -1 to keep unchanged.")] [SerializeField] [Min(-1)] public int lives;
+    [Tooltip("Time limit in seconds. 0 to disable or -1 to keep unchanged.")] [SerializeField] [Min(-1)] public int timeSeconds;
 
     [Tooltip("Chances of each powerup to appear (multiplier). Can be 0, 1 or 4. - " +
              "BlueShell, FireFlower, IceFlower, MegaMushroom, MiniMushroom, Mushroom, PropellerMushroom, Star -")] [SerializeField]
@@ -51,4 +52,22 @@ public class RulesetData : ScriptableObject
         }
     }
     #endif
+
+    public bool IsValid()
+    {
+        var v = rulePairsActions.Length == rulePairsConditions.Length
+            && powerups.Length == 8
+            && powerups.All(x => x is 0 or 1 or 4)
+            && stars <= 99
+            && coins <= 99
+            && lives <= 99
+            && laps <= 99
+            && laps != 0
+            && timeSeconds <= 3599
+            && rulePairsActions.Any(MainMenuManager.Instance.POSSIBLE_ACTIONS.Contains)
+            && rulePairsConditions.Any(MainMenuManager.Instance.POSSIBLE_CONDITIONS.Contains);
+
+        if (!v) Debug.LogWarning("Ruleset is invalid.");
+        return v;
+    }
 }

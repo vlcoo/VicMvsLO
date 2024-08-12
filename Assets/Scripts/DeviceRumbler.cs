@@ -39,7 +39,7 @@ public class DeviceRumbler : MonoBehaviour
         if (!rumbleEnabled || pad == null || duration <= 0f) return;
 
 #if UNITY_ANDROID
-        Vibration.VibrateAndroid(duration * 1000);
+        Vibration.VibrateAndroid((long)(duration * 1000));
 #else
         if (currentlyRumbling != null) StopCoroutine(currentlyRumbling);
         currentlyRumbling = StartCoroutine(Rumble(bassStrength, trebleStrength, duration));

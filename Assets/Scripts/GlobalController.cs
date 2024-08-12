@@ -2,17 +2,14 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
-using System.Runtime.InteropServices;
 using ExitGames.Client.Photon;
 using Newtonsoft.Json;
 using NSMB.Utils;
 using Photon.Pun;
 using Photon.Realtime;
 using TMPro;
-using UnityEditor.PackageManager.UI;
 using UnityEngine;
 using UnityEngine.Experimental.Rendering;
-using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 
 public class GlobalController : Singleton<GlobalController>, IInRoomCallbacks, ILobbyCallbacks
@@ -95,19 +92,6 @@ public class GlobalController : Singleton<GlobalController>, IInRoomCallbacks, I
         {
             ndsCanvas.SetActive(false);
         }
-
-        //todo: this jitters to hell
-#if UNITY_STANDALONE
-        if (Screen.fullScreenMode == FullScreenMode.Windowed && Keyboard.current[Key.LeftShift].isPressed &&
-            (windowWidth != currentWidth || windowHeight != currentHeight))
-        {
-            currentHeight = (int)(currentWidth * (9f / 16f));
-            Screen.SetResolution(currentWidth, currentHeight, false);
-        }
-
-        windowWidth = currentWidth;
-        windowHeight = currentHeight;
-#endif
     }
 
     public void OnPlayerEnteredRoom(Player newPlayer)
