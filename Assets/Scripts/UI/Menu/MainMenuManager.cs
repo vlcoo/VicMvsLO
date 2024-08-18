@@ -2526,27 +2526,21 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
             OpenPrompt(presetHintPrompt, presetHintSelected);
         }
 
-        if (data.rulePairsConditions.Length > 0)
+        foreach (var rule in ruleList)
+            Destroy(rule.gameObject);
+        ruleList.Clear();
+        for (var i = 0; i < data.rulePairsConditions.Length; i++)
+            onAddMatchRuleExplicit(data.rulePairsConditions[i], data.rulePairsActions[i], false);
+        Hashtable table = new()
         {
-            foreach (var rule in ruleList)
-                Destroy(rule.gameObject);
-            ruleList.Clear();
-            for (var i = 0; i < data.rulePairsConditions.Length; i++)
-                onAddMatchRuleExplicit(data.rulePairsConditions[i], data.rulePairsActions[i], false);
-            Hashtable table = new()
-            {
-                [Enums.NetRoomProperties.MatchRules] = MatchRulesToJson()
-            };
-            PhotonNetwork.CurrentRoom.SetCustomProperties(table);
-        }
+            [Enums.NetRoomProperties.MatchRules] = MatchRulesToJson()
+        };
+        PhotonNetwork.CurrentRoom.SetCustomProperties(table);
 
-        if (data.specials.Length > 0)
-        {
-            foreach (Transform toggle in specialTogglesParent.transform.GetChild(0).transform)
-                toggle.transform.GetChild(2).GetComponent<Toggle>().isOn = data.specials.Contains(toggle.name);
-            foreach (Transform toggle in specialTogglesParent.transform.GetChild(1).transform)
-                toggle.transform.GetChild(2).GetComponent<Toggle>().isOn = data.specials.Contains(toggle.name);
-        }
+        foreach (Transform toggle in specialTogglesParent.transform.GetChild(0).transform)
+            toggle.transform.GetChild(2).GetComponent<Toggle>().isOn = data.specials.Contains(toggle.name);
+        foreach (Transform toggle in specialTogglesParent.transform.GetChild(1).transform)
+            toggle.transform.GetChild(2).GetComponent<Toggle>().isOn = data.specials.Contains(toggle.name);
 
         // for the stars, coins, lives and time in the data:
         // if they're -1, they don't get changed at all.
