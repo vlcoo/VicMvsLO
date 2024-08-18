@@ -49,6 +49,7 @@ public class PowerupTile : BreakableBrickTile
         }
 
         Bump(interacter, direction, worldLocation);
+        if (GameManager.Instance.Togglerizer.currentEffects.Contains("NoPowerups")) spawnResult = "";
 
         object[] parametersBump =
             { tileLocation.x, tileLocation.y, direction == InteractionDirection.Down, resultTile, spawnResult };
