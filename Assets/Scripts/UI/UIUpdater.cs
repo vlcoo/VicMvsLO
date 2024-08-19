@@ -172,7 +172,7 @@ public class UIUpdater : MonoBehaviour
             if (seconds != timer)
             {
                 timer = seconds;
-                uiCountdown.text = "<sprite name=\"hudnumber_timer\">" + Utils.GetNumberString(timer / 60) + "<sprite name=\"hudnumber_colon\"" + Utils.GetNumberString((seconds % 60).ToString("00"));
+                uiCountdown.text = "<sprite name=\"hudnumber_timer\">" + Utils.GetNumberString(timer / 60) + " " + Utils.GetNumberString((seconds % 60).ToString("00"));
             }
 
             timerParent.SetActive(true);

@@ -26,6 +26,7 @@ public class Songinator : MonoBehaviour
     [SerializeField] public List<MIDISong> songs;
     [SerializeField] public List<int> chances;
     private readonly WeightedList<MIDISong> weightedList = new();
+    private const float OriginalPitch = 0.985f;
 
     [NonSerialized] public MIDISong CurrentSong;
     [SerializeField] public PlaybackState state = PlaybackState.STOPPED;
@@ -74,7 +75,7 @@ public class Songinator : MonoBehaviour
         Sequencer.Speed = CurrentSong.playbackSpeedNormal;
         Sequencer.StartLoopTicks = CurrentSong.startLoopTicks;
         Sequencer.EndLoopTicks = CurrentSong.endTicks;
-        Source.pitch += CurrentSong.pitchDeltaNormal;
+        Source.pitch = OriginalPitch + CurrentSong.pitchDeltaNormal;
         currentlyMutedChannels = CurrentSong.mutedChannelsNormal;
     }
 
