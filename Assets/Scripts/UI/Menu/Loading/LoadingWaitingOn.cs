@@ -26,7 +26,7 @@ public class LoadingWaitingOn : MonoBehaviour
         spectatorText = "Joining as Spectator...";
 
     [SerializeField] private int waitingTime, waitingLastTime;
-    public Coroutine waitingCoroutine;
+    private Coroutine waitingCoroutine;
     private float waitingLastTimer = -1;
     private bool timedOut = false;
     private bool isErrorMode = false;
@@ -41,7 +41,10 @@ public class LoadingWaitingOn : MonoBehaviour
         koopaLoadingScene.SetActive(isBowsers);
 
         isErrorMode = PhotonNetwork.LocalPlayer?.GetAuthorityLevel() < Enums.AuthorityLevel.NORMAL;
-        if (!isErrorMode) waitingCoroutine = StartCoroutine(WaitForEveryone());
+        if (!isErrorMode)
+        {
+            waitingCoroutine = StartCoroutine(WaitForEveryone());
+        }
     }
 
     public void Update()
