@@ -5,15 +5,15 @@ namespace HGS.Tone
 {
   public class ToneAudioDriver : MonoBehaviour
   {
-    IAudioRenderer _audioRenderer;
-    float[] _buffer;
+    private IAudioRenderer _audioRenderer;
+    private float[] _buffer;
 
-    void Awake()
+    private void Awake()
     {
       CreateAudioSource();
     }
 
-    void CreateAudioSource()
+    private void CreateAudioSource()
     {
       if (!gameObject.TryGetComponent(out AudioSource source))
       {
@@ -26,7 +26,7 @@ namespace HGS.Tone
       _audioRenderer = audioRenderer;
     }
 
-    void OnAudioFilterRead(float[] data, int channels)
+    private void OnAudioFilterRead(float[] data, int channels)
     {
       _buffer = new float[data.Length];
       _audioRenderer.RenderInterleaved(_buffer);

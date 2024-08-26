@@ -87,6 +87,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         rumbleToggle,
         onscreenControlsToggle,
         animsToggle,
+        countersToggle,
         vsyncToggle,
         privateToggle,
         privateToggleRoom,
@@ -220,6 +221,8 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         Instance = this;
         sfx.outputAudioMixerGroup.audioMixer.SetFloat("SFXReverb", 0f);
         // sfx.outputAudioMixerGroup.audioMixer.SetFloat("MasterPitch", -80f);
+
+        GlobalController.Instance.PopulateSpecialPlayers();
 
         //Clear game-specific settings so they don't carry over
         HorizontalCamera.OFFSET_TARGET = 0;
@@ -473,8 +476,8 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         var banList = bans.Cast<NameIdPair>().ToList();
         if (newPlayer.NickName.Length < NICKNAME_MIN ||
             newPlayer.NickName.Length > NICKNAME_MAX ||
-            banList.Any(nip =>
-                nip.userId == newPlayer.UserId || newPlayer.GetAuthorityLevel() < Enums.AuthorityLevel.NORMAL))
+            banList.Any(nip => nip.userId == newPlayer.UserId) ||
+            newPlayer.GetAuthorityLevel() < Enums.AuthorityLevel.NORMAL)
         {
             if (PhotonNetwork.IsMasterClient)
                 StartCoroutine(KickPlayer(newPlayer));
@@ -489,7 +492,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     {
         Utils.GetCustomProperty(Enums.NetRoomProperties.Bans, out object[] bans);
         var banList = bans.Cast<NameIdPair>().ToList();
-        if (banList.Any(nip => nip.userId == otherPlayer.UserId)) return;
+        if (banList.Any(nip => nip.userId == otherPlayer.UserId) || otherPlayer.GetAuthorityLevel() < Enums.AuthorityLevel.NORMAL) return;
         LocalChatMessage($"<i>{otherPlayer.GetUniqueNickname()}</i> just left.", SYSTEM_MESSAGE_COLOR);
         sfx.PlayOneShot(Enums.Sounds.UI_PlayerDisconnect.GetClip());
     }
@@ -821,6 +824,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         vsyncToggle.isOn = Settings.Instance.vsync;
         scoreboardToggle.isOn = Settings.Instance.scoreboardAlways;
         animsToggle.isOn = Settings.Instance.reduceUIAnims;
+        countersToggle.isOn = Settings.Instance.showHUDCounters;
         filterToggle.isOn = Settings.Instance.filter;
         QualitySettings.vSyncCount = Settings.Instance.vsync ? 1 : 0;
     }

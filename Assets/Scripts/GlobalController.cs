@@ -47,7 +47,6 @@ public class GlobalController : Singleton<GlobalController>, IInRoomCallbacks, I
         DiscordController = GetComponent<DiscordController>();
         rumbler = GetComponent<DeviceRumbler>();
         PopulateEmoteNames();
-        PopulateSpecialPlayers();
 
         PhotonNetwork.AddCallbackTarget(this);
     }
@@ -98,7 +97,6 @@ public class GlobalController : Singleton<GlobalController>, IInRoomCallbacks, I
     public void OnPlayerEnteredRoom(Player newPlayer)
     {
         NetworkUtils.nicknameCache.Remove(newPlayer.UserId);
-        PopulateSpecialPlayers();
     }
 
     public void OnPlayerLeftRoom(Player otherPlayer)
@@ -142,10 +140,8 @@ public class GlobalController : Singleton<GlobalController>, IInRoomCallbacks, I
         Instantiate(Resources.Load("Prefabs/Static/GlobalController"));
     }
 
-    private async void PopulateSpecialPlayers()
+    public async void PopulateSpecialPlayers()
     {
-        SPECIAL_PLAYERS.Clear();
-
         //get http results
         var request = (HttpWebRequest)WebRequest.Create(PhotonExtensions.SPECIALS_URL);
         request.Accept = "application/json";
@@ -159,6 +155,8 @@ public class GlobalController : Singleton<GlobalController>, IInRoomCallbacks, I
         var json = await new StreamReader(response.GetResponseStream()!).ReadToEndAsync();
         var deserializedJson = JsonConvert.DeserializeObject<Dictionary<string, string>>(json);
         if (deserializedJson == null) return;
+
+        SPECIAL_PLAYERS.Clear();
         foreach (var player in deserializedJson)
         {
             var sp = new SpecialPlayer(player.Key.Split("|")[1], int.Parse(player.Value));

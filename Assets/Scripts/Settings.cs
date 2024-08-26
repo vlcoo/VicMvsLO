@@ -11,7 +11,7 @@ public class Settings : Singleton<Settings>
     public string nickname;
     public int character, skin;
     public bool ndsResolution, fireballFromSprint = true, vsync, fourByThreeRatio;
-    public bool scoreboardAlways, filter = true, reduceUIAnims = true, onScreenControlsAlways;
+    public bool scoreboardAlways, filter = true, reduceUIAnims = true, onScreenControlsAlways, showHUDCounters = true;
 
     private bool _rumbleController;
 
@@ -86,6 +86,7 @@ public class Settings : Singleton<Settings>
         fourByThreeRatio = PlayerPrefs.GetInt("NDS4by3", 0) == 1;
         scoreboardAlways = PlayerPrefs.GetInt("ScoreboardAlwaysVisible", 1) == 1;
         reduceUIAnims = PlayerPrefs.GetInt("ReduceUIAnims", 0) == 1;
+        showHUDCounters = PlayerPrefs.GetInt("ShowHUDCounters", 1) == 1;
         filter = PlayerPrefs.GetInt("ChatFilter", 1) == 1;
         character = PlayerPrefs.GetInt("Character", 0);
         skin = PlayerPrefs.GetInt("Skin", 0);
@@ -105,6 +106,7 @@ public class Settings : Singleton<Settings>
         PlayerPrefs.SetInt("NDS4by3", fourByThreeRatio ? 1 : 0);
         PlayerPrefs.SetInt("ScoreboardAlwaysVisible", scoreboardAlways ? 1 : 0);
         PlayerPrefs.SetInt("ReduceUIAnims", reduceUIAnims ? 1 : 0);
+        PlayerPrefs.SetInt("ShowHUDCounters", showHUDCounters ? 1 : 0);
         PlayerPrefs.SetInt("ChatFilter", filter ? 1 : 0);
         PlayerPrefs.SetInt("Character", character);
         PlayerPrefs.SetInt("Skin", skin);

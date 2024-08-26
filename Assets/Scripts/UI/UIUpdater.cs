@@ -14,7 +14,7 @@ public class UIUpdater : MonoBehaviour
     public Sprite storedItemNull;
     public TMP_Text uiStars, uiCoins, uiDebug, uiLives, uiCountdown, uiLaps;
     public Image itemReserve, itemColor;
-    public float pingSample;
+    public float pingSample, fpsSample;
     private readonly List<Image> backgrounds = new();
 
     private int coins = -1, stars = -1, lives = -1, timer = -1, laps = -1;
@@ -52,24 +52,25 @@ public class UIUpdater : MonoBehaviour
 
     public void Update()
     {
-        pingSample = Mathf.Lerp(pingSample, PhotonNetwork.GetPing(), Mathf.Clamp01(Time.unscaledDeltaTime * 0.5f));
-        if (pingSample == float.NaN)
-            pingSample = 0;
+        if (Settings.Instance.showHUDCounters)
+        {
+            pingSample = Mathf.Lerp(pingSample, PhotonNetwork.GetPing(), Mathf.Clamp01(Time.unscaledDeltaTime * 0.75f));
+            if (float.IsNaN(pingSample)) pingSample = 0;
+            fpsSample = Mathf.Lerp(fpsSample, 1f / Time.unscaledDeltaTime, Mathf.Clamp01(Time.unscaledDeltaTime * 0.75f));
+            if (float.IsNaN(fpsSample)) fpsSample = 0;
 
-        string signalStrength;
-        if (pingSample < 0)
-            signalStrength = "connection_great";
-        else if (pingSample < 80)
-            signalStrength = "connection_good";
-        else if (pingSample < 120)
-            signalStrength = "connection_fair";
-        else if (pingSample < 180)
-            signalStrength = "connection_bad";
-        else
-            signalStrength = "connection_disconnected";
+            var signalStrength = pingSample switch
+            {
+                < 0 => "connection_great",
+                < 80 => "connection_good",
+                < 120 => "connection_fair",
+                < 180 => "connection_bad",
+                _ => "connection_disconnected"
+            };
 
-        uiDebug.text = "<mark=#000000b0 padding=\"20, 20, 20, 20\">" + (int)pingSample + "ms <sprite name=\"" + signalStrength +
-                       "\">";
+            uiDebug.text = $"<mark=#000000b0 padding=\"20, 20, 20, 20\">{fpsSample:0} FPS\n{pingSample:0}ms <sprite name=\"{signalStrength}\">";
+        }
+        else uiDebug.text = "";
 
         //Player stuff update.
         if (!player && GameManager.Instance.localPlayer)

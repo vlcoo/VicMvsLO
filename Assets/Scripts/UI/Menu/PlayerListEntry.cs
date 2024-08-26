@@ -49,7 +49,7 @@ public class PlayerListEntry : MonoBehaviour
             < 80 => "connection_good",
             < 120 => "connection_fair",
             < 180 => "connection_bad",
-            _ => "connection_disconnectd"
+            _ => "connection_disconnected"
         };
         pingText.text = $"{ping}ms <sprite name=\"{signalStrength}\">";
 
