@@ -55,6 +55,7 @@ public class RouletteTile : BreakableBrickTile
         }
 
         Bump(interacter, direction, worldLocation);
+        if (GameManager.Instance.Togglerizer.currentEffects.Contains("NoPowerups")) spawnResult = null;
 
         var offset = direction == InteractionDirection.Down
             ? bottomSpawnOffset + (spawnResult == "MegaMushroom" ? Vector2.down * 0.5f : Vector2.zero)
