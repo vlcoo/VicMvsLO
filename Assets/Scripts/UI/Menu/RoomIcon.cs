@@ -29,7 +29,8 @@ public class RoomIcon : MonoBehaviour
         var prop = room.CustomProperties;
 
         nameText.text = $"{((string)prop[Enums.NetRoomProperties.HostName]).ToValidUsername()}'s Lobby";
-        playersText.text = $"{room.PlayerCount}/{room.MaxPlayers} - " + ((bool)prop[Enums.NetRoomProperties.GameStarted] ? "Ongoing..." : "Not Started");
+        playersText.text = $"{room.PlayerCount}/{room.MaxPlayers} - " +
+                           ((bool)prop[Enums.NetRoomProperties.GameStarted] ? "Ongoing..." : "Not Started");
         // inProgressText.text = (bool)prop[Enums.NetRoomProperties.GameStarted] ? "In Progress" : "Not Started";
 
         var symbols = "";
@@ -48,9 +49,12 @@ public class RoomIcon : MonoBehaviour
         if (teams) symbols += "<sprite name=\"room_teams\">";
         if (powerups) symbols += "<sprite name=\"room_powerups\">";
         if (time) symbols += "<sprite name=\"room_timer\">";
-        if (lives >= 1) symbols += "<sprite name=\"room_lives\">" + Utils.GetNumberString(lives.ToString(), "room_smallnumber");
-        if (stars >= 1) symbols += "<sprite name=\"room_stars\">" + Utils.GetNumberString(stars.ToString(), "room_smallnumber");
-        if (coins >= 1) symbols += "<sprite name=\"room_coins\">" + Utils.GetNumberString(coins.ToString(), "room_smallnumber");
+        if (lives >= 1)
+            symbols += "<sprite name=\"room_lives\">" + Utils.GetNumberString(lives.ToString(), "room_smallnumber");
+        if (stars >= 1)
+            symbols += "<sprite name=\"room_stars\">" + Utils.GetNumberString(stars.ToString(), "room_smallnumber");
+        if (coins >= 1)
+            symbols += "<sprite name=\"room_coins\">" + Utils.GetNumberString(coins.ToString(), "room_smallnumber");
         //if (password)
         //    symbols += "<sprite name=\"room_privae\">";
 

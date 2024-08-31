@@ -1,14 +1,11 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class MenuWorldSongPlayer : MonoBehaviour
 {
     public int[] levelWorldIds;
+    private int currentWorldId;
 
     private Songinator worldsSonginator;
-    private int currentWorldId = 0;
 
     public void Start()
     {
@@ -20,10 +17,8 @@ public class MenuWorldSongPlayer : MonoBehaviour
         var worldId = levelWorldIds[levelId];
 
         if (worldId == 0)
-        {
             if (worldsSonginator.state != Songinator.PlaybackState.STOPPED)
                 worldsSonginator.SetPlaybackState(Songinator.PlaybackState.STOPPED, 0.5f);
-        }
 
         if (worldId > 0)
         {

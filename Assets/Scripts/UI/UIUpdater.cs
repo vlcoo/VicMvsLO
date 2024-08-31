@@ -16,9 +16,9 @@ public class UIUpdater : MonoBehaviour
     public Image itemReserve, itemColor;
     public float pingSample, fpsSample;
     private readonly List<Image> backgrounds = new();
+    private bool checkpoint;
 
     private int coins = -1, stars = -1, lives = -1, timer = -1, laps = -1;
-    private bool checkpoint = false;
     private GameObject starsParent, coinsParent, livesParent, timerParent, lapsParent;
 
     private Material timerMaterial;
@@ -56,7 +56,8 @@ public class UIUpdater : MonoBehaviour
         {
             pingSample = Mathf.Lerp(pingSample, PhotonNetwork.GetPing(), Mathf.Clamp01(Time.unscaledDeltaTime * 0.75f));
             if (float.IsNaN(pingSample)) pingSample = 0;
-            fpsSample = Mathf.Lerp(fpsSample, 1f / Time.unscaledDeltaTime, Mathf.Clamp01(Time.unscaledDeltaTime * 0.75f));
+            fpsSample = Mathf.Lerp(fpsSample, 1f / Time.unscaledDeltaTime,
+                Mathf.Clamp01(Time.unscaledDeltaTime * 0.75f));
             if (float.IsNaN(fpsSample)) fpsSample = 0;
 
             var signalStrength = pingSample switch
@@ -68,9 +69,13 @@ public class UIUpdater : MonoBehaviour
                 _ => "connection_disconnected"
             };
 
-            uiDebug.text = $"<mark=#000000b0 padding=\"20, 20, 20, 20\">{fpsSample:0} FPS\n{pingSample:0}ms <sprite name=\"{signalStrength}\">";
+            uiDebug.text =
+                $"<mark=#000000b0 padding=\"20, 20, 20, 20\">{fpsSample:0} FPS\n{pingSample:0}ms <sprite name=\"{signalStrength}\">";
         }
-        else uiDebug.text = "";
+        else
+        {
+            uiDebug.text = "";
+        }
 
         //Player stuff update.
         if (!player && GameManager.Instance.localPlayer)
@@ -123,7 +128,9 @@ public class UIUpdater : MonoBehaviour
             if (player.stars != stars)
             {
                 stars = player.stars;
-                uiStars.text = "<sprite name=\"hudnumber_star\"><sprite name=\"hudnumber_x\">" + Utils.GetNumberString(stars) + "<sprite name=\"hudnumber_slash\">" + Utils.GetNumberString(GameManager.Instance.starRequirement);
+                uiStars.text = "<sprite name=\"hudnumber_star\"><sprite name=\"hudnumber_x\">" +
+                               Utils.GetNumberString(stars) + "<sprite name=\"hudnumber_slash\">" +
+                               Utils.GetNumberString(GameManager.Instance.starRequirement);
             }
         }
         else
@@ -136,7 +143,9 @@ public class UIUpdater : MonoBehaviour
             if (player.laps != laps)
             {
                 laps = player.laps;
-                uiLaps.text = "<sprite name=\"hudnumber_laps\"><sprite name=\"hudnumber_x\">" + Utils.GetNumberString(laps) + "<sprite name=\"hudnumber_slash\">" + Utils.GetNumberString(GameManager.Instance.lapRequirement);
+                uiLaps.text = "<sprite name=\"hudnumber_laps\"><sprite name=\"hudnumber_x\">" +
+                              Utils.GetNumberString(laps) + "<sprite name=\"hudnumber_slash\">" +
+                              Utils.GetNumberString(GameManager.Instance.lapRequirement);
             }
         }
         else
@@ -147,9 +156,11 @@ public class UIUpdater : MonoBehaviour
         if (player.coins != coins)
         {
             coins = player.coins;
-            uiCoins.text = "<sprite name=\"hudnumber_coin\"><sprite name=\"hudnumber_x\">" + Utils.GetNumberString(coins) + (GameManager.Instance.coinRequirement > 0
-                ? "<sprite name=\"hudnumber_slash\">" + Utils.GetNumberString(GameManager.Instance.coinRequirement)
-                : "");
+            uiCoins.text = "<sprite name=\"hudnumber_coin\"><sprite name=\"hudnumber_x\">" +
+                           Utils.GetNumberString(coins) + (GameManager.Instance.coinRequirement > 0
+                               ? "<sprite name=\"hudnumber_slash\">" +
+                                 Utils.GetNumberString(GameManager.Instance.coinRequirement)
+                               : "");
         }
 
         if (player.lives >= 0)
@@ -157,7 +168,8 @@ public class UIUpdater : MonoBehaviour
             if (player.lives != lives)
             {
                 lives = player.lives;
-                uiLives.text = Utils.GetCharacterData(player.photonView.Owner).uistring + "<sprite name=\"hudnumber_x\">" +
+                uiLives.text = Utils.GetCharacterData(player.photonView.Owner).uistring +
+                               "<sprite name=\"hudnumber_x\">" +
                                Utils.GetNumberString(lives);
             }
         }
@@ -173,7 +185,8 @@ public class UIUpdater : MonoBehaviour
             if (seconds != timer)
             {
                 timer = seconds;
-                uiCountdown.text = "<sprite name=\"hudnumber_timer\">" + Utils.GetNumberString(timer / 60) + " " + Utils.GetNumberString((seconds % 60).ToString("00"));
+                uiCountdown.text = "<sprite name=\"hudnumber_timer\">" + Utils.GetNumberString(timer / 60) + " " +
+                                   Utils.GetNumberString((seconds % 60).ToString("00"));
             }
 
             timerParent.SetActive(true);

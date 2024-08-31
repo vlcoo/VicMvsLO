@@ -179,7 +179,7 @@ public class KoopaWalk : HoldableEntity
         }
 
         base.FixedUpdate();
-        
+
         animator.SetBool("shell", shell || holder != null);
         animator.SetFloat("xVel", -body.velocity.x * (upsideDown ? -1 : 1));
 
@@ -270,7 +270,9 @@ public class KoopaWalk : HoldableEntity
             else
             {
                 if (isRotating) body.velocity = new Vector2(0, 0);
-                else body.velocity = new Vector2((shell ? currentSpeed : walkSpeed) * (FacingLeftTween ? -1 : 1), body.velocity.y);
+                else
+                    body.velocity = new Vector2((shell ? currentSpeed : walkSpeed) * (FacingLeftTween ? -1 : 1),
+                        body.velocity.y);
             }
         }
 
@@ -443,8 +445,12 @@ public class KoopaWalk : HoldableEntity
             facingLeft = !hitWallOnLeft;
         }
         else
+        {
             FacingLeftTween = !hitWallOnLeft;
-        body.velocity = new Vector2((x > 0.5f ? Mathf.Abs(x) : currentSpeed) * (FacingLeftTween ? -1 : 1), body.velocity.y);
+        }
+
+        body.velocity = new Vector2((x > 0.5f ? Mathf.Abs(x) : currentSpeed) * (FacingLeftTween ? -1 : 1),
+            body.velocity.y);
     }
 
     [PunRPC]

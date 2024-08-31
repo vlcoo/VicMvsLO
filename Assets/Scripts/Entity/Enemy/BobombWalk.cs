@@ -277,7 +277,7 @@ public class BobombWalk : HoldableEntity
     public override void Throw(bool fromLeft, bool crouch, Vector2 pos)
     {
         animator.SetBool("carrying", holder != null);
-        
+
         if (!holder)
             return;
 

@@ -204,11 +204,11 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     [NonSerialized] public List<string> POSSIBLE_ACTIONS = new();
     private bool quit, validName;
     private bool raceMapSelected;
-    private bool warningShown;
     [NonSerialized] public HashSet<MatchRuleListEntry> ruleList = new();
     [NonSerialized] public List<string> specialList = new();
 
     private Coroutine updatePingCoroutine;
+    private bool warningShown;
 
     // Unity Stuff
     public void Start()
@@ -492,7 +492,8 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     {
         Utils.GetCustomProperty(Enums.NetRoomProperties.Bans, out object[] bans);
         var banList = bans.Cast<NameIdPair>().ToList();
-        if (banList.Any(nip => nip.userId == otherPlayer.UserId) || otherPlayer.GetAuthorityLevel() < Enums.AuthorityLevel.NORMAL) return;
+        if (banList.Any(nip => nip.userId == otherPlayer.UserId) ||
+            otherPlayer.GetAuthorityLevel() < Enums.AuthorityLevel.NORMAL) return;
         LocalChatMessage($"<i>{otherPlayer.GetUniqueNickname()}</i> just left.", SYSTEM_MESSAGE_COLOR);
         sfx.PlayOneShot(Enums.Sounds.UI_PlayerDisconnect.GetClip());
     }
@@ -1381,9 +1382,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
         worldSongPlayer.OnLevelSelected(0);
         if (MusicSynth.state == Songinator.PlaybackState.PAUSED)
-        {
             MusicSynth.SetPlaybackState(Songinator.PlaybackState.PLAYING, 0.5f);
-        }
     }
 
     public void StartGame()
@@ -1498,10 +1497,8 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         }
 
         if (worldId > 0)
-        {
             if (MusicSynth.state == Songinator.PlaybackState.PLAYING)
                 MusicSynth.SetPlaybackState(Songinator.PlaybackState.PAUSED, 0.5f);
-        }
     }
 
     public void SelectRoom(GameObject room)
@@ -2560,6 +2557,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
                 starsText.onEndEdit.Invoke(data.stars.ToString());
             }
         }
+
         if (data.coins != -1)
         {
             coinsEnabled.isOn = data.coins != 0;
@@ -2569,6 +2567,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
                 coinsText.onEndEdit.Invoke(data.coins.ToString());
             }
         }
+
         if (data.lives != -1)
         {
             livesEnabled.isOn = data.lives != 0;
@@ -2578,6 +2577,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
                 livesField.onEndEdit.Invoke(data.lives.ToString());
             }
         }
+
         if (data.timeSeconds != -1)
         {
             timeEnabled.isOn = data.timeSeconds != 0;
@@ -2589,6 +2589,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
                 timeField.onEndEdit.Invoke($"{minutes}:{seconds:D2}");
             }
         }
+
         if (data.laps != -1)
         {
             lapsText.text = data.laps.ToString();

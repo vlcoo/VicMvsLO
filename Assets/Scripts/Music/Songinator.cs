@@ -7,10 +7,11 @@ using HGS.Tone;
 using KaimiraGames;
 using MeltySynth;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 public class Songinator : MonoBehaviour
 {
+    public delegate void OnFadingComplete();
+
     public enum PlaybackState
     {
         STOPPED = -2,
@@ -18,25 +19,24 @@ public class Songinator : MonoBehaviour
         PLAYING = 1
     }
 
-    [NonSerialized] private Synthesizer Synth;
-    [NonSerialized] private MidiFileSequencer Sequencer;
-    [NonSerialized] private AudioSource Source;
+    private const float OriginalPitch = 0.985f;
 
     [SerializeField] public bool autoStart = true;
     [SerializeField] public List<MIDISong> songs;
     [SerializeField] public List<int> chances;
-    private readonly WeightedList<MIDISong> weightedList = new();
-    private const float OriginalPitch = 0.985f;
-
-    [NonSerialized] public MIDISong CurrentSong;
     [SerializeField] public PlaybackState state = PlaybackState.STOPPED;
-    private TimeSpan timeAtPause = TimeSpan.Zero;
-    private int currentlyMutedChannels;
-
-    public delegate void OnFadingComplete();
-    private Coroutine switchToSongCoroutine;
+    private readonly WeightedList<MIDISong> weightedList = new();
 
     private MidiFile _currentMidiFile;
+    private int currentlyMutedChannels;
+
+    [NonSerialized] public MIDISong CurrentSong;
+    [NonSerialized] private MidiFileSequencer Sequencer;
+    [NonSerialized] private AudioSource Source;
+    private Coroutine switchToSongCoroutine;
+
+    [NonSerialized] private Synthesizer Synth;
+    private TimeSpan timeAtPause = TimeSpan.Zero;
 
     private void Start()
     {
@@ -46,7 +46,10 @@ public class Songinator : MonoBehaviour
             for (var i = 0; i < songs.Count; i++) weightedList.Add(songs[i], chances[i]);
             CurrentSong = weightedList.Next();
         }
-        else CurrentSong = songs[0];
+        else
+        {
+            CurrentSong = songs[0];
+        }
 
         InitializeMeltySynth();
 
@@ -100,6 +103,7 @@ public class Songinator : MonoBehaviour
                 Source.volume = 0.0f;
                 SetPlaybackState(newState);
             }
+
             return FadeVolume((int)newState, secondsFading, () =>
             {
                 if ((int)newState < 0) SetPlaybackState(newState);
@@ -153,6 +157,7 @@ public class Songinator : MonoBehaviour
             switchToSongCoroutine = null;
             SetPlaybackState(PlaybackState.STOPPED);
         }
+
         switchToSongCoroutine = StartCoroutine(SwitchToSongCoroutine(index, startPlayback, secondsFading));
     }
 

@@ -1,12 +1,11 @@
-﻿using System.Collections;
-using Photon.Pun;
+﻿using Photon.Pun;
 using UnityEngine;
 
 public class DoorManager : MonoBehaviourPun
 {
     public bool entryAllowed = true, fadeOutMusic, isGoal;
     public DoorManager otherDoor;
-    public int playersEnteringCount = 0;
+    public int playersEnteringCount;
     public Animator animator;
 
     [PunRPC]
@@ -16,7 +15,7 @@ public class DoorManager : MonoBehaviourPun
         animator.SetBool("destination", isDestination);
         animator.SetBool("opened", true);
     }
-    
+
     [PunRPC]
     public void SomeoneExited()
     {

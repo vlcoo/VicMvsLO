@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using DG.Tweening;
 using ExitGames.Client.Photon;
 using NSMB.Utils;
 using Photon.Pun;
@@ -67,11 +66,11 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
 
     [Range(1, 10)] public int playersToVisualize = 10;
     private readonly List<BahableEntity> bahableEntities = new();
-    private bool bahRequested = false;
-    private float bahCooldownTimer = 0;
 
     public readonly HashSet<Player> loadedPlayers = new();
     private readonly List<GameObject> remainingSpawns = new();
+    private float bahCooldownTimer;
+    private bool bahRequested;
 
     private ParticleSystem brickBreak;
 
@@ -126,13 +125,12 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         levelUIColor.a = .7f;
         coins = GameObject.FindGameObjectsWithTag("coin");
         if (Togglerizer.currentEffects.Contains("NoCoins"))
-        {
             foreach (var coin in coins)
             {
                 coin.GetComponent<SpriteRenderer>().enabled = false;
                 coin.GetComponent<BoxCollider2D>().enabled = false;
             }
-        }
+
         if (Togglerizer.currentEffects.Contains("ReverseLoop") && loopingLevel) loopingLevel = !loopingLevel;
         if (loopingLevel)
         {
@@ -145,7 +143,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         onScreenControls.SetActive(Utils.GetDeviceType() == Utils.DeviceType.MOBILE ||
                                    Settings.Instance.onScreenControlsAlways);
         foreach (var onScreenButton in onScreenControls.transform.GetComponentsInChildren<Image>())
-            if (onScreenButton.transform.name != "Item") 
+            if (onScreenButton.transform.name != "Item")
                 onScreenButton.color = new Color(levelUIColor.r, levelUIColor.g, levelUIColor.b, .4f);
 
         InputSystem.controls.LoadBindingOverridesFromJson(GlobalController.Instance.controlsJson);
@@ -872,17 +870,13 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         {
             MusicSynth.CurrentSong.mutedChannelsNormal |= 1 << MusicSynth.CurrentSong.bahChannel;
             MusicSynth.CurrentSong.mutedChannelsSpectating |= 1 << MusicSynth.CurrentSong.bahChannel;
-            MusicSynth.SetSpectating(SpectationManager.Spectating);     // force a refresh of the currently muted channels.
+            MusicSynth.SetSpectating(SpectationManager.Spectating); // force a refresh of the currently muted channels.
         }
-        else
-        if (MusicSynth.CurrentSong.bahChannel >= 0)
+        else if (MusicSynth.CurrentSong.bahChannel >= 0)
         {
-            MusicSynth.SetOnMidiMessage((int channel, int command, int data1, int data2) =>
+            MusicSynth.SetOnMidiMessage((channel, command, data1, data2) =>
             {
-                if (channel == MusicSynth.CurrentSong.bahChannel && command == 0x90 && data2 > 0)
-                {
-                    bahRequested = true;
-                }
+                if (channel == MusicSynth.CurrentSong.bahChannel && command == 0x90 && data2 > 0) bahRequested = true;
             });
         }
 
@@ -1001,7 +995,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         if (pipe.fadeOutMusic)
             MusicSynth.FadeVolume(-1, 0.5f);
     }
-    
+
     public void PlayerEnteredDoor(PlayerController whom, DoorManager door)
     {
         MatchConditioner.ConditionActioned(whom, "EnteredDoor");
@@ -1302,7 +1296,9 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
                 bahCooldownTimer = 0.2f;
             }
             else
+            {
                 bahRequested = false;
+            }
         }
 
         var invincible = false;

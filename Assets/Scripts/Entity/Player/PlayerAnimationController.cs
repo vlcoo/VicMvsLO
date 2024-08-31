@@ -16,7 +16,6 @@ public class PlayerAnimationController : MonoBehaviourPun
     [SerializeField] private Color primaryColor = Color.clear, secondaryColor = Color.clear;
     [SerializeField] private float blinkDuration = 0.1f, deathUpTime = 0.6f, deathForce = 7f;
     public float pipeDuration = 2f;
-    private float doorDuration = 2.6f;
     [FormerlySerializedAs("isHopper")] public bool excludeMaterialForSmall;
     [SerializeField] private AudioClip normalDrill, propellerDrill;
     public bool deathUp, wasTurnaround, enableGlow;
@@ -36,6 +35,7 @@ public class PlayerAnimationController : MonoBehaviourPun
     private Rigidbody2D body;
 
     private PlayerController controller;
+    private readonly float doorDuration = 2.6f;
 
     private AudioSource drillParticleAudio;
 
@@ -145,7 +145,7 @@ public class PlayerAnimationController : MonoBehaviourPun
             }
             else if (controller.doorEntering && doorTimer < doorDuration / 1.33f)
             {
-                targetEuler = new Vector3(0, (controller.doorDirection ? 0 : 180), 0);
+                targetEuler = new Vector3(0, controller.doorDirection ? 0 : 180, 0);
                 instant = false;
             }
             else if (animator.GetBool("inShell") && (!controller.onSpinner || Mathf.Abs(body.velocity.x) > 0.3f))
@@ -434,7 +434,7 @@ public class PlayerAnimationController : MonoBehaviourPun
         HandleDoorAnimation();
 
         transform.position = new Vector3(transform.position.x, transform.position.y,
-            (animator.GetBool("pipe") || (controller.doorEntering && doorTimer < doorDuration / 1.33f)) ? 1 : -4);
+            animator.GetBool("pipe") || (controller.doorEntering && doorTimer < doorDuration / 1.33f) ? 1 : -4);
         if (excludeMaterialForSmall) largeMesh.materials = large ? rememberedMaterialsLarge : rememberedMaterialsSmall;
         else if (useSpecialSmall)
             largeModel.transform.GetChild(0).localScale = large ? new Vector3(1, 1, 1) : new Vector3(0.8f, 0.7f, 0.7f);
@@ -542,7 +542,7 @@ public class PlayerAnimationController : MonoBehaviourPun
 
         pipeTimer += Time.fixedDeltaTime;
     }
-    
+
     private void HandleDoorAnimation()
     {
         if (!photonView.IsMine)
@@ -562,7 +562,6 @@ public class PlayerAnimationController : MonoBehaviourPun
 
         if (doorTimer < doorDuration / 2f && doorTimer + Time.fixedDeltaTime >= doorDuration / 2f)
         {
-
             transform.position = body.position =
                 new Vector3(de.otherDoor.transform.position.x, de.otherDoor.transform.position.y, 1);
             animator.SetTrigger("door");
@@ -571,6 +570,7 @@ public class PlayerAnimationController : MonoBehaviourPun
                 GameManager.Instance.WinByGoal(controller);
                 return;
             }
+
             controller.doorDirection = false;
             de.otherDoor.photonView.RPC(nameof(DoorManager.SomeoneEntered), RpcTarget.All, true);
             photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.World_Door_Open);

@@ -39,7 +39,8 @@ public class PlayerListEntry : MonoBehaviour
         colorStrip.color = Utils.GetPlayerColor(player);
         enabled = player.HasSpecialName();
 
-        nameText.text = (player.IsMasterClient ? "<sprite name=\"room_host\">" : "") + Utils.GetCharacterData(player).uistring +
+        nameText.text = (player.IsMasterClient ? "<sprite name=\"room_host\">" : "") +
+                        Utils.GetCharacterData(player).uistring +
                         player.GetUniqueNickname();
 
         Utils.GetCustomProperty(Enums.NetPlayerProperties.Ping, out int ping, player.CustomProperties);

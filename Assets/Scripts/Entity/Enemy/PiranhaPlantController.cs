@@ -74,7 +74,7 @@ public class PiranhaPlantController : KillableEntity
     {
         if (player.invincible > 0 || player.inShell || player.state == Enums.PowerupState.MegaMushroom)
             photonView.RPC("Kill", RpcTarget.All);
-        else if(animator.GetCurrentAnimatorClipInfo(0)[0].clip.name.Equals("pakkun_chomp"))
+        else if (animator.GetCurrentAnimatorClipInfo(0)[0].clip.name.Equals("pakkun_chomp"))
             player.photonView.RPC("Powerdown", RpcTarget.All, false);
     }
 

@@ -212,4 +212,192 @@ public class MatchConditioner : MonoBehaviour
     {
         whom.storedPowerup = null;
     }
+
+    public void Act1SecondIframes(PlayerController whom)
+    {
+        whom.photonView.RPC(nameof(whom.ObtainIframes), RpcTarget.All, 1f);
+    }
+
+    public void Act2SecondIframes(PlayerController whom)
+    {
+        whom.photonView.RPC(nameof(whom.ObtainIframes), RpcTarget.All, 2f);
+    }
+
+    public void Act3SecondIframes(PlayerController whom)
+    {
+        whom.photonView.RPC(nameof(whom.ObtainIframes), RpcTarget.All, 3f);
+    }
+
+    public void ActRespawn(PlayerController whom)
+    {
+        whom.photonView.RPC(nameof(whom.PreRespawn), RpcTarget.All);
+    }
+
+    public void ActRespawnAtPosition(PlayerController whom)
+    {
+        whom.photonView.RPC(nameof(whom.PreRespawnAtPosition), RpcTarget.All);
+    }
+
+    public void ActAdd5Seconds(PlayerController whom)
+    {
+        GameManager.Instance.endServerTime += 5 * 1000;
+        GameManager.Instance.endRealTime += 5 * 1000;
+    }
+
+    public void ActAdd10Seconds(PlayerController whom)
+    {
+        GameManager.Instance.endServerTime += 10 * 1000;
+        GameManager.Instance.endRealTime += 10 * 1000;
+    }
+
+    public void ActAdd15Seconds(PlayerController whom)
+    {
+        GameManager.Instance.endServerTime += 15 * 1000;
+        GameManager.Instance.endRealTime += 15 * 1000;
+    }
+
+    public void ActDropOneCoin(PlayerController whom)
+    {
+        whom.photonView.RPC(nameof(whom.DropCoins), RpcTarget.All, 1);
+    }
+
+    public void ActDropTwoCoins(PlayerController whom)
+    {
+        whom.photonView.RPC(nameof(whom.DropCoins), RpcTarget.All, 2);
+    }
+
+    public void ActDropThreeCoins(PlayerController whom)
+    {
+        whom.photonView.RPC(nameof(whom.DropCoins), RpcTarget.All, 3);
+    }
+
+    public void ActDropFourCoins(PlayerController whom)
+    {
+        whom.photonView.RPC(nameof(whom.DropCoins), RpcTarget.All, 4);
+    }
+
+    public void ActDropFiveCoins(PlayerController whom)
+    {
+        whom.photonView.RPC(nameof(whom.DropCoins), RpcTarget.All, 5);
+    }
+
+    public void ActDropOneStar(PlayerController whom)
+    {
+        whom.photonView.RPC(nameof(whom.DropStars), RpcTarget.All, 1);
+    }
+
+    public void ActDropTwoStars(PlayerController whom)
+    {
+        whom.photonView.RPC(nameof(whom.DropStars), RpcTarget.All, 2);
+    }
+
+    public void ActDropThreeStars(PlayerController whom)
+    {
+        whom.photonView.RPC(nameof(whom.DropStars), RpcTarget.All, 3);
+    }
+
+    public void ActDropFourStars(PlayerController whom)
+    {
+        whom.photonView.RPC(nameof(whom.DropStars), RpcTarget.All, 4);
+    }
+
+    public void ActDropFiveStars(PlayerController whom)
+    {
+        whom.photonView.RPC(nameof(whom.DropStars), RpcTarget.All, 5);
+    }
+
+    public void ActGiveFire(PlayerController whom)
+    {
+        var state = Enums.PowerupState.FireFlower;
+        whom.photonView.RPC(nameof(whom.SwitchPowerupState), RpcTarget.All, state);
+    }
+
+    public void ActGiveIce(PlayerController whom)
+    {
+        var state = Enums.PowerupState.IceFlower;
+        whom.photonView.RPC(nameof(whom.SwitchPowerupState), RpcTarget.All, state);
+    }
+
+    public void ActGiveBlueShell(PlayerController whom)
+    {
+        var state = Enums.PowerupState.BlueShell;
+        whom.photonView.RPC(nameof(whom.SwitchPowerupState), RpcTarget.All, state);
+    }
+
+    public void ActGiveMini(PlayerController whom)
+    {
+        var state = Enums.PowerupState.MiniMushroom;
+        whom.photonView.RPC(nameof(whom.SwitchPowerupState), RpcTarget.All, state);
+    }
+
+    public void ActGivePropeller(PlayerController whom)
+    {
+        var state = Enums.PowerupState.PropellerMushroom;
+        whom.photonView.RPC(nameof(whom.SwitchPowerupState), RpcTarget.All, state);
+    }
+
+    public void ActGiveStarman(PlayerController whom)
+    {
+        whom.photonView.RPC(nameof(whom.StarmanInstantly), RpcTarget.All);
+    }
+
+    public void ActGiveRandomPowerup(PlayerController whom)
+    {
+        List<Enums.PowerupState> states = new()
+        {
+            Enums.PowerupState.None,
+            Enums.PowerupState.MiniMushroom,
+            Enums.PowerupState.Mushroom,
+            Enums.PowerupState.FireFlower,
+            Enums.PowerupState.BlueShell,
+            Enums.PowerupState.IceFlower,
+            Enums.PowerupState.PropellerMushroom,
+            Enums.PowerupState.MegaMushroom
+        };
+        // available powerups list, add a powerup state whenever a new powerup is added
+        // if the order of starman (state.none) or mega (state.megamushroom) are changed, then update the variables below
+        var s = Random.Range(0, states.Count - 1);
+        if (s == 0)
+            whom.photonView.RPC(nameof(whom.StarmanInstantly), RpcTarget.All);
+        else if (s == 7)
+            whom.photonView.RPC(nameof(PlayerController.TransformToMega), RpcTarget.All, true);
+        else
+            whom.photonView.RPC(nameof(whom.SwitchPowerupState), RpcTarget.All, states[s]);
+    }
+
+    public void ActExplodePlayer(PlayerController whom)
+    {
+        whom.photonView.RPC(nameof(whom.Detonate), RpcTarget.All);
+    }
+
+    // projectile rules, might add more in the future
+    public void ActShootFireball(PlayerController whom)
+    {
+        whom.ShootProjectileInstantly("Fireball", false, Enums.Sounds.Powerup_Fireball_Shoot);
+    }
+
+    public void ActShootIceball(PlayerController whom)
+    {
+        whom.ShootProjectileInstantly("Iceball", false, Enums.Sounds.Powerup_Iceball_Shoot);
+    }
+
+    public void ActJump(PlayerController whom)
+    {
+        whom.BounceInstantly();
+    }
+
+    public void ActStartPropeller(PlayerController whom)
+    {
+        whom.StartPropellerInstantly();
+    }
+
+    public void ActResetCoins(PlayerController whom)
+    {
+        whom.coins = 0;
+    }
+
+    public void ActResetStars(PlayerController whom)
+    {
+        whom.stars = 0;
+    }
 }

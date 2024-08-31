@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.ComponentModel;
 using DG.Tweening;
 using NSMB.Utils;
 using Photon.Pun;
@@ -37,6 +36,34 @@ public abstract class KillableEntity : MonoBehaviourPun, IFreezableEntity, ICust
     private byte previousFlags;
     protected SpriteRenderer sRenderer;
 
+    public bool FacingLeftTween
+    {
+        get => facingLeft;
+        set
+        {
+            facingLeft = value;
+
+            var newRotation = value ? -offsetRotation + 360 : offsetRotation;
+
+            if (tweenableRotation)
+            {
+                isRotating = true;
+                DOTween.To(() => transform.rotation.eulerAngles.y, newValue =>
+                {
+                    var currentRotation = transform.rotation.eulerAngles;
+                    currentRotation.y = newValue;
+                    transform.rotation = Quaternion.Euler(currentRotation);
+                }, newRotation, 0.15f).SetEase(Ease.Linear).onComplete += () => isRotating = false;
+            }
+            else
+            {
+                var currentRotation = transform.rotation.eulerAngles;
+                currentRotation.y = newRotation;
+                transform.rotation = Quaternion.Euler(currentRotation);
+            }
+        }
+    }
+
     #region Unity Callbacks
 
     public void OnTriggerEnter2D(Collider2D collider)
@@ -59,34 +86,6 @@ public abstract class KillableEntity : MonoBehaviourPun, IFreezableEntity, ICust
     public bool Frozen { get; set; }
     public bool IsCarryable => iceCarryable;
     public bool IsFlying => flying;
-    
-    public bool FacingLeftTween
-    {
-        get => facingLeft;
-        set
-        {
-            facingLeft = value;
-            
-            var newRotation = value ? -offsetRotation + 360 : offsetRotation;
-
-            if (tweenableRotation)
-            {
-                isRotating = true;
-                DOTween.To(() => transform.rotation.eulerAngles.y, newValue =>
-                {
-                    var currentRotation = transform.rotation.eulerAngles;
-                    currentRotation.y = newValue;
-                    transform.rotation = Quaternion.Euler(currentRotation);
-                }, newRotation, 0.15f).SetEase(Ease.Linear).onComplete += () => isRotating = false;
-            }
-            else
-            {
-                var currentRotation = transform.rotation.eulerAngles;
-                currentRotation.y = newRotation;
-                transform.rotation = Quaternion.Euler(currentRotation);
-            }
-        }
-    }
 
     #region Helper Methods
 

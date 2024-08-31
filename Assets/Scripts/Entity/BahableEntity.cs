@@ -1,11 +1,8 @@
-using System;
-using NSMB.Utils;
-using Photon.Pun;
 using UnityEngine;
 
 public class BahableEntity : MonoBehaviour
 {
-    private static int BAH_STRENGTH = 4;
+    private static readonly int BAH_STRENGTH = 4;
     private KillableEntity child;
 
     private void Start()
@@ -21,13 +18,11 @@ public class BahableEntity : MonoBehaviour
 
         // Exceptions to the bah rule: If a koopa or spiny is in shell and moving, ignore.
         if (child.TryGetComponent(out KoopaWalk koopa))
-        {
-            if (koopa.shell && child.body.velocity.x != 0) return false;
-        }
+            if (koopa.shell && child.body.velocity.x != 0)
+                return false;
         if (child.TryGetComponent(out SpinyWalk spiny))
-        {
-            if (spiny.shell && child.body.velocity.x != 0) return false;
-        }
+            if (spiny.shell && child.body.velocity.x != 0)
+                return false;
 
         child.body.velocity = new Vector2(child.body.velocity.x, BAH_STRENGTH);
         return true;

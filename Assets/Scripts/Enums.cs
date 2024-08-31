@@ -55,7 +55,8 @@ public static class Enums
         IceFlower,
         PropellerMushroom,
         BlueShell,
-        MegaMushroom
+        MegaMushroom,
+        Sheller
     }
 
     #endregion
@@ -271,7 +272,7 @@ public static class Enums
         [SoundData("world/starcoin_collect")] World_Starcoin = 102,
         [SoundData("world/door_open")] World_Door_Open = 106,
         [SoundData("world/door_close")] World_Door_Close = 107,
-        [SoundData("world/flag_down")] World_Pole_Down = 108,
+        [SoundData("world/flag_down")] World_Pole_Down = 108
     }
 
     #endregion

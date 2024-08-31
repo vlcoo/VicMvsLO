@@ -10,12 +10,12 @@ public class BulletBillLauncher : MonoBehaviourPun
     public Animator animator;
     private readonly List<GameObject> bills = new();
     private readonly Vector2 closeSearchBox = new(1.5f, 1f);
-    private Vector2 spawnOffset;
     private string prefabPath;
 
     private Vector2 searchBox;
     private Vector2 searchOffset;
     private float shootTimer;
+    private Vector2 spawnOffset;
 
     private void Start()
     {
