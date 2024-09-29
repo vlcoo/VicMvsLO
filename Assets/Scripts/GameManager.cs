@@ -106,9 +106,6 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         private set => _instance = value;
     }
 
-    public MatchConditioner MatchConditioner { get; private set; }
-    public Togglerizer Togglerizer { get; private set; }
-    public TeamGrouper TeamGrouper { get; private set; }
     public SpectationManager SpectationManager { get; private set; }
 
     public void Awake()
@@ -119,19 +116,9 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
     public void Start()
     {
         SpectationManager = GetComponent<SpectationManager>();
-        MatchConditioner = GetComponent<MatchConditioner>();
-        Togglerizer = GetComponent<Togglerizer>();
-        TeamGrouper = GetComponent<TeamGrouper>();
         levelUIColor.a = .7f;
         coins = GameObject.FindGameObjectsWithTag("coin");
-        if (Togglerizer.currentEffects.Contains("NoCoins"))
-            foreach (var coin in coins)
-            {
-                coin.GetComponent<SpriteRenderer>().enabled = false;
-                coin.GetComponent<BoxCollider2D>().enabled = false;
-            }
 
-        if (Togglerizer.currentEffects.Contains("ReverseLoop") && loopingLevel) loopingLevel = !loopingLevel;
         if (loopingLevel)
         {
             cameraMinX = -1000;
@@ -162,13 +149,6 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
 
         //Respawning Tilemaps
         origin = new BoundsInt(levelMinTileX, levelMinTileY, 0, levelWidthTile, levelHeightTile, 1);
-        if (Togglerizer.currentEffects.Contains("AllBricks"))
-            // funny...
-            for (var x = tilemap.cellBounds.min.x; x < tilemap.cellBounds.max.x; x++)
-            for (var y = tilemap.cellBounds.min.y; y < tilemap.cellBounds.max.y; y++)
-            for (var z = tilemap.cellBounds.min.z; z < tilemap.cellBounds.max.z; z++)
-                if (!nonReplaceableTiles.Contains(tilemap.GetTile(new Vector3Int(x, y, z))))
-                    tilemap.SetTile(new Vector3Int(x, y, z), breakableTileReplacement);
         originalTiles = tilemap.GetTilesBlock(origin);
 
         //Star spawning
@@ -196,12 +176,6 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             SpectationManager.Spectating = true;
         }
 
-        if (Togglerizer.currentEffects.Contains("HeckaSpeed"))
-        {
-            sfx.outputAudioMixerGroup.audioMixer.SetFloat("MasterPitch", 0f);
-            Time.timeScale = 1.5f;
-        }
-
         Utils.GetCustomProperty(Enums.NetRoomProperties.Starcoins, out needsStarcoins);
         if (raceLevel)
         {
@@ -217,19 +191,6 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         showCoinCount = showCoinCount && coinRequirement > 0;
 
         if (PhotonNetwork.IsMasterClient) quitButtonLbl.text = "End Match";
-        if (MatchConditioner.ruleList is not null && MatchConditioner.ruleList.Count > 0)
-        {
-            rulesLbl.text = "";
-            foreach (var entry in MatchConditioner.ruleList)
-            {
-                var sanitizedCond = Regex.Replace(entry.Condition, "(\\B[A-Z0-9])", " $1");
-                var sanitizedAct = Regex.Replace(entry.Action, "(\\B[A-Z0-9])", " $1").Replace("Act ", "");
-                rulesLbl.text += sanitizedCond + " -> " + sanitizedAct +
-                                 (MatchConditioner.ruleList.Last().Equals(entry) ? "" : "\n");
-            }
-        }
-
-        rulesLbl.text += "\n& " + Togglerizer.currentEffects.Count + " Specials";
 
         brickBreak = ((GameObject)Instantiate(Resources.Load("Prefabs/Particle/BrickBreak")))
             .GetComponent<ParticleSystem>();
@@ -253,7 +214,6 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
                 {
                     hurryup = true;
                     sfx.PlayOneShot(Enums.Sounds.UI_HurryUp.GetClip());
-                    MatchConditioner.ConditionActioned(null, "1MinRemaining");
                 }
 
                 if (!tenSecondCountdown && timeRemaining <= 10)
@@ -604,21 +564,10 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
 
                 tilemap.SetTilesBlock(origin, originalTiles);
 
-                if (!Togglerizer.currentEffects.Contains("NoCoins"))
-                    foreach (var coin in coins)
-                    {
-                        //dont use setactive cause it breaks animation cycles being synced
-                        coin.GetComponent<SpriteRenderer>().enabled = true;
-                        coin.GetComponent<BoxCollider2D>().enabled = true;
-                    }
-
                 StartCoroutine(BigStarRespawn());
 
                 if (!PhotonNetwork.IsMasterClient)
                     return;
-                if (!Togglerizer.currentEffects.Contains("NoEnemies"))
-                    foreach (var point in enemySpawnpoints)
-                        point.AttemptSpawning();
 
                 break;
             }
@@ -818,7 +767,6 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
 
             controllers.gameObject.SetActive(spectating);
 
-            if (TeamGrouper.teams.Count != 0) TeamGrouper.teams[controllers.character.prefab].Add(controllers);
         }
 
         try
@@ -831,9 +779,6 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         {
         }
 
-        if (Togglerizer.currentEffects.Contains("HideSeek"))
-            tilemap.transform.parent.position = new Vector3(0, 0, -5);
-
         if (gameStarting)
         {
             if (!GlobalController.Instance.fastLoad)
@@ -842,37 +787,11 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
                 fader.FadeOut();
             }
 
-            if (PhotonNetwork.IsMasterClient && !Togglerizer.currentEffects.Contains("NoEnemies"))
-                foreach (var point in FindObjectsOfType<EnemySpawnpoint>())
-                {
-                    point.AttemptSpawning();
-                    if (point.currentEntity == null) continue;
-                    var entity = point.currentEntity.GetComponent<BahableEntity>();
-                    if (entity == null) continue;
-                    bahableEntities.Add(entity);
-                }
-
-            if (Togglerizer.currentEffects.Contains("NoEnemies"))
-            {
-                foreach (var launcher in FindObjectsOfType<BulletBillLauncher>())
-                    launcher.enabled = false;
-                foreach (var plant in FindObjectsOfType<PiranhaPlantController>())
-                    plant.enabled = false;
-            }
-
             if (localPlayer)
                 localPlayer.GetComponent<PlayerController>().OnGameStart();
         }
 
-        teamsMatch = TeamGrouper.isTeamsMatch;
-
-        if (Togglerizer.currentEffects.Contains("NoBahs"))
-        {
-            MusicSynth.CurrentSong.mutedChannelsNormal |= 1 << MusicSynth.CurrentSong.bahChannel;
-            MusicSynth.CurrentSong.mutedChannelsSpectating |= 1 << MusicSynth.CurrentSong.bahChannel;
-            MusicSynth.SetSpectating(SpectationManager.Spectating); // force a refresh of the currently muted channels.
-        }
-        else if (MusicSynth.CurrentSong.bahChannel >= 0)
+        if (MusicSynth.CurrentSong.bahChannel >= 0)
         {
             MusicSynth.SetOnMidiMessage((channel, command, data1, data2) =>
             {
@@ -991,14 +910,12 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
 
     public void PlayerEnteredPipe(PlayerController whom, PipeManager pipe)
     {
-        MatchConditioner.ConditionActioned(whom, "EnteredPipe");
         if (pipe.fadeOutMusic)
             MusicSynth.FadeVolume(-1, 0.5f);
     }
 
     public void PlayerEnteredDoor(PlayerController whom, DoorManager door)
     {
-        MatchConditioner.ConditionActioned(whom, "EnteredDoor");
         if (door.fadeOutMusic)
             MusicSynth.FadeVolume(-1, 0.5f);
     }
@@ -1044,9 +961,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
 
         if (!cancelled) yield return new WaitForSecondsRealtime(0.2f);
 
-        var teams = winner != null && localPlayer != null && TeamGrouper.IsPlayerTeammate(
-            localPlayer.GetComponent<PlayerController>(),
-            GlobalController.Instance.characters[winnerCharacterIndex].prefab);
+        var teams = false;
         var win = winner != null && (winner.IsLocal || teams) && !cancelled;
         var draw = winner == null && !cancelled;
         var secondsUntilMenu = cancelled ? 1.7f : 4.5f;
@@ -1233,10 +1148,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             return;
         }
 
-        if ((alivePlayers.Count == 1 || (teamsMatch && alivePlayers.Count != 0 &&
-                                         alivePlayers.All(controller =>
-                                             TeamGrouper.IsPlayerTeammate(alivePlayers[0], controller, true)))) &&
-            playerCount >= 2)
+        if (alivePlayers.Count == 1 && playerCount >= 2)
         {
             //one player left alive (and not in a solo game). winner!
             PhotonNetwork.RaiseEvent((byte)Enums.NetEventIds.EndGame, alivePlayers[0].photonView.Owner,
@@ -1253,10 +1165,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
                 // it's a draw! Thanks for playing the demo!
                 PhotonNetwork.RaiseEvent((byte)Enums.NetEventIds.EndGame, null, NetworkUtils.EventAll,
                     SendOptions.SendReliable);
-            else if (winningPlayers.Count == 1 || (teamsMatch && winningPlayers.Count != 0 &&
-                                                   winningPlayers.All(controller =>
-                                                       TeamGrouper.IsPlayerTeammate(winningPlayers[0], controller,
-                                                           true))))
+            else if (winningPlayers.Count == 1)
                 PhotonNetwork.RaiseEvent((byte)Enums.NetEventIds.EndGame, winningPlayers[0].photonView.Owner,
                     NetworkUtils.EventAll, SendOptions.SendReliable);
 
@@ -1292,7 +1201,6 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             {
                 bahRequested = false;
                 foreach (var enemy in bahableEntities) enemy.Bah();
-                MatchConditioner.ConditionActioned(null, "Bah'd");
                 bahCooldownTimer = 0.2f;
             }
             else

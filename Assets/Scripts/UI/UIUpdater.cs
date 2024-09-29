@@ -109,12 +109,6 @@ public class UIUpdater : MonoBehaviour
 
     private void UpdateStoredItemUI()
     {
-        if (GameManager.Instance.Togglerizer.currentEffects.Contains("NoReserve"))
-        {
-            itemReserve.gameObject.SetActive(false);
-            invis = true;
-        }
-
         itemReserve.sprite = player.storedPowerup != null ? player.storedPowerup.reserveSprite : storedItemNull;
     }
 

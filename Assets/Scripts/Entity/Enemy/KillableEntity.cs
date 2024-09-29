@@ -116,7 +116,6 @@ public abstract class KillableEntity : MonoBehaviourPun, IFreezableEntity, ICust
                 {
                     player.groundpound = false;
                     photonView.RPC(nameof(Kill), RpcTarget.All);
-                    GameManager.Instance.MatchConditioner.ConditionActioned(player, "SteppedOnEnemy");
                 }
 
                 player.bounce = true;
@@ -124,7 +123,6 @@ public abstract class KillableEntity : MonoBehaviourPun, IFreezableEntity, ICust
             else
             {
                 photonView.RPC(nameof(Kill), RpcTarget.All);
-                GameManager.Instance.MatchConditioner.ConditionActioned(player, "SteppedOnEnemy");
                 player.bounce = !player.groundpound;
             }
 
