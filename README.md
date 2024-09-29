@@ -1,20 +1,10 @@
-<p align="center"><img src="Assets/Sprites/UI/Menu/TitleAll.png" alt="vic's Custom Match-inator" width="600px"></p>
-
 A **standalone mod** of the 2-10 player remake of the Mario vs. Luigi gamemode from New Super Mario Bros. DS.
 
-This mod introduces the concept of *"Match rules"*, a list of conditions that can trigger whatever the lobby's host desires! Win when dying? Get a mega mush when stomping on another player? Uh, sure, if you're into that sort of thing. Oh, it also has around *13 "Race maps"* where you can speedrun a classic NSMB level from start to finish!
-
-Apart from that, the defining features of the original remake remain!
+This mod allows the player to create and upload custom levels, as well as browse and try out community creations easily! Bored of the same vanilla maps? Give it a try!
 
 ## Downloads
 
-Go to the repository's releases or use these shortcuts to the latest builds:
-
-- [**Windows**](https://github.com/vlcoo/VicMvsLO/releases/latest/download/win64-vcmi.zip)
-- [**Linux**](https://github.com/vlcoo/VicMvsLO/releases/latest/download/linux-vcmi.zip)
-- [**MacOS**](https://github.com/vlcoo/VicMvsLO/releases/latest/download/macos-vcmi.zip)
-- [**Android**](https://github.com/vlcoo/VicMvsLO/releases/latest/download/android-vcmi.apk)
-- [**Play in browser**](https://vlco-o.itch.io/vics-custom-match-inator) (not recommended)
+Still in progress. Downloads will be available soon.
 
 ## Discord
 [**Join the discord**](https://discord.gg/dgKVaUKpj5) of the original game to keep up to date with its development, make feature suggestions, report bugs (if you're too lazy to use issues...), get technical support, look for people to play with, and just talk about the game!
@@ -34,7 +24,7 @@ Go to the repository's releases or use these shortcuts to the latest builds:
 <details>
   <summary><h2>Opening in Unity Editor</h2></summary>
 
-Please follow the instructions listed in the [parent repository](https://github.com/ipodtouch0218/NSMB-MarioVsLuigi), but cloning this fork instead.
+Please follow the instructions listed in the [parent repository](https://github.com/ipodtouch0218/NSMB-MarioVsLuigi), but cloning this fork and branch instead.
 
 </details>
 <details>
