@@ -7,7 +7,7 @@ public class ScoreboardUpdater : MonoBehaviour
     public static ScoreboardUpdater instance;
     private static IComparer<ScoreboardEntry> entryComparer;
 
-    [SerializeField] private GameObject entryTemplate, rulesListBox;
+    [SerializeField] private GameObject entryTemplate;
 
     private readonly List<ScoreboardEntry> entries = new();
     private Animator animator;
@@ -88,8 +88,6 @@ public class ScoreboardUpdater : MonoBehaviour
     {
         entries.Sort(entryComparer);
         entries.ForEach(se => se.transform.SetAsLastSibling());
-
-        rulesListBox.transform.SetSiblingIndex(transform.childCount - 1);
     }
 
     public void Populate(IEnumerable<PlayerController> players)

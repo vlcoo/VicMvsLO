@@ -8,15 +8,13 @@ using UnityEngine.UI;
 public class UIUpdater : MonoBehaviour
 {
     public static UIUpdater Instance;
-    public GameObject playerTrackTemplate, starTrackTemplate, goalTrackIcon;
-    public TrackIcon checkpointTrackIcon;
+    public GameObject playerTrackTemplate, starTrackTemplate;
     public PlayerController player;
     public Sprite storedItemNull;
     public TMP_Text uiStars, uiCoins, uiDebug, uiLives, uiCountdown, uiLaps;
     public Image itemReserve, itemColor;
     public float pingSample, fpsSample;
     private readonly List<Image> backgrounds = new();
-    private bool checkpoint;
 
     private int coins = -1, stars = -1, lives = -1, timer = -1, laps = -1;
     private GameObject starsParent, coinsParent, livesParent, timerParent, lapsParent;
@@ -46,8 +44,6 @@ public class UIUpdater : MonoBehaviour
         itemColor.color = new Color(GameManager.Instance.levelUIColor.r - 0.2f,
             GameManager.Instance.levelUIColor.g - 0.2f, GameManager.Instance.levelUIColor.b - 0.2f,
             GameManager.Instance.levelUIColor.a);
-
-        goalTrackIcon.SetActive(GameManager.Instance.raceLevel);
     }
 
     public void Update()
@@ -201,15 +197,6 @@ public class UIUpdater : MonoBehaviour
         else
         {
             timerParent.SetActive(false);
-        }
-
-        if (player.gotCheckpoint != checkpoint)
-        {
-            checkpoint = player.gotCheckpoint;
-            checkpointTrackIcon.gameObject.SetActive(checkpoint);
-            if (checkpoint)
-                checkpointTrackIcon.SetPositionFromLevelCoords(GameManager.Instance.checkpoint);
-            checkpointTrackIcon.animator.enabled = checkpoint;
         }
     }
 

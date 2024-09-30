@@ -569,6 +569,9 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
                 if (!PhotonNetwork.IsMasterClient)
                     return;
 
+                foreach (var point in enemySpawnpoints)
+                    point.AttemptSpawning();
+
                 break;
             }
             case (byte)Enums.NetEventIds.SyncTilemap:
@@ -786,6 +789,16 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
                 yield return new WaitForSeconds(3.5f);
                 fader.FadeOut();
             }
+
+            if (PhotonNetwork.IsMasterClient)
+                foreach (var point in FindObjectsOfType<EnemySpawnpoint>())
+                {
+                    point.AttemptSpawning();
+                    if (point.currentEntity == null) continue;
+                    var entity = point.currentEntity.GetComponent<BahableEntity>();
+                    if (entity == null) continue;
+                    bahableEntities.Add(entity);
+                }
 
             if (localPlayer)
                 localPlayer.GetComponent<PlayerController>().OnGameStart();
