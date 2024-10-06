@@ -1536,12 +1536,23 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
     public void JoinSpecificRoom()
     {
+        if (lobbyJoinField.text.Length == 0)
+        {
+            // paste from clipboard
+            lobbyJoinField.text = GUIUtility.systemCopyBuffer.ToUpper()[..8];
+            if (lobbyJoinField.text.Length == 0)
+            {
+                OpenErrorBox("Clipboard was empty!\nTry typing the ID manually.");
+                return;
+            }
+        }
+
         var id = lobbyJoinField.text.ToUpper();
         if (id.Length == 0) return;
         var index = roomNameChars.IndexOf(id[0]);
         if (id.Length < 8 || index < 0 || index >= allRegions.Count)
         {
-            OpenErrorBox("Room doesn't exist.");
+            OpenErrorBox($"Lobby with ID <i>{id}</i>\ndoesn't exist.");
             return;
         }
 
@@ -1568,7 +1579,9 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
     public void OnPrivatePromptTextEdited(Button confirmButton)
     {
-        confirmButton.interactable = lobbyJoinField.text.Length == 8;
+        // confirmButton.interactable = lobbyJoinField.text.Length == 8;
+        confirmButton.transform.GetChild(0).GetComponent<TMP_Text>().text =
+            lobbyJoinField.text.Length == 0 ? "Paste from clipboard" : "OK";
     }
 
     public void CreateRoom()
@@ -1731,12 +1744,12 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     {
         if (!target.IsLocal && PhotonNetwork.LocalPlayer.GetAuthorityLevel() < target.GetAuthorityLevel())
         {
-            LocalChatMessage($"Unknown player {target.NickName}.", SYSTEM_MESSAGE_COLOR);
+            LocalChatMessage($"Unknown player <i>{target.NickName}</i>.", SYSTEM_MESSAGE_COLOR);
         }
         else
         {
             GUIUtility.systemCopyBuffer = target.UserId;
-            LocalChatMessage($"Copied {target.NickName}'s ID: {target.UserId}", SYSTEM_MESSAGE_COLOR);
+            LocalChatMessage($"Copied <i>{target.NickName}</i>'s ID: {target.UserId}", SYSTEM_MESSAGE_COLOR);
         }
     }
 
@@ -1787,7 +1800,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
             return;
         }
 
-        LocalChatMessage($"Unknown player {playername}.", SYSTEM_MESSAGE_COLOR);
+        LocalChatMessage($"Unknown player <i>{playername}</i>.", SYSTEM_MESSAGE_COLOR);
     }
 
     public void Ban(Player target)
@@ -1824,7 +1837,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
             [Enums.NetRoomProperties.Bans] = pairs.ToArray()
         };
         PhotonNetwork.CurrentRoom.SetCustomProperties(table, null, NetworkUtils.forward);
-        LocalChatMessage($"{targetPair.name} has been unbanned from this lobby.", SYSTEM_MESSAGE_COLOR);
+        LocalChatMessage($"<i>{targetPair.name}</i> has been unbanned from this lobby.", SYSTEM_MESSAGE_COLOR);
     }
 
     private void RunCommand(string[] args)
@@ -1852,7 +1865,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
                         pl.GetUniqueNickname().ToLower() == strTarget);
                 if (target == null)
                 {
-                    LocalChatMessage($"Unknown player {args[1]}.", SYSTEM_MESSAGE_COLOR);
+                    LocalChatMessage($"Unknown player <i>{args[1]}</i>.", SYSTEM_MESSAGE_COLOR);
                     return;
                 }
 
@@ -1873,7 +1886,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
                         pl.GetUniqueNickname().ToLower() == strTarget);
                 if (target == null)
                 {
-                    LocalChatMessage($"Unknown player {args[1]}.", SYSTEM_MESSAGE_COLOR);
+                    LocalChatMessage($"Unknown player <i>{args[1]}</i>.", SYSTEM_MESSAGE_COLOR);
                     return;
                 }
 
@@ -1908,7 +1921,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
                     PhotonNetwork.CurrentRoom.Players.Values.FirstOrDefault(pl => pl.NickName.ToLower() == strTarget);
                 if (target == null)
                 {
-                    LocalChatMessage($"Unknown player {args[1]}.", SYSTEM_MESSAGE_COLOR);
+                    LocalChatMessage($"Unknown player <i>{args[1]}</i>.", SYSTEM_MESSAGE_COLOR);
                     return;
                 }
 
