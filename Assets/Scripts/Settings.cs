@@ -8,10 +8,10 @@ public class Settings : Singleton<Settings>
 {
     public AudioMixer mixer;
 
-    public string nickname;
+    public string nickname, favouriteRegion;
     public int character, skin;
     public bool ndsResolution, fireballFromSprint = true, vsync, fourByThreeRatio;
-    public bool scoreboardAlways, filter = true, reduceUIAnims = true, onScreenControlsAlways, showHUDCounters = true;
+    public bool scoreboardAlways, filter = true, reduceUIAnims = false, onScreenControlsAlways, showHUDCounters = true;
 
     private bool _rumbleController;
 
@@ -71,7 +71,14 @@ public class Settings : Singleton<Settings>
     {
         nickname = PlayerPrefs.GetString("Nickname");
         if (string.IsNullOrEmpty(nickname))
-            nickname = "Player" + Random.Range(1000, 10000);
+        {
+            var possibleNicks = new[]
+            {
+                "mario", "luigi", "hopper", "broozer", "bully", "bones", "goombud", "bro", "kabomb", "moneybag",
+                "monty", "nabbit", "rex", "shyguy", "spike", "splunkin"
+            };
+            nickname = possibleNicks[Random.Range(0, possibleNicks.Length)] + Random.Range(10, 100);
+        }
 
         VolumeSFX = PlayerPrefs.GetFloat("volumeSFX", 0.5f);
         VolumeMusic = PlayerPrefs.GetFloat("volumeMusic", 0.25f);
@@ -90,6 +97,7 @@ public class Settings : Singleton<Settings>
         filter = PlayerPrefs.GetInt("ChatFilter", 1) == 1;
         character = PlayerPrefs.GetInt("Character", 0);
         skin = PlayerPrefs.GetInt("Skin", 0);
+        favouriteRegion = PlayerPrefs.GetString("FavouriteRegion", "");
     }
 
     public void SaveSettingsToPreferences()
@@ -110,6 +118,7 @@ public class Settings : Singleton<Settings>
         PlayerPrefs.SetInt("ChatFilter", filter ? 1 : 0);
         PlayerPrefs.SetInt("Character", character);
         PlayerPrefs.SetInt("Skin", skin);
+        PlayerPrefs.SetString("FavouriteRegion", favouriteRegion);
         PlayerPrefs.Save();
     }
 

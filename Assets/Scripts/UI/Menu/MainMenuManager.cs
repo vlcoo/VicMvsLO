@@ -49,6 +49,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         privatePrompt,
         updateBox,
         webglWarningBox,
+        favRegionHintBox,
         newRuleS1Prompt,
         newRuleS2Prompt,
         emoteListPrompt,
@@ -72,7 +73,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
     public TMP_Dropdown levelDropdown, characterDropdown;
     public RoomIcon selectedRoomIcon, privateJoinRoom;
-    public Button joinRoomBtn, createRoomBtn, startGameBtn, exitBtn, backBtn;
+    public Button joinRoomBtn, createRoomBtn, startGameBtn, exitBtn, backBtn, favRegionBtn;
 
     public Toggle ndsResolutionToggle,
         fullscreenToggle,
@@ -127,6 +128,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         reconnectSelected,
         updateBoxSelected,
         webglWarningBoxSelected,
+        favRegionHintBoxSelected,
         newRuleS1Selected,
         newRuleS2Selected,
         emoteListSelected,
@@ -286,7 +288,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
             {
                 var r = pingSortedRegions[i];
                 newRegions.Add(
-                    $"{NetworkUtils.regionsFullNames.GetValueOrDefault(r.Code, r.Code.ToUpper())} <color=#bbbbbb>({(r.Ping == 4000 ? "?" : r.Ping)} ms)");
+                    $"{NetworkUtils.regionsFullNames.GetValueOrDefault(r.Code, r.Code.ToUpper())} <color=#bbbbbb>({(r.Ping == 4000 ? "?" : r.Ping)} ms){(r.Code == Settings.Instance.favouriteRegion ? " <color=#ff8888><3" : "")}");
                 if (r.Code == lastRegion)
                     index = i;
             }
@@ -413,9 +415,9 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
             foreach (var r in pingSortedRegions)
                 formattedRegions.Add(
-                    $"{NetworkUtils.regionsFullNames.GetValueOrDefault(r.Code, r.Code.ToUpper())} <color=#bbbbbb>({(r.Ping == 4000 ? "?" : r.Ping)}ms)");
+                    $"{NetworkUtils.regionsFullNames.GetValueOrDefault(r.Code, r.Code.ToUpper())} <color=#bbbbbb>({(r.Ping == 4000 ? "?" : r.Ping)}ms){(r.Code == Settings.Instance.favouriteRegion ? " <color=#ff8888><3" : "")}");
 
-            lastRegion = pingSortedRegions[0].Code;
+            lastRegion = Settings.Instance.favouriteRegion == "" ? pingSortedRegions[0].Code : Settings.Instance.favouriteRegion;
             pingsReceived = true;
         }, "");
     }
@@ -2613,5 +2615,35 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     public void ChangeLobbyHeader(string name)
     {
         SetText(lobbyText, $"{name.ToValidUsername()}'s Lobby", true);
+    }
+
+    private const string FavRegionText = " <color=#ff8888><3";
+    public void SetUnsetFavouriteRegion()
+    {
+        if (Settings.Instance.favouriteRegion != lastRegion)
+        {
+            Debug.Log($"region {lastRegion} is now favourite!");
+            region.captionText.text += FavRegionText;
+            region.options[region.value].text += FavRegionText;
+            if (Settings.Instance.favouriteRegion != "")
+            {
+                var i = Array.IndexOf(pingSortedRegions, pingSortedRegions.First(r => r.Code == Settings.Instance.favouriteRegion));
+                // remove the favourite heart from the previous favourite region
+                region.options[i ].text = region.options[i ].text[..^FavRegionText.Length];
+            }
+            Settings.Instance.favouriteRegion = lastRegion;
+            OpenPrompt(favRegionHintBox, favRegionHintBoxSelected);
+        }
+        else
+        {
+            Debug.Log($"region {lastRegion} is now unfavourited!");
+            var i = Array.IndexOf(pingSortedRegions, pingSortedRegions.First(r => r.Code == Settings.Instance.favouriteRegion));
+            // remove the favourite heart from the previous favourite region
+            region.options[i ].text = region.options[i ].text[..^FavRegionText.Length];
+            region.captionText.text = region.captionText.text[..^FavRegionText.Length];
+            Settings.Instance.favouriteRegion = "";
+        }
+
+        Settings.Instance.SaveSettingsToPreferences();
     }
 }
