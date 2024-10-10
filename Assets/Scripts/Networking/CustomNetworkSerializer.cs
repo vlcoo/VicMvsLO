@@ -21,7 +21,7 @@ public class CustomNetworkSerializer : MonoBehaviour, IPunObservable
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {
         //dont serialize when game is over
-        if (!GameManager.Instance || (GameManager.Instance && GameManager.Instance.gameover))
+        if (!GameManager.Instance)
             return;
 
         //clear byte buffer

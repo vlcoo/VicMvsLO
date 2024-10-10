@@ -2090,10 +2090,19 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
 
         if (GameManager.Instance.gameover)
         {
-            body.velocity = Vector2.zero;
-            animator.enabled = false;
-            body.isKinematic = true;
-            return;
+            var shouldFinishDeathAnim =
+                dead && GameManager.Instance.winningPlayer.ActorNumber != photonView.Owner.ActorNumber;
+            animator.enabled = shouldFinishDeathAnim;
+            body.isKinematic = !shouldFinishDeathAnim;
+            if (shouldFinishDeathAnim)
+            {
+                // AnimationController.HandleDeathAnimation();
+            }
+            else
+            {
+                body.velocity = Vector2.zero;
+                return;
+            }
         }
 
         groundpoundLastFrame = groundpound;

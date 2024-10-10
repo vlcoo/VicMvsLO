@@ -232,7 +232,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
         if (GlobalController.Instance.disconnectCause != null)
         {
-            OpenErrorBox(GlobalController.Instance.disconnectCause.Value);
+            OpenErrorBox(NetworkUtils.disconnectMessages.GetValueOrDefault(GlobalController.Instance.disconnectCause.Value, NetworkUtils.genericMessage));
             GlobalController.Instance.disconnectCause = null;
         }
 
@@ -376,7 +376,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         Debug.Log("[PHOTON] Disconnected: " + cause);
         if (cause is not (DisconnectCause.None or DisconnectCause.DisconnectByClientLogic
             or DisconnectCause.CustomAuthenticationFailed))
-            OpenErrorBox(cause);
+            OpenErrorBox(NetworkUtils.disconnectMessages.GetValueOrDefault(cause, NetworkUtils.genericMessage));
 
         selectedRoom = null;
         selectedRoomIcon = null;
@@ -432,7 +432,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     public void OnCustomAuthenticationFailed(string failure)
     {
         Debug.Log("[PHOTON] Auth Failure: " + failure);
-        OpenErrorBox(failure);
+        OpenErrorBox("Auth failed! Servers might be down.\nPlease try again later.");
     }
 
     public void OnConnectedToMaster()
@@ -653,14 +653,14 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     public void OnJoinRoomFailed(short reasonId, string reasonMessage)
     {
         Debug.LogError($"[PHOTON] Join room failed ({reasonId}, {reasonMessage})");
-        OpenErrorBox(reasonMessage);
+        OpenErrorBox(NetworkUtils.errorMessages.GetValueOrDefault(reasonId, NetworkUtils.genericMessage));
         JoinMainLobby();
     }
 
     public void OnCreateRoomFailed(short reasonId, string reasonMessage)
     {
         Debug.LogError($"[PHOTON] Create room failed ({reasonId}, {reasonMessage})");
-        OpenErrorBox(reasonMessage);
+        OpenErrorBox(NetworkUtils.errorMessages.GetValueOrDefault(reasonId, NetworkUtils.genericMessage));
 
         OnConnectedToMaster();
     }
@@ -1285,17 +1285,6 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         OpenPrompt(privatePrompt, privateSelected);
     }
 
-    private void OpenErrorBox(DisconnectCause cause)
-    {
-        if (!errorBox.activeSelf)
-            sfx.PlayOneShot(Enums.Sounds.UI_Error.GetClip());
-
-        errorText.text = NetworkUtils.disconnectMessages.GetValueOrDefault(cause, "Unknown cause");
-        errorDetail.text = cause.ToString();
-
-        OpenPrompt(errorBox, errorButton);
-    }
-
     public void OpenErrorBox(string text)
     {
         if (text == NetworkUtils.banMessage)
@@ -1539,12 +1528,14 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         if (lobbyJoinField.text.Length == 0)
         {
             // paste from clipboard
-            lobbyJoinField.text = GUIUtility.systemCopyBuffer.ToUpper()[..8];
+            lobbyJoinField.text = GUIUtility.systemCopyBuffer.ToUpper();
             if (lobbyJoinField.text.Length == 0)
             {
                 OpenErrorBox("Clipboard was empty!\nTry typing the ID manually.");
                 return;
             }
+
+            lobbyJoinField.text = lobbyJoinField.text[..8];
         }
 
         var id = lobbyJoinField.text.ToUpper();
@@ -1552,7 +1543,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         var index = roomNameChars.IndexOf(id[0]);
         if (id.Length < 8 || index < 0 || index >= allRegions.Count)
         {
-            OpenErrorBox($"Lobby with ID <i>{id}</i>\ndoesn't exist.");
+            OpenErrorBox($"The ID <i>{id}</i>\nis incorrect!");
             return;
         }
 

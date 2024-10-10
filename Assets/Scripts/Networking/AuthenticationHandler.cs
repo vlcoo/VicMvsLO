@@ -30,7 +30,7 @@ public class AuthenticationHandler
                 {
                     MainMenuManager.Instance.OpenErrorBox(
                         client.error.Contains("Cannot resolve")
-                            ? "Your device's internet connection is poor."
+                            ? "Check your internet connection or try again later!"
                             : "Servers might be down; try again later.");
                     MainMenuManager.Instance.OnDisconnected(DisconnectCause.CustomAuthenticationFailed);
                 }

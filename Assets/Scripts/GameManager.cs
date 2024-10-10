@@ -46,6 +46,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
     public AudioSource sfx;
 
     public GameObject localPlayer;
+    public Player winningPlayer;
     public bool paused, loaded, started;
     public GameObject pauseUI, pausePanel, pauseButton, onScreenControls;
     public TMP_Text quitButtonLbl, rulesLbl, speedrunTimer;
@@ -1028,6 +1029,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         var uniqueName = "";
         if (winner != null)
         {
+            winningPlayer = winner;
             winnerCharacterIndex = (int)winner.CustomProperties[Enums.NetPlayerProperties.Character];
             uniqueName = teamsMatch
                 ? "The " + GlobalController.Instance.characters[winnerCharacterIndex].legalName +
