@@ -193,7 +193,7 @@ public class PlayerAnimationController : MonoBehaviourPun
             wasTurnaround = animator.GetCurrentAnimatorStateInfo(0).IsName("turnaround");
         }
 
-        if (!controller.Frozen && (!GameManager.Instance.gameover || (GameManager.Instance.gameover && GameManager.Instance.winningPlayer.ActorNumber != photonView.Owner.ActorNumber)))
+        if (!controller.Frozen && (!GameManager.Instance.gameover || (GameManager.Instance.gameover && (GameManager.Instance.winningPlayer == null || GameManager.Instance.winningPlayer.ActorNumber != photonView.Owner.ActorNumber))))
         {
             if (controller.dead)
             {

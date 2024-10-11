@@ -2090,8 +2090,9 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
 
         if (GameManager.Instance.gameover)
         {
+            // the animation should continue if we haven't won, as in, we lost or we've tied - aka, there ain't winningPlayer, or we aren't them.
             var shouldFinishDeathAnim =
-                dead && GameManager.Instance.winningPlayer.ActorNumber != photonView.Owner.ActorNumber;
+                dead && (GameManager.Instance.winningPlayer == null || GameManager.Instance.winningPlayer.ActorNumber != photonView.Owner.ActorNumber);
             animator.enabled = shouldFinishDeathAnim;
             body.isKinematic = !shouldFinishDeathAnim;
             if (shouldFinishDeathAnim)
