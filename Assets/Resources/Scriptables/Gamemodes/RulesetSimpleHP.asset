@@ -1,0 +1,50 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9bb3a0ea21d3e51a18160b8d0fe3428e, type: 3}
+  m_Name: RulesetSimpleHP
+  m_EditorClassIdentifier: 
+  rulePairsConditions:
+  - Every30Sec
+  - Reached0Coins
+  - KnockedBack
+  - BumpedInto
+  - Disqualified
+  - Spawned
+  - Spawned
+  - Spawned
+  - Spawned
+  rulePairsActions:
+  - ActRespawnLevel
+  - ActKillPlayer
+  - ActRemoveCoin
+  - ActRemoveCoin
+  - ActGiveMega
+  - ActGiveCoin
+  - ActGiveCoin
+  - ActGiveCoin
+  - ActGiveCoin
+  specials: []
+  showCoins: 1
+  hideTrack: 0
+  laps: 99
+  stars: 0
+  coins: 15
+  lives: 5
+  timeSeconds: 300
+  powerups: 0100000001000000010000000100000001000000010000000100000001000000
+  legalName: HP Deathmatch
+  description: 'Forget the stars! Use coins as health
+
+    points, and stomp on other
+    players
+
+    to drain their lives!'

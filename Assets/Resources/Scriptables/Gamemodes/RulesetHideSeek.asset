@@ -12,19 +12,33 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9bb3a0ea21d3e51a18160b8d0fe3428e, type: 3}
   m_Name: RulesetHideSeek
   m_EditorClassIdentifier: 
-  rulePairsConditions: []
-  rulePairsActions: []
-  specials: []
+  rulePairsConditions:
+  - LookedUp
+  - Spawned
+  - Disqualified
+  - Frozen
+  rulePairsActions:
+  - ActSpawnPowerup
+  - ActExplodeLevel
+  - ActGiveMega
+  - ActDisqualifyPlayer
+  specials:
+  - NoCollisions
+  - HideSeek
   showCoins: 0
-  hideTrack: 0
-  laps: 1
-  stars: 10
-  coins: 10
+  hideTrack: 1
+  laps: -1
+  stars: 0
+  coins: -1
   lives: 5
   timeSeconds: 300
-  powerups: 0100000001000000010000000100000001000000010000000100000001000000
-  legalName: Reset All!
-  description: 'This clears all custom rules and sets
+  powerups: 0000000000000000040000000000000000000000000000000000000000000000
+  legalName: Hide & Seek
+  description: 'If you''re the host, you seek! Press
 
-    the stars, coins, etc.
-    to their default amounts.'
+    ''Up'' to get an ice flower,
+    and tag
+
+    the opponents with it while they
+
+    hide behind stuff!'
