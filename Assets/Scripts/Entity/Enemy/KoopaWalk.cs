@@ -392,7 +392,7 @@ public class KoopaWalk : HoldableEntity
     {
         shell = false;
         body.velocity = new Vector2(-walkSpeed, 0);
-        tweenableRotation = true;
+        tweenableRotation = needsTweenableRotation;
         FacingLeftTween = true;
         upsideDown = false;
         stationary = false;

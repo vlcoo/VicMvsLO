@@ -438,7 +438,7 @@ public class PlayerAnimationController : MonoBehaviourPun
         HandleDoorAnimation();
 
         transform.position = new Vector3(transform.position.x, transform.position.y,
-            animator.GetBool("pipe") || (controller.doorEntering && doorTimer < doorDuration / 1.33f) ? 1 : -4);
+            animator.GetBool("pipe") || (controller.doorEntering && doorTimer < doorDuration / 1.33f) ? 1 : -1);
         if (excludeMaterialForSmall) largeMesh.materials = large ? rememberedMaterialsLarge : rememberedMaterialsSmall;
         else if (useSpecialSmall)
             largeModel.transform.GetChild(0).localScale = large ? new Vector3(1, 1, 1) : new Vector3(0.8f, 0.7f, 0.7f);

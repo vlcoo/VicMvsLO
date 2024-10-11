@@ -73,7 +73,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
     public TMP_Dropdown levelDropdown, characterDropdown;
     public RoomIcon selectedRoomIcon, privateJoinRoom;
-    public Button joinRoomBtn, createRoomBtn, startGameBtn, exitBtn, backBtn, favRegionBtn;
+    public Button joinRoomBtn, createRoomBtn, startGameBtn, exitBtn, backBtn, favRegionBtn, sendChatBtn;
 
     public Toggle ndsResolutionToggle,
         fullscreenToggle,
@@ -1714,6 +1714,11 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
         PhotonNetwork.RaiseEvent((byte)Enums.NetEventIds.PlayerChatMessage, text, NetworkUtils.EventAll,
             SendOptions.SendReliable);
+    }
+
+    public void OnChatInputChanged(TMP_InputField input)
+    {
+        sendChatBtn.interactable = input.text.Length > 0;
     }
 
     public void Kick(Player target)
