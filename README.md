@@ -1,4 +1,4 @@
-<p align="center"><img src="Assets/Sprites/UI/Menu/TitleAll.png" alt="vic's Custom Match-inator" width="600px"></p>
+<p align="center"><img src="Assets/Sprites/UI/Menu/TitleAll.png" alt="vic's Custom Match-inator" width="400px"></p>
 
 A **standalone mod** of the 2-10 player remake of the Mario vs. Luigi gamemode from New Super Mario Bros. DS.
 
