@@ -86,11 +86,11 @@ void PixShader(Input input, inout SurfaceOutput o)
     #endif
 
     #if GLOW_ON
-	float4 glowColor = GetGlowColor(sd, scale);
-	glowColor.a *= input.color.a;
-	emission += glowColor.rgb*glowColor.a;
-	faceColor = BlendARGB(glowColor, faceColor);
-	faceColor.rgb /= max(faceColor.a, 0.0001);
+    float4 glowColor = GetGlowColor(sd, scale);
+    glowColor.a *= input.color.a;
+    emission += glowColor.rgb * glowColor.a;
+    faceColor = BlendARGB(glowColor, faceColor);
+    faceColor.rgb /= max(faceColor.a, 0.0001);
     #endif
 
     // Set Standard output structure

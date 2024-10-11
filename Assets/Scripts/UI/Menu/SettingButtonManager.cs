@@ -76,6 +76,11 @@ public class SettingButtonManager : MonoBehaviour
         Settings.SaveSettingsToPreferences();
     }
 
+    public void OnHUDCountersToggle(Toggle toggle)
+    {
+        Settings.showHUDCounters = toggle.isOn;
+        Settings.SaveSettingsToPreferences();
+    }
 
     public void OnFullscreenToggle(Toggle toggle)
     {

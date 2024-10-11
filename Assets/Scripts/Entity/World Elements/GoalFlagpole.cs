@@ -4,6 +4,7 @@ using UnityEngine.U2D;
 
 public class GoalFlagpole : MonoBehaviour
 {
+    // abcd
     [FormerlySerializedAs("collider")] public BoxCollider2D colliderPole;
     public BoxCollider2D colliderBottom;
     public SpriteShapeController spline;

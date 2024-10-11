@@ -19,8 +19,8 @@ struct pixel_t
     float4 param : TEXCOORD1; // weight, scaleRatio
     float2 mask : TEXCOORD2;
     #if (UNDERLAY_ON || UNDERLAY_INNER)
-    float4	texcoord2		: TEXCOORD3;
-    float4	underlayColor	: COLOR2;
+    float4 texcoord2 : TEXCOORD3;
+    float4 underlayColor : COLOR2;
     #endif
 };
 
@@ -124,7 +124,8 @@ float4 PixShader(pixel_t input) : SV_Target
 
     #if UNDERLAY_ON
     d = tex2D(_MainTex, input.texcoord2.xy).a * layerScale;
-    faceColor += float4(_UnderlayColor.rgb * _UnderlayColor.a, _UnderlayColor.a) * saturate(d - layerBias) * (1 - faceColor.a);
+    faceColor += float4(_UnderlayColor.rgb * _UnderlayColor.a, _UnderlayColor.a) * saturate(d - layerBias) * (1 -
+        faceColor.a);
     #endif
 
     #if UNDERLAY_INNER

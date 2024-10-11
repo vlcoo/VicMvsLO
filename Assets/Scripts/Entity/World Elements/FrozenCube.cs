@@ -194,7 +194,7 @@ public class FrozenCube : HoldableEntity
             }
         }
 
-        body.velocity = new Vector2(throwSpeed * (left ? -1 : 1), body.velocity.y);
+        body.velocity = new Vector2(throwSpeed * (FacingLeftTween ? -1 : 1), body.velocity.y);
 
         if (autoBreakTimer > 0 && (entity is PlayerController || (!holder && !fastSlide)))
         {
@@ -237,6 +237,8 @@ public class FrozenCube : HoldableEntity
 
     public override void InteractWithPlayer(PlayerController player)
     {
+        if (entity is PlayerController && ReferenceEquals(player, entity)) return;
+
         var damageDirection = (player.body.position - body.position).normalized;
         var attackedFromAbove = damageDirection.y > -0.4f;
         if (previousHolder == player && throwTimer > 0)
@@ -312,14 +314,14 @@ public class FrozenCube : HoldableEntity
     }
 
     [PunRPC]
-    public override void Throw(bool facingLeft, bool crouch, Vector2 pos)
+    public override void Throw(bool fromLeft, bool crouch, Vector2 pos)
     {
         if (holder == null)
             return;
 
         fallen = false;
         flying = false;
-        left = facingLeft;
+        FacingLeftTween = fromLeft;
         fastSlide = true;
         body.position = new Vector2(pos.x + (holder.facingRight ? 0.1f : -0.1f), pos.y);
 
@@ -338,7 +340,7 @@ public class FrozenCube : HoldableEntity
 
         ApplyConstraints();
 
-        body.velocity = new Vector2(throwSpeed * (left ? -1 : 1), Mathf.Min(0, body.velocity.y));
+        body.velocity = new Vector2(throwSpeed * (FacingLeftTween ? -1 : 1), Mathf.Min(0, body.velocity.y));
     }
 
     [PunRPC]

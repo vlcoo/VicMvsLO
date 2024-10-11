@@ -5,8 +5,9 @@ public class TrackIcon : MonoBehaviour
 {
     public float trackMinX, trackMaxX;
     public GameObject target;
-    public bool doAnimation;
+    public bool doAnimation, targetless;
     public Sprite starSprite;
+    public Animator animator;
     private bool changedSprite;
 
     private float flashTimer;
@@ -19,9 +20,9 @@ public class TrackIcon : MonoBehaviour
         image = GetComponent<Image>();
 
         StarBouncer star;
-        if ((star = target.GetComponent<StarBouncer>()) && star.stationary)
+        if (target && (star = target.GetComponent<StarBouncer>()) && star.stationary)
         {
-            GetComponent<Animator>().enabled = true;
+            animator.enabled = true;
             transform.localScale = Vector2.zero;
         }
 
@@ -33,7 +34,7 @@ public class TrackIcon : MonoBehaviour
     {
         if (target == null)
         {
-            Destroy(gameObject);
+            if (!targetless) Destroy(gameObject);
             return;
         }
 
@@ -69,10 +70,15 @@ public class TrackIcon : MonoBehaviour
             changedSprite = true;
         }
 
+        SetPositionFromLevelCoords(target.transform.position);
+    }
+
+    public void SetPositionFromLevelCoords(Vector3 position)
+    {
         var gm = GameManager.Instance;
         var levelWidth = gm.GetLevelMaxX() - gm.GetLevelMinX();
         var trackWidth = trackMaxX - trackMinX;
-        var percentage = (target.transform.position.x - gm.GetLevelMinX()) / levelWidth;
+        var percentage = (position.x - gm.GetLevelMinX()) / levelWidth;
         transform.localPosition = new Vector3(percentage * trackWidth - trackMaxX, transform.localPosition.y);
     }
 }

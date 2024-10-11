@@ -7,11 +7,12 @@ public class NumberParticle : MonoBehaviour
 
     public void ApplyColor(Color color)
     {
-        text.ForceMeshUpdate();
-        var mr = GetComponentsInChildren<MeshRenderer>()[1];
-        MaterialPropertyBlock mpb = new();
-        mpb.SetColor("_Color", color);
-        mr.SetPropertyBlock(mpb);
+        text.color = color;
+        // text.ForceMeshUpdate();
+        // var mr = GetComponentsInChildren<MeshRenderer>()[1];
+        // MaterialPropertyBlock mpb = new();
+        // mpb.SetColor("_Color", color);
+        // mr.SetPropertyBlock(mpb);
     }
 
     public void Kill()

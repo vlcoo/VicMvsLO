@@ -31,10 +31,11 @@ public class PlayerAnimationController : MonoBehaviourPun
     private Color? _glowColor;
 
     private Animator animator;
-    private float blinkTimer, pipeTimer, deathTimer, propellerVelocity;
+    private float blinkTimer, pipeTimer, doorTimer, deathTimer, propellerVelocity;
     private Rigidbody2D body;
 
     private PlayerController controller;
+    private readonly float doorDuration = 2.6f;
 
     private AudioSource drillParticleAudio;
 
@@ -129,18 +130,15 @@ public class PlayerAnimationController : MonoBehaviourPun
                 targetEuler = new Vector3(0, controller.facingRight ? 110 : 250, 0);
                 instant = true;
             }
-            else if (controller.dead)
-            {
-                if (animator.GetBool("firedeath") && deathTimer > deathUpTime)
-                    targetEuler = new Vector3(-15, controller.facingRight ? 110 : 250, 0);
-                else
-                    targetEuler = new Vector3(0, 180, 0);
-                instant = true;
-            }
             else if (animator.GetBool("pipe"))
             {
                 targetEuler = new Vector3(0, 180, 0);
                 instant = true;
+            }
+            else if (controller.doorEntering && doorTimer < doorDuration / 1.33f)
+            {
+                targetEuler = new Vector3(0, controller.doorDirection ? 0 : 180, 0);
+                instant = false;
             }
             else if (animator.GetBool("inShell") && (!controller.onSpinner || Mathf.Abs(body.velocity.x) > 0.3f))
             {
@@ -192,6 +190,20 @@ public class PlayerAnimationController : MonoBehaviourPun
                     Time.deltaTime, -2500, -300);
             propeller.transform.Rotate(Vector3.forward, propellerVelocity * Time.deltaTime);
 
+            wasTurnaround = animator.GetCurrentAnimatorStateInfo(0).IsName("turnaround");
+        }
+
+        if (!controller.Frozen && (!GameManager.Instance.gameover || (GameManager.Instance.gameover && (GameManager.Instance.winningPlayer == null || GameManager.Instance.winningPlayer.ActorNumber != photonView.Owner.ActorNumber))))
+        {
+            if (controller.dead)
+            {
+                if (animator.GetBool("firedeath") && deathTimer > deathUpTime)
+                    targetEuler = new Vector3(-15, controller.facingRight ? 110 : 250, 0);
+                else
+                    targetEuler = new Vector3(0, 180, 0);
+                instant = true;
+            }
+
             if (instant || wasTurnaround)
             {
                 models.transform.rotation = Quaternion.Euler(targetEuler);
@@ -210,8 +222,6 @@ public class PlayerAnimationController : MonoBehaviourPun
 
             if (changeFacing)
                 controller.facingRight = models.transform.eulerAngles.y < 180;
-
-            wasTurnaround = animator.GetCurrentAnimatorStateInfo(0).IsName("turnaround");
         }
 
         //Particles
@@ -425,14 +435,16 @@ public class PlayerAnimationController : MonoBehaviourPun
 
         HandleDeathAnimation();
         HandlePipeAnimation();
+        HandleDoorAnimation();
 
-        transform.position = new Vector3(transform.position.x, transform.position.y, animator.GetBool("pipe") ? 1 : -4);
+        transform.position = new Vector3(transform.position.x, transform.position.y,
+            animator.GetBool("pipe") || (controller.doorEntering && doorTimer < doorDuration / 1.33f) ? 1 : -0.5f);
         if (excludeMaterialForSmall) largeMesh.materials = large ? rememberedMaterialsLarge : rememberedMaterialsSmall;
         else if (useSpecialSmall)
             largeModel.transform.GetChild(0).localScale = large ? new Vector3(1, 1, 1) : new Vector3(0.8f, 0.7f, 0.7f);
     }
 
-    private void HandleDeathAnimation()
+    public void HandleDeathAnimation()
     {
         if (!controller.dead)
         {
@@ -440,7 +452,11 @@ public class PlayerAnimationController : MonoBehaviourPun
             return;
         }
 
-        deathTimer += Time.fixedDeltaTime;
+        if (GameManager.Instance.Togglerizer.currentEffects.Contains("FastDeath"))
+            deathTimer = 3f;
+        else
+            deathTimer += Time.fixedDeltaTime;
+
         if (deathTimer < deathUpTime)
         {
             deathUp = false;
@@ -469,9 +485,9 @@ public class PlayerAnimationController : MonoBehaviourPun
 
         if (controller.photonView.IsMine && deathTimer + Time.fixedDeltaTime > 2.5f - 0.43f &&
             deathTimer < 2.5f - 0.43f)
-            controller.fadeOut.FadeOutAndIn(0.33f, .1f);
+            if (!GameManager.Instance.gameover) controller.fadeOut.FadeOutAndIn();
 
-        if (photonView.IsMine && deathTimer >= 3f)
+        if (photonView.IsMine && deathTimer >= 3f && !GameManager.Instance.gameover)
             photonView.RPC("PreRespawn", RpcTarget.All);
 
         if (body.position.y < GameManager.Instance.GetLevelMinY() - transform.lossyScale.y)
@@ -533,6 +549,67 @@ public class PlayerAnimationController : MonoBehaviourPun
         }
 
         pipeTimer += Time.fixedDeltaTime;
+    }
+
+    private void HandleDoorAnimation()
+    {
+        if (!photonView.IsMine)
+            return;
+        if (!controller.doorEntering)
+        {
+            doorTimer = 0;
+            return;
+        }
+
+        controller.UpdateHitbox();
+
+        var de = controller.doorEntering;
+
+        body.isKinematic = true;
+        body.velocity = Vector2.zero;
+
+        if (doorTimer < doorDuration / 2f && doorTimer + Time.fixedDeltaTime >= doorDuration / 2f)
+        {
+            transform.position = body.position =
+                new Vector3(de.otherDoor.transform.position.x, de.otherDoor.transform.position.y, 1);
+            animator.SetTrigger("door");
+            if (de.otherDoor.isGoal)
+            {
+                GameManager.Instance.WinByGoal(controller);
+                return;
+            }
+
+            controller.doorDirection = false;
+            de.otherDoor.photonView.RPC(nameof(DoorManager.SomeoneEntered), RpcTarget.All, true);
+            photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.World_Door_Open);
+            // controller.cameraController.Recenter();
+        }
+        else if (doorTimer < doorDuration / 4f && doorTimer + Time.fixedDeltaTime >= doorDuration / 4f)
+        {
+            de.photonView.RPC(nameof(DoorManager.SomeoneExited), RpcTarget.All);
+            photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.World_Door_Close);
+            controller.fadeOut.FadeOutAndIn(true);
+        }
+        else if (doorTimer < doorDuration / 1.33f && doorTimer + Time.fixedDeltaTime >= doorDuration / 1.33f)
+        {
+            de.otherDoor.photonView.RPC(nameof(DoorManager.SomeoneExited), RpcTarget.All);
+            photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.World_Door_Close);
+        }
+
+        if (doorTimer >= doorDuration)
+        {
+            controller.doorEntering = null;
+            body.isKinematic = false;
+            controller.onGround = false;
+            controller.properJump = false;
+            controller.koyoteTime = 1;
+            controller.crouching = false;
+            controller.alreadyGroundpounded = true;
+            controller.pipeTimer = 0.25f;
+            body.velocity = Vector2.zero;
+        }
+
+        doorTimer += Time.fixedDeltaTime;
     }
 
     public void DisableAllModels()

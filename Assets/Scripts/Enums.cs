@@ -55,7 +55,8 @@ public static class Enums
         IceFlower,
         PropellerMushroom,
         BlueShell,
-        MegaMushroom
+        MegaMushroom,
+        Sheller
     }
 
     #endregion
@@ -89,7 +90,7 @@ public static class Enums
     //Sound effects
     public enum Sounds : byte
     {
-        //CURRENT MAX: 105
+        //CURRENT MAX: 108 (incl.)
 
         //Enemy
         [SoundData("enemy/freeze")] Enemy_Generic_Freeze = 0,
@@ -268,7 +269,10 @@ public static class Enums
         [SoundData("world/water_splash")] World_Water_Splash = 77,
         [SoundData("world/checkpoint")] World_Checkpoint = 98,
         [SoundData("world/falling_snow")] World_Falling_Snow = 100,
-        [SoundData("world/starcoin_collect")] World_Starcoin = 102
+        [SoundData("world/starcoin_collect")] World_Starcoin = 102,
+        [SoundData("world/door_open")] World_Door_Open = 106,
+        [SoundData("world/door_close")] World_Door_Close = 107,
+        [SoundData("world/flag_down")] World_Pole_Down = 108
     }
 
     #endregion
@@ -331,6 +335,7 @@ public static class Enums
         PlayerChatMessage = 3,
         ChangeMaxPlayers = 4,
         ChangePrivate = 5,
+        LoadedGamemodePreset = 6,
 
         // 10-19 = game state events
         PlayerFinishedLoading = 10,

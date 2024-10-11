@@ -33,6 +33,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     private static readonly Random rng = new();
     public AudioSource sfx, music;
     public Songinator MusicSynth;
+    public MenuWorldSongPlayer worldSongPlayer;
     public GameObject lobbiesContent, lobbyPrefab;
     public GameObject connecting;
 
@@ -47,16 +48,19 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         controlsMenu,
         privatePrompt,
         updateBox,
+        webglWarningBox,
+        favRegionHintBox,
         newRuleS1Prompt,
         newRuleS2Prompt,
         emoteListPrompt,
         RNGRulesBox,
         specialPrompt,
+        presetPrompt,
+        presetHintPrompt,
         stagePrompt,
         teamsPrompt,
         powerupsPrompt;
 
-    // public Animator createLobbyPromptAnimator, privatePromptAnimator, updateBoxAnimator, errorBoxAnimator, rebindPromptAnimator, newRuleS1PromptAnimator, newRuleS2PromptAnimator, emoteListPromptAnimator, RNGRulesBoxAnimator;
     public GameObject[] levelCameraPositions;
 
     public GameObject sliderText,
@@ -69,7 +73,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
     public TMP_Dropdown levelDropdown, characterDropdown;
     public RoomIcon selectedRoomIcon, privateJoinRoom;
-    public Button joinRoomBtn, createRoomBtn, startGameBtn, exitBtn, backBtn;
+    public Button joinRoomBtn, createRoomBtn, startGameBtn, exitBtn, backBtn, favRegionBtn, sendChatBtn;
 
     public Toggle ndsResolutionToggle,
         fullscreenToggle,
@@ -84,6 +88,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         rumbleToggle,
         onscreenControlsToggle,
         animsToggle,
+        countersToggle,
         vsyncToggle,
         privateToggle,
         privateToggleRoom,
@@ -122,11 +127,15 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         privateSelected,
         reconnectSelected,
         updateBoxSelected,
+        webglWarningBoxSelected,
+        favRegionHintBoxSelected,
         newRuleS1Selected,
         newRuleS2Selected,
         emoteListSelected,
         RNGRulesSelected,
         specialSelected,
+        presetSelected,
+        presetHintSelected,
         stageSelected,
         teamsSelected,
         powerupsSelected;
@@ -184,7 +193,8 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         new KeyValuePair<string, string>("KnockedBack", "ActKnockbackPlayer"),
         new KeyValuePair<string, string>("Frozen", "ActFreezePlayer"),
         new KeyValuePair<string, string>("Died", "ActFreezePlayer"),
-        new KeyValuePair<string, string>("ReachedCoinLimit", "ActGiveCoin")
+        new KeyValuePair<string, string>("ReachedCoinLimit", "ActGiveCoin"),
+        new KeyValuePair<string, string>("LostPowerup", "ActHarmPlayer")
     };
 
     private List<string> formattedRegions;
@@ -200,6 +210,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     [NonSerialized] public List<string> specialList = new();
 
     private Coroutine updatePingCoroutine;
+    private bool warningShown;
 
     // Unity Stuff
     public void Start()
@@ -211,7 +222,9 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
         Instance = this;
         sfx.outputAudioMixerGroup.audioMixer.SetFloat("SFXReverb", 0f);
-        sfx.outputAudioMixerGroup.audioMixer.SetFloat("MasterPitch", -80f);
+        // sfx.outputAudioMixerGroup.audioMixer.SetFloat("MasterPitch", -80f);
+
+        GlobalController.Instance.PopulateSpecialPlayers();
 
         //Clear game-specific settings so they don't carry over
         HorizontalCamera.OFFSET_TARGET = 0;
@@ -221,7 +234,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
         if (GlobalController.Instance.disconnectCause != null)
         {
-            OpenErrorBox(GlobalController.Instance.disconnectCause.Value);
+            OpenErrorBox(NetworkUtils.disconnectMessages.GetValueOrDefault(GlobalController.Instance.disconnectCause.Value, NetworkUtils.genericMessage));
             GlobalController.Instance.disconnectCause = null;
         }
 
@@ -275,7 +288,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
             {
                 var r = pingSortedRegions[i];
                 newRegions.Add(
-                    $"{NetworkUtils.regionsFullNames.GetValueOrDefault(r.Code, r.Code)} <color=#bbbbbb>({(r.Ping == 4000 ? "?" : r.Ping)} ms)");
+                    $"{NetworkUtils.regionsFullNames.GetValueOrDefault(r.Code, r.Code.ToUpper())} <color=#bbbbbb>({(r.Ping == 4000 ? "?" : r.Ping)} ms){(r.Code == Settings.Instance.favouriteRegion ? " <color=#ff8888><3" : "")}");
                 if (r.Code == lastRegion)
                     index = i;
             }
@@ -313,6 +326,9 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
             GlobalController.Instance.checkedForVersion = true;
         }
 #endif
+
+        if (Utils.GetDeviceType() == Utils.DeviceType.MOBILE)
+            Application.targetFrameRate = 91;
     }
 
     private void Update()
@@ -362,7 +378,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         Debug.Log("[PHOTON] Disconnected: " + cause);
         if (cause is not (DisconnectCause.None or DisconnectCause.DisconnectByClientLogic
             or DisconnectCause.CustomAuthenticationFailed))
-            OpenErrorBox(cause);
+            OpenErrorBox(NetworkUtils.disconnectMessages.GetValueOrDefault(cause, NetworkUtils.genericMessage));
 
         selectedRoom = null;
         selectedRoomIcon = null;
@@ -399,9 +415,9 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
             foreach (var r in pingSortedRegions)
                 formattedRegions.Add(
-                    $"{NetworkUtils.regionsFullNames.GetValueOrDefault(r.Code, r.Code)} <color=#bbbbbb>({(r.Ping == 4000 ? "?" : r.Ping)} ms)");
+                    $"{NetworkUtils.regionsFullNames.GetValueOrDefault(r.Code, r.Code.ToUpper())} <color=#bbbbbb>({(r.Ping == 4000 ? "?" : r.Ping)}ms){(r.Code == Settings.Instance.favouriteRegion ? " <color=#ff8888><3" : "")}");
 
-            lastRegion = pingSortedRegions[0].Code;
+            lastRegion = Settings.Instance.favouriteRegion == "" ? pingSortedRegions[0].Code : Settings.Instance.favouriteRegion;
             pingsReceived = true;
         }, "");
     }
@@ -418,7 +434,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     public void OnCustomAuthenticationFailed(string failure)
     {
         Debug.Log("[PHOTON] Auth Failure: " + failure);
-        OpenErrorBox(failure);
+        OpenErrorBox("Auth failed! Servers might be down.\nPlease try again later.");
     }
 
     public void OnConnectedToMaster()
@@ -462,8 +478,8 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         var banList = bans.Cast<NameIdPair>().ToList();
         if (newPlayer.NickName.Length < NICKNAME_MIN ||
             newPlayer.NickName.Length > NICKNAME_MAX ||
-            banList.Any(nip =>
-                nip.userId == newPlayer.UserId || newPlayer.GetAuthorityLevel() < Enums.AuthorityLevel.NORMAL))
+            banList.Any(nip => nip.userId == newPlayer.UserId) ||
+            newPlayer.GetAuthorityLevel() < Enums.AuthorityLevel.NORMAL)
         {
             if (PhotonNetwork.IsMasterClient)
                 StartCoroutine(KickPlayer(newPlayer));
@@ -478,7 +494,8 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     {
         Utils.GetCustomProperty(Enums.NetRoomProperties.Bans, out object[] bans);
         var banList = bans.Cast<NameIdPair>().ToList();
-        if (banList.Any(nip => nip.userId == otherPlayer.UserId)) return;
+        if (banList.Any(nip => nip.userId == otherPlayer.UserId) ||
+            otherPlayer.GetAuthorityLevel() < Enums.AuthorityLevel.NORMAL) return;
         LocalChatMessage($"<i>{otherPlayer.GetUniqueNickname()}</i> just left.", SYSTEM_MESSAGE_COLOR);
         sfx.PlayOneShot(Enums.Sounds.UI_PlayerDisconnect.GetClip());
     }
@@ -638,14 +655,14 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     public void OnJoinRoomFailed(short reasonId, string reasonMessage)
     {
         Debug.LogError($"[PHOTON] Join room failed ({reasonId}, {reasonMessage})");
-        OpenErrorBox(reasonMessage);
+        OpenErrorBox(NetworkUtils.errorMessages.GetValueOrDefault(reasonId, NetworkUtils.genericMessage));
         JoinMainLobby();
     }
 
     public void OnCreateRoomFailed(short reasonId, string reasonMessage)
     {
         Debug.LogError($"[PHOTON] Create room failed ({reasonId}, {reasonMessage})");
-        OpenErrorBox(reasonMessage);
+        OpenErrorBox(NetworkUtils.errorMessages.GetValueOrDefault(reasonId, NetworkUtils.genericMessage));
 
         OnConnectedToMaster();
     }
@@ -722,6 +739,22 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
             case (byte)Enums.NetEventIds.ChangePrivate:
             {
                 ChangePrivate();
+                break;
+            }
+            case (byte)Enums.NetEventIds.LoadedGamemodePreset:
+            {
+                var description = e.CustomData as string;
+
+                if (string.IsNullOrWhiteSpace(description) || description.Contains("Reset"))
+                    return;
+
+                var presetName = description.Split("|")[0];
+                description = description.Split("|")[1];
+
+                presetHintPrompt.transform.Find("Image/Header/NameLbl").GetComponent<TMP_Text>().text = presetName;
+                presetHintPrompt.transform.Find("Image/DescriptionLbl").GetComponent<TMP_Text>().text = description;
+                OpenPrompt(presetHintPrompt, presetHintSelected);
+
                 break;
             }
         }
@@ -810,6 +843,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         vsyncToggle.isOn = Settings.Instance.vsync;
         scoreboardToggle.isOn = Settings.Instance.scoreboardAlways;
         animsToggle.isOn = Settings.Instance.reduceUIAnims;
+        countersToggle.isOn = Settings.Instance.showHUDCounters;
         filterToggle.isOn = Settings.Instance.filter;
         QualitySettings.vSyncCount = Settings.Instance.vsync ? 1 : 0;
     }
@@ -828,20 +862,18 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         }
     }
 
-    public void onSetSpecialRule(GameObject element)
+    public void SetSpecialRule(string ruleName, bool how)
     {
-        var name = element.name;
         var thereWereDuplicates = false;
-        var how = element.transform.GetChild(2).GetComponent<Toggle>().isOn;
 
         if (how)
         {
-            if (!specialList.Contains(name)) specialList.Add(name);
+            if (!specialList.Contains(ruleName)) specialList.Add(ruleName);
             else thereWereDuplicates = true;
         }
         else
         {
-            specialList.Remove(name);
+            specialList.Remove(ruleName);
         }
 
         specialCountText.text = "Specials: " + specialList.Count;
@@ -852,6 +884,11 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
             [Enums.NetRoomProperties.SpecialRules] = SpecialRulesToDict()
         };
         PhotonNetwork.CurrentRoom.SetCustomProperties(table);
+    }
+
+    public void onSetSpecialRule(GameObject element)
+    {
+        SetSpecialRule(element.name, element.transform.GetChild(2).GetComponent<Toggle>().isOn);
     }
 
     public void saveMatchRules()
@@ -904,6 +941,15 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
                 newEntry.SetActive(true);
             }
 
+            /*var redundantEntryCount = ruleList.Count(entry => newEntryScript.Equals(entry));
+            if (redundantEntryCount > 0)
+            {
+                newEntryScript.hiddenRedundant = true;
+                newEntry.SetActive(false);
+                var redundantEntry = ruleList.First(entry => newEntryScript.Equals(entry) && !entry.hiddenRedundant);
+                redundantEntry.lbl.text = $"{redundantEntry.GetSanitizedLabel()} * {redundantEntryCount + 1}";
+            }*/
+
             ruleList.Add(newEntryScript);
 
             if (updateNetRoom)
@@ -953,6 +999,16 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     public void onDownPowerupChance(string powerup)
     {
         powerupList.Find(entry => entry.powerup.Equals(powerup)).Chance -= 1;
+        Hashtable table = new()
+        {
+            [Enums.NetRoomProperties.PowerupChances] = PowerupChancesToDict()
+        };
+        PhotonNetwork.CurrentRoom.SetCustomProperties(table);
+    }
+
+    public void onExplicitPowerupChance(string powerup, int chance)
+    {
+        powerupList.Find(entry => entry.powerup.Equals(powerup)).Chance = chance;
         Hashtable table = new()
         {
             [Enums.NetRoomProperties.PowerupChances] = PowerupChancesToDict()
@@ -1040,6 +1096,12 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         ClosePrompt(updateBox);
 
         EventSystem.current.SetSelectedGameObject(mainMenuSelected);
+
+        if (!warningShown && Utils.GetDeviceType() == Utils.DeviceType.BROWSER)
+        {
+            OpenPrompt(webglWarningBox, webglWarningBoxSelected);
+            warningShown = true;
+        }
     }
 
     public void ConnectOffline()
@@ -1057,6 +1119,12 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
     public void OpenLobbyMenu()
     {
+        if (PhotonNetwork.LocalPlayer?.GetAuthorityLevel() < Enums.AuthorityLevel.NORMAL)
+        {
+            OpenErrorBox(NetworkUtils.banMessage);
+            return;
+        }
+
         title.SetActive(false);
         bg.SetActive(true);
         mainMenu.SetActive(false);
@@ -1137,6 +1205,11 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     public void OpenSpecialRule()
     {
         OpenPrompt(specialPrompt, specialSelected);
+    }
+
+    public void OpenPresetRule()
+    {
+        OpenPrompt(presetPrompt, presetSelected);
     }
 
     public void OpenMapSelector()
@@ -1239,19 +1312,14 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         OpenPrompt(privatePrompt, privateSelected);
     }
 
-    private void OpenErrorBox(DisconnectCause cause)
-    {
-        if (!errorBox.activeSelf)
-            sfx.PlayOneShot(Enums.Sounds.UI_Error.GetClip());
-
-        errorText.text = NetworkUtils.disconnectMessages.GetValueOrDefault(cause, "Unknown cause");
-        errorDetail.text = cause.ToString();
-
-        OpenPrompt(errorBox, errorButton);
-    }
-
     public void OpenErrorBox(string text)
     {
+        if (text == NetworkUtils.banMessage)
+        {
+            SceneManager.LoadScene(1, LoadSceneMode.Single);
+            return;
+        }
+
         if (!errorBox.activeSelf)
             sfx.PlayOneShot(Enums.Sounds.UI_Error.GetClip());
         errorText.text = text;
@@ -1327,14 +1395,20 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     {
         noUpdateNetRoom = true;
         PhotonNetwork.LeaveRoom();
+
+        worldSongPlayer.OnLevelSelected(0);
+        if (MusicSynth.state == Songinator.PlaybackState.PAUSED)
+            MusicSynth.SetPlaybackState(Songinator.PlaybackState.PLAYING, 0.5f);
     }
 
     public void StartGame()
     {
         backBtn.interactable = false;
         sfx.PlayOneShot(Enums.Sounds.UI_Match_Starting.GetClip());
-        MusicSynth.player.Pause();
+        MusicSynth.SetPlaybackState(Songinator.PlaybackState.STOPPED);
+        worldSongPlayer.Stop();
         fader.SetInvisible(GlobalController.Instance.settings.reduceUIAnims);
+        fader.anim.speed = 1.5f;
         fader.anim.SetTrigger("out");
         StartCoroutine(WaitForMusicFadeStartGame());
     }
@@ -1409,9 +1483,21 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     {
         levelDropdown.SetValueWithoutNotify(index);
         stageText.text = "Map: " + levelDropdown.options[index].text;
-        raceMapSelected = levelDropdown.options[index].text.Contains("!ui_flag");
+        raceMapSelected = levelDropdown.options[index].text.Contains("hudnumber_laps");
         UpdateSettingEnableStates();
         Camera.main.transform.position = levelCameraPositions[index].transform.position;
+
+        var worldId = worldSongPlayer.levelWorldIds[index];
+        worldSongPlayer.OnLevelSelected(index);
+        if (worldId == 0 && MusicSynth.state == Songinator.PlaybackState.PAUSED)
+        {
+            MusicSynth.SetPlaybackState(Songinator.PlaybackState.PLAYING, 0.5f);
+            return;
+        }
+
+        if (worldId > 0)
+            if (MusicSynth.state == Songinator.PlaybackState.PLAYING)
+                MusicSynth.SetPlaybackState(Songinator.PlaybackState.PAUSED, 0.5f);
     }
 
     public void SetLevelIndex(int newLevelIndex)
@@ -1429,6 +1515,18 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
             [Enums.NetRoomProperties.Level] = newLevelIndex
         };
         PhotonNetwork.CurrentRoom.SetCustomProperties(table);
+
+        /*var worldId = worldSongPlayer.levelWorldIds[newLevelIndex];
+        worldSongPlayer.OnLevelSelected(newLevelIndex);
+        if (worldId == 0 && MusicSynth.state == Songinator.PlaybackState.PAUSED)
+        {
+            MusicSynth.SetPlaybackState(Songinator.PlaybackState.PLAYING, 0.5f);
+            return;
+        }
+
+        if (worldId > 0)
+            if (MusicSynth.state == Songinator.PlaybackState.PLAYING)
+                MusicSynth.SetPlaybackState(Songinator.PlaybackState.PAUSED, 0.5f);*/
     }
 
     public void SelectRoom(GameObject room)
@@ -1454,18 +1552,43 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         if (selectedRoom == null)
             return;
 
+        if (PhotonNetwork.LocalPlayer?.GetAuthorityLevel() < Enums.AuthorityLevel.NORMAL)
+        {
+            OpenErrorBox(NetworkUtils.banMessage);
+            return;
+        }
+
         PhotonNetwork.NickName = nicknameField.text;
         PhotonNetwork.JoinRoom(selectedRoomIcon.room.Name);
     }
 
     public void JoinSpecificRoom()
     {
+        if (lobbyJoinField.text.Length == 0)
+        {
+            // paste from clipboard
+            lobbyJoinField.text = GUIUtility.systemCopyBuffer.ToUpper();
+            if (lobbyJoinField.text.Length == 0)
+            {
+                OpenErrorBox("Clipboard was empty!\nTry typing the ID manually.");
+                return;
+            }
+
+            lobbyJoinField.text = lobbyJoinField.text[..8];
+        }
+
         var id = lobbyJoinField.text.ToUpper();
         if (id.Length == 0) return;
         var index = roomNameChars.IndexOf(id[0]);
         if (id.Length < 8 || index < 0 || index >= allRegions.Count)
         {
-            OpenErrorBox("Room doesn't exist.");
+            OpenErrorBox($"The ID <i>{id}</i>\nis incorrect!");
+            return;
+        }
+
+        if (PhotonNetwork.LocalPlayer?.GetAuthorityLevel() < Enums.AuthorityLevel.NORMAL)
+        {
+            OpenErrorBox(NetworkUtils.banMessage);
             return;
         }
 
@@ -1486,14 +1609,16 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
     public void OnPrivatePromptTextEdited(Button confirmButton)
     {
-        confirmButton.interactable = lobbyJoinField.text.Length == 8;
+        // confirmButton.interactable = lobbyJoinField.text.Length == 8;
+        confirmButton.transform.GetChild(0).GetComponent<TMP_Text>().text =
+            lobbyJoinField.text.Length == 0 ? "Paste from clipboard" : "OK";
     }
 
     public void CreateRoom()
     {
-        if (PhotonNetwork.LocalPlayer?.GetAuthorityLevel() < Enums.AuthorityLevel.SOFT_BANNED)
+        if (PhotonNetwork.LocalPlayer?.GetAuthorityLevel() < Enums.AuthorityLevel.NORMAL)
         {
-            OpenErrorBox("You've been banned.");
+            OpenErrorBox(NetworkUtils.banMessage);
             return;
         }
 
@@ -1628,6 +1753,11 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
             SendOptions.SendReliable);
     }
 
+    public void OnChatInputChanged(TMP_InputField input)
+    {
+        sendChatBtn.interactable = input.text.Length > 0;
+    }
+
     public void Kick(Player target)
     {
         PhotonNetwork.CloseConnection(target);
@@ -1649,12 +1779,12 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     {
         if (!target.IsLocal && PhotonNetwork.LocalPlayer.GetAuthorityLevel() < target.GetAuthorityLevel())
         {
-            LocalChatMessage($"Unknown player {target.NickName}.", SYSTEM_MESSAGE_COLOR);
+            LocalChatMessage($"Unknown player <i>{target.NickName}</i>.", SYSTEM_MESSAGE_COLOR);
         }
         else
         {
             GUIUtility.systemCopyBuffer = target.UserId;
-            LocalChatMessage($"Copied {target.NickName}'s ID: {target.UserId}", SYSTEM_MESSAGE_COLOR);
+            LocalChatMessage($"Copied <i>{target.NickName}</i>'s ID: {target.UserId}", SYSTEM_MESSAGE_COLOR);
         }
     }
 
@@ -1705,7 +1835,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
             return;
         }
 
-        LocalChatMessage($"Unknown player {playername}.", SYSTEM_MESSAGE_COLOR);
+        LocalChatMessage($"Unknown player <i>{playername}</i>.", SYSTEM_MESSAGE_COLOR);
     }
 
     public void Ban(Player target)
@@ -1742,7 +1872,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
             [Enums.NetRoomProperties.Bans] = pairs.ToArray()
         };
         PhotonNetwork.CurrentRoom.SetCustomProperties(table, null, NetworkUtils.forward);
-        LocalChatMessage($"{targetPair.name} has been unbanned from this lobby.", SYSTEM_MESSAGE_COLOR);
+        LocalChatMessage($"<i>{targetPair.name}</i> has been unbanned from this lobby.", SYSTEM_MESSAGE_COLOR);
     }
 
     private void RunCommand(string[] args)
@@ -1770,7 +1900,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
                         pl.GetUniqueNickname().ToLower() == strTarget);
                 if (target == null)
                 {
-                    LocalChatMessage($"Unknown player {args[1]}.", SYSTEM_MESSAGE_COLOR);
+                    LocalChatMessage($"Unknown player <i>{args[1]}</i>.", SYSTEM_MESSAGE_COLOR);
                     return;
                 }
 
@@ -1791,7 +1921,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
                         pl.GetUniqueNickname().ToLower() == strTarget);
                 if (target == null)
                 {
-                    LocalChatMessage($"Unknown player {args[1]}.", SYSTEM_MESSAGE_COLOR);
+                    LocalChatMessage($"Unknown player <i>{args[1]}</i>.", SYSTEM_MESSAGE_COLOR);
                     return;
                 }
 
@@ -1826,7 +1956,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
                     PhotonNetwork.CurrentRoom.Players.Values.FirstOrDefault(pl => pl.NickName.ToLower() == strTarget);
                 if (target == null)
                 {
-                    LocalChatMessage($"Unknown player {args[1]}.", SYSTEM_MESSAGE_COLOR);
+                    LocalChatMessage($"Unknown player <i>{args[1]}</i>.", SYSTEM_MESSAGE_COLOR);
                     return;
                 }
 
@@ -2434,8 +2564,129 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         return seconds;
     }
 
+    public void SetRulesetPreset(RulesetData data)
+    {
+        if (!data.IsValid()) return;
+
+        if (data.description != "")
+        {
+            presetHintPrompt.transform.Find("Image/Header/NameLbl").GetComponent<TMP_Text>().text = data.legalName;
+            presetHintPrompt.transform.Find("Image/DescriptionLbl").GetComponent<TMP_Text>().text = data.description;
+            OpenPrompt(presetHintPrompt, presetHintSelected);
+        }
+
+        foreach (var rule in ruleList)
+            Destroy(rule.gameObject);
+        ruleList.Clear();
+        for (var i = 0; i < data.rulePairsConditions.Length; i++)
+            onAddMatchRuleExplicit(data.rulePairsConditions[i], data.rulePairsActions[i], false);
+        Hashtable table = new()
+        {
+            [Enums.NetRoomProperties.MatchRules] = MatchRulesToJson()
+        };
+        PhotonNetwork.CurrentRoom.SetCustomProperties(table);
+
+        foreach (Transform toggle in specialTogglesParent.transform.GetChild(0).transform)
+            toggle.transform.GetChild(2).GetComponent<Toggle>().isOn = data.specials.Contains(toggle.name);
+        foreach (Transform toggle in specialTogglesParent.transform.GetChild(1).transform)
+            toggle.transform.GetChild(2).GetComponent<Toggle>().isOn = data.specials.Contains(toggle.name);
+
+        // for the stars, coins, lives and time in the data:
+        // if they're -1, they don't get changed at all.
+        // if they're 0, they get disabled like with the toggle in the ui.
+        // finally, if they're 1 or more is valid and will enable them and set the value to that.
+        // exactly the same for laps, but they can't be 0.
+        if (data.stars != -1)
+        {
+            starsEnabled.isOn = data.stars != 0;
+            if (data.stars != 0)
+            {
+                starsText.text = data.stars.ToString();
+                starsText.onEndEdit.Invoke(data.stars.ToString());
+            }
+        }
+
+        if (data.coins != -1)
+        {
+            coinsEnabled.isOn = data.coins != 0;
+            if (data.coins != 0)
+            {
+                coinsText.text = data.coins.ToString();
+                coinsText.onEndEdit.Invoke(data.coins.ToString());
+            }
+        }
+
+        if (data.lives != -1)
+        {
+            livesEnabled.isOn = data.lives != 0;
+            if (data.lives != 0)
+            {
+                livesField.text = data.lives.ToString();
+                livesField.onEndEdit.Invoke(data.lives.ToString());
+            }
+        }
+
+        if (data.timeSeconds != -1)
+        {
+            timeEnabled.isOn = data.timeSeconds != 0;
+            if (data.timeSeconds != 0)
+            {
+                var minutes = data.timeSeconds / 60;
+                var seconds = data.timeSeconds % 60;
+                timeField.text = $"{minutes}:{seconds:D2}";
+                timeField.onEndEdit.Invoke($"{minutes}:{seconds:D2}");
+            }
+        }
+
+        if (data.laps != -1)
+        {
+            lapsText.text = data.laps.ToString();
+            lapsText.onEndEdit.Invoke(data.laps.ToString());
+        }
+
+        for (var i = 0; i < data.powerups.Length; i++)
+        {
+            powerupList[i].Chance = data.powerups[i];
+            onExplicitPowerupChance(powerupList[i].powerup, data.powerups[i]);
+        }
+
+        nomapToggle.isOn = data.hideTrack;
+        coincountToggle.isOn = data.showCoins;
+
+        PhotonNetwork.RaiseEvent((byte)Enums.NetEventIds.LoadedGamemodePreset, $"{data.legalName}|{data.description}", NetworkUtils.EventOthers,
+            SendOptions.SendReliable);
+    }
+
     public void ChangeLobbyHeader(string name)
     {
         SetText(lobbyText, $"{name.ToValidUsername()}'s Lobby", true);
+    }
+
+    private const string FavRegionText = " <color=#ff8888><3";
+    public void SetUnsetFavouriteRegion()
+    {
+        if (Settings.Instance.favouriteRegion != lastRegion)
+        {
+            region.captionText.text += FavRegionText;
+            region.options[region.value].text += FavRegionText;
+            if (Settings.Instance.favouriteRegion != "")
+            {
+                var i = Array.IndexOf(pingSortedRegions, pingSortedRegions.First(r => r.Code == Settings.Instance.favouriteRegion));
+                // remove the favourite heart from the previous favourite region
+                region.options[i ].text = region.options[i ].text[..^FavRegionText.Length];
+            }
+            Settings.Instance.favouriteRegion = lastRegion;
+            OpenPrompt(favRegionHintBox, favRegionHintBoxSelected);
+        }
+        else
+        {
+            var i = Array.IndexOf(pingSortedRegions, pingSortedRegions.First(r => r.Code == Settings.Instance.favouriteRegion));
+            // remove the favourite heart from the previous favourite region
+            region.options[i ].text = region.options[i ].text[..^FavRegionText.Length];
+            region.captionText.text = region.captionText.text[..^FavRegionText.Length];
+            Settings.Instance.favouriteRegion = "";
+        }
+
+        Settings.Instance.SaveSettingsToPreferences();
     }
 }

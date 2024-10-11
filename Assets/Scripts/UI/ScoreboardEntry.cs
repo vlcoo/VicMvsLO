@@ -28,7 +28,7 @@ public class ScoreboardEntry : MonoBehaviour
         var c = target.AnimationController.GlowColor;
         background.color = new Color(c.r, c.g, c.b, 0.5f);
 
-        rainbowEnabled = target.photonView.Owner.HasRainbowName();
+        rainbowEnabled = target.photonView.Owner.HasSpecialName();
     }
 
     public void Update()
@@ -65,13 +65,13 @@ public class ScoreboardEntry : MonoBehaviour
     {
         var txt = "";
         if (currentLives >= 0)
-            txt += target.character.uistring + Utils.GetSymbolString(currentLives.ToString());
+            txt += target.character.uistring + Utils.GetNumberString(currentLives.ToString());
         if (GameManager.Instance.starRequirement > 0)
-            txt += Utils.GetSymbolString($"S{currentStars}");
+            txt += " <sprite name=\"hudnumber_star\">" + Utils.GetNumberString($"{currentStars}");
         if (GameManager.Instance.raceLevel && GameManager.Instance.lapRequirement > 1)
-            txt += Utils.GetSymbolString($"L{currentLaps}");
+            txt += " <sprite name=\"hudnumber_laps\">" + Utils.GetNumberString($"{currentLaps}");
         if (GameManager.Instance.showCoinCount)
-            txt += Utils.GetSymbolString($"C{currentCoins}");
+            txt += " <sprite name=\"hudnumber_coin\">" + Utils.GetNumberString($"{currentCoins}");
 
         valuesText.text = txt;
     }

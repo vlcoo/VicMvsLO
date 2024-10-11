@@ -13,7 +13,7 @@ public static class PhotonExtensions
         return !view || view.IsMine;
     }
 
-    public static bool HasRainbowName(this Player player)
+    public static bool HasSpecialName(this Player player)
     {
         return player.GetAuthorityLevel() > Enums.AuthorityLevel.NORMAL;
     }

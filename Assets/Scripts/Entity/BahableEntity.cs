@@ -1,35 +1,30 @@
-using Photon.Pun;
 using UnityEngine;
 
 public class BahableEntity : MonoBehaviour
 {
-    public static int BAH_STRENGTH = 3;
+    private static readonly int BAH_STRENGTH = 4;
     private KillableEntity child;
 
-    // Start is called before the first frame update
     private void Start()
     {
         child = GetComponent<KillableEntity>();
     }
 
-    // Update is called once per frame
-    private void Update()
+    // A bah is just a little jump (or animation) of the entity. In the original NSMB, they also change directions, but
+    // we don't do that here so enemies' positions are the same for all players (since bahs happen at diff times for each person).
+    public bool Bah()
     {
-    }
+        if (!child.body || child.dead) return false;
 
-    public void bah()
-    {
-        if (child.body == null) return;
+        // Exceptions to the bah rule: If a koopa or spiny is in shell and moving, ignore.
         if (child.TryGetComponent(out KoopaWalk koopa))
-        {
-            if (koopa.shell && child.body.velocity.x != 0) return;
-            if (!koopa.shell) child.photonView.RPC(nameof(child.SetLeft), RpcTarget.All, !child.left);
-        }
-        else
-        {
-            child.photonView.RPC(nameof(child.SetLeft), RpcTarget.All, !child.left);
-        }
+            if (koopa.shell && child.body.velocity.x != 0)
+                return false;
+        if (child.TryGetComponent(out SpinyWalk spiny))
+            if (spiny.shell && child.body.velocity.x != 0)
+                return false;
 
         child.body.velocity = new Vector2(child.body.velocity.x, BAH_STRENGTH);
+        return true;
     }
 }

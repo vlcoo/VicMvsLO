@@ -6,15 +6,9 @@ public class StartingWall : MonoBehaviour
 {
     [FormerlySerializedAs("START_DELAY")] public int startDelay;
 
-    // Start is called before the first frame update
     private void Start()
     {
         StartCoroutine(nameof(WaitAndDestroy));
-    }
-
-    // Update is called once per frame
-    private void Update()
-    {
     }
 
     private IEnumerator WaitAndDestroy()

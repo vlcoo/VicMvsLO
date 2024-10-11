@@ -11,19 +11,21 @@ namespace NSMB.Utils
     {
         public static WebFlags forward = new(WebFlags.HttpForwardConst);
 
-        public static Dictionary<string, string> regionsFullNames = new()
+        public static readonly Dictionary<string, string> regionsFullNames = new()
         {
             ["asia"] = "Asia",
             ["au"] = "Australia",
             ["cae"] = "Canada",
             ["cn"] = "Mainland China",
             ["eu"] = "Europe",
+            ["hk"] = "Hong Kong",
             ["in"] = "India",
             ["jp"] = "Japan",
             ["za"] = "South Africa",
             ["sa"] = "South America",
             ["kr"] = "South Korea",
             ["tr"] = "Turkey",
+            ["uae"] = "United Arab Emirates",
             ["us"] = "USA",
             ["usw"] = "USA, West",
             ["ussc"] = "USA, Central",
@@ -31,17 +33,31 @@ namespace NSMB.Utils
             ["rue"] = "Russia, East"
         };
 
-        public static Dictionary<DisconnectCause, string> disconnectMessages = new()
+        public static string banMessage = "Unauthorized Access!";
+
+        public static readonly Dictionary<DisconnectCause, string> disconnectMessages = new()
         {
+            [DisconnectCause.Exception] = "Check your internet connection or try again later!",
             [DisconnectCause.MaxCcuReached] = "This region is full; try again later.",
-            [DisconnectCause.CustomAuthenticationFailed] = "Servers might be down; try again later.",
+            [DisconnectCause.CustomAuthenticationFailed] = "Servers might be down; try again later!",
             [DisconnectCause.DisconnectByServerLogic] = "You've been disconnected for cheating.",
             [DisconnectCause.DisconnectByClientLogic] = "You've been disconnected.",
             [DisconnectCause.DisconnectByOperationLimit] = "Spam prevention kicked in.",
-            [DisconnectCause.ClientTimeout] = "Servers might be down; try again later.",
+            [DisconnectCause.ClientTimeout] = "Your device lagged out, or the servers are down.\nPlease try again!",
             [DisconnectCause.DnsExceptionOnConnect] = "Your device's internet connection is poor.",
             [DisconnectCause.ServerTimeout] = "Your device's internet connection is poor."
         };
+
+        public static readonly Dictionary<int, string> errorMessages = new()
+        {
+            [ErrorCode.GameDoesNotExist] = "Lobby doesn't exist.",
+            [ErrorCode.GameIdAlreadyExists] = "Multiple games in one device is not allowed!\nYou can only join one lobby at a time.",
+            [ErrorCode.GameFull] = "Lobby is full.",
+            [ErrorCode.MaxCcuReached] = disconnectMessages[DisconnectCause.MaxCcuReached],
+            [ErrorCode.CustomAuthenticationFailed] = disconnectMessages[DisconnectCause.CustomAuthenticationFailed]
+        };
+
+        public static string genericMessage = "Disconnected due to an unknown cause!";
 
         private static readonly Hashtable _defaultRoomProperties = new()
         {

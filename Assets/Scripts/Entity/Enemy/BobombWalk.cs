@@ -16,13 +16,6 @@ public class BobombWalk : HoldableEntity
 
     #region Unity Methods
 
-    public override void Start()
-    {
-        base.Start();
-
-        body.velocity = new Vector2(walkSpeed * (left ? -1 : 1), body.velocity.y);
-    }
-
     public override void FixedUpdate()
     {
         if (GameManager.Instance && GameManager.Instance.gameover)
@@ -46,21 +39,32 @@ public class BobombWalk : HoldableEntity
         if (!photonView || photonView.IsMine)
             HandleCollision();
 
-        sRenderer.flipX = left;
+        sRenderer.flipX = FacingLeftTween;
 
-        if (lit && !detonated)
+        switch (lit)
         {
-            if ((detonateCount -= Time.fixedDeltaTime) < 0)
+            case true when !detonated:
             {
-                if (photonView.IsMine)
-                    photonView.RPC("Detonate", RpcTarget.All);
-                return;
-            }
+                if ((detonateCount -= Time.fixedDeltaTime) < 0)
+                {
+                    if (photonView.IsMine)
+                        photonView.RPC("Detonate", RpcTarget.All);
+                    return;
+                }
 
-            var redOverlayPercent = 5.39f / (detonateCount + 2.695f) * 10f % 1f;
-            MaterialPropertyBlock block = new();
-            block.SetFloat("FlashAmount", redOverlayPercent);
-            sRenderer.SetPropertyBlock(block);
+                var redOverlayPercent = 5.39f / (detonateCount + 2.695f) * 10f % 1f;
+                MaterialPropertyBlock block = new();
+                block.SetFloat("FlashAmount", redOverlayPercent);
+                sRenderer.SetPropertyBlock(block);
+                animator.SetBool("carrying", holder != null);
+                break;
+            }
+            case false when isRotating:
+                body.velocity = new Vector2(0, 0);
+                break;
+            case false:
+                body.velocity = new Vector2(walkSpeed * (FacingLeftTween ? -1 : 1), body.velocity.y);
+                break;
         }
 
         previousFrameVelocity = body.velocity;
@@ -146,14 +150,14 @@ public class BobombWalk : HoldableEntity
         if (!photonView.IsMineOrLocal())
             return;
 
-        if (physics.hitRight && !left)
+        if (physics.hitRight && !FacingLeftTween)
         {
             if (photonView)
                 photonView.RPC("Turnaround", RpcTarget.All, false);
             else
                 Turnaround(false);
         }
-        else if (physics.hitLeft && left)
+        else if (physics.hitLeft && FacingLeftTween)
         {
             if (photonView)
                 photonView.RPC("Turnaround", RpcTarget.All, true);
@@ -262,6 +266,7 @@ public class BobombWalk : HoldableEntity
     public void Light()
     {
         animator.SetTrigger("lit");
+        tweenableRotation = false;
         detonateCount = hasBigExplosion ? 0 : detonationTime;
         body.velocity = Vector2.zero;
         lit = true;
@@ -269,8 +274,10 @@ public class BobombWalk : HoldableEntity
     }
 
     [PunRPC]
-    public override void Throw(bool facingLeft, bool crouch, Vector2 pos)
+    public override void Throw(bool fromLeft, bool crouch, Vector2 pos)
     {
+        animator.SetBool("carrying", holder != null);
+
         if (!holder)
             return;
 
@@ -280,30 +287,30 @@ public class BobombWalk : HoldableEntity
 
         holder = null;
         photonView.TransferOwnership(PhotonNetwork.MasterClient);
-        left = facingLeft;
-        sRenderer.flipX = left;
+        // FacingLeftTween = fromLeft;
+        sRenderer.flipX = FacingLeftTween;
         if (crouch)
-            body.velocity = new Vector2(2f * (facingLeft ? -1 : 1), body.velocity.y);
+            body.velocity = new Vector2(2f * (fromLeft ? -1 : 1), body.velocity.y);
         else
-            body.velocity = new Vector2(kickSpeed * (facingLeft ? -1 : 1), body.velocity.y);
+            body.velocity = new Vector2(kickSpeed * (fromLeft ? -1 : 1), body.velocity.y);
     }
 
     [PunRPC]
     public override void Kick(bool fromLeft, float speed, bool groundpound)
     {
-        left = !fromLeft;
-        sRenderer.flipX = left;
-        body.velocity = new Vector2(kickSpeed * (left ? -1 : 1), 3f);
+        FacingLeftTween = !fromLeft;
+        sRenderer.flipX = FacingLeftTween;
+        body.velocity = new Vector2(kickSpeed * (FacingLeftTween ? -1 : 1), 3f);
         PlaySound(Enums.Sounds.Enemy_Shell_Kick);
     }
 
     [PunRPC]
     public void Turnaround(bool hitWallOnLeft)
     {
-        left = !hitWallOnLeft;
-        sRenderer.flipX = left;
-        body.velocity = new Vector2((lit ? -previousFrameVelocity.x : walkSpeed) * (left ? -1 : 1), body.velocity.y);
-        animator.SetTrigger("turnaround");
+        FacingLeftTween = !hitWallOnLeft;
+        sRenderer.flipX = FacingLeftTween;
+        body.velocity = new Vector2(lit ? -previousFrameVelocity.x : walkSpeed, body.velocity.y);
+        if (lit) PlaySound(Enums.Sounds.World_Block_Bump);
     }
 
     #endregion

@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using DG.Tweening;
 using ExitGames.Client.Photon;
 using NSMB.Utils;
 using Photon.Pun;
@@ -26,8 +25,10 @@ public class LoadingWaitingOn : MonoBehaviour
         spectatorText = "Joining as Spectator...";
 
     [SerializeField] private int waitingTime, waitingLastTime;
-    public Coroutine waitingCoroutine;
-    private float waitingLastTimer;
+    private bool isErrorMode;
+    private bool timedOut;
+    private Coroutine waitingCoroutine;
+    private float waitingLastTimer = -1;
 
     public void Start()
     {
@@ -38,11 +39,29 @@ public class LoadingWaitingOn : MonoBehaviour
         marioLoadingScene.SetActive(!isBowsers);
         koopaLoadingScene.SetActive(isBowsers);
 
-        waitingCoroutine = StartCoroutine(WaitForEveryone());
+        isErrorMode = PhotonNetwork.LocalPlayer?.GetAuthorityLevel() < Enums.AuthorityLevel.NORMAL;
+        if (!isErrorMode) waitingCoroutine = StartCoroutine(WaitForEveryone());
     }
 
     public void Update()
     {
+        if (isErrorMode)
+        {
+            if (MusicSynth.state == Songinator.PlaybackState.PLAYING)
+                MusicSynth.SetPlaybackState(Songinator.PlaybackState.STOPPED);
+            if (MusicSynthIdle.state == Songinator.PlaybackState.STOPPED)
+                MusicSynthIdle.SetPlaybackState(Songinator.PlaybackState.PLAYING);
+            infoText.text = NetworkUtils.banMessage;
+            highPingAlert.text = "";
+            return;
+        }
+
+        if (timedOut)
+        {
+            infoText.text = "Timed out!";
+            return;
+        }
+
         if (waitingLastTimer > 0)
         {
             Utils.TickTimer(ref waitingLastTimer, 0, Time.deltaTime);
@@ -77,17 +96,18 @@ public class LoadingWaitingOn : MonoBehaviour
         waitingFor.ExceptWith(GameManager.Instance.loadedPlayers);
         playerList.text = waitingFor.Count == 0
             ? ""
-            : "- Waiting for -\n" + string.Join("\n", waitingFor.Select(pl => pl.GetUniqueNickname()));
+            : "<font=\"NSMBStrongFont\">- Waiting for -</font>\n<size=8> </size>\n" +
+              string.Join("\n", waitingFor.Select(pl => pl.GetUniqueNickname()));
     }
 
     private IEnumerator WaitForEveryone()
     {
         yield return new WaitForSeconds(waitingTime);
-        yield return DOTween.To(() => MusicSynth.player.Gain, v => MusicSynth.player.Gain = v, 0, 1f)
-            .WaitForCompletion();
-        MusicSynthIdle.StartPlayback();
+        yield return MusicSynth.SetPlaybackState(Songinator.PlaybackState.STOPPED, 1f);
+        MusicSynthIdle.SetPlaybackState(Songinator.PlaybackState.PLAYING);
         waitingLastTimer = waitingLastTime;
         yield return new WaitForSeconds(waitingLastTime);
+        timedOut = true;
         if (PhotonNetwork.IsMasterClient)
         {
             PhotonNetwork.RaiseEvent((byte)Enums.NetEventIds.EndGame, "DUMMY_TIMEOUT", NetworkUtils.EventAll,
@@ -105,6 +125,7 @@ public class LoadingWaitingOn : MonoBehaviour
         waitingLastTime = 0;
         StopCoroutine(waitingCoroutine);
         GetComponent<Animator>().SetTrigger(spectating ? "spectating" : "loaded");
-        DOTween.To(() => MusicSynth.player.Gain, v => MusicSynth.player.Gain = v, 0f, 2f).SetEase(Ease.Linear);
+        MusicSynth.SetPlaybackState(Songinator.PlaybackState.STOPPED, 2.0f);
+        MusicSynthIdle.SetPlaybackState(Songinator.PlaybackState.STOPPED, 2.0f);
     }
 }

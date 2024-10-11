@@ -792,7 +792,7 @@ namespace Photon.Realtime
         /// <param name="raiseEventOptions">
         ///     Contains (slightly) less often used options. If you pass null, the default options will
         ///     be used.
-        /// </param>
+        /// </param> 
         /// <param name="sendOptions">Send options for reliable, encryption etc</param>
         /// <returns>If operation could be enqueued for sending. Sent when calling: Service or SendOutgoingCommands.</returns>
         public virtual bool OpRaiseEvent(byte eventCode, object customEventContent, RaiseEventOptions raiseEventOptions,

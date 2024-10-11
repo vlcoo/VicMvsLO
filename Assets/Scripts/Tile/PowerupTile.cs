@@ -49,12 +49,13 @@ public class PowerupTile : BreakableBrickTile
         }
 
         Bump(interacter, direction, worldLocation);
+        if (GameManager.Instance.Togglerizer.currentEffects.Contains("NoPowerups")) spawnResult = "";
 
         object[] parametersBump =
             { tileLocation.x, tileLocation.y, direction == InteractionDirection.Down, resultTile, spawnResult };
         GameManager.Instance.SendAndExecuteEvent(Enums.NetEventIds.BumpTile, parametersBump, SendOptions.SendReliable);
 
-        if (interacter is MonoBehaviourPun pun2)
+        if (interacter is MonoBehaviourPun pun2 && spawnResult != "")
             pun2.photonView.RPC("PlaySound", RpcTarget.All, Enums.Sounds.World_Block_Powerup);
         return false;
     }

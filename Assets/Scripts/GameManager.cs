@@ -19,8 +19,6 @@ using Random = UnityEngine.Random;
 public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IConnectionCallbacks,
     IMatchmakingCallbacks
 {
-    public const float MAX_MUSIC_GAIN = 0.5f;
-
     private static GameManager _instance;
 
     public Songinator MusicSynth, MusicSynthMega, MusicSynthStarman;
@@ -48,6 +46,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
     public AudioSource sfx;
 
     public GameObject localPlayer;
+    public Player winningPlayer;
     public bool paused, loaded, started;
     public GameObject pauseUI, pausePanel, pauseButton, onScreenControls;
     public TMP_Text quitButtonLbl, rulesLbl, speedrunTimer;
@@ -71,6 +70,8 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
 
     public readonly HashSet<Player> loadedPlayers = new();
     private readonly List<GameObject> remainingSpawns = new();
+    private float bahCooldownTimer;
+    private bool bahRequested;
 
     private ParticleSystem brickBreak;
 
@@ -124,6 +125,13 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         TeamGrouper = GetComponent<TeamGrouper>();
         levelUIColor.a = .7f;
         coins = GameObject.FindGameObjectsWithTag("coin");
+        if (Togglerizer.currentEffects.Contains("NoCoins"))
+            foreach (var coin in coins)
+            {
+                coin.GetComponent<SpriteRenderer>().enabled = false;
+                coin.GetComponent<BoxCollider2D>().enabled = false;
+            }
+
         if (Togglerizer.currentEffects.Contains("ReverseLoop") && loopingLevel) loopingLevel = !loopingLevel;
         if (loopingLevel)
         {
@@ -136,7 +144,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         onScreenControls.SetActive(Utils.GetDeviceType() == Utils.DeviceType.MOBILE ||
                                    Settings.Instance.onScreenControlsAlways);
         foreach (var onScreenButton in onScreenControls.transform.GetComponentsInChildren<Image>())
-            if (onScreenButton.transform.name != "Item") 
+            if (onScreenButton.transform.name != "Item")
                 onScreenButton.color = new Color(levelUIColor.r, levelUIColor.g, levelUIColor.b, .4f);
 
         InputSystem.controls.LoadBindingOverridesFromJson(GlobalController.Instance.controlsJson);
@@ -217,12 +225,12 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             {
                 var sanitizedCond = Regex.Replace(entry.Condition, "(\\B[A-Z0-9])", " $1");
                 var sanitizedAct = Regex.Replace(entry.Action, "(\\B[A-Z0-9])", " $1").Replace("Act ", "");
-                rulesLbl.text += sanitizedCond + " .. " + sanitizedAct +
+                rulesLbl.text += sanitizedCond + " -> " + sanitizedAct +
                                  (MatchConditioner.ruleList.Last().Equals(entry) ? "" : "\n");
             }
         }
 
-        rulesLbl.text += "\n& " + Togglerizer.currentEffects.Count + " special effects";
+        rulesLbl.text += "\n& " + Togglerizer.currentEffects.Count + " Specials";
 
         brickBreak = ((GameObject)Instantiate(Resources.Load("Prefabs/Particle/BrickBreak")))
             .GetComponent<ParticleSystem>();
@@ -597,12 +605,13 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
 
                 tilemap.SetTilesBlock(origin, originalTiles);
 
-                foreach (var coin in coins)
-                {
-                    //dont use setactive cause it breaks animation cycles being synced
-                    coin.GetComponent<SpriteRenderer>().enabled = true;
-                    coin.GetComponent<BoxCollider2D>().enabled = true;
-                }
+                if (!Togglerizer.currentEffects.Contains("NoCoins"))
+                    foreach (var coin in coins)
+                    {
+                        //dont use setactive cause it breaks animation cycles being synced
+                        coin.GetComponent<SpriteRenderer>().enabled = true;
+                        coin.GetComponent<BoxCollider2D>().enabled = true;
+                    }
 
                 StartCoroutine(BigStarRespawn());
 
@@ -857,12 +866,20 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         }
 
         teamsMatch = TeamGrouper.isTeamsMatch;
-        // else {
-        //     if (MusicSynth.currentSong.hasBahs) MusicSynth.player.SetTickEvent(tick =>
-        // {
-        //     if (MusicSynth.nextBahTick == tick) BahAllEnemies();
-        //     MusicSynth.AdvanceBah();
-        // });}
+
+        if (Togglerizer.currentEffects.Contains("NoBahs"))
+        {
+            MusicSynth.CurrentSong.mutedChannelsNormal |= 1 << MusicSynth.CurrentSong.bahChannel;
+            MusicSynth.CurrentSong.mutedChannelsSpectating |= 1 << MusicSynth.CurrentSong.bahChannel;
+            MusicSynth.SetSpectating(SpectationManager.Spectating); // force a refresh of the currently muted channels.
+        }
+        else if (MusicSynth.CurrentSong.bahChannel >= 0)
+        {
+            MusicSynth.SetOnMidiMessage((channel, command, data1, data2) =>
+            {
+                if (channel == MusicSynth.CurrentSong.bahChannel && command == 0x90 && data2 > 0) bahRequested = true;
+            });
+        }
 
         startServerTime = startTimestamp + 3500;
         foreach (var wfgs in FindObjectsOfType<WaitForGameStart>())
@@ -871,7 +888,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         yield return new WaitForSeconds(1f);
 
         musicEnabled = true;
-        // MusicSynth.StartPlayback();
+        // MusicSynth.SetPlaybackState(Songinator.PlaybackState.PLAYING);
         Utils.GetCustomProperty(Enums.NetRoomProperties.Time, out timedGameDuration);
 
         startRealTime = DateTimeOffset.Now.ToUnixTimeMilliseconds();
@@ -914,33 +931,24 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         }
     }
 
-    public void FadeMusic(bool how)
+    public void SetAllMusicPlaybackState(Songinator.PlaybackState state, float secondsFading = 0.0f)
     {
-        if (!how)
+        MusicSynth.SetPlaybackState(state, secondsFading);
+        MusicSynthMega.SetPlaybackState(state, secondsFading);
+        MusicSynthStarman.SetPlaybackState(state, secondsFading);
+    }
+
+    public void StartMusicConditionally()
+    {
+        if (gameover) return;
+        var songPlayer = musicState switch
         {
-            MusicSynth.player.Stop();
-            MusicSynthMega.player.Pause();
-            MusicSynthStarman.player.Pause();
-        }
-        else
-        {
-            if (gameover) return;
-            switch (musicState)
-            {
-                case Enums.MusicState.Normal:
-                    MusicSynth.player.Play();
-                    break;
-                case Enums.MusicState.Starman:
-                    MusicSynthStarman.StartPlayback(false);
-                    break;
-                case Enums.MusicState.MegaMushroom:
-                    MusicSynthMega.StartPlayback(false);
-                    break;
-            }
-            // songPlayer.Gain = 0f;
-            // DOTween.To(() => songPlayer.Gain, v => songPlayer.Gain = v, MAX_MUSIC_GAIN,
-            //     0.5f).SetEase(Ease.Linear);
-        }
+            Enums.MusicState.Normal => MusicSynth,
+            Enums.MusicState.MegaMushroom => MusicSynthMega,
+            Enums.MusicState.Starman => MusicSynthStarman,
+            _ => null
+        };
+        if (songPlayer) songPlayer.SetPlaybackState(Songinator.PlaybackState.PLAYING);
     }
 
     public void SetSpectateMusic(bool how)
@@ -948,7 +956,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         MusicSynth.SetSpectating(how);
         MusicSynthMega.SetSpectating(how);
         MusicSynthStarman.SetSpectating(how);
-        if (musicState == Enums.MusicState.Normal) MusicSynth.player.Play();
+        if (how) StartMusicConditionally();
     }
 
     public void SetStartSpeedrunTimer(PlayerController byWhom)
@@ -982,6 +990,20 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         SceneManager.LoadSceneAsync(level + 2, LoadSceneMode.Single);
     }
 
+    public void PlayerEnteredPipe(PlayerController whom, PipeManager pipe)
+    {
+        MatchConditioner.ConditionActioned(whom, "EnteredPipe");
+        if (pipe.fadeOutMusic)
+            MusicSynth.FadeVolume(-1, 0.5f);
+    }
+
+    public void PlayerEnteredDoor(PlayerController whom, DoorManager door)
+    {
+        MatchConditioner.ConditionActioned(whom, "EnteredDoor");
+        if (door.fadeOutMusic)
+            MusicSynth.FadeVolume(-1, 0.5f);
+    }
+
     private IEnumerator EndGame(Player winner, string causeString = "")
     {
         gameover = true;
@@ -989,9 +1011,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         sfx.outputAudioMixerGroup.audioMixer.SetFloat("SFXReverb", 0f);
 
         PhotonNetwork.CurrentRoom.SetCustomProperties(new Hashtable { [Enums.NetRoomProperties.GameStarted] = false });
-        MusicSynth.player.Pause();
-        MusicSynthMega.player.Pause();
-        MusicSynthStarman.player.Pause();
+        SetAllMusicPlaybackState(Songinator.PlaybackState.STOPPED);
 
         if (causeString is "DUMMY_TIMEOUT")
         {
@@ -1009,6 +1029,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         var uniqueName = "";
         if (winner != null)
         {
+            winningPlayer = winner;
             winnerCharacterIndex = (int)winner.CustomProperties[Enums.NetPlayerProperties.Character];
             uniqueName = teamsMatch
                 ? "The " + GlobalController.Instance.characters[winnerCharacterIndex].legalName +
@@ -1018,9 +1039,9 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         }
 
         text.GetComponent<TMP_Text>().text = cancelled
-            ? "No contest"
+            ? "No Contest"
             : winner == null
-                ? "It's a tie..."
+                ? "Draw..."
                 : $"{uniqueName} Wins!";
 
         if (!cancelled) yield return new WaitForSecondsRealtime(0.2f);
@@ -1150,6 +1171,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         if (!PhotonNetwork.IsMasterClient) return;
         foreach (var player in players.Where(player => player != null && player != whom))
             player.photonView.RPC("Disqualify", RpcTarget.All);
+        SetAllMusicPlaybackState(Songinator.PlaybackState.STOPPED, 0.5f);
     }
 
     public void CheckForWinner()
@@ -1249,44 +1271,43 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
                     NetworkUtils.EventAll, SendOptions.SendReliable);
     }
 
-    public void BahAllEnemies()
-    {
-        foreach (var enemy in bahableEntities) enemy.bah();
-        MatchConditioner.ConditionActioned(null, "Bah‘d");
-    }
-
-    private void PlaySong(Enums.MusicState state)
+    private void SetMusicState(Enums.MusicState state)
     {
         if (musicState == state)
             return;
 
-        MusicSynth.player.Stop();
-        MusicSynthMega.player.Stop();
-        MusicSynthStarman.player.Stop();
+        SetAllMusicPlaybackState(Songinator.PlaybackState.STOPPED);
 
         musicState = state;
         if (localPlayer != null && !localPlayer.GetComponent<PlayerController>().spawned) return;
 
-        var songPlayer = state switch
-        {
-            Enums.MusicState.Normal => MusicSynth.player,
-            Enums.MusicState.MegaMushroom => MusicSynthMega.player,
-            Enums.MusicState.Starman => MusicSynthStarman.player,
-            _ => null
-        };
-        if (songPlayer != null) songPlayer.Play();
+        StartMusicConditionally();
     }
 
     private void HandleMusic()
     {
+        Utils.TickTimer(ref bahCooldownTimer, 0, Time.fixedDeltaTime);
+
+        if (bahRequested)
+        {
+            if (bahCooldownTimer <= 0)
+            {
+                bahRequested = false;
+                foreach (var enemy in bahableEntities) enemy.Bah();
+                MatchConditioner.ConditionActioned(null, "Bah'd");
+                bahCooldownTimer = 0.2f;
+            }
+            else
+            {
+                bahRequested = false;
+            }
+        }
+
         var invincible = false;
         var mega = false;
 
-        foreach (var player in players)
+        foreach (var player in players.Where(player => player))
         {
-            if (!player)
-                continue;
-
             if (player.state == Enums.PowerupState.MegaMushroom && player.giantTimer != 15)
                 mega = true;
             if (player.invincible > 0)
@@ -1300,11 +1321,11 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         speedup |= players.All(pl => !pl || pl.lives == 1 || pl.lives == 0);
 
         if (mega)
-            PlaySong(Enums.MusicState.MegaMushroom);
+            SetMusicState(Enums.MusicState.MegaMushroom);
         else if (invincible)
-            PlaySong(Enums.MusicState.Starman);
+            SetMusicState(Enums.MusicState.Starman);
         else
-            PlaySong(Enums.MusicState.Normal);
+            SetMusicState(Enums.MusicState.Normal);
     }
 
     public void OnPause(InputAction.CallbackContext context)

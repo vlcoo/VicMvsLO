@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using NSMB.Utils;
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -66,7 +67,7 @@ public class RebindManager : MonoBehaviour
         }
 
         fireballToggle.isOn = true;
-        Settings.Instance.fireballFromSprint = true;
+        Settings.Instance.fireballFromSprint = Utils.GetDeviceType() != Utils.DeviceType.MOBILE;
         Settings.Instance.SaveSettingsToPreferences();
         SaveRebindings();
     }

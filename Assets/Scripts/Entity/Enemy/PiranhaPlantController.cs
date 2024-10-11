@@ -31,7 +31,7 @@ public class PiranhaPlantController : KillableEntity
                 return;
         }
 
-        left = false;
+        FacingLeftTween = false;
 
         if (!dead && photonView && photonView.IsMine &&
             Utils.GetTileAtWorldLocation(transform.position + (upsideDown ? Vector3.up : Vector3.down * 0.1f)) == null)
@@ -74,7 +74,7 @@ public class PiranhaPlantController : KillableEntity
     {
         if (player.invincible > 0 || player.inShell || player.state == Enums.PowerupState.MegaMushroom)
             photonView.RPC("Kill", RpcTarget.All);
-        else
+        else if (animator.GetCurrentAnimatorClipInfo(0)[0].clip.name.Equals("pakkun_chomp"))
             player.photonView.RPC("Powerdown", RpcTarget.All, false);
     }
 
