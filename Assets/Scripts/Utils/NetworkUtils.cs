@@ -39,11 +39,11 @@ namespace NSMB.Utils
         {
             [DisconnectCause.Exception] = "Check your internet connection or try again later!",
             [DisconnectCause.MaxCcuReached] = "This region is full; try again later.",
-            [DisconnectCause.CustomAuthenticationFailed] = "Servers might be down; try again later.",
+            [DisconnectCause.CustomAuthenticationFailed] = "Servers might be down; try again later!",
             [DisconnectCause.DisconnectByServerLogic] = "You've been disconnected for cheating.",
             [DisconnectCause.DisconnectByClientLogic] = "You've been disconnected.",
             [DisconnectCause.DisconnectByOperationLimit] = "Spam prevention kicked in.",
-            [DisconnectCause.ClientTimeout] = "Your device lagged out, or the servers are down.\nPlease try again",
+            [DisconnectCause.ClientTimeout] = "Your device lagged out, or the servers are down.\nPlease try again!",
             [DisconnectCause.DnsExceptionOnConnect] = "Your device's internet connection is poor.",
             [DisconnectCause.ServerTimeout] = "Your device's internet connection is poor."
         };

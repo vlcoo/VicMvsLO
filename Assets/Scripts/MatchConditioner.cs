@@ -225,6 +225,7 @@ public class MatchConditioner : MonoBehaviour
 
     public void Act3SecondIframes(PlayerController whom)
     {
+        // this is the vanilla amount of iframes when harmed.
         whom.photonView.RPC(nameof(whom.ObtainIframes), RpcTarget.All, 3f);
     }
 

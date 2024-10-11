@@ -1666,7 +1666,22 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
 
     public PlayerAnimationController AnimationController { get; private set; }
 
-    public bool onGround,
+    private bool isOnGround;
+
+    public bool onGround
+    {
+        get => isOnGround;
+        set
+        {
+            if (isOnGround != value && value)
+            {
+                GameManager.Instance.MatchConditioner.ConditionActioned(this, "TouchedGround");
+            }
+            isOnGround = value;
+        }
+    }
+
+    public bool
         previousOnGround,
         crushGround,
         doGroundSnap,
@@ -3117,7 +3132,8 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
 
         PlaySound(Enums.Sounds.Enemy_Generic_Freeze);
         frozenObject = PhotonView.Find(cube).GetComponentInChildren<FrozenCube>();
-        frozenObject.autoBreakTimer = 1.75f;
+        frozenObject.autoBreakTimer =
+            GameManager.Instance.Togglerizer.currentEffects.Contains("PermaFreeze") ? float.MaxValue : 1.75f;
         Frozen = true;
         animator.enabled = false;
         body.isKinematic = true;
@@ -3739,7 +3755,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         animator.SetBool("flying", false);
         animator.SetBool("firedeath", fire);
 
-        PlaySound(cameraController.IsControllingCamera
+        PlaySound(cameraController.IsControllingCamera && !GameManager.Instance.Togglerizer.currentEffects.Contains("FastDeath")
             ? Enums.Sounds.Player_Sound_Death
             : Enums.Sounds.Player_Sound_DeathOthers);
 
@@ -4195,6 +4211,9 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
 
         SpawnStars(starsToDrop, false);
         HandleLayerState();
+
+        if (GameManager.Instance.Togglerizer.currentEffects.Contains("NoStun"))
+            ResetKnockback();
     }
 
     public void ResetKnockbackFromAnim()

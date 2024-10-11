@@ -2627,7 +2627,6 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     {
         if (Settings.Instance.favouriteRegion != lastRegion)
         {
-            Debug.Log($"region {lastRegion} is now favourite!");
             region.captionText.text += FavRegionText;
             region.options[region.value].text += FavRegionText;
             if (Settings.Instance.favouriteRegion != "")
@@ -2641,7 +2640,6 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         }
         else
         {
-            Debug.Log($"region {lastRegion} is now unfavourited!");
             var i = Array.IndexOf(pingSortedRegions, pingSortedRegions.First(r => r.Code == Settings.Instance.favouriteRegion));
             // remove the favourite heart from the previous favourite region
             region.options[i ].text = region.options[i ].text[..^FavRegionText.Length];
