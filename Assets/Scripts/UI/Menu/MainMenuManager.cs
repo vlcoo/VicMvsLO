@@ -745,7 +745,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
             {
                 var description = e.CustomData as string;
 
-                if (string.IsNullOrWhiteSpace(description))
+                if (string.IsNullOrWhiteSpace(description) || description.Contains("Reset"))
                     return;
 
                 var presetName = description.Split("|")[0];
@@ -1486,6 +1486,18 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         raceMapSelected = levelDropdown.options[index].text.Contains("hudnumber_laps");
         UpdateSettingEnableStates();
         Camera.main.transform.position = levelCameraPositions[index].transform.position;
+
+        var worldId = worldSongPlayer.levelWorldIds[index];
+        worldSongPlayer.OnLevelSelected(index);
+        if (worldId == 0 && MusicSynth.state == Songinator.PlaybackState.PAUSED)
+        {
+            MusicSynth.SetPlaybackState(Songinator.PlaybackState.PLAYING, 0.5f);
+            return;
+        }
+
+        if (worldId > 0)
+            if (MusicSynth.state == Songinator.PlaybackState.PLAYING)
+                MusicSynth.SetPlaybackState(Songinator.PlaybackState.PAUSED, 0.5f);
     }
 
     public void SetLevelIndex(int newLevelIndex)
@@ -1504,7 +1516,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         };
         PhotonNetwork.CurrentRoom.SetCustomProperties(table);
 
-        var worldId = worldSongPlayer.levelWorldIds[newLevelIndex];
+        /*var worldId = worldSongPlayer.levelWorldIds[newLevelIndex];
         worldSongPlayer.OnLevelSelected(newLevelIndex);
         if (worldId == 0 && MusicSynth.state == Songinator.PlaybackState.PAUSED)
         {
@@ -1514,7 +1526,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
         if (worldId > 0)
             if (MusicSynth.state == Songinator.PlaybackState.PLAYING)
-                MusicSynth.SetPlaybackState(Songinator.PlaybackState.PAUSED, 0.5f);
+                MusicSynth.SetPlaybackState(Songinator.PlaybackState.PAUSED, 0.5f);*/
     }
 
     public void SelectRoom(GameObject room)
