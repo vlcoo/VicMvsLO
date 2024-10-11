@@ -741,6 +741,22 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
                 ChangePrivate();
                 break;
             }
+            case (byte)Enums.NetEventIds.LoadedGamemodePreset:
+            {
+                var description = e.CustomData as string;
+
+                if (string.IsNullOrWhiteSpace(description))
+                    return;
+
+                var presetName = description.Split("|")[0];
+                description = description.Split("|")[1];
+
+                presetHintPrompt.transform.Find("Image/Header/NameLbl").GetComponent<TMP_Text>().text = presetName;
+                presetHintPrompt.transform.Find("Image/DescriptionLbl").GetComponent<TMP_Text>().text = description;
+                OpenPrompt(presetHintPrompt, presetHintSelected);
+
+                break;
+            }
         }
     }
 
@@ -924,6 +940,15 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
                 newEntry.transform.SetSiblingIndex(lblConditions.transform.GetSiblingIndex() - 1);
                 newEntry.SetActive(true);
             }
+
+            /*var redundantEntryCount = ruleList.Count(entry => newEntryScript.Equals(entry));
+            if (redundantEntryCount > 0)
+            {
+                newEntryScript.hiddenRedundant = true;
+                newEntry.SetActive(false);
+                var redundantEntry = ruleList.First(entry => newEntryScript.Equals(entry) && !entry.hiddenRedundant);
+                redundantEntry.lbl.text = $"{redundantEntry.GetSanitizedLabel()} * {redundantEntryCount + 1}";
+            }*/
 
             ruleList.Add(newEntryScript);
 
@@ -2615,6 +2640,9 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
         nomapToggle.isOn = data.hideTrack;
         coincountToggle.isOn = data.showCoins;
+
+        PhotonNetwork.RaiseEvent((byte)Enums.NetEventIds.LoadedGamemodePreset, $"{data.legalName}|{data.description}", NetworkUtils.EventOthers,
+            SendOptions.SendReliable);
     }
 
     public void ChangeLobbyHeader(string name)

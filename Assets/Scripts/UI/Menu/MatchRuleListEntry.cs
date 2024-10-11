@@ -42,6 +42,7 @@ public class MatchRuleListEntry : MonoBehaviour, IEquatable<MatchRuleListEntry>
 {
     public string Condition, Action;
     public List<string> Parameters;
+    public bool hiddenRedundant = false;
 
     public TMP_Text lbl;
     public Selectable removeButton;
@@ -61,10 +62,15 @@ public class MatchRuleListEntry : MonoBehaviour, IEquatable<MatchRuleListEntry>
         Action = act;
         if (lbl is not null)
         {
-            var sanitizedCond = Regex.Replace(cond, "(\\B[A-Z0-9])", " $1");
-            var sanitizedAct = Regex.Replace(act, "(\\B[A-Z0-9])", " $1").Replace("Act ", "");
-            lbl.text = sanitizedCond + " -> " + sanitizedAct;
+            lbl.text = GetSanitizedLabel();
         }
+    }
+
+    public string GetSanitizedLabel()
+    {
+        var sanitizedCond = Regex.Replace(Condition, "(\\B[A-Z0-9])", " $1");
+        var sanitizedAct = Regex.Replace(Action, "(\\B[A-Z0-9])", " $1").Replace("Act ", "");
+        return sanitizedCond + " -> " + sanitizedAct;
     }
 
     public void onRemoveButtonPressed()
