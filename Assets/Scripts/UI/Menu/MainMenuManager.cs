@@ -941,14 +941,14 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
                 newEntry.SetActive(true);
             }
 
-            /*var redundantEntryCount = ruleList.Count(entry => newEntryScript.Equals(entry));
+            var redundantEntryCount = ruleList.Count(entry => newEntryScript.Equals(entry));
             if (redundantEntryCount > 0)
             {
                 newEntryScript.hiddenRedundant = true;
                 newEntry.SetActive(false);
                 var redundantEntry = ruleList.First(entry => newEntryScript.Equals(entry) && !entry.hiddenRedundant);
                 redundantEntry.lbl.text = $"{redundantEntry.GetSanitizedLabel()} * {redundantEntryCount + 1}";
-            }*/
+            }
 
             ruleList.Add(newEntryScript);
 

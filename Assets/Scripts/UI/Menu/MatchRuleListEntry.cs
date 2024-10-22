@@ -21,7 +21,7 @@ public class MatchRuleDataEntry : IEquatable<MatchRuleDataEntry>
     {
         if (ReferenceEquals(null, other)) return false;
         if (ReferenceEquals(this, other)) return true;
-        return base.Equals(other) && Condition == other.Condition && Action == other.Action;
+        return  Condition == other.Condition && Action == other.Action;
     }
 
     public override bool Equals(object obj)
@@ -51,7 +51,7 @@ public class MatchRuleListEntry : MonoBehaviour, IEquatable<MatchRuleListEntry>
     {
         if (ReferenceEquals(null, other)) return false;
         if (ReferenceEquals(this, other)) return true;
-        return base.Equals(other) && Condition == other.Condition && Action == other.Action;
+        return Condition == other.Condition && Action == other.Action;
     }
 
     public void setRules(string cond, string act)
