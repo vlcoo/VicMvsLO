@@ -14,6 +14,8 @@ public class MenuWorldSongPlayer : MonoBehaviour
 
     public void OnLevelSelected(int levelId)
     {
+        if (worldsSonginator is null) return;
+
         var worldId = levelWorldIds[levelId];
 
         if (worldId == 0)

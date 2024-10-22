@@ -335,6 +335,7 @@ public static class Enums
         PlayerChatMessage = 3,
         ChangeMaxPlayers = 4,
         ChangePrivate = 5,
+        LoadedGamemodePreset = 6,
 
         // 10-19 = game state events
         PlayerFinishedLoading = 10,

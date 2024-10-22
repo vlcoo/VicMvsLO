@@ -6,7 +6,7 @@ public class MovingPowerup : MonoBehaviourPun
 {
     private static int groundMask = -1, HITS_NOTHING_LAYERID, ENTITY_LAYERID;
 
-    public float speed, bouncePower, terminalVelocity = 4, blinkingRate = 4;
+    public float speed, bouncePower, terminalVelocity = 4, blinkingRate = 4, originalSpriteScale = 0.5f;
     public bool avoidPlayers;
     public PlayerController followMe;
     public float followMeCounter, despawnCounter = 15, ignoreCounter;
@@ -149,15 +149,14 @@ public class MovingPowerup : MonoBehaviourPun
         transform.position = new Vector3(followMe.transform.position.x,
             followMe.cameraController.currentPosition.y + size * 0.6f);
 
-        //float scale = Mathf.Abs(Mathf.Sin(followMeCounter * blinkingRate / 2f) / 8f);
-        var scale = Mathf.PingPong(followMeCounter * 1.5f, 0.2f) + 0.5f;
+        var scale = Mathf.PingPong(followMeCounter * 1.5f, 0.2f) + originalSpriteScale;
         if ((followMeCounter -= Time.deltaTime) < 0)
         {
             followMe = null;
             sRenderer.sortingOrder = originalLayer;
             if (photonView.IsMine)
                 photonView.TransferOwnership(PhotonNetwork.MasterClient);
-            scale = 0.5f;
+            scale = originalSpriteScale;
         }
 
         sRenderer.transform.localScale = new Vector3(scale, scale, 1f);

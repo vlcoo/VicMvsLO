@@ -130,14 +130,6 @@ public class PlayerAnimationController : MonoBehaviourPun
                 targetEuler = new Vector3(0, controller.facingRight ? 110 : 250, 0);
                 instant = true;
             }
-            else if (controller.dead)
-            {
-                if (animator.GetBool("firedeath") && deathTimer > deathUpTime)
-                    targetEuler = new Vector3(-15, controller.facingRight ? 110 : 250, 0);
-                else
-                    targetEuler = new Vector3(0, 180, 0);
-                instant = true;
-            }
             else if (animator.GetBool("pipe"))
             {
                 targetEuler = new Vector3(0, 180, 0);
@@ -198,6 +190,20 @@ public class PlayerAnimationController : MonoBehaviourPun
                     Time.deltaTime, -2500, -300);
             propeller.transform.Rotate(Vector3.forward, propellerVelocity * Time.deltaTime);
 
+            wasTurnaround = animator.GetCurrentAnimatorStateInfo(0).IsName("turnaround");
+        }
+
+        if (!controller.Frozen && (!GameManager.Instance.gameover || (GameManager.Instance.gameover && (GameManager.Instance.winningPlayer == null || GameManager.Instance.winningPlayer.ActorNumber != photonView.Owner.ActorNumber))))
+        {
+            if (controller.dead)
+            {
+                if (animator.GetBool("firedeath") && deathTimer > deathUpTime)
+                    targetEuler = new Vector3(-15, controller.facingRight ? 110 : 250, 0);
+                else
+                    targetEuler = new Vector3(0, 180, 0);
+                instant = true;
+            }
+
             if (instant || wasTurnaround)
             {
                 models.transform.rotation = Quaternion.Euler(targetEuler);
@@ -216,8 +222,6 @@ public class PlayerAnimationController : MonoBehaviourPun
 
             if (changeFacing)
                 controller.facingRight = models.transform.eulerAngles.y < 180;
-
-            wasTurnaround = animator.GetCurrentAnimatorStateInfo(0).IsName("turnaround");
         }
 
         //Particles
@@ -434,13 +438,13 @@ public class PlayerAnimationController : MonoBehaviourPun
         HandleDoorAnimation();
 
         transform.position = new Vector3(transform.position.x, transform.position.y,
-            animator.GetBool("pipe") || (controller.doorEntering && doorTimer < doorDuration / 1.33f) ? 1 : -4);
+            animator.GetBool("pipe") || (controller.doorEntering && doorTimer < doorDuration / 1.33f) ? 1 : -0.5f);
         if (excludeMaterialForSmall) largeMesh.materials = large ? rememberedMaterialsLarge : rememberedMaterialsSmall;
         else if (useSpecialSmall)
             largeModel.transform.GetChild(0).localScale = large ? new Vector3(1, 1, 1) : new Vector3(0.8f, 0.7f, 0.7f);
     }
 
-    private void HandleDeathAnimation()
+    public void HandleDeathAnimation()
     {
         if (!controller.dead)
         {
@@ -448,7 +452,11 @@ public class PlayerAnimationController : MonoBehaviourPun
             return;
         }
 
-        deathTimer += Time.fixedDeltaTime;
+        if (GameManager.Instance.Togglerizer.currentEffects.Contains("FastDeath"))
+            deathTimer = 3f;
+        else
+            deathTimer += Time.fixedDeltaTime;
+
         if (deathTimer < deathUpTime)
         {
             deathUp = false;
@@ -477,9 +485,9 @@ public class PlayerAnimationController : MonoBehaviourPun
 
         if (controller.photonView.IsMine && deathTimer + Time.fixedDeltaTime > 2.5f - 0.43f &&
             deathTimer < 2.5f - 0.43f)
-            controller.fadeOut.FadeOutAndIn();
+            if (!GameManager.Instance.gameover) controller.fadeOut.FadeOutAndIn();
 
-        if (photonView.IsMine && deathTimer >= 3f)
+        if (photonView.IsMine && deathTimer >= 3f && !GameManager.Instance.gameover)
             photonView.RPC("PreRespawn", RpcTarget.All);
 
         if (body.position.y < GameManager.Instance.GetLevelMinY() - transform.lossyScale.y)

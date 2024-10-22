@@ -3,7 +3,7 @@ using UnityEngine.UI;
 
 public class FadeOutManager : MonoBehaviour
 {
-    public float fadeTimer, fadeTime, blackTime, totalTime;
+    public float fadeTimer, fadeTime, blackTime, totalTime, nextFadeSpeedMultiplier = 1f;
     public Animator anim;
     public bool alreadyInitiallyFadedOut;
     private Coroutine fadeCoroutine;
@@ -24,8 +24,9 @@ public class FadeOutManager : MonoBehaviour
 
     public void FadeOutAndIn(bool positive = false)
     {
-        anim.speed = positive ? 1.5f : 1;
+        anim.speed = (positive ? 1.5f : 1) * nextFadeSpeedMultiplier;
         anim.SetTrigger(positive ? "FadeDoor" : "FadeInAndOut");
+        nextFadeSpeedMultiplier = 1f;
     }
 
     public void FadeOut()

@@ -26,7 +26,7 @@ public abstract class KillableEntity : MonoBehaviourPun, IFreezableEntity, ICust
     public Rigidbody2D body;
     public BoxCollider2D hitbox;
     public float offsetRotation;
-    public bool tweenableRotation, facingLeft;
+    public bool tweenableRotation, facingLeft, needsTweenableRotation;
     protected Animator animator;
     protected AudioSource audioSource;
     protected bool isRotating;
@@ -176,6 +176,7 @@ public abstract class KillableEntity : MonoBehaviourPun, IFreezableEntity, ICust
         sRenderer = GetComponent<SpriteRenderer>();
         physics = GetComponent<PhysicsEntity>();
         FacingLeftTween = true;
+        needsTweenableRotation = tweenableRotation;
     }
 
     public virtual void FixedUpdate()
