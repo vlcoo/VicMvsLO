@@ -1650,14 +1650,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
     public bool onGround
     {
         get => isOnGround;
-        set
-        {
-            if (isOnGround != value && value)
-            {
-                GameManager.Instance.MatchConditioner.ConditionActioned(this, "TouchedGround");
-            }
-            isOnGround = value;
-        }
+        set => isOnGround = value;
     }
 
     public bool
@@ -2223,9 +2216,6 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         {
             case "Player":
             {
-                //hit players
-                // if (GameManager.Instance.Togglerizer.currentEffects.Contains("NoCollisions")) break;
-
                 if (contacts.Length < collision.contactCount)
                     contacts = new ContactPoint2D[collision.contactCount];
                 collision.GetContacts(contacts);
@@ -3040,8 +3030,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
 
         PlaySound(Enums.Sounds.Enemy_Generic_Freeze);
         frozenObject = PhotonView.Find(cube).GetComponentInChildren<FrozenCube>();
-        frozenObject.autoBreakTimer =
-            GameManager.Instance.Togglerizer.currentEffects.Contains("PermaFreeze") ? float.MaxValue : 1.75f;
+        frozenObject.autoBreakTimer = 1.75f;
         Frozen = true;
         animator.enabled = false;
         body.isKinematic = true;
@@ -3567,7 +3556,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         animator.SetBool("flying", false);
         animator.SetBool("firedeath", fire);
 
-        PlaySound(cameraController.IsControllingCamera && !GameManager.Instance.Togglerizer.currentEffects.Contains("FastDeath")
+        PlaySound(cameraController.IsControllingCamera
             ? Enums.Sounds.Player_Sound_Death
             : Enums.Sounds.Player_Sound_DeathOthers);
 
@@ -3990,9 +3979,6 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
 
         SpawnStars(starsToDrop, false);
         HandleLayerState();
-
-        if (GameManager.Instance.Togglerizer.currentEffects.Contains("NoStun"))
-            ResetKnockback();
     }
 
     public void ResetKnockbackFromAnim()

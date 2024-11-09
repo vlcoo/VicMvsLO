@@ -452,10 +452,7 @@ public class PlayerAnimationController : MonoBehaviourPun
             return;
         }
 
-        if (GameManager.Instance.Togglerizer.currentEffects.Contains("FastDeath"))
-            deathTimer = 3f;
-        else
-            deathTimer += Time.fixedDeltaTime;
+        deathTimer += Time.fixedDeltaTime;
 
         if (deathTimer < deathUpTime)
         {
