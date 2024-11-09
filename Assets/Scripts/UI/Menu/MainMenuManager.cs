@@ -6,7 +6,6 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using DG.Tweening;
 using ExitGames.Client.Photon;
-using Newtonsoft.Json;
 using NSMB.Utils;
 using Photon.Pun;
 using Photon.Realtime;
@@ -2008,5 +2007,10 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     public void ChangeLobbyHeader(string name)
     {
         SetText(lobbyText, $"{name.ToValidUsername()}'s Lobby", true);
+    }
+
+    public void SendTestIPC()
+    {
+        GlobalController.Instance.ipc.SendOutgoingMessage(Enums.IpcMessages.CheckHealth);
     }
 }

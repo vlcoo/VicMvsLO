@@ -282,49 +282,49 @@ public static class Enums
     // Networking Enums
     public static class NetPlayerProperties
     {
-        public static string Character { get; } = "C";
-        public static string Ping { get; } = "P";
-        public static string PlayerColor { get; } = "C1";
-        public static string GameState { get; } = "S";
-        public static string Spectator { get; } = "Sp";
-        public static string DeviceType { get; } = "Dt";
+        public static string Character => "C";
+        public static string Ping => "P";
+        public static string PlayerColor => "C1";
+        public static string GameState => "S";
+        public static string Spectator => "Sp";
+        public static string DeviceType => "Dt";
     }
 
     public static class NetPlayerGameState
     {
-        public static string Stars { get; } = "S";
-        public static string Laps { get; } = "La";
-        public static string Coins { get; } = "C";
-        public static string Lives { get; } = "L";
-        public static string PowerupState { get; } = "P";
-        public static string ReserveItem { get; } = "R";
+        public static string Stars => "S";
+        public static string Laps => "La";
+        public static string Coins => "C";
+        public static string Lives => "L";
+        public static string PowerupState => "P";
+        public static string ReserveItem => "R";
     }
 
     public static class NetRoomProperties
     {
-        public static string Level { get; } = "L";
-        public static string StarRequirement { get; } = "S";
-        public static string LapRequirement { get; } = "La";
-        public static string CoinRequirement { get; } = "Co";
-        public static string Lives { get; } = "Li";
-        public static string Time { get; } = "T";
-        public static string DrawTime { get; } = "Dt";
-        public static string NewPowerups { get; } = "C";
-        public static string PowerupChances { get; } = "Po";
-        public static string Teams { get; } = "Te";
-        public static string FriendlyFire { get; } = "Fr";
-        public static string ShareStars { get; } = "Sh";
-        public static string GameStarted { get; } = "G";
-        public static string HostName { get; } = "H";
-        public static string Debug { get; } = "D";
-        public static string Mutes { get; } = "M";
-        public static string Bans { get; } = "B";
-        public static string MatchRules { get; } = "Mr";
-        public static string ChainableRules { get; } = "Cr";
-        public static string SpecialRules { get; } = "Sr";
-        public static string Starcoins { get; } = "Sc";
-        public static string ShowCoinCount { get; } = "Cc";
-        public static string NoMap { get; } = "Nm";
+        public static string Level => "L";
+        public static string StarRequirement => "S";
+        public static string LapRequirement => "La";
+        public static string CoinRequirement => "Co";
+        public static string Lives => "Li";
+        public static string Time => "T";
+        public static string DrawTime => "Dt";
+        public static string NewPowerups => "C";
+        public static string PowerupChances => "Po";
+        public static string Teams => "Te";
+        public static string FriendlyFire => "Fr";
+        public static string ShareStars => "Sh";
+        public static string GameStarted => "G";
+        public static string HostName => "H";
+        public static string Debug => "D";
+        public static string Mutes => "M";
+        public static string Bans => "B";
+        public static string MatchRules => "Mr";
+        public static string ChainableRules => "Cr";
+        public static string SpecialRules => "Sr";
+        public static string Starcoins => "Sc";
+        public static string ShowCoinCount => "Cc";
+        public static string NoMap => "Nm";
     }
 
     public enum NetEventIds : byte
@@ -357,6 +357,15 @@ public static class Enums
 
         // 40-49 = player-related events
         PlayerDamagePlayer = 40
+    }
+
+    public static class IpcMessages
+    {
+        public const string CheckHealth = "ping";
+        public const string GenericAccept = "ok";
+        public const string GenericReject = "ng";
+        public const string GenericGiveFocus = "focus";
+        public const string BeginLevelContentsTransmission = "begin-contents";
     }
 
     #endregion

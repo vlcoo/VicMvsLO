@@ -36,6 +36,7 @@ public class GlobalController : Singleton<GlobalController>, IInRoomCallbacks, I
     private int windowWidth, windowHeight;
     public DiscordController DiscordController { get; private set; }
     public DeviceRumbler rumbler { get; private set; }
+    public IPCommunicator ipc { get; private set; }
 
     public void Awake()
     {
@@ -46,6 +47,7 @@ public class GlobalController : Singleton<GlobalController>, IInRoomCallbacks, I
         settings = GetComponent<Settings>();
         DiscordController = GetComponent<DiscordController>();
         rumbler = GetComponent<DeviceRumbler>();
+        ipc = GetComponent<IPCommunicator>();
         PopulateEmoteNames();
 
         PhotonNetwork.AddCallbackTarget(this);
