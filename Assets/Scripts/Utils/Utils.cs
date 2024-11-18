@@ -5,6 +5,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using ExitGames.Client.Photon;
+using Newtonsoft.Json.Linq;
 using Photon.Pun;
 using Photon.Realtime;
 using TMPro;
@@ -733,6 +734,28 @@ namespace NSMB.Utils
         public static string SaveFileBrowser(string filter, string fname)
         {
             return Marshal.PtrToStringAnsi(get_save_filename(filter, fname));
+        }
+
+        public static Dictionary<string, object> DeserializeNestedJson(string json)
+        {
+            var jObject = JObject.Parse(json);
+            var dict = new Dictionary<string, object>();
+            foreach (var property in jObject.Properties())
+            {
+                dict[property.Name] = ConvertJToken(property.Value);
+            }
+
+            return dict;
+        }
+
+        private static object ConvertJToken(JToken token)
+        {
+            return token.Type switch
+            {
+                JTokenType.Object => DeserializeNestedJson(token.ToString()),
+                JTokenType.Array => token.Select(ConvertJToken).ToArray(),
+                _ => token.ToObject<object>()
+            };
         }
     }
 }

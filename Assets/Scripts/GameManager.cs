@@ -62,7 +62,6 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
     public EnemySpawnpoint[] enemySpawnpoints;
     public FadeOutManager fader;
 
-
     public float size = 1.39f, ySize = 0.8f;
 
     [Range(1, 10)] public int playersToVisualize = 10;
@@ -1357,5 +1356,24 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         if (spawn.x > GetLevelMaxX())
             spawn -= new Vector3(levelWidthTile / 2f, 0);
         return spawn;
+    }
+
+    public void BuildLevelFromContents(Dictionary<string, object> contents)
+    {
+        // for (var x = tilemap.cellBounds.min.x; x < tilemap.cellBounds.max.x; x++)
+        // for (var y = tilemap.cellBounds.min.y; y < tilemap.cellBounds.max.y; y++)
+        // for (var z = tilemap.cellBounds.min.z; z < tilemap.cellBounds.max.z; z++)
+        // {
+        //     tilemap.SetTile(new Vector3Int(x, y, z), breakableTileReplacement);
+        // }
+
+        var tiles = contents["t"] as object[];
+
+        foreach (var tile in tiles)
+        {
+            var tile_dict = tile as Dictionary<string, object>;
+            Debug.Log($"{tile_dict["x"]} {tile_dict["y"]}");
+            tilemap.SetTile(new Vector3Int(Convert.ToInt32((long)tile_dict["x"]) + tilemap.cellBounds.min.x, -(Convert.ToInt32((long)tile_dict["y"]) + tilemap.cellBounds.min.y), 0), breakableTileReplacement);
+        }
     }
 }

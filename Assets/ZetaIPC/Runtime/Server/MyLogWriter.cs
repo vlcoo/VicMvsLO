@@ -10,7 +10,7 @@
             string type,
             string message)
         {
-            Trace.WriteLine($@"[Web server, {type}] {message}");
+            UnityEngine.Debug.Log($@"[Web server, {type}] {message}");
         }
 
         public void Write(object source, LogPrio priority, string message)

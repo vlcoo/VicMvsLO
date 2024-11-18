@@ -1,5 +1,8 @@
+using System.Collections;
 using System.Collections.Generic;
 using Newtonsoft.Json;
+using NSMB.Utils;
+using PimDeWitte.UnityMainThreadDispatcher;
 using UnityEngine;
 using ZetaIpc.Runtime.Client;
 using ZetaIpc.Runtime.Server;
@@ -21,7 +24,17 @@ public class IPCommunicator : MonoBehaviour
     private IpcClient client;
 
     public ConnectionStatus Status { get; private set; } = ConnectionStatus.Disconnected;
-    public string LastIncomingMessage { get; private set; } = "";
+    public string LastIncomingMessage = "";
+
+    public string LastIncomingMessage1
+    {
+        get => LastIncomingMessage;
+        set
+        {
+            UnityMainThreadDispatcher.Instance().Enqueue(HandleIncomingMessage(value));
+            LastIncomingMessage = value;
+        }
+    }
 
     private void Start()
     {
@@ -36,7 +49,8 @@ public class IPCommunicator : MonoBehaviour
         server.Start(PortPlayer);
         server.ReceivedRequest += (sender, args) =>
         {
-            args.Response = HandleIncomingMessage(args.Request);
+            LastIncomingMessage1 = args.Request;
+            args.Response = Enums.IpcMessages.GenericAccept;
             args.Handled = true;
         };
     }
@@ -49,46 +63,57 @@ public class IPCommunicator : MonoBehaviour
 
     public void SendOutgoingMessage(string message)
     {
-        // the response indicates if the message was accepted.
-        // should be GenericAccept in most cases (only that will be deemed as "accepted").
-        // Can be GenericReject to signify an unknown error, or a different string for a specific error.
         var response = client.Send(message);
         if (response is null)
         {
             Debug.LogError($"Other end never responded!");
+            return;
         }
 
-        if (response != Enums.IpcMessages.GenericAccept)
+        if (response == Enums.IpcMessages.GenericAccept)
+        {
+        }
+
+        else if (response == Enums.IpcMessages.GenericReject)
         {
             Debug.LogError($"Other end rejected the message!");
-            if (response != Enums.IpcMessages.GenericReject)
-            {
-                Debug.LogError($"...this is what it had to say: {response}");
-            }
         }
     }
 
-    private string HandleIncomingMessage(string request)
+    private IEnumerator HandleIncomingMessage(string request)
     {
+        Debug.Log(request);
         var response = "";
 
         // check for specific messages in specific situations.
-        if (LastIncomingMessage == Enums.IpcMessages.BeginLevelContentsTransmission)
+        if (request.StartsWith("{"))
         {
             // level transmission began last message. this one must contain a stringified json of the contents.
-            var contents = JsonConvert.DeserializeObject<Dictionary<string, Object>>(request);
-            if (contents is null)
+            Debug.Log("deserializing lvl!");
+            var level_dict = Utils.DeserializeNestedJson(request);
+            if (level_dict == null)
             {
                 response = Enums.IpcMessages.GenericReject;
-                Debug.Log(request);
+                request = Enums.IpcMessages.GenericReject;
+                Debug.LogError("failure...");
             }
-            // TODO: give the contents dict to the GameManager to process.
+            else
+            {
+                response = Enums.IpcMessages.GenericAccept;
+                request = Enums.IpcMessages.GenericAccept;  // avoid leaving the level contents in this persistent var.
+                // TODO: give the contents dict to the GameManager to process.
+                Debug.Log("success!");
+                if (GameManager.Instance is not null)
+                {
+                    GameManager.Instance.BuildLevelFromContents(level_dict.GetValueOrDefault("contents") as Dictionary<string, object>);
+                }
+            }
         }
 
         if (response != "")
         {
-            LastIncomingMessage = request;
-            return response;
+            // LastIncomingMessage = request;
+            Debug.Log(response);
         }
 
         // all done. check rest of generic messages.
@@ -108,7 +133,7 @@ public class IPCommunicator : MonoBehaviour
                 response = client is not null && server is not null
                     ? Enums.IpcMessages.GenericAccept
                     : Enums.IpcMessages.GenericReject;
-                Debug.Log($"CheckHeakth requested. Result: {response}");
+                Debug.Log($"CheckHealth requested. Result: {response}");
                 break;
 
             case Enums.IpcMessages.GenericGiveFocus:
@@ -126,7 +151,7 @@ public class IPCommunicator : MonoBehaviour
                 break;
         }
 
-        LastIncomingMessage = request;
-        return response;
+        // LastIncomingMessage = request;
+        yield return null;
     }
 }

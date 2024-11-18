@@ -57,13 +57,13 @@
             _server = new HttpServer(new MyLogWriter());
 
             _server.ExceptionThrown +=
-                (_, exception) => throw new Exception("Error during server processing.", exception);
+                (_, exception) => throw exception;
 
             _server.FormDecoderProviders.Add(new MyFormDecoder());
             _server.Add(new MyModule(this));
             _server.Start(IPAddress.Loopback, Port);
 
-            Trace.WriteLine(
+            UnityEngine.Debug.Log(
                 $@"[Web server] Started local web server for URL '{baseUrl}'.");
         }
 
@@ -162,7 +162,7 @@
             }
             catch (Exception x)
             {
-                Trace.TraceError(@"Error during request handling: {0}", x);
+                UnityEngine.Debug.Log($"Error during request handling: {x}");
                 sendError500(response, x);
                 throw;
             }
@@ -184,7 +184,7 @@
 
             if (request.Method != @"Headers" && response.Status != HttpStatusCode.NotModified)
             {
-                Trace.WriteLine(
+                UnityEngine.Debug.Log(
                     $@"[Web server] Sending text for URL '{request.Uri.AbsolutePath}': '{responseText}'.");
 
                 var buffer2 = getBytesWithBom(responseText);
@@ -199,7 +199,7 @@
                 response.ContentLength = 0;
                 response.SendHeaders();
 
-                Trace.WriteLine(@"[Web server] Not sending.");
+                UnityEngine.Debug.Log(@"[Web server] Not sending.");
             }
         }
 

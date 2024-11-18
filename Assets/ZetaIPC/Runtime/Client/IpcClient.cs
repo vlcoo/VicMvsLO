@@ -12,6 +12,7 @@
     public class IpcClient
     {
         private int _port;
+        private MyWebClient wc;
 
         /// <summary>
         /// Initialized to connect to an IcpServer running on 127.0.0.1:port.
@@ -25,6 +26,7 @@
             _port = port;
             TimeoutMilliSeconds = timeoutMilliSeconds;
             Encoding = encoding;
+            wc = new MyWebClient(timeoutMilliSeconds, Encoding);
         }
 
         /// <summary>
@@ -34,7 +36,6 @@
         /// </summary>
         public string Send(string request)
         {
-            using var wc = new MyWebClient(TimeoutMilliSeconds, Encoding);
             try
             {
                 return wc.UploadString(url, @"POST", request ?? string.Empty);
