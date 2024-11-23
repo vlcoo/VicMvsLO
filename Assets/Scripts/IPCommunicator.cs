@@ -105,7 +105,7 @@ public class IPCommunicator : MonoBehaviour
                 Debug.Log("success!");
                 if (GameManager.Instance is not null)
                 {
-                    GameManager.Instance.BuildLevelFromContents(level_dict.GetValueOrDefault("contents") as Dictionary<string, object>);
+                    GameManager.Instance.mvlxTools.BuildLevelFromContents(level_dict.GetValueOrDefault("contents") as Dictionary<string, object>);
                 }
             }
         }

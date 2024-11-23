@@ -61,6 +61,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
     public List<PlayerController> players = new();
     public EnemySpawnpoint[] enemySpawnpoints;
     public FadeOutManager fader;
+    public LevelContentConverter mvlxTools;
 
     public float size = 1.39f, ySize = 0.8f;
 
@@ -116,6 +117,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
     public void Start()
     {
         SpectationManager = GetComponent<SpectationManager>();
+        mvlxTools = GetComponent<LevelContentConverter>();
         levelUIColor.a = .7f;
         coins = GameObject.FindGameObjectsWithTag("coin");
 

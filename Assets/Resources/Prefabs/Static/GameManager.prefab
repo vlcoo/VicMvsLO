@@ -1373,8 +1373,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerTrackTemplate: {fileID: 4050413685647265443}
   starTrackTemplate: {fileID: 4524465249670580737}
-  goalTrackIcon: {fileID: 0}
-  checkpointTrackIcon: {fileID: 0}
   player: {fileID: 0}
   storedItemNull: {fileID: 7194109699264141795, guid: a87d3b028baa82640b06b88398a8c4f0,
     type: 3}
@@ -2922,6 +2920,7 @@ MonoBehaviour:
   fadeTime: 0
   blackTime: 0
   totalTime: 0
+  nextFadeSpeedMultiplier: 1
   anim: {fileID: 0}
   alreadyInitiallyFadedOut: 0
 --- !u!95 &6350119650090559253
@@ -5432,6 +5431,7 @@ GameObject:
   - component: {fileID: 8814515203468784576}
   - component: {fileID: 6161724238288570319}
   - component: {fileID: 7849939448187379519}
+  - component: {fileID: 1243928159820659487}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -5545,6 +5545,7 @@ MonoBehaviour:
   players: []
   enemySpawnpoints: []
   fader: {fileID: 8303334505018391514}
+  mvlxTools: {fileID: 0}
   size: 1.39
   ySize: 0.8
   playersToVisualize: 10
@@ -5770,6 +5771,19 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &1243928159820659487
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5500062339093502118}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9338514b9f600c4b86d9880b30707ec, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  parent: {fileID: 5500062339093502114}
 --- !u!1 &5576651048504557500
 GameObject:
   m_ObjectHideFlags: 0
@@ -6271,7 +6285,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   entryTemplate: {fileID: 4763787563664214452}
-  rulesListBox: {fileID: 0}
 --- !u!114 &6324742379979219190
 MonoBehaviour:
   m_ObjectHideFlags: 0
