@@ -10,16 +10,19 @@ public class LevelContentConverter : MonoBehaviour
     public GameManager parent;
     public GameObject spawnsFolder, itemsFolder, platformsFolder;
 
-    public enum ItemTypes
+    private enum ItemTypes
     {
         KoopaGreen, KoopaRed, KoopaBlue, Goomba, Spiny, BulletLauncher, Squishy, Star, Spinner, Pipe, PipeMini, SemiMushroom, SemiMushroomMini, PlatMariobros, PlatCloud, Spawn
     }
 
-    public interface IUnityObject {}
+    private interface IUnityObject {}
 
-    public struct GdTileObject
+    private readonly struct GdTileObject : IEquatable<GdTileObject>
     {
-        public int TilesetId, TileIdX, TileIdY, AlternativeId;
+        public readonly int TilesetId;
+        public readonly int TileIdX;
+        public readonly int TileIdY;
+        public readonly int AlternativeId;
 
         public GdTileObject(int tilesetId, int tileIdX, int tileIdY, int alternativeId = 0)
         {
@@ -28,12 +31,19 @@ public class LevelContentConverter : MonoBehaviour
             TileIdY = tileIdY;
             AlternativeId = alternativeId;
         }
+
+        public bool Equals(GdTileObject other) => TilesetId == other.TilesetId && TileIdX == other.TileIdX && TileIdY == other.TileIdY && AlternativeId == other.AlternativeId;
+
+        public override bool Equals(object obj) => obj is GdTileObject other && Equals(other);
+
+        public override int GetHashCode() => HashCode.Combine(TilesetId, TileIdX, TileIdY, AlternativeId);
     }
 
-    public struct UnityTileObject : IUnityObject
+    private readonly struct UnityTileObject : IUnityObject
     {
-        public string TilePalettePrefabPath;
-        public int TileIdX, TileIdY;
+        public readonly string TilePalettePrefabPath;
+        public readonly int TileIdX;
+        public readonly int TileIdY;
 
         public UnityTileObject(string tilePalettePrefabPath, int tileIdX, int tileIdY)
         {
@@ -43,9 +53,9 @@ public class LevelContentConverter : MonoBehaviour
         }
     }
 
-    public struct UnityItemObject : IUnityObject
+    private readonly struct UnityItemObject : IUnityObject
     {
-        public string ItemPrefabPath;
+        public readonly string ItemPrefabPath;
 
         public UnityItemObject(string itemPrefabPath)
         {
@@ -58,7 +68,7 @@ public class LevelContentConverter : MonoBehaviour
         }
     }
 
-    public static readonly Dictionary<GdTileObject, IUnityObject> tileMapping = new()    // tile in gd (tileset and palette pos)
+    private static readonly Dictionary<GdTileObject, IUnityObject> TileMapping = new()    // tile in gd (tileset and palette pos)
     {
         { new GdTileObject(5, 13, 4), new UnityTileObject("Tilemaps/Palettes/Desert", -4, -5) },
         { new GdTileObject(5, 14, 4), new UnityTileObject("Tilemaps/Palettes/Desert", -4, -5) },
@@ -538,7 +548,7 @@ public class LevelContentConverter : MonoBehaviour
         { new GdTileObject(127, 1, 17), new UnityItemObject("Prefabs/Static/RespawningInvisibleBlock") }
     };
 
-    public static readonly Dictionary<ItemTypes, IUnityObject> itemMapping = new()       // item type in gd
+    private static readonly Dictionary<ItemTypes, IUnityObject> ItemMapping = new()       // item type in gd
     {
         { ItemTypes.KoopaGreen, new UnityItemObject("Prefabs/Enemy/Koopa") },
         { ItemTypes.KoopaRed, new UnityItemObject("Prefabs/Enemy/RedKoopa") },
@@ -566,11 +576,16 @@ public class LevelContentConverter : MonoBehaviour
     // rest of enemies: empty gameobject with enemyspawnpoint component
     public void BuildLevelFromContents(Dictionary<string, object> contents)
     {
-        if (contents["t"] is not object[] tiles || contents["i"] is not object[] items)
+        if (contents["t"] is not object[] tiles || contents["i"] is not object[] items || contents["p"] is not Dictionary<string, object> properties)
         {
             Debug.LogError("Invalid level content format");
             return;
         }
+
+        parent.levelWidthTile = Convert.ToInt32((long)properties["w"]);
+        parent.levelHeightTile = Convert.ToInt32((long)properties["h"]) + 3;    // compensate for the deathplane.
+        parent.cameraMaxX = (float)(parent.levelWidthTile / 2.0);
+        parent.cameraHeightY = (float)(Convert.ToDouble((long)properties["h"]) / 2.0);
 
         foreach (var tile in tiles)
         {
@@ -580,7 +595,7 @@ public class LevelContentConverter : MonoBehaviour
                 continue;
             }
 
-            var targetObject = tileMapping.FirstOrDefault(x =>
+            var targetObject = TileMapping.FirstOrDefault(x =>
                 x.Key.TilesetId == Convert.ToInt32((long)tileDict["t"]) &&
                 x.Key.TileIdX == Convert.ToInt32((long)tileDict["tx"]) &&
                 x.Key.TileIdY == Convert.ToInt32((long)tileDict["ty"]) &&
@@ -590,6 +605,7 @@ public class LevelContentConverter : MonoBehaviour
             // source is tile...
             var targetX = Convert.ToInt32((long)tileDict["x"]);
             var targetY = Convert.ToInt32((long)tileDict["y"]);
+            var correctedTargetY = -targetY + 44;    // Y-axis is inverted in Unity, so we need to adjust it. 44 is the maximum height of a stage.
             var background = tileDict["b"];
 
             switch (targetObject)
@@ -597,16 +613,16 @@ public class LevelContentConverter : MonoBehaviour
                 // ...target is tile. examples: ground, wall, terrain.
                 case UnityTileObject tileObject:
                 {
-                    PutTile(tileObject.TilePalettePrefabPath, tileObject.TileIdX, tileObject.TileIdY, targetX, targetY);
+                    PutTile(tileObject.TilePalettePrefabPath, tileObject.TileIdX, tileObject.TileIdY, targetX,
+                        correctedTargetY);
                     break;
                 }
 
                 // ...target is item. examples: coin.
                 case UnityItemObject itemObject:
                 {
-                    // TODO
-                    var itemInstance = Instantiate(Resources.Load<GameObject>(itemObject.ItemPrefabPath), new Vector3(targetX, targetY, 0), Quaternion.identity);
-                    itemInstance.transform.parent = itemsFolder.transform;
+                    PutPrefab(itemObject.ItemPrefabPath, (float)(targetX * 16 / 32.0),
+                        (float)(-targetY * 16 / 32.0 + 22), itemsFolder);
                     break;
                 }
             }
@@ -624,18 +640,21 @@ public class LevelContentConverter : MonoBehaviour
             var itemType = (ItemTypes)(long)itemDict["t"];
             var targetX = Convert.ToInt32((long)itemDict["x"]);
             var targetY = Convert.ToInt32((long)itemDict["y"]);
-            var properties = itemDict["p"] as Dictionary<string, object>;
+            var correctedTargetX = (float)(targetX / 32.0);  // 16/0.5 is the ratio between gd and unity units.
+            var correctedTargetY = (float)(-targetY / 32.0 + 22);  // Y-axis inversion again before applying scale ratio. Also, shift up 22 units to align origin (1 unity tile = 0.5 units, and 44 is the maximum height of a stage).
+            var itemProperties = itemDict["p"] as Dictionary<string, object>;
 
-            if (HandleSpecialItemMapping(itemType, targetX, targetY, properties)) continue;
+            if (HandleSpecialItemMapping(itemType, correctedTargetX, correctedTargetY, itemProperties)) continue;
 
-            var targetObject = itemMapping[itemType];
+            var targetObject = ItemMapping[itemType];
 
             switch (targetObject)
             {
                 // ...target is tile.
                 case UnityTileObject tileObject:
                 {
-                    PutTile(tileObject.TilePalettePrefabPath, tileObject.TileIdX, tileObject.TileIdY, targetX, targetY);
+                    PutTile(tileObject.TilePalettePrefabPath, tileObject.TileIdX, tileObject.TileIdY,
+                        (int)Math.Floor(correctedTargetX), (int)Math.Floor(correctedTargetY));
                     break;
                 }
 
@@ -659,7 +678,7 @@ public class LevelContentConverter : MonoBehaviour
                                 transform =
                                 {
                                     parent = spawnsFolder.transform,
-                                    position = new Vector3(targetX, targetY, 0)
+                                    position = new Vector3(correctedTargetX, correctedTargetY, 0)
                                 }
                             };
                             enemySpawnpoint.AddComponent<EnemySpawnpoint>().prefab = itemObject.ItemPrefabPath;
@@ -668,20 +687,20 @@ public class LevelContentConverter : MonoBehaviour
                         case ItemTypes.Spinner:
                         {
                             // just a prefab instance.
-                            PutPrefab(itemObject.ItemPrefabPath, targetX, targetY, platformsFolder);
+                            PutPrefab(itemObject.ItemPrefabPath, correctedTargetX, correctedTargetY, platformsFolder);
                             break;
                         }
                         case ItemTypes.PlatMariobros:
                         {
                             // same jazz, but there are some properties to be set too.
-                            var platform = PutPrefab(itemObject.ItemPrefabPath, targetX, targetY, platformsFolder, "MarioBrosPlatform") as MarioBrosPlatform;
-                            if (properties != null && platform) platform.platformWidth = Convert.ToInt32((long)properties["width"]);
+                            var platform = PutPrefab(itemObject.ItemPrefabPath, correctedTargetX, correctedTargetY, platformsFolder, "MarioBrosPlatform") as MarioBrosPlatform;
+                            if (itemProperties != null && platform) platform.platformWidth = Convert.ToInt32((long)itemProperties["width"]);
                             break;
                         }
                         case ItemTypes.PlatCloud:
                         {
-                            var platform = PutPrefab(itemObject.ItemPrefabPath, targetX, targetY, platformsFolder, "CloudPlatform") as CloudPlatform;
-                            if (properties != null && platform) platform.platformWidth = Convert.ToInt32((long)properties["width"]);
+                            var platform = PutPrefab(itemObject.ItemPrefabPath, correctedTargetX, correctedTargetY, platformsFolder, "CloudPlatform") as CloudPlatform;
+                            if (itemProperties != null && platform) platform.platformWidth = Convert.ToInt32((long)itemProperties["width"]);
                             break;
                         }
                     }
@@ -691,7 +710,7 @@ public class LevelContentConverter : MonoBehaviour
         }
     }
 
-    private bool HandleSpecialItemMapping(ItemTypes itemType, int targetX, int targetY, Dictionary<string, object> properties)
+    private bool HandleSpecialItemMapping(ItemTypes itemType, float targetX, float targetY, Dictionary<string, object> properties)
     {
         // source is item...
         // ...target is extra logic when being placed, i.e. multiple tiles or prefabs. overrides default mapping.
@@ -752,10 +771,10 @@ public class LevelContentConverter : MonoBehaviour
         // TODO: add a way to reference all four (ground, semi, background, squishy) types of tilemaps.
         var tilePalette = Resources.Load<GameObject>(tilePalettePath).GetComponentInChildren<Tilemap>();
         var usingTile = tilePalette.GetTile(new Vector3Int(tileIdX, tileIdY, 0));
-        parent.tilemap.SetTile(new Vector3Int(targetX + parent.tilemap.cellBounds.min.x, -(targetY + parent.tilemap.cellBounds.min.y), 0), usingTile);
+        parent.tilemap.SetTile(new Vector3Int(targetX, targetY, 0), usingTile);
     }
 
-    private Component PutPrefab(string prefabPath, int targetX, int targetY, GameObject parentFolder, string componentName = null)
+    private Component PutPrefab(string prefabPath, float targetX, float targetY, GameObject parentFolder, string componentName = null)
     {
         Debug.Log(prefabPath);
         var itemInstance = Instantiate(Resources.Load<GameObject>(prefabPath), new Vector3(targetX, targetY, 0), Quaternion.identity);

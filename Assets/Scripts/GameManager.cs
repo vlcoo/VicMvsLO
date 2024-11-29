@@ -24,7 +24,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
     public Songinator MusicSynth, MusicSynthMega, MusicSynthStarman;
 
     public int levelMinTileX, levelMinTileY, levelWidthTile, levelHeightTile;
-    public float cameraMinY, cameraHeightY, cameraMinX = -1000, cameraMaxX = 1000;
+    public float cameraMinX = -1000, cameraMinY, cameraMaxX = 1000, cameraHeightY;
     public bool loopingLevel = true;
     public bool raceLevel, reverberedSFX;
     public Vector3 spawnpoint;
