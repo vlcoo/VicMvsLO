@@ -29,7 +29,8 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
     public bool raceLevel, reverberedSFX;
     public Vector3 spawnpoint;
     public Vector3 checkpoint;
-    public Tilemap tilemap;
+    public Tilemap tilemap, tilemapBackground, tilemapSemisolid, tilemapSquishy;
+    public Transform backgroundsHolder;
     [ColorUsage(false)] public Color levelUIColor = new(24, 178, 170);
     public bool spawnBigPowerups = true, spawnVerticalPowerups = true;
     public string levelDesigner = "", richPresenceId = "", levelName = "Unknown";

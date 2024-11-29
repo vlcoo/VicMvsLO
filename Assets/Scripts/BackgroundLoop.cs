@@ -22,6 +22,7 @@ public class BackgroundLoop : MonoBehaviour
         for (var i = 0; i < children.Length; i++)
         {
             var obj = children[i];
+            if (!obj.activeSelf) continue;
             var difference = transform.position.x - lastPosition.x +
                              (obj.transform.position.x - positionsAfterPixelSnap[i].x);
             var parallaxSpeed = 1 - Mathf.Clamp01(Mathf.Abs(lastPosition.z / obj.transform.position.z));

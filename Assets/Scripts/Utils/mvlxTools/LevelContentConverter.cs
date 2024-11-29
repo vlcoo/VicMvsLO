@@ -586,6 +586,12 @@ public class LevelContentConverter : MonoBehaviour
         parent.levelHeightTile = Convert.ToInt32((long)properties["h"]) + 3;    // compensate for the deathplane.
         parent.cameraMaxX = (float)(parent.levelWidthTile / 2.0);
         parent.cameraHeightY = (float)(Convert.ToDouble((long)properties["h"]) / 2.0);
+        for (var i = 0; i < parent.backgroundsHolder.childCount; i++)
+        {
+            var bgLayer = parent.backgroundsHolder.GetChild(i).gameObject;
+            if (i == Convert.ToInt32((long)properties["t"])) bgLayer.SetActive(true);
+            else bgLayer.SetActive(false);
+        }
 
         foreach (var tile in tiles)
         {
@@ -603,26 +609,22 @@ public class LevelContentConverter : MonoBehaviour
             ).Value ?? DefaultTile;
 
             // source is tile...
-            var targetX = Convert.ToInt32((long)tileDict["x"]);
-            var targetY = Convert.ToInt32((long)tileDict["y"]);
-            var correctedTargetY = -targetY + 44;    // Y-axis is inverted in Unity, so we need to adjust it. 44 is the maximum height of a stage.
-            var background = tileDict["b"];
+            var targetPosition = new Vector3(Convert.ToInt32((long)tileDict["x"]), Convert.ToInt32((long)tileDict["y"]));
+            var background = (bool)tileDict["b"];
 
             switch (targetObject)
             {
                 // ...target is tile. examples: ground, wall, terrain.
                 case UnityTileObject tileObject:
                 {
-                    PutTile(tileObject.TilePalettePrefabPath, tileObject.TileIdX, tileObject.TileIdY, targetX,
-                        correctedTargetY);
+                    PutTile(tileObject, targetPosition.GdTileToUnityTile(), background);
                     break;
                 }
 
                 // ...target is item. examples: coin.
                 case UnityItemObject itemObject:
                 {
-                    PutPrefab(itemObject.ItemPrefabPath, (float)(targetX * 16 / 32.0),
-                        (float)(-targetY * 16 / 32.0 + 22), itemsFolder);
+                    PutPrefab(itemObject.ItemPrefabPath, targetPosition.GdTileToUnityWorld(), itemsFolder);
                     break;
                 }
             }
@@ -638,13 +640,10 @@ public class LevelContentConverter : MonoBehaviour
 
             // source is item...
             var itemType = (ItemTypes)(long)itemDict["t"];
-            var targetX = Convert.ToInt32((long)itemDict["x"]);
-            var targetY = Convert.ToInt32((long)itemDict["y"]);
-            var correctedTargetX = (float)(targetX / 32.0);  // 16/0.5 is the ratio between gd and unity units.
-            var correctedTargetY = (float)(-targetY / 32.0 + 22);  // Y-axis inversion again before applying scale ratio. Also, shift up 22 units to align origin (1 unity tile = 0.5 units, and 44 is the maximum height of a stage).
+            var targetPos = new Vector3(Convert.ToInt32((long)itemDict["x"]), Convert.ToInt32((long)itemDict["y"]), 0);
             var itemProperties = itemDict["p"] as Dictionary<string, object>;
 
-            if (HandleSpecialItemMapping(itemType, correctedTargetX, correctedTargetY, itemProperties)) continue;
+            if (HandleSpecialItemMapping(itemType, targetPos, itemProperties)) continue;
 
             var targetObject = ItemMapping[itemType];
 
@@ -653,8 +652,7 @@ public class LevelContentConverter : MonoBehaviour
                 // ...target is tile.
                 case UnityTileObject tileObject:
                 {
-                    PutTile(tileObject.TilePalettePrefabPath, tileObject.TileIdX, tileObject.TileIdY,
-                        (int)Math.Floor(correctedTargetX), (int)Math.Floor(correctedTargetY));
+                    // TODO
                     break;
                 }
 
@@ -662,7 +660,6 @@ public class LevelContentConverter : MonoBehaviour
                 case UnityItemObject itemObject:
                 {
                     // var itemPrefab = Resources.Load<GameObject>(itemObject.ItemPrefabPath);
-                    // TODO: instantiate the prefab in a networked way, in gamemanager. use enemyspawnpoint where needed.
                     switch (itemType)
                     {
                         // TODO: item type-specific properties
@@ -678,7 +675,7 @@ public class LevelContentConverter : MonoBehaviour
                                 transform =
                                 {
                                     parent = spawnsFolder.transform,
-                                    position = new Vector3(correctedTargetX, correctedTargetY, 0)
+                                    position = targetPos.GdWorldToUnityWorld()
                                 }
                             };
                             enemySpawnpoint.AddComponent<EnemySpawnpoint>().prefab = itemObject.ItemPrefabPath;
@@ -687,19 +684,19 @@ public class LevelContentConverter : MonoBehaviour
                         case ItemTypes.Spinner:
                         {
                             // just a prefab instance.
-                            PutPrefab(itemObject.ItemPrefabPath, correctedTargetX, correctedTargetY, platformsFolder);
+                            PutPrefab(itemObject.ItemPrefabPath, targetPos.GdWorldToUnityWorld(), platformsFolder);
                             break;
                         }
                         case ItemTypes.PlatMariobros:
                         {
                             // same jazz, but there are some properties to be set too.
-                            var platform = PutPrefab(itemObject.ItemPrefabPath, correctedTargetX, correctedTargetY, platformsFolder, "MarioBrosPlatform") as MarioBrosPlatform;
+                            var platform = PutPrefab(itemObject.ItemPrefabPath, targetPos.GdWorldToUnityWorld(), platformsFolder, "MarioBrosPlatform") as MarioBrosPlatform;
                             if (itemProperties != null && platform) platform.platformWidth = Convert.ToInt32((long)itemProperties["width"]);
                             break;
                         }
                         case ItemTypes.PlatCloud:
                         {
-                            var platform = PutPrefab(itemObject.ItemPrefabPath, correctedTargetX, correctedTargetY, platformsFolder, "CloudPlatform") as CloudPlatform;
+                            var platform = PutPrefab(itemObject.ItemPrefabPath, targetPos.GdWorldToUnityWorld(), platformsFolder, "CloudPlatform") as CloudPlatform;
                             if (itemProperties != null && platform) platform.platformWidth = Convert.ToInt32((long)itemProperties["width"]);
                             break;
                         }
@@ -710,7 +707,7 @@ public class LevelContentConverter : MonoBehaviour
         }
     }
 
-    private bool HandleSpecialItemMapping(ItemTypes itemType, float targetX, float targetY, Dictionary<string, object> properties)
+    private bool HandleSpecialItemMapping(ItemTypes itemType, Vector3 targetPos, Dictionary<string, object> properties)
     {
         // source is item...
         // ...target is extra logic when being placed, i.e. multiple tiles or prefabs. overrides default mapping.
@@ -720,11 +717,15 @@ public class LevelContentConverter : MonoBehaviour
             // TODO
             case ItemTypes.BulletLauncher:
             {
+                var launcherTop1 = new UnityTileObject("Tilemaps/Palettes/Snow", -3, 2);
+                var launcherTop2 = new UnityTileObject("Tilemaps/Palettes/Snow", -3, 1);
+                var launcherMid = new UnityTileObject("Tilemaps/Palettes/Snow", -3, 0);
+                PutTile(launcherMid, targetPos.GdWorldToUnityTile());
                 return true;
             }
             case ItemTypes.Spawn:
             {
-                parent.spawnpoint = new Vector3(targetX, targetY, 0);
+                parent.spawnpoint = targetPos.GdWorldToUnityWorld();
                 return true;
             }
             case ItemTypes.Star:
@@ -735,7 +736,7 @@ public class LevelContentConverter : MonoBehaviour
                     transform =
                     {
                         parent = spawnsFolder.transform,
-                        position = new Vector3(targetX, targetY, 0)
+                        position = targetPos.GdWorldToUnityWorld()
                     },
                     tag = "StarSpawn"
                 };
@@ -765,20 +766,29 @@ public class LevelContentConverter : MonoBehaviour
         }
     }
 
-    private void PutTile(string tilePalettePath, int tileIdX, int tileIdY, int targetX, int targetY)
+    private void PutTile(UnityTileObject tileObject, Vector3 targetPos, bool background = false)
     {
         // TODO: temporary solution. must eventually add a way to reuse objects!
         // TODO: add a way to reference all four (ground, semi, background, squishy) types of tilemaps.
-        var tilePalette = Resources.Load<GameObject>(tilePalettePath).GetComponentInChildren<Tilemap>();
-        var usingTile = tilePalette.GetTile(new Vector3Int(tileIdX, tileIdY, 0));
-        parent.tilemap.SetTile(new Vector3Int(targetX, targetY, 0), usingTile);
+        var tilePalette = Resources.Load<GameObject>(tileObject.TilePalettePrefabPath).GetComponentInChildren<Tilemap>();
+        var usingTile = tilePalette.GetTile(new Vector3Int(tileObject.TileIdX, tileObject.TileIdY, 0));
+        if (background) parent.tilemapBackground.SetTile(new Vector3Int((int)targetPos.x, (int)targetPos.y, 0), usingTile);
+        else parent.tilemap.SetTile(new Vector3Int((int)targetPos.x, (int)targetPos.y, 0), usingTile);
     }
 
-    private Component PutPrefab(string prefabPath, float targetX, float targetY, GameObject parentFolder, string componentName = null)
+    private Component PutPrefab(string prefabPath, Vector3 targetPos, GameObject parentFolder, string componentName = null)
     {
         Debug.Log(prefabPath);
-        var itemInstance = Instantiate(Resources.Load<GameObject>(prefabPath), new Vector3(targetX, targetY, 0), Quaternion.identity);
+        var itemInstance = Instantiate(Resources.Load<GameObject>(prefabPath), targetPos, Quaternion.identity);
         itemInstance.transform.parent = parentFolder.transform;
         return componentName != null ? itemInstance.GetComponent(componentName) : itemInstance.transform;
     }
+}
+
+public static class Vector3Extensions
+{
+    public static Vector3 GdTileToUnityTile(this Vector3 input) => new(input.x, -input.y + 44);
+    public static Vector3 GdWorldToUnityWorld(this Vector3 input) => new(input.x / 32.0f, -input.y / 32.0f + 22.5f);
+    public static Vector3 GdTileToUnityWorld(this Vector3 input) => new(input.x * 16 / 32.0f + 0.25f, -input.y * 16 / 32.0f + 22.25f);
+    public static Vector3 GdWorldToUnityTile(this Vector3 input) => input.GdWorldToUnityWorld() * 2;
 }
