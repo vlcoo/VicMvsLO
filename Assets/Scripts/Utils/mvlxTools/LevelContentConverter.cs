@@ -586,11 +586,25 @@ public class LevelContentConverter : MonoBehaviour
         parent.levelHeightTile = Convert.ToInt32((long)properties["h"]) + 3;    // compensate for the deathplane.
         parent.cameraMaxX = (float)(parent.levelWidthTile / 2.0);
         parent.cameraHeightY = (float)(Convert.ToDouble((long)properties["h"]) / 2.0);
+
+        var themeIndex = Convert.ToInt32((long)properties["t"]);
         for (var i = 0; i < parent.backgroundsHolder.childCount; i++)
         {
             var bgLayer = parent.backgroundsHolder.GetChild(i).gameObject;
-            if (i == Convert.ToInt32((long)properties["t"])) bgLayer.SetActive(true);
-            else bgLayer.SetActive(false);
+            if (i != themeIndex) continue;
+            bgLayer.SetActive(true);
+        }
+
+        var pitType = Convert.ToInt32((long)properties["p"]);
+        for (var i = 0; i < parent.pitsHolder.childCount; i++)
+        {
+            var pit = parent.pitsHolder.GetChild(i).gameObject;
+            if (i != pitType) continue;
+            pit.SetActive(true);
+            pit.GetComponent<WaterSplash>().widthTiles = parent.levelWidthTile;
+            var pitPosition = pit.transform.position;
+            pitPosition.x = parent.levelWidthTile / 2.0f / 2.0f;
+            pit.transform.position = pitPosition;
         }
 
         foreach (var tile in tiles)
@@ -662,7 +676,6 @@ public class LevelContentConverter : MonoBehaviour
                     // var itemPrefab = Resources.Load<GameObject>(itemObject.ItemPrefabPath);
                     switch (itemType)
                     {
-                        // TODO: item type-specific properties
                         case ItemTypes.KoopaGreen:
                         case ItemTypes.KoopaRed:
                         case ItemTypes.KoopaBlue:
@@ -717,10 +730,10 @@ public class LevelContentConverter : MonoBehaviour
             // TODO
             case ItemTypes.BulletLauncher:
             {
-                var launcherTop1 = new UnityTileObject("Tilemaps/Palettes/Snow", -3, 2);
-                var launcherTop2 = new UnityTileObject("Tilemaps/Palettes/Snow", -3, 1);
-                var launcherMid = new UnityTileObject("Tilemaps/Palettes/Snow", -3, 0);
-                PutTile(launcherMid, targetPos.GdWorldToUnityTile());
+                // var launcherTop1 = new UnityTileObject("Tilemaps/Palettes/Snow", -3, 2);
+                // var launcherTop2 = new UnityTileObject("Tilemaps/Palettes/Snow", -3, 1);
+                // var launcherMid = new UnityTileObject("Tilemaps/Palettes/Snow", -3, 0);
+                // PutTile(launcherMid, targetPos.GdWorldToUnityTile());
                 return true;
             }
             case ItemTypes.Spawn:
@@ -769,7 +782,6 @@ public class LevelContentConverter : MonoBehaviour
     private void PutTile(UnityTileObject tileObject, Vector3 targetPos, bool background = false)
     {
         // TODO: temporary solution. must eventually add a way to reuse objects!
-        // TODO: add a way to reference all four (ground, semi, background, squishy) types of tilemaps.
         var tilePalette = Resources.Load<GameObject>(tileObject.TilePalettePrefabPath).GetComponentInChildren<Tilemap>();
         var usingTile = tilePalette.GetTile(new Vector3Int(tileObject.TileIdX, tileObject.TileIdY, 0));
         if (background) parent.tilemapBackground.SetTile(new Vector3Int((int)targetPos.x, (int)targetPos.y, 0), usingTile);
