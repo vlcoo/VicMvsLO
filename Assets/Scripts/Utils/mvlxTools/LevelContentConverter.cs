@@ -14,6 +14,7 @@ public class LevelContentConverter : MonoBehaviour
     {
         KoopaGreen, KoopaRed, KoopaBlue, Goomba, Spiny, BulletLauncher, Squishy, Star, Spinner, Pipe, PipeMini, SemiMushroom, SemiMushroomMini, PlatMariobros, PlatCloud, Spawn
     }
+    private enum GridTypes {Normal, Background, Semisolid, Squishy}
 
     private interface IUnityObject {}
 
@@ -51,6 +52,9 @@ public class LevelContentConverter : MonoBehaviour
             TileIdX = tileIdX;
             TileIdY = tileIdY;
         }
+
+        public UnityTileObject X(int increment) => new(TilePalettePrefabPath, TileIdX + increment, TileIdY);
+        public UnityTileObject Y(int increment) => new(TilePalettePrefabPath, TileIdX, TileIdY + increment);
     }
 
     private readonly struct UnityItemObject : IUnityObject
@@ -560,7 +564,7 @@ public class LevelContentConverter : MonoBehaviour
         { ItemTypes.PlatCloud, new UnityItemObject("Prefabs/Static/CloudPlatform") }
     };
 
-    private static readonly UnityTileObject DefaultTile = new UnityTileObject("Tilemaps/Palettes/Basic Blocks", 1, -1);
+    private static readonly UnityTileObject DefaultTile = new UnityTileObject("Tilemaps/Palettes/Clown", 3, -7);
 
     // stars: empty gameobject with StarSpawn tag
     // spinner: prefab instance
@@ -601,6 +605,7 @@ public class LevelContentConverter : MonoBehaviour
             var pit = parent.pitsHolder.GetChild(i).gameObject;
             if (i != pitType) continue;
             pit.SetActive(true);
+            if (i == 0) continue;
             pit.GetComponent<WaterSplash>().widthTiles = parent.levelWidthTile;
             var pitPosition = pit.transform.position;
             pitPosition.x = parent.levelWidthTile / 2.0f / 2.0f;
@@ -631,7 +636,7 @@ public class LevelContentConverter : MonoBehaviour
                 // ...target is tile. examples: ground, wall, terrain.
                 case UnityTileObject tileObject:
                 {
-                    PutTile(tileObject, targetPosition.GdTileToUnityTile(), background);
+                    PutTile(tileObject, targetPosition.GdTileToUnityTile(), background ? GridTypes.Background : GridTypes.Normal);
                     break;
                 }
 
@@ -666,7 +671,8 @@ public class LevelContentConverter : MonoBehaviour
                 // ...target is tile.
                 case UnityTileObject tileObject:
                 {
-                    // TODO
+                    // TODO: a situation in which this happens is yet to be found.
+                    PutTile(DefaultTile, targetPos.GdWorldToUnityTile());
                     break;
                 }
 
@@ -713,6 +719,7 @@ public class LevelContentConverter : MonoBehaviour
                             if (itemProperties != null && platform) platform.platformWidth = Convert.ToInt32((long)itemProperties["width"]);
                             break;
                         }
+                        default: PutTile(DefaultTile, targetPos.GdWorldToUnityTile()); break;
                     }
                     break;
                 }
@@ -725,15 +732,26 @@ public class LevelContentConverter : MonoBehaviour
         // source is item...
         // ...target is extra logic when being placed, i.e. multiple tiles or prefabs. overrides default mapping.
         // examples: pipes, semisolids.
+        var targetPosTile = targetPos.GdWorldToUnityTile();
+        var targetPosWorld = targetPos.GdWorldToUnityWorld();
+
         switch (itemType)
         {
-            // TODO
             case ItemTypes.BulletLauncher:
             {
-                // var launcherTop1 = new UnityTileObject("Tilemaps/Palettes/Snow", -3, 2);
-                // var launcherTop2 = new UnityTileObject("Tilemaps/Palettes/Snow", -3, 1);
-                // var launcherMid = new UnityTileObject("Tilemaps/Palettes/Snow", -3, 0);
-                // PutTile(launcherMid, targetPos.GdWorldToUnityTile());
+                var height = Convert.ToInt32((long)properties["height"]);
+                var launcherTop1 = new UnityTileObject("Tilemaps/Palettes/Snow", -3, 2);
+                var launcherTop2 = new UnityTileObject("Tilemaps/Palettes/Snow", -3, 1);
+                var launcherMid = new UnityTileObject("Tilemaps/Palettes/Snow", -3, 0);
+                PutTile(launcherTop1, new Vector3(targetPosTile.x, targetPosTile.y + height / 2.0f - 1, 0));
+                PutTile(launcherTop2, new Vector3(targetPosTile.x, targetPosTile.y + height / 2.0f - 2, 0));
+                for (var i = targetPosTile.y + height / 2.0f - 3; i > targetPosTile.y - height / 2.0f - 1; i--)
+                {
+                    PutTile(launcherMid, new Vector3(targetPosTile.x, i, 0));
+                }
+
+                PutPrefab("Prefabs/Static/BulletBillLauncher",
+                    new Vector3(targetPosTile.x, targetPosTile.y + height / 2.0f - 0.5f, 0) / 2.0f, itemsFolder);
                 return true;
             }
             case ItemTypes.Spawn:
@@ -757,35 +775,268 @@ public class LevelContentConverter : MonoBehaviour
             }
             case ItemTypes.Squishy:
             {
+                var width = Convert.ToInt32((long)properties["width"]);
+                var height = Convert.ToInt32((long)properties["height"]);
+                var squishyTopLeft = new UnityTileObject("Tilemaps/Palettes/Castle", 6, 4);
+                var squishyTopMid = new UnityTileObject("Tilemaps/Palettes/Castle", 7, 4);
+                var squishyTopRight = new UnityTileObject("Tilemaps/Palettes/Castle", 8, 4);
+                var squishyMidLeft = new UnityTileObject("Tilemaps/Palettes/Castle", 8, 3);
+                var squishyMidMid = new UnityTileObject("Tilemaps/Palettes/Castle", 7, 3);
+                var squishyMidRight = new UnityTileObject("Tilemaps/Palettes/Castle", 6, 3);
+                var squishyBotLeft = new UnityTileObject("Tilemaps/Palettes/Castle", 8, 2);
+                var squishyBotMid = new UnityTileObject("Tilemaps/Palettes/Castle", 7, -1);
+                var squishyBotRight = new UnityTileObject("Tilemaps/Palettes/Castle", 6, 2);
+                PutTile(squishyTopLeft, new Vector3(targetPosTile.x - width / 2.0f - 1, targetPosTile.y + height / 2.0f, 0), GridTypes.Squishy);
+                PutTile(squishyTopRight, new Vector3(targetPosTile.x + width / 2.0f, targetPosTile.y + height / 2.0f, 0), GridTypes.Squishy);
+                PutTile(squishyBotLeft, new Vector3(targetPosTile.x - width / 2.0f - 1, targetPosTile.y - height / 2.0f - 1, 0), GridTypes.Squishy);
+                PutTile(squishyBotRight, new Vector3(targetPosTile.x + width / 2.0f, targetPosTile.y - height / 2.0f - 1, 0), GridTypes.Squishy);
+                for (var i = targetPosTile.x - width / 2.0f; i < targetPosTile.x + width / 2.0f - 1; i++)
+                {
+                    if (i == targetPosTile.x - width / 2.0f)
+                    {
+                        PutTile(squishyTopMid, new Vector3(i, targetPosTile.y + height / 2.0f, 0), GridTypes.Squishy);
+                        PutTile(squishyBotMid, new Vector3(i, targetPosTile.y - height / 2.0f - 1, 0), GridTypes.Squishy);
+                    }
+                    else if (i == targetPosTile.x + width / 2.0f - 1)
+                    {
+                        PutTile(squishyMidLeft, new Vector3(i, targetPosTile.y + height / 2.0f - 1, 0), GridTypes.Squishy);
+                        PutTile(squishyMidRight, new Vector3(i, targetPosTile.y - height / 2.0f, 0), GridTypes.Squishy);
+                    }
+                    for (var j = targetPosTile.y - height / 2.0f; j < targetPosTile.y + height / 2.0f - 1; j++)
+                    {
+                        PutTile(squishyMidMid, new Vector3(i, j, 0), GridTypes.Squishy);
+                    }
+                }
                 return true;
             }
             case ItemTypes.Pipe:
             {
+                var color = Convert.ToInt32((long)properties["color"]);     // 0 Green, 1 Yellow, 2 Red, 3 Blue
+                var rotation = Convert.ToInt32((long)properties["rotation"]);   // 0 Up, 1 Right, 2 Down, 3 Left
+                var height = Convert.ToInt32((long)properties["height"]);
+                var enterable = (bool)properties["enterable"];
+                var pipeUpLeft = new UnityTileObject("Tilemaps/Palettes/Basic Blocks", 4, 1).Y(-4 * color);
+                var pipeUpRight = pipeUpLeft.X(1);
+                var pipeVertLeft = pipeUpLeft.Y(-1);
+                var pipeVertRight = pipeVertLeft.X(1);
+                var pipeDownLeft = pipeVertLeft.Y(-1);
+                var pipeDownRight = pipeDownLeft.X(1);
+                var pipeLeftUp = new UnityTileObject("Tilemaps/Palettes/Basic Blocks", 7, 1).Y(-4 * color);
+                var pipeLeftDown = pipeLeftUp.Y(-1);
+                var pipeHorizUp = pipeLeftUp.X(1);
+                var pipeHorizDown = pipeHorizUp.Y(-1);
+                var pipeRightUp = pipeHorizUp.X(1);
+                var pipeRightDown = pipeRightUp.Y(-1);
+                var pipeBreakUpLeft = new UnityTileObject("Tilemaps/Palettes/Basic Blocks", 11, 1).Y(-4 * color);
+                var pipeBreakUpRight = pipeBreakUpLeft.X(1);
+                var pipeBreakUpMidLeft = pipeBreakUpLeft.Y(-1);
+                var pipeBreakUpMidRight = pipeBreakUpMidLeft.X(1);
+                var pipeBreakDownLeft = new UnityTileObject("Tilemaps/Palettes/Basic Blocks", 14, -1).Y(-4 * color);
+                var pipeBreakDownRight = pipeBreakDownLeft.X(1);
+                var pipeBreakDownMidLeft = pipeBreakDownLeft.Y(1);
+                var pipeBreakDownMidRight = pipeBreakDownMidLeft.X(1);
+                if (!enterable)
+                {
+                    // all four rotations are possible. up and down are breakable, left and right are not.
+                    switch (rotation)
+                    {
+                        case 0:
+                            PutTile(pipeBreakUpLeft,
+                                new Vector3(targetPosTile.x - 1, targetPosTile.y + height / 2.0f - 1, 0));
+                            PutTile(pipeBreakUpRight, new Vector3(targetPosTile.x, targetPosTile.y + height / 2.0f - 1, 0));
+                            for (var i = targetPosTile.y + height / 2.0f - 2; i > targetPosTile.y - height / 2.0f - 1; i--)
+                            {
+                                PutTile(pipeBreakUpMidLeft, new Vector3(targetPosTile.x - 1, i, 0));
+                                PutTile(pipeBreakUpMidRight, new Vector3(targetPosTile.x, i, 0));
+                            }
+                            break;
+                        case 1:
+                            PutTile(pipeRightUp, new Vector3(targetPosTile.x + height / 2.0f - 1, targetPosTile.y, 0));
+                            PutTile(pipeRightDown, new Vector3(targetPosTile.x + height / 2.0f - 1, targetPosTile.y - 1, 0));
+                            for (var i = targetPosTile.x + height / 2.0f - 2; i > targetPosTile.x - height / 2.0f - 1; i--)
+                            {
+                                PutTile(pipeHorizUp, new Vector3(i, targetPosTile.y, 0));
+                                PutTile(pipeHorizDown, new Vector3(i, targetPosTile.y - 1, 0));
+                            }
+                            break;
+                        case 2:
+                            PutTile(pipeBreakDownLeft,
+                                new Vector3(targetPosTile.x - 1, targetPosTile.y - height / 2.0f, 0));
+                            PutTile(pipeBreakDownRight, new Vector3(targetPosTile.x, targetPosTile.y - height / 2.0f, 0));
+                            for (var i = targetPosTile.y - height / 2.0f + 1; i < targetPosTile.y + height / 2.0f; i++)
+                            {
+                                PutTile(pipeBreakDownMidLeft, new Vector3(targetPosTile.x - 1, i, 0));
+                                PutTile(pipeBreakDownMidRight, new Vector3(targetPosTile.x, i, 0));
+                            }
+                            break;
+                        case 3:
+                            PutTile(pipeLeftUp, new Vector3(targetPosTile.x - height / 2.0f, targetPosTile.y, 0));
+                            PutTile(pipeLeftDown, new Vector3(targetPosTile.x - height / 2.0f, targetPosTile.y - 1, 0));
+                            for (var i = targetPosTile.x - height / 2.0f + 1; i < targetPosTile.x + height / 2.0f; i++)
+                            {
+                                PutTile(pipeHorizUp, new Vector3(i, targetPosTile.y, 0));
+                                PutTile(pipeHorizDown, new Vector3(i, targetPosTile.y - 1, 0));
+                            }
+                            break;
+                    }
+                }
+                else {
+                    // only up and down are permitted. both are not breakable.
+                    switch (rotation)
+                    {
+                        case 0:
+                            PutTile(pipeUpLeft,
+                                new Vector3(targetPosTile.x - 1, targetPosTile.y + height / 2.0f - 1, 0));
+                            PutTile(pipeUpRight, new Vector3(targetPosTile.x, targetPosTile.y + height / 2.0f - 1, 0));
+                            for (var i = targetPosTile.y + height / 2.0f - 2; i > targetPosTile.y - height / 2.0f - 1; i--)
+                            {
+                                PutTile(pipeVertLeft, new Vector3(targetPosTile.x - 1, i, 0));
+                                PutTile(pipeVertRight, new Vector3(targetPosTile.x, i, 0));
+                            }
+                            break;
+                        case 2:
+                            PutTile(pipeDownLeft,
+                                new Vector3(targetPosTile.x - 1, targetPosTile.y - height / 2.0f, 0));
+                            PutTile(pipeDownRight, new Vector3(targetPosTile.x, targetPosTile.y - height / 2.0f, 0));
+                            for (var i = targetPosTile.y - height / 2.0f + 1; i < targetPosTile.y + height / 2.0f; i++)
+                            {
+                                PutTile(pipeVertLeft, new Vector3(targetPosTile.x - 1, i, 0));
+                                PutTile(pipeVertRight, new Vector3(targetPosTile.x, i, 0));
+                            }
+                            break;
+                    }
+                }
                 return true;
             }
             case ItemTypes.PipeMini:
             {
+                var rotation = Convert.ToInt32((long)properties["rotation"]);   // 0 Up, 1 Right, 2 Down, 3 Left
+                var height = Convert.ToInt32((long)properties["height"]);
+                var enterable = (bool)properties["enterable"];
+                var pipeUp = new UnityTileObject("Tilemaps/Palettes/Basic Blocks", -2, -4);
+                var pipeVert = pipeUp.Y(-1);
+                var pipeDown = pipeVert.Y(-1);
+                var pipeLeft = new UnityTileObject("Tilemaps/Palettes/Basic Blocks", 0, -4);
+                var pipeHoriz = pipeLeft.X(1);
+                var pipeRight = pipeHoriz.X(1);
+                // all four rotations are possible. up and down are breakable, left and right are not.
+                switch (rotation)
+                {
+                    case 0:
+                        PutTile(pipeUp, new Vector3(targetPosTile.x, targetPosTile.y + height / 2.0f - 1, 0));
+                        for (var i = targetPosTile.y + height / 2.0f - 2; i > targetPosTile.y - height / 2.0f - 1; i--)
+                        {
+                            PutTile(pipeVert, new Vector3(targetPosTile.x, i, 0));
+                        }
+                        break;
+                    case 1:
+                        PutTile(pipeRight, new Vector3(targetPosTile.x + height / 2.0f - 1, targetPosTile.y, 0));
+                        for (var i = targetPosTile.x + height / 2.0f - 2; i > targetPosTile.x - height / 2.0f - 1; i--)
+                        {
+                            PutTile(pipeHoriz, new Vector3(i, targetPosTile.y, 0));
+                        }
+                        break;
+                    case 2:
+                        PutTile(pipeDown, new Vector3(targetPosTile.x, targetPosTile.y - height / 2.0f, 0));
+                        for (var i = targetPosTile.y - height / 2.0f + 1; i < targetPosTile.y + height / 2.0f; i++)
+                        {
+                            PutTile(pipeVert, new Vector3(targetPosTile.x, i, 0));
+                        }
+                        break;
+                    case 3:
+                        PutTile(pipeLeft, new Vector3(targetPosTile.x - height / 2.0f, targetPosTile.y, 0));
+                        for (var i = targetPosTile.x - height / 2.0f + 1; i < targetPosTile.x + height / 2.0f; i++)
+                        {
+                            PutTile(pipeHoriz, new Vector3(i, targetPosTile.y, 0));
+                        }
+                        break;
+                }
                 return true;
             }
             case ItemTypes.SemiMushroom:
             {
+                var width = Convert.ToInt32((long)properties["width"]) + 3;
+                var height = Convert.ToInt32((long)properties["height"]);
+                var color = Convert.ToInt32((long)properties["color"]);     // 0 Red, 1 Green
+                var semiLeft0 = new UnityTileObject("Tilemaps/Palettes/Sky", 2, 8).X(6 * color);
+                var semiLeft1 = semiLeft0.X(1);
+                var semiLeft2 = semiLeft0.Y(-1);
+                var semiLeft3 = semiLeft2.X(1);
+                var semiMid0 = semiLeft1.X(1);
+                var semiMid1 = semiMid0.X(1);
+                var semiMid2 = semiMid0.Y(-1);
+                var semiMid3 = semiMid2.X(1);
+                var semiRight0 = semiMid1.X(1);
+                var semiRight1 = semiRight0.X(1);
+                var semiRight2 = semiRight0.Y(-1);
+                var semiRight3 = semiRight2.X(1);
+                var semiBase0 = new UnityTileObject("Tilemaps/Palettes/Sky", 4, 6).X(6 * color);
+                var semiBase1 = semiBase0.X(1);
+                var semiTail0 = semiBase0.Y(-1);
+                var semiTail1 = semiTail0.X(1);
+                for (var i = targetPosTile.y + height / 2.0f - 2; i > targetPosTile.y - height / 2.0f - 1; i--)
+                {
+                    PutTile(semiTail0, new Vector3(targetPosTile.x - 1, i, 0));
+                    PutTile(semiTail1, new Vector3(targetPosTile.x, i, 0));
+                }
+                PutTile(semiBase0, new Vector3(targetPosTile.x - 1, targetPosTile.y + height / 2.0f - 1, 0), GridTypes.Semisolid);
+                PutTile(semiBase1, new Vector3(targetPosTile.x, targetPosTile.y + height / 2.0f - 1, 0), GridTypes.Semisolid);
+                for (var i = targetPosTile.x - width + 3; i < targetPosTile.x + width - 4; i += 2)
+                {
+                    PutTile(semiMid0, new Vector3(i, targetPosTile.y + height / 2.0f + 1, 0), GridTypes.Semisolid);
+                    PutTile(semiMid1, new Vector3(i + 1, targetPosTile.y + height / 2.0f + 1, 0), GridTypes.Semisolid);
+                    PutTile(semiMid2, new Vector3(i, targetPosTile.y + height / 2.0f, 0), GridTypes.Semisolid);
+                    PutTile(semiMid3, new Vector3(i + 1, targetPosTile.y + height / 2.0f, 0), GridTypes.Semisolid);
+                }
+                PutTile(semiLeft0, new Vector3(targetPosTile.x - width + 1, targetPosTile.y + height / 2.0f + 1, 0), GridTypes.Semisolid);
+                PutTile(semiLeft1, new Vector3(targetPosTile.x - width + 2, targetPosTile.y + height / 2.0f + 1, 0), GridTypes.Semisolid);
+                PutTile(semiLeft2, new Vector3(targetPosTile.x - width + 1, targetPosTile.y + height / 2.0f, 0), GridTypes.Semisolid);
+                PutTile(semiLeft3, new Vector3(targetPosTile.x - width + 2, targetPosTile.y + height / 2.0f, 0), GridTypes.Semisolid);
+                PutTile(semiRight0, new Vector3(targetPosTile.x + width - 3, targetPosTile.y + height / 2.0f + 1, 0), GridTypes.Semisolid);
+                PutTile(semiRight1, new Vector3(targetPosTile.x + width - 2, targetPosTile.y + height / 2.0f + 1, 0), GridTypes.Semisolid);
+                PutTile(semiRight2, new Vector3(targetPosTile.x + width - 3, targetPosTile.y + height / 2.0f, 0), GridTypes.Semisolid);
+                PutTile(semiRight3, new Vector3(targetPosTile.x + width - 2, targetPosTile.y + height / 2.0f, 0), GridTypes.Semisolid);
                 return true;
             }
             case ItemTypes.SemiMushroomMini:
             {
+                var width = Convert.ToInt32((long)properties["width"]) + 3;
+                var height = Convert.ToInt32((long)properties["height"]);
+                var color = Convert.ToInt32((long)properties["color"]);     // 0 Red, 1 Green
+                var semi = new UnityTileObject("Tilemaps/Palettes/Sky", -6, 1).X(-2 * color);
+                for (var i = targetPosTile.y + height / 2.0f - 2; i > targetPosTile.y - height / 2.0f - 1; i--)
+                {
+                    PutTile(semi, new Vector3(targetPosTile.x, i, 0));
+                }
+                PutTile(semi, new Vector3(targetPosTile.x, targetPosTile.y + height / 2.0f - 1, 0), GridTypes.Semisolid);
+                for (var i = targetPosTile.x - width; i < targetPosTile.x + width; i++)
+                {
+                    PutTile(semi, new Vector3(i, targetPosTile.y + height / 2.0f, 0), GridTypes.Semisolid);
+                }
+                PutTile(semi, new Vector3(targetPosTile.x - width + 1, targetPosTile.y + height / 2.0f + 1, 0), GridTypes.Semisolid);
+                PutTile(semi, new Vector3(targetPosTile.x + width - 3, targetPosTile.y + height / 2.0f + 1, 0), GridTypes.Semisolid);
                 return true;
             }
             default: return false;
         }
     }
 
-    private void PutTile(UnityTileObject tileObject, Vector3 targetPos, bool background = false)
+    private void PutTile(UnityTileObject tileObject, Vector3 targetPos, GridTypes targetGrid = GridTypes.Normal)
     {
-        // TODO: temporary solution. must eventually add a way to reuse objects!
-        var tilePalette = Resources.Load<GameObject>(tileObject.TilePalettePrefabPath).GetComponentInChildren<Tilemap>();
-        var usingTile = tilePalette.GetTile(new Vector3Int(tileObject.TileIdX, tileObject.TileIdY, 0));
-        if (background) parent.tilemapBackground.SetTile(new Vector3Int((int)targetPos.x, (int)targetPos.y, 0), usingTile);
-        else parent.tilemap.SetTile(new Vector3Int((int)targetPos.x, (int)targetPos.y, 0), usingTile);
+        // TODO: temporary solution. must eventually add a way to reuse objects! *
+        var sourceIdPos = new Vector3Int(tileObject.TileIdX, tileObject.TileIdY, 0);
+        var targetTilemap = targetGrid switch
+        {
+            GridTypes.Background => parent.tilemapBackground,
+            GridTypes.Semisolid => parent.tilemapSemisolid,
+            GridTypes.Squishy => parent.tilemapSquishy,
+            _ => parent.tilemap
+        };
+        var tilePalette = Resources.Load<GameObject>(tileObject.TilePalettePrefabPath).GetComponentInChildren<Tilemap>();   // *
+        var usingTile = tilePalette.GetTile(sourceIdPos);
+        var usingTileTransform = tilePalette.GetTransformMatrix(sourceIdPos);
+        targetTilemap.SetTile(targetPos.Flatten(), usingTile);
+        targetTilemap.SetTransformMatrix(targetPos.Flatten(), usingTileTransform);
     }
 
     private Component PutPrefab(string prefabPath, Vector3 targetPos, GameObject parentFolder, string componentName = null)
@@ -803,4 +1054,5 @@ public static class Vector3Extensions
     public static Vector3 GdWorldToUnityWorld(this Vector3 input) => new(input.x / 32.0f, -input.y / 32.0f + 22.5f);
     public static Vector3 GdTileToUnityWorld(this Vector3 input) => new(input.x * 16 / 32.0f + 0.25f, -input.y * 16 / 32.0f + 22.25f);
     public static Vector3 GdWorldToUnityTile(this Vector3 input) => input.GdWorldToUnityWorld() * 2;
+    public static Vector3Int Flatten(this Vector3 input) => new((int)input.x, (int)input.y, 0);
 }
