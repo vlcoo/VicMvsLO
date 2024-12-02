@@ -36,6 +36,8 @@ public class IPCommunicator : MonoBehaviour
         }
     }
 
+    public LevelModel CurrentDownloadedLevel;
+
     private void Start()
     {
         BeginServer();
@@ -90,8 +92,8 @@ public class IPCommunicator : MonoBehaviour
         {
             // level transmission began last message. this one must contain a stringified json of the contents.
             Debug.Log("deserializing lvl!");
-            var level_dict = Utils.DeserializeNestedJson(request);
-            if (level_dict == null)
+            var levelDict = Utils.DeserializeNestedJson(request);
+            if (levelDict == null)
             {
                 response = Enums.IpcMessages.GenericReject;
                 request = Enums.IpcMessages.GenericReject;
@@ -101,12 +103,9 @@ public class IPCommunicator : MonoBehaviour
             {
                 response = Enums.IpcMessages.GenericAccept;
                 request = Enums.IpcMessages.GenericAccept;  // avoid leaving the level contents in this persistent var.
-                // TODO: give the contents dict to the GameManager to process.
                 Debug.Log("success!");
-                if (GameManager.Instance is not null)
-                {
-                    GameManager.Instance.mvlxTools.BuildLevelFromContents(level_dict.GetValueOrDefault("contents") as Dictionary<string, object>);
-                }
+                CurrentDownloadedLevel = new LevelModel(levelDict);
+                MainMenuManager.Instance.OnDownloadedLevelSelected(CurrentDownloadedLevel);
             }
         }
 

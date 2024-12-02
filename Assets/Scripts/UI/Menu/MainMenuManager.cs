@@ -14,6 +14,7 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 using Hashtable = ExitGames.Client.Photon.Hashtable;
 using Random = System.Random;
@@ -48,7 +49,8 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         updateBox,
         webglWarningBox,
         emoteListPrompt,
-        stagePrompt;
+        stagePrompt,
+        levelDownloadedBox;
 
     public GameObject[] levelCameraPositions;
 
@@ -106,7 +108,8 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         updateBoxSelected,
         webglWarningBoxSelected,
         emoteListSelected,
-        stageSelected;
+        stageSelected,
+        levelDownloadedBoxSelected;
 
     public GameObject errorBox, errorButton, rebindPrompt, reconnectBox;
 
@@ -116,7 +119,9 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         rebindText,
         reconnectText,
         updateText,
-        stageText;
+        stageText,
+        dlMapText,
+        levelDownloadedDetailText;
 
     public TMP_Dropdown region;
     public RebindManager rebindManager;
@@ -153,6 +158,14 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     private Coroutine updatePingCoroutine;
     private bool warningShown;
 
+    public LevelModel CurrentDownloadedLevel
+    {
+        get => GlobalController.Instance.Ipc.CurrentDownloadedLevel;
+        set => GlobalController.Instance.Ipc.CurrentDownloadedLevel = value;
+    }
+
+    public bool levelDownloadingAllowed = true;
+
     // Unity Stuff
     public void Start()
     {
@@ -173,10 +186,10 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         GlobalController.Instance.joinedAsSpectator = false;
         Time.timeScale = 1;
 
-        if (GlobalController.Instance.disconnectCause != null)
+        if (GlobalController.Instance.DisconnectCause != null)
         {
-            OpenErrorBox(GlobalController.Instance.disconnectCause.Value);
-            GlobalController.Instance.disconnectCause = null;
+            OpenErrorBox(GlobalController.Instance.DisconnectCause.Value);
+            GlobalController.Instance.DisconnectCause = null;
         }
 
         Camera.main.transform.position =
@@ -594,6 +607,15 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         Debug.Log($"[PHOTON] Created Room ({PhotonNetwork.CurrentRoom.Name})");
     }
 
+    public void OnDownloadedLevelSelected(LevelModel level)
+    {
+        dlMapText.text = "Level downloaded. Ready to start!!";
+        levelDownloadedDetailText.text =
+            $"<u><i>{level.Title}</i></u>  by  <i>{level.UserName}</i><size=8>\n\n- - -\n </size>\n<color=#ffffff60><size=16>{level.Description}</size></color>";
+        SetLevelIndex(10);
+        OpenPrompt(levelDownloadedBox, levelDownloadedBoxSelected);
+    }
+
     // CUSTOM EVENT CALLBACKS
     public void OnEvent(EventData e)
     {
@@ -619,7 +641,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
                 GlobalController.Instance.fastLoad = false;
                 SceneManager.LoadSceneAsync(1, LoadSceneMode.Single);
                 SceneManager.LoadSceneAsync(level + 2, LoadSceneMode.Additive);
-                GlobalController.Instance.rumbler.RumbleForSeconds(0.1f, 0.3f, 0.3f);
+                GlobalController.Instance.Rumbler.RumbleForSeconds(0.1f, 0.3f, 0.3f);
                 break;
             }
             case (byte)Enums.NetEventIds.PlayerChatMessage:
@@ -785,6 +807,8 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
         OpenInLobbyMenu();
         characterDropdown.SetValueWithoutNotify(Utils.GetCharacterIndex());
+        dlMapText.text = "No level chosen... Pls download a stage!";
+        CurrentDownloadedLevel = null;
 
         Utils.GetCustomProperty(Enums.NetPlayerProperties.PlayerColor, out int value,
             PhotonNetwork.LocalPlayer.CustomProperties);
@@ -1311,7 +1335,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
             return !spectating;
         }).Count();
 
-        startGameBtn.interactable = PhotonNetwork.IsMasterClient && playingPlayers >= 1;
+        startGameBtn.interactable = PhotonNetwork.IsMasterClient && playingPlayers >= 1 && CurrentDownloadedLevel != null;
     }
 
     public void PlayerChatMessage(string message)
@@ -2011,6 +2035,6 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
     public void SendTestIPC()
     {
-        GlobalController.Instance.ipc.SendOutgoingMessage(Enums.IpcMessages.CheckHealth);
+        GlobalController.Instance.Ipc.SendOutgoingMessage(Enums.IpcMessages.CheckHealth);
     }
 }

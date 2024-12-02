@@ -49,8 +49,12 @@ public class BackgroundLoop : MonoBehaviour
     {
         Instance = this;
 
-        var t = GameObject.FindGameObjectWithTag("Backgrounds").transform;
+        var t = GameObject.FindGameObjectWithTag("Backgrounds");
+        if (t) InitializeBackground(t.transform);
+    }
 
+    public void InitializeBackground(Transform t)
+    {
         children = new GameObject[t.childCount];
         ppus = new float[t.childCount];
         truePositions = new Vector3[t.childCount];

@@ -62,7 +62,8 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
     public List<PlayerController> players = new();
     public EnemySpawnpoint[] enemySpawnpoints;
     public FadeOutManager fader;
-    public LevelContentConverter mvlxTools;
+    private LevelContentConverter mvlxTools;
+    public LevelModel CurrentDownloadedLevel => GlobalController.Instance.Ipc.CurrentDownloadedLevel;
 
     public float size = 1.39f, ySize = 0.8f;
 
@@ -113,14 +114,17 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
     public void Awake()
     {
         Instance = this;
+        mvlxTools = GetComponent<LevelContentConverter>();
+        if (mvlxTools && GlobalController.Instance.Ipc.CurrentDownloadedLevel != null)
+        {
+            mvlxTools.BuildLevelFromContents(CurrentDownloadedLevel.Contents);
+        }
     }
 
     public void Start()
     {
         SpectationManager = GetComponent<SpectationManager>();
-        mvlxTools = GetComponent<LevelContentConverter>();
         levelUIColor.a = .7f;
-        coins = GameObject.FindGameObjectsWithTag("coin");
 
         if (loopingLevel)
         {
@@ -150,12 +154,14 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
 
         nonSpectatingPlayers = PhotonNetwork.CurrentRoom.Players.Values.Where(pl => !pl.IsSpectator()).ToHashSet();
 
-        //Respawning Tilemaps
+        coins = GameObject.FindGameObjectsWithTag("coin");      // !!
+
+        //Respawning Tilemaps   // !!
         origin = new BoundsInt(levelMinTileX, levelMinTileY, 0, levelWidthTile, levelHeightTile, 1);
         originalTiles = tilemap.GetTilesBlock(origin);
 
         //Star spawning
-        starSpawns = GameObject.FindGameObjectsWithTag("StarSpawn");
+        starSpawns = GameObject.FindGameObjectsWithTag("StarSpawn");    // !!
         Utils.GetCustomProperty(Enums.NetRoomProperties.StarRequirement, out starRequirement);
         Utils.GetCustomProperty(Enums.NetRoomProperties.CoinRequirement, out coinRequirement);
         Utils.GetCustomProperty(Enums.NetRoomProperties.LapRequirement, out lapRequirement);
@@ -172,32 +178,18 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
 
             RaiseEventOptions options = new()
                 { Receivers = ReceiverGroup.Others, CachingOption = EventCaching.AddToRoomCache };
-            SendAndExecuteEvent(Enums.NetEventIds.PlayerFinishedLoading, null, SendOptions.SendReliable, options);
+            SendAndExecuteEvent(Enums.NetEventIds.PlayerFinishedLoading, null, SendOptions.SendReliable, options);  // !!!
         }
         else
         {
             SpectationManager.Spectating = true;
         }
 
-        Utils.GetCustomProperty(Enums.NetRoomProperties.Starcoins, out needsStarcoins);
-        if (raceLevel)
-        {
-            goal = FindObjectOfType<GoalFlagpole>();
-            goal.SetUnlocked(!needsStarcoins);
-            if (!needsStarcoins)
-                foreach (var coin in FindObjectsOfType<Starcoin>())
-                    coin.SetDisabled();
-        }
-
-        Utils.GetCustomProperty(Enums.NetRoomProperties.NoMap, out hideMap);
-        Utils.GetCustomProperty(Enums.NetRoomProperties.ShowCoinCount, out showCoinCount);
-        showCoinCount = showCoinCount && coinRequirement > 0;
-
         if (PhotonNetwork.IsMasterClient) quitButtonLbl.text = "End Match";
 
         brickBreak = ((GameObject)Instantiate(Resources.Load("Prefabs/Particle/BrickBreak")))
             .GetComponent<ParticleSystem>();
-        resetHardButton.SetActive(raceLevel && nonSpectatingPlayers.Count == 1 && !SpectationManager.Spectating);
+        resetHardButton.SetActive(false);
     }
 
     public void Update()
@@ -325,7 +317,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
 
     public void OnDisconnected(DisconnectCause cause)
     {
-        GlobalController.Instance.disconnectCause = cause;
+        GlobalController.Instance.DisconnectCause = cause;
         SceneManager.LoadScene(0);
     }
 
@@ -740,7 +732,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
 
         loaded = true;
         loadedPlayers.Clear();
-        enemySpawnpoints = FindObjectsOfType<EnemySpawnpoint>();
+        enemySpawnpoints = FindObjectsOfType<EnemySpawnpoint>();    // !!
         var spectating = GlobalController.Instance.joinedAsSpectator;
         var gameStarting = startTimestamp - PhotonNetwork.ServerTimestamp > 0;
 
@@ -794,25 +786,14 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             }
 
             if (PhotonNetwork.IsMasterClient)
-                foreach (var point in FindObjectsOfType<EnemySpawnpoint>())
+                foreach (var point in FindObjectsOfType<EnemySpawnpoint>())     // !!
                 {
                     point.AttemptSpawning();
                     if (point.currentEntity == null) continue;
-                    var entity = point.currentEntity.GetComponent<BahableEntity>();
-                    if (entity == null) continue;
-                    bahableEntities.Add(entity);
                 }
 
             if (localPlayer)
                 localPlayer.GetComponent<PlayerController>().OnGameStart();
-        }
-
-        if (MusicSynth.CurrentSong.bahChannel >= 0)
-        {
-            MusicSynth.SetOnMidiMessage((channel, command, data1, data2) =>
-            {
-                if (channel == MusicSynth.CurrentSong.bahChannel && command == 0x90 && data2 > 0) bahRequested = true;
-            });
         }
 
         startServerTime = startTimestamp + 3500;
@@ -1090,12 +1071,6 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         nametag.SetActive(!hideMap);
     }
 
-    public void AllStarcoinsCollected()
-    {
-        if (!raceLevel || !needsStarcoins || !goal) return;
-        goal.SetUnlocked(true);
-    }
-
     public void WinByGoal(PlayerController whom)
     {
         if (!PhotonNetwork.IsMasterClient) return;
@@ -1359,24 +1334,5 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         if (spawn.x > GetLevelMaxX())
             spawn -= new Vector3(levelWidthTile / 2f, 0);
         return spawn;
-    }
-
-    public void BuildLevelFromContents(Dictionary<string, object> contents)
-    {
-        // for (var x = tilemap.cellBounds.min.x; x < tilemap.cellBounds.max.x; x++)
-        // for (var y = tilemap.cellBounds.min.y; y < tilemap.cellBounds.max.y; y++)
-        // for (var z = tilemap.cellBounds.min.z; z < tilemap.cellBounds.max.z; z++)
-        // {
-        //     tilemap.SetTile(new Vector3Int(x, y, z), breakableTileReplacement);
-        // }
-
-        var tiles = contents["t"] as object[];
-
-        foreach (var tile in tiles)
-        {
-            var tile_dict = tile as Dictionary<string, object>;
-            Debug.Log($"{tile_dict["x"]} {tile_dict["y"]}");
-            tilemap.SetTile(new Vector3Int(Convert.ToInt32((long)tile_dict["x"]) + tilemap.cellBounds.min.x, -(Convert.ToInt32((long)tile_dict["y"]) + tilemap.cellBounds.min.y), 0), breakableTileReplacement);
-        }
     }
 }

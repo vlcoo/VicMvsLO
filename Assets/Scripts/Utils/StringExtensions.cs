@@ -5,6 +5,11 @@ namespace NSMB.Utils
 {
     public static class StringExtensions
     {
+        public static string SanitizeForRichTextbox(this string input)
+        {
+            return "<noparse>" + input.Replace("<noparse>", "").Replace("</noparse>", "") + "</noparse>";
+        }
+
         public static string Filter(this string input)
         {
             if (Settings.Instance.filter)

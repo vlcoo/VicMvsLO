@@ -1561,7 +1561,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
                     photonView.RPC(nameof(PlaySound), RpcTarget.All, sound);
                     photonView.RPC(nameof(SpawnParticle), RpcTarget.All, "Prefabs/Particle/GroundpoundDust",
                         body.position);
-                    if (photonView.IsMine) GlobalController.Instance.rumbler.RumbleForSeconds(0.2f, 0.3f, 0.1f);
+                    if (photonView.IsMine) GlobalController.Instance.Rumbler.RumbleForSeconds(0.2f, 0.3f, 0.1f);
                     groundpoundDelay = 0;
                 }
                 else
@@ -1579,7 +1579,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
                 photonView.RPC(nameof(PlaySound), RpcTarget.All, Enums.Sounds.Powerup_MegaMushroom_Groundpound);
                 photonView.RPC(nameof(SpawnParticle), RpcTarget.All, "Prefabs/Particle/GroundpoundDust", body.position);
                 CameraController.ScreenShake = 0.35f;
-                GlobalController.Instance.rumbler.RumbleForSeconds(0.8f, 0.3f, 0.5f);
+                GlobalController.Instance.Rumbler.RumbleForSeconds(0.8f, 0.3f, 0.5f);
             }
         }
     }
@@ -3069,7 +3069,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             frozenObject.holder?.photonView.RPC(nameof(Knockback), RpcTarget.All, frozenObject.holder.facingRight, 1,
                 true, photonView.ViewID);
             frozenObject.Kill();
-            GlobalController.Instance.rumbler.RumbleForSeconds(0f, 0.05f, 0.4f);
+            GlobalController.Instance.Rumbler.RumbleForSeconds(0f, 0.05f, 0.4f);
         }
 
         if (knockbackStars > 0)
@@ -3126,7 +3126,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             PlaySoundEverywhere(photonView.IsMine
                 ? Enums.Sounds.World_Star_Collect_Self
                 : Enums.Sounds.World_Star_Collect_Enemy);
-            if (photonView.IsMine) GlobalController.Instance.rumbler.RumbleForSeconds(0f, 0.8f, 0.1f);
+            if (photonView.IsMine) GlobalController.Instance.Rumbler.RumbleForSeconds(0f, 0.8f, 0.1f);
         }
 
         stars = Mathf.Clamp(newCount, 0, GameManager.Instance.starRequirement);
@@ -3768,7 +3768,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         CameraController.ScreenShake = 0.15f;
         SpawnParticle("Prefabs/Particle/GroundpoundDust", body.position + new Vector2(facingRight ? 0.5f : -0.5f, 0));
         PlaySound(Enums.Sounds.Powerup_MegaMushroom_Walk, (byte)(step ? 1 : 2));
-        GlobalController.Instance.rumbler.RumbleForSeconds(0.5f, 0f, 0.07f);
+        GlobalController.Instance.Rumbler.RumbleForSeconds(0.5f, 0f, 0.07f);
         step = !step;
     }
 
@@ -3946,7 +3946,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             fireballKnockback ? Enums.Sounds.Player_Sound_Collision_Fireball : Enums.Sounds.Player_Sound_Collision, 0,
             3);
         if (photonView.IsMine)
-            GlobalController.Instance.rumbler.RumbleForSeconds(0.1f, 0.2f, fireballKnockback ? 0.1f : 0.3f);
+            GlobalController.Instance.Rumbler.RumbleForSeconds(0.1f, 0.2f, fireballKnockback ? 0.1f : 0.3f);
 
         animator.SetBool("fireballKnockback", fireball);
         animator.SetBool("knockforwards", facingRight != fromRight);

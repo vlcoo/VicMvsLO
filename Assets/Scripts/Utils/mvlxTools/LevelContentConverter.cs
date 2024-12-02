@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Photon.Pun;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 // ReSharper disable UsageOfDefaultStructEquality
@@ -60,10 +61,12 @@ public class LevelContentConverter : MonoBehaviour
     private readonly struct UnityItemObject : IUnityObject
     {
         public readonly string ItemPrefabPath;
+        public readonly bool NeedsNetworkInstantiation;
 
-        public UnityItemObject(string itemPrefabPath)
+        public UnityItemObject(string itemPrefabPath, bool needsNetworkInstantiation = false)
         {
             ItemPrefabPath = itemPrefabPath;
+            NeedsNetworkInstantiation = needsNetworkInstantiation;
             if (itemPrefabPath.StartsWith("Resources/") || itemPrefabPath.EndsWith(".prefab"))
             {
                 Debug.LogWarning(
@@ -548,7 +551,7 @@ public class LevelContentConverter : MonoBehaviour
         { new GdTileObject(6, 12, 3), new UnityTileObject("Tilemaps/Palettes/Jungle", -1, 1) },
         { new GdTileObject(6, 13, 2), new UnityTileObject("Tilemaps/Palettes/Jungle", -1, 1) },
         { new GdTileObject(6, 14, 2), new UnityTileObject("Tilemaps/Palettes/Jungle", -1, 1) },
-        { new GdTileObject(127, 0, 18), new UnityItemObject("Prefabs/FloatingCoin") },
+        { new GdTileObject(127, 0, 18), new UnityItemObject("Prefabs/FloatingCoin", true) },
         { new GdTileObject(127, 1, 17), new UnityItemObject("Prefabs/Static/RespawningInvisibleBlock") }
     };
 
@@ -560,7 +563,7 @@ public class LevelContentConverter : MonoBehaviour
         { ItemTypes.Goomba, new UnityItemObject("Prefabs/Enemy/Goomba") },
         { ItemTypes.Spiny, new UnityItemObject("Prefabs/Enemy/Spiny") },
         { ItemTypes.Spinner, new UnityItemObject("Prefabs/Static/Spinner") },
-        { ItemTypes.PlatMariobros, new UnityItemObject("Prefabs/Static/MarioBrosPlatform") },
+        { ItemTypes.PlatMariobros, new UnityItemObject("Prefabs/Static/MarioBrosPlatform", true) },
         { ItemTypes.PlatCloud, new UnityItemObject("Prefabs/Static/CloudPlatform") }
     };
 
@@ -597,6 +600,7 @@ public class LevelContentConverter : MonoBehaviour
             var bgLayer = parent.backgroundsHolder.GetChild(i).gameObject;
             if (i != themeIndex) continue;
             bgLayer.SetActive(true);
+            GameObject.FindGameObjectWithTag("MainCamera").GetComponent<BackgroundLoop>().InitializeBackground(bgLayer.transform);
         }
 
         var pitType = Convert.ToInt32((long)properties["p"]);
@@ -643,7 +647,7 @@ public class LevelContentConverter : MonoBehaviour
                 // ...target is item. examples: coin.
                 case UnityItemObject itemObject:
                 {
-                    PutPrefab(itemObject.ItemPrefabPath, targetPosition.GdTileToUnityWorld(), itemsFolder);
+                    PutPrefab(itemObject, targetPosition.GdTileToUnityWorld(), itemsFolder);
                     break;
                 }
             }
@@ -703,20 +707,23 @@ public class LevelContentConverter : MonoBehaviour
                         case ItemTypes.Spinner:
                         {
                             // just a prefab instance.
-                            PutPrefab(itemObject.ItemPrefabPath, targetPos.GdWorldToUnityWorld(), platformsFolder);
+                            PutPrefab(itemObject, targetPos.GdWorldToUnityWorld(), platformsFolder);
                             break;
                         }
                         case ItemTypes.PlatMariobros:
                         {
                             // same jazz, but there are some properties to be set too.
-                            var platform = PutPrefab(itemObject.ItemPrefabPath, targetPos.GdWorldToUnityWorld(), platformsFolder, "MarioBrosPlatform") as MarioBrosPlatform;
-                            if (itemProperties != null && platform) platform.platformWidth = Convert.ToInt32((long)itemProperties["width"]);
+                            var platform = PutPrefab(itemObject, targetPos.GdWorldToUnityWorld() + new Vector3(1, -0.25f, 0), platformsFolder, "MarioBrosPlatform") as MarioBrosPlatform;
+                            if (itemProperties != null && platform) platform.platformWidth = Convert.ToInt32((long)itemProperties["width"]) + 1;
                             break;
                         }
                         case ItemTypes.PlatCloud:
                         {
-                            var platform = PutPrefab(itemObject.ItemPrefabPath, targetPos.GdWorldToUnityWorld(), platformsFolder, "CloudPlatform") as CloudPlatform;
-                            if (itemProperties != null && platform) platform.platformWidth = Convert.ToInt32((long)itemProperties["width"]);
+                            var platform = PutPrefab(itemObject, targetPos.GdWorldToUnityWorld() - Vector3.one * 0.5f, platformsFolder, "CloudPlatform") as CloudPlatform;
+                            if (itemProperties != null && platform)
+                            {
+                                platform.platformWidth = Convert.ToInt32((long)itemProperties["width"]) + 3;
+                            }
                             break;
                         }
                         default: PutTile(DefaultTile, targetPos.GdWorldToUnityTile()); break;
@@ -1038,10 +1045,17 @@ public class LevelContentConverter : MonoBehaviour
         targetTilemap.SetTransformMatrix(targetPos.Flatten(), usingTileTransform);
     }
 
-    private Component PutPrefab(string prefabPath, Vector3 targetPos, GameObject parentFolder, string componentName = null)
+    private Component PutPrefab(UnityItemObject itemObject, Vector3 targetPos, GameObject parentFolder, string componentName = null)
     {
-        Debug.Log(prefabPath);
-        var itemInstance = Instantiate(Resources.Load<GameObject>(prefabPath), targetPos, Quaternion.identity);
+        return PutPrefab(itemObject.ItemPrefabPath, targetPos, parentFolder, componentName, itemObject.NeedsNetworkInstantiation);
+    }
+
+    private Component PutPrefab(string prefabPath, Vector3 targetPos, GameObject parentFolder, string componentName = null, bool networked = false)
+    {
+        if (networked && !PhotonNetwork.IsMasterClient) return null;
+        var itemInstance = networked
+            ? PhotonNetwork.InstantiateRoomObject(prefabPath, targetPos, Quaternion.identity)
+            : Instantiate(Resources.Load<GameObject>(prefabPath), targetPos, Quaternion.identity);
         itemInstance.transform.parent = parentFolder.transform;
         return componentName != null ? itemInstance.GetComponent(componentName) : itemInstance.transform;
     }

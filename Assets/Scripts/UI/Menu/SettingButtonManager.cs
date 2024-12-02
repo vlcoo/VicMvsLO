@@ -49,7 +49,7 @@ public class SettingButtonManager : MonoBehaviour
     {
         Settings.rumbleController = toggle.isOn;
         Settings.SaveSettingsToPreferences();
-        GlobalController.Instance.rumbler.RumbleForSeconds(0.5f, 0.5f, 0.2f);
+        GlobalController.Instance.Rumbler.RumbleForSeconds(0.5f, 0.5f, 0.2f);
     }
 
     public void OnOnScreenToggle(Toggle toggle)

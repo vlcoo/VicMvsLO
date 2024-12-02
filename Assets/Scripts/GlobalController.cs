@@ -29,14 +29,15 @@ public class GlobalController : Singleton<GlobalController>, IInRoomCallbacks, I
 
     public bool joinedAsSpectator, checkedForVersion, fastLoad;
     public List<string> EMOTE_NAMES = new();
-    public DisconnectCause? disconnectCause = null;
+    public DisconnectCause? DisconnectCause = null;
 
     public List<SpecialPlayer> SPECIAL_PLAYERS = new();
 
     private int windowWidth, windowHeight;
     public DiscordController DiscordController { get; private set; }
-    public DeviceRumbler rumbler { get; private set; }
-    public IPCommunicator ipc { get; private set; }
+    public DeviceRumbler Rumbler { get; private set; }
+    public IPCommunicator Ipc { get; private set; }
+
 
     public void Awake()
     {
@@ -46,8 +47,8 @@ public class GlobalController : Singleton<GlobalController>, IInRoomCallbacks, I
         Instance = this;
         settings = GetComponent<Settings>();
         DiscordController = GetComponent<DiscordController>();
-        rumbler = GetComponent<DeviceRumbler>();
-        ipc = GetComponent<IPCommunicator>();
+        Rumbler = GetComponent<DeviceRumbler>();
+        Ipc = GetComponent<IPCommunicator>();
         PopulateEmoteNames();
 
         PhotonNetwork.AddCallbackTarget(this);

@@ -53,7 +53,7 @@ public class Settings : Singleton<Settings>
         set
         {
             _rumbleController = value;
-            GlobalController.Instance.rumbler.rumbleEnabled = value;
+            GlobalController.Instance.Rumbler.rumbleEnabled = value;
         }
     }
 
