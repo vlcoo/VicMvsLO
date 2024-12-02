@@ -786,27 +786,25 @@ public class LevelContentConverter : MonoBehaviour
                 var squishyBotLeft = new UnityTileObject("Tilemaps/Palettes/Castle", 8, 2);
                 var squishyBotMid = new UnityTileObject("Tilemaps/Palettes/Castle", 7, -1);
                 var squishyBotRight = new UnityTileObject("Tilemaps/Palettes/Castle", 6, 2);
-                PutTile(squishyTopLeft, new Vector3(targetPosTile.x - width / 2.0f - 1, targetPosTile.y + height / 2.0f, 0), GridTypes.Squishy);
-                PutTile(squishyTopRight, new Vector3(targetPosTile.x + width / 2.0f, targetPosTile.y + height / 2.0f, 0), GridTypes.Squishy);
-                PutTile(squishyBotLeft, new Vector3(targetPosTile.x - width / 2.0f - 1, targetPosTile.y - height / 2.0f - 1, 0), GridTypes.Squishy);
-                PutTile(squishyBotRight, new Vector3(targetPosTile.x + width / 2.0f, targetPosTile.y - height / 2.0f - 1, 0), GridTypes.Squishy);
-                for (var i = targetPosTile.x - width / 2.0f; i < targetPosTile.x + width / 2.0f - 1; i++)
+                var boundsTop = targetPosTile.y - 1;
+                var boundsLeft = targetPosTile.x;
+                var boundsBottom = targetPosTile.y - height;
+                var boundsRight = targetPosTile.x + width - 1;
+                for (var i = boundsTop; i >= boundsBottom; i--)
                 {
-                    if (i == targetPosTile.x - width / 2.0f)
+                    PutTile(squishyMidLeft, new Vector3(boundsLeft, i, 0), GridTypes.Squishy);
+                    PutTile(squishyMidRight, new Vector3(boundsRight, i, 0), GridTypes.Squishy);
+                    for (var j = boundsLeft + 1; j <= boundsRight; j++)
                     {
-                        PutTile(squishyTopMid, new Vector3(i, targetPosTile.y + height / 2.0f, 0), GridTypes.Squishy);
-                        PutTile(squishyBotMid, new Vector3(i, targetPosTile.y - height / 2.0f - 1, 0), GridTypes.Squishy);
-                    }
-                    else if (i == targetPosTile.x + width / 2.0f - 1)
-                    {
-                        PutTile(squishyMidLeft, new Vector3(i, targetPosTile.y + height / 2.0f - 1, 0), GridTypes.Squishy);
-                        PutTile(squishyMidRight, new Vector3(i, targetPosTile.y - height / 2.0f, 0), GridTypes.Squishy);
-                    }
-                    for (var j = targetPosTile.y - height / 2.0f; j < targetPosTile.y + height / 2.0f - 1; j++)
-                    {
-                        PutTile(squishyMidMid, new Vector3(i, j, 0), GridTypes.Squishy);
+                        if (i == boundsTop) PutTile(squishyTopMid, new Vector3(j, i, 0), GridTypes.Squishy);
+                        else if (i == boundsBottom - 1) PutTile(squishyBotMid, new Vector3(j, i, 0), GridTypes.Squishy);
+                        else PutTile(squishyMidMid, new Vector3(j, i, 0), GridTypes.Squishy);
                     }
                 }
+                PutTile(squishyTopLeft, new Vector3(boundsLeft, boundsTop, 0), GridTypes.Squishy);
+                PutTile(squishyTopRight, new Vector3(boundsRight, boundsTop, 0), GridTypes.Squishy);
+                PutTile(squishyBotLeft, new Vector3(boundsLeft, boundsBottom, 0), GridTypes.Squishy);
+                PutTile(squishyBotRight, new Vector3(boundsRight, boundsBottom, 0), GridTypes.Squishy);
                 return true;
             }
             case ItemTypes.Pipe:
@@ -1003,18 +1001,19 @@ public class LevelContentConverter : MonoBehaviour
                 var width = Convert.ToInt32((long)properties["width"]) + 3;
                 var height = Convert.ToInt32((long)properties["height"]);
                 var color = Convert.ToInt32((long)properties["color"]);     // 0 Red, 1 Green
-                var semi = new UnityTileObject("Tilemaps/Palettes/Sky", -6, 1).X(-2 * color);
-                for (var i = targetPosTile.y + height / 2.0f - 2; i > targetPosTile.y - height / 2.0f - 1; i--)
-                {
-                    PutTile(semi, new Vector3(targetPosTile.x, i, 0));
-                }
-                PutTile(semi, new Vector3(targetPosTile.x, targetPosTile.y + height / 2.0f - 1, 0), GridTypes.Semisolid);
-                for (var i = targetPosTile.x - width; i < targetPosTile.x + width; i++)
-                {
-                    PutTile(semi, new Vector3(i, targetPosTile.y + height / 2.0f, 0), GridTypes.Semisolid);
-                }
-                PutTile(semi, new Vector3(targetPosTile.x - width + 1, targetPosTile.y + height / 2.0f + 1, 0), GridTypes.Semisolid);
-                PutTile(semi, new Vector3(targetPosTile.x + width - 3, targetPosTile.y + height / 2.0f + 1, 0), GridTypes.Semisolid);
+                PutTile(DefaultTile, new Vector3(targetPosTile.x, targetPosTile.y + height / 2.0f - 1, 0));
+                // TODO
+                // var semi = new UnityTileObject("Tilemaps/Palettes/Sky", -6, 1).X(-2 * color);
+                // for (var i = targetPosTile.y + height / 2.0f - 2; i > targetPosTile.y - height / 2.0f - 1; i--)
+                // {
+                //     PutTile(semi, new Vector3(targetPosTile.x, i, 0));
+                // }
+                // for (var i = targetPosTile.x - width; i < targetPosTile.x + width; i++)
+                // {
+                //     PutTile(semi, new Vector3(i, targetPosTile.y + height / 2.0f, 0));
+                // }
+                // PutTile(semi, new Vector3(targetPosTile.x - width + 1, targetPosTile.y + height / 2.0f + 1, 0));
+                // PutTile(semi, new Vector3(targetPosTile.x + width - 3, targetPosTile.y + height / 2.0f + 1, 0));
                 return true;
             }
             default: return false;
