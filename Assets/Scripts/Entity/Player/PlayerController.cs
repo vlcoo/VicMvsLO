@@ -266,8 +266,6 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
 
     private void HandleWallslide(bool holdingLeft, bool holdingRight, bool jump)
     {
-        if (GameManager.Instance.Togglerizer.currentEffects.Contains("LimitedMoveset")) return;
-
         Vector2 currentWallDirection;
         if (holdingLeft)
             currentWallDirection = Vector2.left;
@@ -414,7 +412,6 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
                                  ((body.velocity.x < 0 && !facingRight) || (body.velocity.x > 0 && facingRight)) &&
                                  !Physics2D.Raycast(body.position + new Vector2(0, 0.1f), Vector2.up, 1f,
                                      Layers.MaskOnlyGround);
-            if (GameManager.Instance.Togglerizer.currentEffects.Contains("LimitedMoveset")) canSpecialJump = false;
             float jumpBoost = 0;
 
             koyoteTime = 1;
@@ -834,9 +831,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         Utils.TickTimer(ref groundpoundCounter, 0, delta);
         Utils.TickTimer(ref giantEndTimer, 0, delta);
         Utils.TickTimer(ref groundpoundDelay, 0, delta);
-        if (GameManager.Instance.Togglerizer.currentEffects.Contains("NoIFrames"))
-            hitInvincibilityCounter = 0f;
-        else Utils.TickTimer(ref hitInvincibilityCounter, 0, delta);
+        Utils.TickTimer(ref hitInvincibilityCounter, 0, delta);
         Utils.TickTimer(ref propellerSpinTimer, 0, delta);
         Utils.TickTimer(ref propellerTimer, 0, delta);
         Utils.TickTimer(ref knockbackTimer, 0, delta);
@@ -983,19 +978,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         if (photonView.IsMine && deathplaneDirection != 0)
         {
             //death via pit
-            if (GameManager.Instance.Togglerizer.currentEffects.Contains("NoDeathplane"))
-            {
-                var levelWrapPos = Vector2.zero;
-                if (deathplaneDirection == -1 && body.velocity.y < 0)
-                    levelWrapPos = new Vector2(
-                        transform.position.x,
-                        GameManager.Instance.GetLevelMinY() + GameManager.Instance.levelHeightTile);
-                else if (deathplaneDirection == 1 && body.velocity.y > 0)
-                    levelWrapPos = new Vector2(transform.position.x, GameManager.Instance.GetLevelMinY());
-                if (levelWrapPos != Vector2.zero) transform.position = body.position = levelWrapPos;
-            }
-            else if (GameManager.Instance.Togglerizer.currentEffects.Contains("UpDeathplane") ||
-                     deathplaneDirection == -1)
+            if (deathplaneDirection == -1)
             {
                 photonView.RPC(nameof(Death), RpcTarget.All, true, false);
                 return;
@@ -1514,7 +1497,6 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         else
         {
             //start groundpound
-            if (GameManager.Instance.Togglerizer.currentEffects.Contains("LimitedMoveset")) return;
             //check if high enough above ground
             if (Physics2D.BoxCast(body.position, MainHitbox.size * Vector2.right * transform.localScale, 0,
                     Vector2.down, 0.15f * (state == Enums.PowerupState.MegaMushroom ? 2.5f : 1), Layers.MaskAnyGround))
@@ -1671,14 +1653,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
     public bool onGround
     {
         get => isOnGround;
-        set
-        {
-            if (isOnGround != value && value)
-            {
-                GameManager.Instance.MatchConditioner.ConditionActioned(this, "TouchedGround");
-            }
-            isOnGround = value;
-        }
+        set => isOnGround = value;
     }
 
     public bool
@@ -1995,18 +1970,12 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         hitboxes = GetComponents<BoxCollider2D>();
         trackIcon = UIUpdater.Instance.CreatePlayerIcon(this);
         transform.position = body.position = GameManager.Instance.spawnpoint;
-        noPlayerCollisions = GameManager.Instance.Togglerizer.currentEffects.Contains("NoCollisions");
 
         LoadFromGameState();
         // spawned = true;
         cameraController.Recenter();
 
-        normalGravity /= GameManager.Instance.Togglerizer.currentEffects.Contains("LowGravity") ? 4 : 1;
-        groundpoundVelocity /= GameManager.Instance.Togglerizer.currentEffects.Contains("LowGravity") ? 2.25f : 1;
-        propellerLaunchVelocity /= GameManager.Instance.Togglerizer.currentEffects.Contains("NerfedPropeller") ? 3 : 1;
-
-        body.sharedMaterial.bounciness =
-            GameManager.Instance.Togglerizer.currentEffects.Contains("BouncyPlayer") ? 1 : 0;
+        body.sharedMaterial.bounciness = 0;
 
         if (photonView.IsMine)
         {
@@ -2467,41 +2436,6 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
     public void OnTriggerEnter2D(Collider2D collider)
     {
         var obj = collider.gameObject;
-        switch (obj.tag)
-        {
-            case "checkpoint":
-            {
-                if (gotCheckpoint) return;
-
-                gotCheckpoint = true;
-                obj.GetComponent<Animation>().Play();
-                PlaySoundEverywhere(Enums.Sounds.World_Checkpoint);
-                GameManager.Instance.SendAndExecuteEvent(Enums.NetEventIds.ResetTiles, null, SendOptions.SendReliable);
-                GameManager.Instance.MatchConditioner.ConditionActioned(this, "GotCheckpoint");
-                break;
-            }
-            case "goal":
-            {
-                currentFlagpole = obj;
-                photonView.RPC(nameof(AttemptCollectLap), RpcTarget.AllViaServer);
-                break;
-            }
-            case "starcoin":
-            {
-                if (!photonView.IsMine) break;
-                var coin = collider.transform.parent.GetComponent<Starcoin>();
-                if (collectedStarcoins[coin.number - 1]) return;
-                PlaySound(Enums.Sounds.World_Starcoin, 0, 3);
-                coin.animationController.SetTrigger("collected");
-                collectedStarcoins[coin.number - 1] = true;
-                if (collectedStarcoins.All(x => x)) GameManager.Instance.AllStarcoinsCollected();
-                Instantiate(Resources.Load("Prefabs/Particle/StarcoinCollect"), obj.transform.position,
-                    Quaternion.identity);
-                photonView.RPC(nameof(StarCoinRuleTrigger), RpcTarget.All);
-                GlobalController.Instance.rumbler.RumbleForSeconds(0f, 0.8f, 0.1f);
-                break;
-            }
-        }
 
         if (!photonView.IsMine || dead || Frozen || pipeEntering || !MainHitbox.IsTouching(collider))
             return;
@@ -2652,15 +2586,6 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
 
     public void OnMovement(InputAction.CallbackContext context)
     {
-        if (joystick.x > 0)
-            GameManager.Instance.MatchConditioner.ConditionActioned(this, "LookedRight");
-        if (joystick.x < 0)
-            GameManager.Instance.MatchConditioner.ConditionActioned(this, "LookedLeft");
-        if (joystick.y > 0)
-            GameManager.Instance.MatchConditioner.ConditionActioned(this, "LookedUp");
-        if (joystick.y < 0)
-            GameManager.Instance.MatchConditioner.ConditionActioned(this, "LookedDown");
-
         if (!photonView.IsMine)
             return;
 
@@ -2669,7 +2594,6 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
 
     public void OnJump(InputAction.CallbackContext context)
     {
-        GameManager.Instance.MatchConditioner.ConditionActioned(this, "Jumped");
         if (!photonView.IsMine)
             return;
 
@@ -2679,7 +2603,6 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
 
     public void OnSprint(InputAction.CallbackContext context)
     {
-        GameManager.Instance.MatchConditioner.ConditionActioned(this, "Ran");
         if (!photonView.IsMine)
             return;
 
@@ -2711,7 +2634,6 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         if (knockback || pipeEntering || GameManager.Instance.gameover || dead || Frozen || holding)
             return;
 
-        var noTrigger = false;
         switch (state)
         {
             case Enums.PowerupState.IceFlower:
@@ -2783,15 +2705,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
                 UseShellerShell();
                 break;
             }
-            default:
-            {
-                noTrigger = true;
-                break;
-            }
         }
-
-        if (!noTrigger)
-            GameManager.Instance.MatchConditioner.ConditionActioned(this, "TriggeredPowerup");
     }
 
     [PunRPC]
@@ -2854,8 +2768,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         if (!photonView.IsMine || GameManager.Instance.paused || GameManager.Instance.gameover)
             return;
 
-        if (storedPowerup == null || dead || !spawned ||
-            GameManager.Instance.Togglerizer.currentEffects.Contains("NoReserve"))
+        if (storedPowerup == null || dead || !spawned)
         {
             PlaySound(Enums.Sounds.UI_Error);
             return;
@@ -2922,7 +2835,6 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         if (alsoSetState)
         {
             state = Enums.PowerupState.MegaMushroom;
-            GameManager.Instance.MatchConditioner.ConditionActioned(this, "GotMega");
         }
     }
 
@@ -2951,7 +2863,6 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         var cp = Enums.PowerupStatePriority[state];
         var reserve = cp.statePriority > pp.itemPriority || state == newState;
         var soundPlayed = false;
-        var megad = false;
 
         if (powerup.state == Enums.PowerupState.MegaMushroom && state != Enums.PowerupState.MegaMushroom)
         {
@@ -2970,7 +2881,6 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
 
             PlaySoundEverywhere(powerup.soundEffect);
             soundPlayed = true;
-            megad = true;
         }
         else if (powerup.prefab == "Star")
         {
@@ -3038,10 +2948,6 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         }
 
         UpdateGameState();
-        if (!megad)
-            GameManager.Instance.MatchConditioner.ConditionActioned(this, "GotPowerup");
-        else
-            GameManager.Instance.MatchConditioner.ConditionActioned(this, "GotMega");
 
         if (view.IsMine)
             PhotonNetwork.Destroy(view);
@@ -3100,8 +3006,6 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         propellerSpinTimer = 0;
         usedPropellerThisJump = false;
 
-        GameManager.Instance.MatchConditioner.ConditionActioned(this, "LostPowerup");
-
         if (!nowDead)
         {
             hitInvincibilityCounter = 3f;
@@ -3132,8 +3036,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
 
         PlaySound(Enums.Sounds.Enemy_Generic_Freeze);
         frozenObject = PhotonView.Find(cube).GetComponentInChildren<FrozenCube>();
-        frozenObject.autoBreakTimer =
-            GameManager.Instance.Togglerizer.currentEffects.Contains("PermaFreeze") ? float.MaxValue : 1.75f;
+        frozenObject.autoBreakTimer = 1.75f;
         Frozen = true;
         animator.enabled = false;
         body.isKinematic = true;
@@ -3147,8 +3050,6 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
 
         propellerTimer = 0;
         skidding = false;
-
-        GameManager.Instance.MatchConditioner.ConditionActioned(this, "Frozen");
     }
 
     [PunRPC]
@@ -3186,82 +3087,6 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
     #endregion
 
     #region -- COIN / STAR COLLECTION --
-
-    public void CollectBigStarInstantly(int id = -1)
-    {
-        photonView.RPC(nameof(CollectBigStar), RpcTarget.All, (Vector2)transform.position, id, stars + 1);
-    }
-
-    public void RemoveBigStarInstantly(int id = -1)
-    {
-        photonView.RPC(nameof(CollectBigStar), RpcTarget.All, (Vector2)transform.position, id, stars - 1);
-        if (stars == 0) GameManager.Instance.MatchConditioner.ConditionActioned(this, "Reached0Stars");
-    }
-
-    [PunRPC]
-    public void StarCoinRuleTrigger()
-    {
-        GameManager.Instance.MatchConditioner.ConditionActioned(this, "GotStarcoin");
-    }
-
-    [PunRPC]
-    public void AttemptCollectLap(PhotonMessageInfo info)
-    {
-        if (info.Sender != photonView.Owner || !PhotonNetwork.IsMasterClient)
-            return;
-        if (dead || !spawned)
-            return;
-
-        photonView.RPC(nameof(CollectLap), RpcTarget.All, laps + 1);
-    }
-
-    [PunRPC]
-    public void CollectLap(int newCount, PhotonMessageInfo info)
-    {
-        gotCheckpoint = false;
-
-        if (newCount > laps)
-        {
-            if (newCount >= GameManager.Instance.lapRequirement && (!GameManager.Instance.needsStarcoins ||
-                                                                    (collectedStarcoins.All(x => x) &&
-                                                                     GameManager.Instance.needsStarcoins)))
-            {
-                laps = Mathf.Clamp(newCount, 0, GameManager.Instance.lapRequirement);
-                sfx.PlayOneShot(Enums.Sounds.UI_Match_Goal_Short.GetClip());
-                GameManager.Instance.WinByGoal(this);
-                transform.position =
-                    body.position = new Vector3(currentFlagpole.transform.position.x, transform.position.y, 1);
-                spawned = false;
-                body.gravityScale = 0;
-                body.velocity = Vector2.zero;
-                groundpound = false;
-                propeller = false;
-                drill = false;
-                flying = false;
-                animator.SetTrigger("winByGoal");
-                StartCoroutine(GameManager.Instance.nonSpectatingPlayers.Count > 1
-                    ? nameof(GoalAnimReachBottomNotAlone)
-                    : nameof(GoalAnimReachBottom));
-            }
-            else if (newCount < GameManager.Instance.lapRequirement)
-            {
-                laps = Mathf.Clamp(newCount, 0, GameManager.Instance.lapRequirement);
-                PlaySound(Enums.Sounds.UI_WindowOpen);
-                GameManager.Instance.MatchConditioner.ConditionActioned(this, "FinishedLap");
-                transform.position = body.position =
-                    gotCheckpoint ? GameManager.Instance.checkpoint : GameManager.Instance.GetSpawnpoint(playerId);
-                hitInvincibilityCounter = 2f;
-                GameManager.Instance.SendAndExecuteEvent(Enums.NetEventIds.ResetTiles, null, SendOptions.SendReliable);
-                goalReachedBottom = false;
-            }
-            else
-            {
-                goalReachedBottom = false;
-            }
-        }
-
-        UpdateGameState();
-    }
 
     [PunRPC]
     public void AttemptCollectBigStar(int starID, PhotonMessageInfo info)
@@ -3305,19 +3130,13 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         //state
         if (newCount > stars && starView != -2)
         {
-            PlaySoundEverywhere(photonView.IsMine || (GameManager.Instance.localPlayer != null &&
-                                                      GameManager.Instance.TeamGrouper.IsPlayerTeammate(this,
-                                                          GameManager.Instance.localPlayer
-                                                              .GetComponent<PlayerController>(), true))
+            PlaySoundEverywhere(photonView.IsMine || (GameManager.Instance.localPlayer != null)
                 ? Enums.Sounds.World_Star_Collect_Self
                 : Enums.Sounds.World_Star_Collect_Enemy);
             if (photonView.IsMine) GlobalController.Instance.rumbler.RumbleForSeconds(0f, 0.8f, 0.1f);
-            GameManager.Instance.MatchConditioner.ConditionActioned(this, "GotStar");
         }
 
         stars = Mathf.Clamp(newCount, 0, GameManager.Instance.starRequirement);
-        if (stars >= GameManager.Instance.starRequirement)
-            GameManager.Instance.MatchConditioner.ConditionActioned(this, "ReachedStarLimit");
         UpdateGameState();
 
         //game mechanics
@@ -3336,7 +3155,6 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
                 Destroy(star.gameObject);
         }
 
-        if (starView != -2) GameManager.Instance.TeamGrouper.PlayerGotStar(this);
     }
 
     [PunRPC]
@@ -3364,17 +3182,6 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         photonView.RPC(nameof(CollectCoin), RpcTarget.All, coinID, coins + 1, particle);
     }
 
-    public void CollectCoinInstantly()
-    {
-        photonView.RPC(nameof(CollectCoin), RpcTarget.All, -1, coins + 1, (Vector2)transform.position);
-    }
-
-    public void RemoveCoinInstantly()
-    {
-        photonView.RPC(nameof(CollectCoin), RpcTarget.All, -1, coins - 1, (Vector2)transform.position);
-        if (coins == 0) GameManager.Instance.MatchConditioner.ConditionActioned(this, "Reached0Coins");
-    }
-
     [PunRPC]
     protected void CollectCoin(int coinID, int newCount, Vector2 position, PhotonMessageInfo info)
     {
@@ -3397,7 +3204,6 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         if (newCount > coins)
         {
             PlaySound(Enums.Sounds.World_Coin_Collect);
-            GameManager.Instance.MatchConditioner.ConditionActioned(this, "GotCoin");
         }
 
         coins = Mathf.Max(0, newCount);
@@ -3415,7 +3221,6 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
 
             if (coins >= GameManager.Instance.coinRequirement)
             {
-                GameManager.Instance.MatchConditioner.ConditionActioned(this, "ReachedCoinLimit");
                 SpawnCoinItem();
                 coins = 0;
             }
@@ -3441,16 +3246,6 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         UpdateGameState();
     }
 
-    [PunRPC]
-    public void SpawnCoinItemInstantly(PhotonMessageInfo info)
-    {
-        var prefab = Utils.GetRandomItem(this).prefab;
-        if (GameManager.Instance.Togglerizer.powerupChanceMultipliers[prefab] == 0) return;
-        PhotonNetwork.InstantiateRoomObject("Prefabs/Powerup/" + prefab, body.position + Vector2.up * 5f,
-            Quaternion.identity, 0, new object[] { photonView.ViewID });
-        photonView.RPC(nameof(PlaySound), RpcTarget.All, Enums.Sounds.Player_Sound_PowerupReserveUse);
-    }
-
     public void SpawnCoinItem()
     {
         if (coins < GameManager.Instance.coinRequirement)
@@ -3460,7 +3255,6 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             return;
 
         var prefab = Utils.GetRandomItem(this).prefab;
-        if (GameManager.Instance.Togglerizer.powerupChanceMultipliers[prefab] == 0) return;
         PhotonNetwork.InstantiateRoomObject("Prefabs/Powerup/" + prefab, body.position + Vector2.up * 5f,
             Quaternion.identity, 0, new object[] { photonView.ViewID });
         photonView.RPC(nameof(PlaySound), RpcTarget.All, Enums.Sounds.Player_Sound_PowerupReserveUse);
@@ -3519,8 +3313,6 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
 
     private void SpawnStars(int amount, bool deathplane)
     {
-        if (GameManager.Instance.Togglerizer.currentEffects.Contains("NoDropStars")) return;
-
         if (stars > 0)
             PlaySound(Enums.Sounds.World_Star_Spawn);
 
@@ -3549,7 +3341,6 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             PhotonNetwork.InstantiateRoomObject("Prefabs/BigStar",
                 body.position + Vector2.up * transform.localScale * MainHitbox.size, Quaternion.identity, 0,
                 new object[] { starDirection, photonView.ViewID, PhotonNetwork.ServerTimestamp + 1000, deathplane });
-            GameManager.Instance.TeamGrouper.PlayerLostStar(this);
 
             starDirection = (starDirection + 1) % 4;
             stars--;
@@ -3627,7 +3418,6 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         }
 
         PlaySound(Enums.Sounds.Player_Sound_DeathOthers);
-        GameManager.Instance.MatchConditioner.ConditionActioned(this, "Disqualified");
         GameManager.Instance.CheckForWinner();
 
         Destroy(gameObject);
@@ -3729,7 +3519,6 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         animator.Play("deadstart");
         if (--lives == 0)
         {
-            GameManager.Instance.MatchConditioner.ConditionActioned(this, "Disqualified");
             GameManager.Instance.CheckForWinner();
         }
 
@@ -3755,7 +3544,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         animator.SetBool("flying", false);
         animator.SetBool("firedeath", fire);
 
-        PlaySound(cameraController.IsControllingCamera && !GameManager.Instance.Togglerizer.currentEffects.Contains("FastDeath")
+        PlaySound(cameraController.IsControllingCamera
             ? Enums.Sounds.Player_Sound_Death
             : Enums.Sounds.Player_Sound_DeathOthers);
 
@@ -3774,8 +3563,6 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             ScoreboardUpdater.instance.OnDeathToggle();
             GameManager.Instance.SetAllMusicPlaybackState(Songinator.PlaybackState.STOPPED);
         }
-
-        GameManager.Instance.MatchConditioner.ConditionActioned(this, "Died");
     }
 
     [PunRPC]
@@ -3905,25 +3692,6 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             ScoreboardUpdater.instance.OnRespawnToggle();
 
         UpdateGameState();
-        StartCoroutine(WaitBeforeSpawnedCondition());
-        GameManager.Instance.SetStartSpeedrunTimer(this);
-    }
-
-    private IEnumerator WaitBeforeSpawnedCondition()
-    {
-        yield return new WaitForSeconds(1);
-        GameManager.Instance.MatchConditioner.ConditionActioned(this, "Spawned");
-    }
-
-    public void RandomTeleport()
-    {
-        // i guess...??
-        var levelRandomPos = new Vector2(
-            Random.Range(GameManager.Instance.levelMinTileX,
-                GameManager.Instance.levelMinTileX + GameManager.Instance.levelWidthTile) / 2,
-            Math.Abs(Random.Range(GameManager.Instance.levelMinTileY,
-                GameManager.Instance.levelMinTileY + GameManager.Instance.levelHeightTile)) / 2);
-        transform.position = body.position = levelRandomPos;
     }
 
     #endregion
@@ -4118,7 +3886,6 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             return 0;
         if (tile is InteractableTile it)
         {
-            GameManager.Instance.MatchConditioner.ConditionActioned(this, "HitBlock");
             return it.Interact(this, direction, Utils.TilemapToWorldPosition(tilePos)) ? 1 : 0;
         }
 
@@ -4142,7 +3909,6 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             return;
 
         var attacker = PhotonNetwork.GetPhotonView(attackerView);
-        if (GameManager.Instance.TeamGrouper.IsPlayerTeammate(this, attackerView, false)) return;
 
         if (state == Enums.PowerupState.MiniMushroom && starsToDrop > 1)
         {
@@ -4198,22 +3964,8 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         body.gravityScale = normalGravity;
         wallSlideLeft = wallSlideRight = false;
 
-        if (fireball)
-        {
-            GameManager.Instance.MatchConditioner.ConditionActioned(this, "BumpedInto");
-            GameManager.Instance.MatchConditioner.ConditionActioned(attackerView, "BumpedSmn");
-        }
-        else
-        {
-            GameManager.Instance.MatchConditioner.ConditionActioned(this, "KnockedBack");
-            GameManager.Instance.MatchConditioner.ConditionActioned(attackerView, "StompedSmn");
-        }
-
         SpawnStars(starsToDrop, false);
         HandleLayerState();
-
-        if (GameManager.Instance.Togglerizer.currentEffects.Contains("NoStun"))
-            ResetKnockback();
     }
 
     public void ResetKnockbackFromAnim()
@@ -4308,7 +4060,6 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         else
         {
             pickupTimer = pickupTime;
-            GameManager.Instance.MatchConditioner.ConditionActioned(this, "GrabbedShell");
         }
 
         animator.ResetTrigger("throw");
@@ -4430,7 +4181,6 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
             transform.position = body.position = new Vector2(obj.transform.position.x, transform.position.y);
 
             photonView.RPC(nameof(PlaySound), RpcTarget.All, Enums.Sounds.Player_Sound_Powerdown);
-            GameManager.Instance.MatchConditioner.ConditionActioned(this, "EnteredPipe");
             crouching = false;
             sliding = false;
             propeller = false;

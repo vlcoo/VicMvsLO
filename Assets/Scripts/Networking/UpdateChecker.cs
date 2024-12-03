@@ -6,7 +6,7 @@ using UnityEngine;
 
 public class UpdateChecker
 {
-    private static readonly string API_URL = "http://api.github.com/repos/vlcoo/VicMvsLO/releases/latest";
+    private static readonly string API_URL = "http://example.com";
 
     /// <summary>
     ///     Returns if we're up to date, OR newer, compared to the latest GitHub release version number
@@ -16,7 +16,7 @@ public class UpdateChecker
         //get http results
         var request = (HttpWebRequest)WebRequest.Create(API_URL);
         request.Accept = "application/json";
-        request.UserAgent = "vlcoo/VicMvsLO";
+        request.UserAgent = "";
 
         var response = (HttpWebResponse)await request.GetResponseAsync();
 

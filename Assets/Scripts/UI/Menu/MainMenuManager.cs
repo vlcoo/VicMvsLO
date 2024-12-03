@@ -50,26 +50,15 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         updateBox,
         webglWarningBox,
         favRegionHintBox,
-        newRuleS1Prompt,
-        newRuleS2Prompt,
         emoteListPrompt,
-        RNGRulesBox,
-        specialPrompt,
-        presetPrompt,
-        presetHintPrompt,
-        stagePrompt,
-        teamsPrompt,
-        powerupsPrompt;
+        stagePrompt;
 
     public GameObject[] levelCameraPositions;
 
     public GameObject sliderText,
         lobbyText,
         currentMaxPlayers,
-        settingsPanel,
-        ruleTemplate,
-        lblConditions,
-        specialTogglesParent;
+        settingsPanel;
 
     public TMP_Dropdown levelDropdown, characterDropdown;
     public RoomIcon selectedRoomIcon, privateJoinRoom;
@@ -80,7 +69,6 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         livesEnabled,
         powerupsEnabled,
         timeEnabled,
-        starcoinsEnabled,
         starsEnabled,
         coinsEnabled,
         drawTimeupToggle,
@@ -95,14 +83,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         aspectToggle,
         spectateToggle,
         scoreboardToggle,
-        filterToggle,
-        chainableActionsToggle,
-        RNGClear,
-        teamsToggle,
-        friendlyToggle,
-        shareToggle,
-        nomapToggle,
-        coincountToggle;
+        filterToggle;
 
     public GameObject playersContent, playersPrefab, chatContent, chatPrefab;
 
@@ -115,7 +96,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         lobbyJoinField,
         chatTextField;
 
-    public Slider musicSlider, sfxSlider, masterSlider, lobbyPlayersSlider, changePlayersSlider, RNGSlider;
+    public Slider musicSlider, sfxSlider, masterSlider, lobbyPlayersSlider, changePlayersSlider;
 
     public GameObject mainMenuSelected,
         optionsSelected,
@@ -129,16 +110,8 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         updateBoxSelected,
         webglWarningBoxSelected,
         favRegionHintBoxSelected,
-        newRuleS1Selected,
-        newRuleS2Selected,
         emoteListSelected,
-        RNGRulesSelected,
-        specialSelected,
-        presetSelected,
-        presetHintSelected,
-        stageSelected,
-        teamsSelected,
-        powerupsSelected;
+        stageSelected;
 
     public GameObject errorBox, errorButton, rebindPrompt, reconnectBox;
 
@@ -148,10 +121,6 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         rebindText,
         reconnectText,
         updateText,
-        RNGSliderText,
-        specialCountText,
-        teamHintText,
-        setSpecialBtn,
         stageText;
 
     public TMP_Dropdown region;
@@ -173,41 +142,18 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
     public ColorChooser colorManager;
 
-    public List<string> POSSIBLE_CONDITIONS = new();
-    public List<PowerupChanceListEntry> powerupList = new();
-
     private readonly List<string> allRegions = new();
 
     private readonly Dictionary<string, RoomIcon> currentRooms = new();
 
     private readonly Dictionary<Player, double> lastMessage = new();
-    private string aboutToAddAct = "";
-
-    private string aboutToAddCond = "";
-
-    public List<KeyValuePair<string, string>> DISALLOWED_RULES = new()
-    {
-        new KeyValuePair<string, string>("GotCoin", "ActGiveCoin"),
-        new KeyValuePair<string, string>("GotStar", "ActGiveStar"),
-        new KeyValuePair<string, string>("Spawned", "ActKillPlayer"),
-        new KeyValuePair<string, string>("KnockedBack", "ActKnockbackPlayer"),
-        new KeyValuePair<string, string>("Frozen", "ActFreezePlayer"),
-        new KeyValuePair<string, string>("Died", "ActFreezePlayer"),
-        new KeyValuePair<string, string>("ReachedCoinLimit", "ActGiveCoin"),
-        new KeyValuePair<string, string>("LostPowerup", "ActHarmPlayer")
-    };
 
     private List<string> formattedRegions;
 
-    private bool noUpdateNetRoom;
     private Region[] pingSortedRegions;
 
     private bool pingsReceived, joinedLate;
-    [NonSerialized] public List<string> POSSIBLE_ACTIONS = new();
     private bool quit, validName;
-    private bool raceMapSelected;
-    [NonSerialized] public HashSet<MatchRuleListEntry> ruleList = new();
-    [NonSerialized] public List<string> specialList = new();
 
     private Coroutine updatePingCoroutine;
     private bool warningShown;
@@ -223,8 +169,6 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         Instance = this;
         sfx.outputAudioMixerGroup.audioMixer.SetFloat("SFXReverb", 0f);
         // sfx.outputAudioMixerGroup.audioMixer.SetFloat("MasterPitch", -80f);
-
-        GlobalController.Instance.PopulateSpecialPlayers();
 
         //Clear game-specific settings so they don't carry over
         HorizontalCamera.OFFSET_TARGET = 0;
@@ -304,10 +248,6 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
         rebindManager.Init();
 
-        foreach (var method in Type.GetType("MatchConditioner").GetMethods())
-            if (method.Name.StartsWith("Act"))
-                POSSIBLE_ACTIONS.Add(method.Name);
-
         GlobalController.Instance.DiscordController.UpdateActivity();
         EventSystem.current.SetSelectedGameObject(title);
 
@@ -317,12 +257,12 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 #else
         if (!GlobalController.Instance.checkedForVersion)
         {
-            UpdateChecker.IsUpToDate(latestVersion =>
-            {
-                updateText.text =
-                    $"You're running an old\nversion of this mod.\n\nPlease update!\n(Latest: <i>{latestVersion}</i>)";
-                OpenPrompt(updateBox, updateBoxSelected);
-            });
+            // UpdateChecker.IsUpToDate(latestVersion =>
+            // {
+            //     updateText.text =
+            //         $"You're running an old\nversion of this mod.\n\nPlease update!\n(Latest: <i>{latestVersion}</i>)";
+            //     OpenPrompt(updateBox, updateBoxSelected);
+            // });
             GlobalController.Instance.checkedForVersion = true;
         }
 #endif
@@ -508,26 +448,12 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         AttemptToUpdateProperty<bool>(updatedProperties, Enums.NetRoomProperties.Debug, ChangeDebugState);
         AttemptToUpdateProperty<int>(updatedProperties, Enums.NetRoomProperties.Level, ChangeLevel);
         AttemptToUpdateProperty<int>(updatedProperties, Enums.NetRoomProperties.StarRequirement, ChangeStarRequirement);
-        AttemptToUpdateProperty<int>(updatedProperties, Enums.NetRoomProperties.LapRequirement, ChangeLapRequirement);
-        // AttemptToUpdateProperty<Dictionary<string, string>>(updatedProperties, Enums.NetRoomProperties.MatchRules, DictToMatchRules);
-        AttemptToUpdateProperty<string>(updatedProperties, Enums.NetRoomProperties.MatchRules, JsonToMatchRules);
-        AttemptToUpdateProperty<Dictionary<string, bool>>(updatedProperties, Enums.NetRoomProperties.SpecialRules,
-            DictToSpecialRules);
-        AttemptToUpdateProperty<Dictionary<string, int>>(updatedProperties, Enums.NetRoomProperties.PowerupChances,
-            DictToPowerupChances);
         AttemptToUpdateProperty<int>(updatedProperties, Enums.NetRoomProperties.CoinRequirement, ChangeCoinRequirement);
         AttemptToUpdateProperty<int>(updatedProperties, Enums.NetRoomProperties.Lives, ChangeLives);
         AttemptToUpdateProperty<bool>(updatedProperties, Enums.NetRoomProperties.NewPowerups, ChangeNewPowerups);
         AttemptToUpdateProperty<int>(updatedProperties, Enums.NetRoomProperties.Time, ChangeTime);
         AttemptToUpdateProperty<bool>(updatedProperties, Enums.NetRoomProperties.DrawTime, ChangeDrawTime);
         AttemptToUpdateProperty<string>(updatedProperties, Enums.NetRoomProperties.HostName, ChangeLobbyHeader);
-        AttemptToUpdateProperty<bool>(updatedProperties, Enums.NetRoomProperties.ChainableRules, ChangeChainableRules);
-        AttemptToUpdateProperty<bool>(updatedProperties, Enums.NetRoomProperties.Starcoins, ChangeStarcoins);
-        AttemptToUpdateProperty<bool>(updatedProperties, Enums.NetRoomProperties.Teams, ChangeTeams);
-        AttemptToUpdateProperty<bool>(updatedProperties, Enums.NetRoomProperties.FriendlyFire, ChangeFriendly);
-        AttemptToUpdateProperty<bool>(updatedProperties, Enums.NetRoomProperties.ShareStars, ChangeShare);
-        AttemptToUpdateProperty<bool>(updatedProperties, Enums.NetRoomProperties.NoMap, ChangeNoMap);
-        AttemptToUpdateProperty<bool>(updatedProperties, Enums.NetRoomProperties.ShowCoinCount, ChangeCoinCount);
     }
 
     // LOBBY CALLBACKS
@@ -741,22 +667,6 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
                 ChangePrivate();
                 break;
             }
-            case (byte)Enums.NetEventIds.LoadedGamemodePreset:
-            {
-                var description = e.CustomData as string;
-
-                if (string.IsNullOrWhiteSpace(description) || description.Contains("Reset"))
-                    return;
-
-                var presetName = description.Split("|")[0];
-                description = description.Split("|")[1];
-
-                presetHintPrompt.transform.Find("Image/Header/NameLbl").GetComponent<TMP_Text>().text = presetName;
-                presetHintPrompt.transform.Find("Image/DescriptionLbl").GetComponent<TMP_Text>().text = description;
-                OpenPrompt(presetHintPrompt, presetHintSelected);
-
-                break;
-            }
         }
     }
 
@@ -862,160 +772,6 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         }
     }
 
-    public void SetSpecialRule(string ruleName, bool how)
-    {
-        var thereWereDuplicates = false;
-
-        if (how)
-        {
-            if (!specialList.Contains(ruleName)) specialList.Add(ruleName);
-            else thereWereDuplicates = true;
-        }
-        else
-        {
-            specialList.Remove(ruleName);
-        }
-
-        specialCountText.text = "Specials: " + specialList.Count;
-
-        if (noUpdateNetRoom || thereWereDuplicates) return;
-        Hashtable table = new()
-        {
-            [Enums.NetRoomProperties.SpecialRules] = SpecialRulesToDict()
-        };
-        PhotonNetwork.CurrentRoom.SetCustomProperties(table);
-    }
-
-    public void onSetSpecialRule(GameObject element)
-    {
-        SetSpecialRule(element.name, element.transform.GetChild(2).GetComponent<Toggle>().isOn);
-    }
-
-    public void saveMatchRules()
-    {
-#if UNITY_ANDROID || UNITY_WEBGL
-        sfx.PlayOneShot(Enums.Sounds.UI_Error.GetClip());
-        return;
-#endif
-        var path = Utils.SaveFileBrowser("Ruleset files (JSON)|*.json", "vcmiRuleset.json");
-        if (path is null or "") return;
-
-        File.WriteAllText(path, MatchRulesToJson());
-    }
-
-    public void loadMatchRules()
-    {
-#if UNITY_ANDROID || UNITY_WEBGL
-        sfx.PlayOneShot(Enums.Sounds.UI_Error.GetClip());
-        return;
-#endif
-        var path = Utils.OpenFileBrowser("Ruleset files (JSON)|*.json");
-        if (path is null or "") return;
-
-        JsonToMatchRules(File.ReadAllText(path));
-        Hashtable table = new()
-        {
-            [Enums.NetRoomProperties.MatchRules] = MatchRulesToJson()
-        };
-        PhotonNetwork.CurrentRoom.SetCustomProperties(table);
-    }
-
-    public void onAddMatchRuleExplicit(string cond, string act, bool updateNetRoom, bool updateUIList = true)
-    {
-        if (cond is null || act is null || !POSSIBLE_CONDITIONS.Contains(cond) ||
-            DISALLOWED_RULES.Contains(new KeyValuePair<string, string>(cond, act)))
-        {
-            sfx.PlayOneShot(Enums.Sounds.UI_Error.GetClip());
-            return;
-        }
-
-        if (!cond.Equals("") && !act.Equals(""))
-        {
-            var newEntry = Instantiate(ruleTemplate);
-            var newEntryScript = newEntry.GetComponent<MatchRuleListEntry>();
-            newEntryScript.setRules(cond, act);
-            if (updateUIList)
-            {
-                newEntry.transform.SetParent(settingsPanel.transform, false);
-                newEntry.transform.SetSiblingIndex(lblConditions.transform.GetSiblingIndex() - 1);
-                newEntry.SetActive(true);
-            }
-
-            /*var redundantEntryCount = ruleList.Count(entry => newEntryScript.Equals(entry));
-            if (redundantEntryCount > 0)
-            {
-                newEntryScript.hiddenRedundant = true;
-                newEntry.SetActive(false);
-                var redundantEntry = ruleList.First(entry => newEntryScript.Equals(entry) && !entry.hiddenRedundant);
-                redundantEntry.lbl.text = $"{redundantEntry.GetSanitizedLabel()} * {redundantEntryCount + 1}";
-            }*/
-
-            ruleList.Add(newEntryScript);
-
-            if (updateNetRoom)
-            {
-                Hashtable table = new()
-                {
-                    [Enums.NetRoomProperties.MatchRules] = MatchRulesToJson()
-                };
-                PhotonNetwork.CurrentRoom.SetCustomProperties(table);
-            }
-        }
-    }
-
-    public void onAddMatchRule()
-    {
-        if (!POSSIBLE_CONDITIONS.Contains(aboutToAddCond) || !POSSIBLE_ACTIONS.Contains(aboutToAddAct))
-            return;
-
-        onAddMatchRuleExplicit(aboutToAddCond, aboutToAddAct, true, false);
-        aboutToAddCond = "";
-        aboutToAddAct = "";
-    }
-
-    public void onRemoveMatchRule(MatchRuleListEntry which)
-    {
-        which.onRemoveButtonPressed();
-        ruleList.Remove(which);
-        Destroy(which.gameObject);
-
-        Hashtable table = new()
-        {
-            [Enums.NetRoomProperties.MatchRules] = MatchRulesToJson()
-        };
-        PhotonNetwork.CurrentRoom.SetCustomProperties(table);
-    }
-
-    public void onUpPowerupChance(string powerup)
-    {
-        powerupList.Find(entry => entry.powerup.Equals(powerup)).Chance += 1;
-        Hashtable table = new()
-        {
-            [Enums.NetRoomProperties.PowerupChances] = PowerupChancesToDict()
-        };
-        PhotonNetwork.CurrentRoom.SetCustomProperties(table);
-    }
-
-    public void onDownPowerupChance(string powerup)
-    {
-        powerupList.Find(entry => entry.powerup.Equals(powerup)).Chance -= 1;
-        Hashtable table = new()
-        {
-            [Enums.NetRoomProperties.PowerupChances] = PowerupChancesToDict()
-        };
-        PhotonNetwork.CurrentRoom.SetCustomProperties(table);
-    }
-
-    public void onExplicitPowerupChance(string powerup, int chance)
-    {
-        powerupList.Find(entry => entry.powerup.Equals(powerup)).Chance = chance;
-        Hashtable table = new()
-        {
-            [Enums.NetRoomProperties.PowerupChances] = PowerupChancesToDict()
-        };
-        PhotonNetwork.CurrentRoom.SetCustomProperties(table);
-    }
-
     public void EnterRoom()
     {
         var room = PhotonNetwork.CurrentRoom;
@@ -1055,7 +811,6 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
             PhotonNetwork.LocalPlayer.CustomProperties);
         spectateToggle.isOn = spectating;
         chatTextField.SetTextWithoutNotify("");
-        noUpdateNetRoom = false;
     }
 
     private IEnumerator SetScroll()
@@ -1163,82 +918,9 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         OpenPrompt(emoteListPrompt, emoteListSelected);
     }
 
-    public void GenRandomRules()
-    {
-        var howMany = (int)RNGSlider.value;
-        var clearFirst = RNGClear.isOn;
-
-        if (clearFirst)
-        {
-            foreach (var rule in ruleList)
-                Destroy(rule.gameObject);
-            ruleList.Clear();
-        }
-
-        for (var i = 0; i < howMany; i++)
-            onAddMatchRuleExplicit(POSSIBLE_CONDITIONS[rng.Next(POSSIBLE_CONDITIONS.Count)],
-                POSSIBLE_ACTIONS[rng.Next(POSSIBLE_ACTIONS.Count)], false);
-
-        Hashtable table = new()
-        {
-            [Enums.NetRoomProperties.MatchRules] = MatchRulesToJson()
-        };
-        PhotonNetwork.CurrentRoom.SetCustomProperties(table);
-        ClosePrompt(RNGRulesBox);
-    }
-
-    public void OpenNewRuleS1()
-    {
-        OpenPrompt(newRuleS1Prompt, newRuleS1Selected);
-    }
-
-    public void OpenNewRuleS2(string condition)
-    {
-        ClosePrompt(newRuleS1Prompt);
-
-        aboutToAddCond = condition;
-        newRuleS2Prompt.transform.Find("Image/LblExplain").GetComponent<TMP_Text>().text =
-            $"What will happen when \"{condition}\" gets triggered?";
-        OpenPrompt(newRuleS2Prompt, newRuleS2Selected);
-    }
-
-    public void OpenSpecialRule()
-    {
-        OpenPrompt(specialPrompt, specialSelected);
-    }
-
-    public void OpenPresetRule()
-    {
-        OpenPrompt(presetPrompt, presetSelected);
-    }
-
     public void OpenMapSelector()
     {
         OpenPrompt(stagePrompt, stageSelected);
-    }
-
-    public void OpenTeams()
-    {
-        OpenPrompt(teamsPrompt, teamsSelected);
-    }
-
-    public void OpenPowerups()
-    {
-        foreach (var powerupChanceListEntry in powerupList)
-            powerupChanceListEntry.Chance = powerupChanceListEntry.Chance;
-        OpenPrompt(powerupsPrompt, powerupsSelected);
-    }
-
-    public void CloseNewRuleS2(string action)
-    {
-        ClosePrompt(newRuleS2Prompt);
-        aboutToAddAct = action;
-        onAddMatchRule();
-    }
-
-    public void OpenRNGRules()
-    {
-        OpenPrompt(RNGRulesBox, RNGRulesSelected);
     }
 
     public void OpenOptions()
@@ -1393,7 +1075,6 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
     public void QuitRoom()
     {
-        noUpdateNetRoom = true;
         PhotonNetwork.LeaveRoom();
 
         worldSongPlayer.OnLevelSelected(0);
@@ -1483,7 +1164,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     {
         levelDropdown.SetValueWithoutNotify(index);
         stageText.text = "Map: " + levelDropdown.options[index].text;
-        raceMapSelected = levelDropdown.options[index].text.Contains("hudnumber_laps");
+        levelDropdown.options[index].text.Contains("hudnumber_laps");
         UpdateSettingEnableStates();
         Camera.main.transform.position = levelCameraPositions[index].transform.position;
 
@@ -1662,23 +1343,12 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     {
         foreach (var s in roomSettings)
             s.interactable = PhotonNetwork.IsMasterClient;
-        if (ruleList != null)
-            foreach (var s in ruleList)
-                s.removeButton.interactable = PhotonNetwork.IsMasterClient;
 
         livesField.interactable = PhotonNetwork.IsMasterClient && livesEnabled.isOn;
         timeField.interactable = PhotonNetwork.IsMasterClient && timeEnabled.isOn;
         starsText.interactable = PhotonNetwork.IsMasterClient && starsEnabled.isOn;
         coinsText.interactable = PhotonNetwork.IsMasterClient && coinsEnabled.isOn;
         drawTimeupToggle.interactable = PhotonNetwork.IsMasterClient && timeEnabled.isOn;
-        chainableActionsToggle.interactable = PhotonNetwork.IsMasterClient;
-        // setSpecialBtn.text = PhotonNetwork.IsMasterClient ? "Set" : "See";
-        // starcoinsEnabled.transform.parent.gameObject.SetActive(raceMapSelected);
-        starcoinsEnabled.interactable = PhotonNetwork.IsMasterClient && raceMapSelected;
-        // lapsText.transform.parent.gameObject.SetActive(raceMapSelected);
-        lapsText.interactable = PhotonNetwork.IsMasterClient && raceMapSelected;
-        shareToggle.interactable = PhotonNetwork.IsMasterClient && teamsToggle.isOn;
-        friendlyToggle.interactable = PhotonNetwork.IsMasterClient && teamsToggle.isOn;
 
         Utils.GetCustomProperty(Enums.NetRoomProperties.Debug, out bool debug);
         privateToggleRoom.interactable = PhotonNetwork.IsMasterClient && !debug;
@@ -2086,7 +1756,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
     public void OpenLinks()
     {
-        Application.OpenURL("https://github.com/vlcoo/VicMvsLO/blob/master/LINKS.md");
+        Application.OpenURL("https://example.com");
     }
 
     public void Quit()
@@ -2109,89 +1779,6 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 #if UNITY_EDITOR
         EditorApplication.isPlaying = false;
 #endif
-    }
-
-    public void JsonToMatchRules(string j)
-    {
-        foreach (var rule in ruleList) Destroy(rule.gameObject);
-        ruleList.Clear();
-        List<MatchRuleDataEntry> dataList;
-
-        try
-        {
-            dataList = JsonConvert.DeserializeObject<List<MatchRuleDataEntry>>(j);
-        }
-        catch (JsonReaderException)
-        {
-            dataList = new List<MatchRuleDataEntry>();
-        }
-
-        if (dataList is not List<MatchRuleDataEntry>) dataList = new List<MatchRuleDataEntry>();
-
-        foreach (var data in dataList)
-        {
-            if (data is not MatchRuleDataEntry) return;
-            onAddMatchRuleExplicit(data.Condition, data.Action, false);
-        }
-    }
-
-    public string MatchRulesToJson()
-    {
-        return JsonConvert.SerializeObject(ruleList.Select(rule => rule.Serialize()).ToList());
-    }
-
-    // public void DictToMatchRules(Dictionary<string, string> dict)
-    // {
-    //     foreach (var rule in ruleList)
-    //         Destroy(rule.gameObject);
-    //     ruleList.Clear();
-    //     
-    //     foreach(KeyValuePair<string, string> entry in dict)
-    //         onAddMatchRuleExplicit(entry.Key, entry.Value, false, true);
-    // }
-    //
-    // public Dictionary<string, string> MatchRulesToDict()
-    // {
-    //     Dictionary<string, string> dict = new Dictionary<string, string>();
-    //     foreach (var rule in ruleList)
-    //     {
-    //         if (dict.ContainsKey(rule.Condition)) continue;
-    //         dict.Add(rule.Condition, rule.Action);
-    //     }
-    //
-    //     return dict;
-    // }
-
-    public void DictToSpecialRules(Dictionary<string, bool> dict)
-    {
-        specialList = dict.Keys.ToList();
-        // whatever lol
-        foreach (Transform toggle in specialTogglesParent.transform.GetChild(0).transform)
-            toggle.transform.GetChild(2).GetComponent<Toggle>().isOn = specialList.Contains(toggle.name);
-        foreach (Transform toggle in specialTogglesParent.transform.GetChild(1).transform)
-            toggle.transform.GetChild(2).GetComponent<Toggle>().isOn = specialList.Contains(toggle.name);
-        specialCountText.text = "Specials: " + specialList.Count;
-    }
-
-    public Dictionary<string, bool> SpecialRulesToDict()
-    {
-        specialList = specialList.Distinct().ToList();
-        return specialList.ToDictionary(x => x, x => true);
-    }
-
-    public void DictToPowerupChances(Dictionary<string, int> dict)
-    {
-        if (dict.Count == 0) return;
-
-        foreach (var entry in powerupList) entry.Chance = dict[entry.powerup];
-    }
-
-    public Dictionary<string, int> PowerupChancesToDict()
-    {
-        Dictionary<string, int> dict = new();
-        foreach (var entry in powerupList) dict[entry.powerup] = entry.Chance;
-
-        return dict;
     }
 
     public void ChangeStarRequirement(int stars)
@@ -2225,66 +1812,6 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         };
         PhotonNetwork.CurrentRoom.SetCustomProperties(table);
         //ChangeStarRequirement(newValue);
-    }
-
-    public void ChangeLapRequirement(int laps)
-    {
-        lapsText.SetTextWithoutNotify(laps.ToString());
-    }
-
-    public void SetLapRequirement(TMP_InputField input)
-    {
-        if (!PhotonNetwork.IsMasterClient)
-            return;
-
-        int.TryParse(input.text, out var newValue);
-
-        newValue = Math.Clamp(newValue, 1, 99);
-        ChangeLapRequirement(newValue);
-
-        Hashtable table = new()
-        {
-            [Enums.NetRoomProperties.LapRequirement] = newValue
-        };
-        PhotonNetwork.CurrentRoom.SetCustomProperties(table);
-    }
-
-    public void ChangeChainableRules(bool how)
-    {
-        chainableActionsToggle.SetIsOnWithoutNotify(how);
-    }
-
-    public void ChangeTeams(bool how)
-    {
-        teamsToggle.SetIsOnWithoutNotify(how);
-        UpdateSettingEnableStates();
-        teamHintText.text = "Teams: " + (how ? "ON" : "OFF");
-    }
-
-    public void ChangeFriendly(bool how)
-    {
-        friendlyToggle.SetIsOnWithoutNotify(how);
-    }
-
-    public void ChangeShare(bool how)
-    {
-        shareToggle.SetIsOnWithoutNotify(how);
-    }
-
-
-    public void ChangeStarcoins(bool how)
-    {
-        starcoinsEnabled.SetIsOnWithoutNotify(how);
-    }
-
-    public void ChangeNoMap(bool how)
-    {
-        nomapToggle.SetIsOnWithoutNotify(how);
-    }
-
-    public void ChangeCoinCount(bool how)
-    {
-        coincountToggle.SetIsOnWithoutNotify(how);
     }
 
     public void ChangeCoinRequirement(int coins)
@@ -2328,7 +1855,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
     public void OpenDownloadsPage()
     {
-        Application.OpenURL("https://github.com/vlcoo/VicMvsLO/releases/latest");
+        Application.OpenURL("https://example.com");
         OpenMainMenu();
     }
 
@@ -2376,11 +1903,6 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
             SendOptions.SendReliable);
     }
 
-    public void SetNoRNGRules(Slider slider)
-    {
-        RNGSliderText.GetComponent<TMP_Text>().text = slider.value.ToString();
-    }
-
     public void ChangeTime(int time)
     {
         timeEnabled.SetIsOnWithoutNotify(time != -1);
@@ -2419,15 +1941,6 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         PhotonNetwork.CurrentRoom.SetCustomProperties(table);
     }
 
-    public void EnableChainableActions(Toggle toggle)
-    {
-        Hashtable properties = new()
-        {
-            [Enums.NetRoomProperties.ChainableRules] = toggle.isOn
-        };
-        PhotonNetwork.CurrentRoom.SetCustomProperties(properties);
-    }
-
     public void EnableStars(Toggle toggle)
     {
         Hashtable properties = new()
@@ -2455,34 +1968,6 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         PhotonNetwork.LocalPlayer.SetCustomProperties(properties);
     }
 
-    public void EnableTeams(Toggle toggle)
-    {
-        Hashtable properties = new()
-        {
-            [Enums.NetRoomProperties.Teams] = toggle.isOn
-        };
-        PhotonNetwork.CurrentRoom.SetCustomProperties(properties);
-        teamHintText.text = "Teams: " + (toggle.isOn ? "ON" : "OFF");
-    }
-
-    public void EnableFriendly(Toggle toggle)
-    {
-        Hashtable properties = new()
-        {
-            [Enums.NetRoomProperties.FriendlyFire] = toggle.isOn
-        };
-        PhotonNetwork.CurrentRoom.SetCustomProperties(properties);
-    }
-
-    public void EnableShare(Toggle toggle)
-    {
-        Hashtable properties = new()
-        {
-            [Enums.NetRoomProperties.ShareStars] = toggle.isOn
-        };
-        PhotonNetwork.CurrentRoom.SetCustomProperties(properties);
-    }
-
     public void EnableTime(Toggle toggle)
     {
         Hashtable properties = new()
@@ -2505,33 +1990,6 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         Hashtable properties = new()
         {
             [Enums.NetRoomProperties.DrawTime] = toggle.isOn
-        };
-        PhotonNetwork.CurrentRoom.SetCustomProperties(properties);
-    }
-
-    public void SetStarcoins(Toggle toggle)
-    {
-        Hashtable properties = new()
-        {
-            [Enums.NetRoomProperties.Starcoins] = toggle.isOn
-        };
-        PhotonNetwork.CurrentRoom.SetCustomProperties(properties);
-    }
-
-    public void SetCoinCount(Toggle toggle)
-    {
-        Hashtable properties = new()
-        {
-            [Enums.NetRoomProperties.ShowCoinCount] = toggle.isOn
-        };
-        PhotonNetwork.CurrentRoom.SetCustomProperties(properties);
-    }
-
-    public void SetNoMap(Toggle toggle)
-    {
-        Hashtable properties = new()
-        {
-            [Enums.NetRoomProperties.NoMap] = toggle.isOn
         };
         PhotonNetwork.CurrentRoom.SetCustomProperties(properties);
     }
@@ -2562,99 +2020,6 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         seconds = minutes * 60 + seconds;
 
         return seconds;
-    }
-
-    public void SetRulesetPreset(RulesetData data)
-    {
-        if (!data.IsValid()) return;
-
-        if (data.description != "")
-        {
-            presetHintPrompt.transform.Find("Image/Header/NameLbl").GetComponent<TMP_Text>().text = data.legalName;
-            presetHintPrompt.transform.Find("Image/DescriptionLbl").GetComponent<TMP_Text>().text = data.description;
-            OpenPrompt(presetHintPrompt, presetHintSelected);
-        }
-
-        foreach (var rule in ruleList)
-            Destroy(rule.gameObject);
-        ruleList.Clear();
-        for (var i = 0; i < data.rulePairsConditions.Length; i++)
-            onAddMatchRuleExplicit(data.rulePairsConditions[i], data.rulePairsActions[i], false);
-        Hashtable table = new()
-        {
-            [Enums.NetRoomProperties.MatchRules] = MatchRulesToJson()
-        };
-        PhotonNetwork.CurrentRoom.SetCustomProperties(table);
-
-        foreach (Transform toggle in specialTogglesParent.transform.GetChild(0).transform)
-            toggle.transform.GetChild(2).GetComponent<Toggle>().isOn = data.specials.Contains(toggle.name);
-        foreach (Transform toggle in specialTogglesParent.transform.GetChild(1).transform)
-            toggle.transform.GetChild(2).GetComponent<Toggle>().isOn = data.specials.Contains(toggle.name);
-
-        // for the stars, coins, lives and time in the data:
-        // if they're -1, they don't get changed at all.
-        // if they're 0, they get disabled like with the toggle in the ui.
-        // finally, if they're 1 or more is valid and will enable them and set the value to that.
-        // exactly the same for laps, but they can't be 0.
-        if (data.stars != -1)
-        {
-            starsEnabled.isOn = data.stars != 0;
-            if (data.stars != 0)
-            {
-                starsText.text = data.stars.ToString();
-                starsText.onEndEdit.Invoke(data.stars.ToString());
-            }
-        }
-
-        if (data.coins != -1)
-        {
-            coinsEnabled.isOn = data.coins != 0;
-            if (data.coins != 0)
-            {
-                coinsText.text = data.coins.ToString();
-                coinsText.onEndEdit.Invoke(data.coins.ToString());
-            }
-        }
-
-        if (data.lives != -1)
-        {
-            livesEnabled.isOn = data.lives != 0;
-            if (data.lives != 0)
-            {
-                livesField.text = data.lives.ToString();
-                livesField.onEndEdit.Invoke(data.lives.ToString());
-            }
-        }
-
-        if (data.timeSeconds != -1)
-        {
-            timeEnabled.isOn = data.timeSeconds != 0;
-            if (data.timeSeconds != 0)
-            {
-                var minutes = data.timeSeconds / 60;
-                var seconds = data.timeSeconds % 60;
-                timeField.text = $"{minutes}:{seconds:D2}";
-                timeField.onEndEdit.Invoke($"{minutes}:{seconds:D2}");
-            }
-        }
-
-        if (data.laps != -1)
-        {
-            lapsText.text = data.laps.ToString();
-            lapsText.onEndEdit.Invoke(data.laps.ToString());
-        }
-
-        for (var i = 0; i < data.powerups.Length; i++)
-        {
-            powerupList[i].Chance = data.powerups[i];
-            onExplicitPowerupChance(powerupList[i].powerup, data.powerups[i]);
-        }
-
-        nomapToggle.isOn = data.hideTrack;
-        coincountToggle.isOn = data.showCoins;
-
-        PhotonNetwork.RaiseEvent((byte)Enums.NetEventIds.LoadedGamemodePreset, $"{data.legalName}|{data.description}", NetworkUtils.EventOthers,
-            SendOptions.SendReliable);
     }
 
     public void ChangeLobbyHeader(string name)

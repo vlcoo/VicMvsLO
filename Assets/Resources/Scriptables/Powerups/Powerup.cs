@@ -14,6 +14,6 @@ public class Powerup : ScriptableObject
     {
         var starDifference = leaderStars - ourStars;
         var bonus = losingSpawnBonus * Mathf.Log(starDifference + 1) * (1f - (starsToWin - leaderStars) / starsToWin);
-        return Mathf.Max(0, spawnChance + bonus) * GameManager.Instance.Togglerizer.powerupChanceMultipliers[prefab];
+        return Mathf.Max(0, spawnChance + bonus);
     }
 }

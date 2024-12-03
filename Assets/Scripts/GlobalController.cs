@@ -31,8 +31,6 @@ public class GlobalController : Singleton<GlobalController>, IInRoomCallbacks, I
     public List<string> EMOTE_NAMES = new();
     public DisconnectCause? disconnectCause = null;
 
-    public List<SpecialPlayer> SPECIAL_PLAYERS = new();
-
     private int windowWidth, windowHeight;
     public DiscordController DiscordController { get; private set; }
     public DeviceRumbler rumbler { get; private set; }
@@ -138,30 +136,6 @@ public class GlobalController : Singleton<GlobalController>, IInRoomCallbacks, I
     public static void CreateInstance()
     {
         Instantiate(Resources.Load("Prefabs/Static/GlobalController"));
-    }
-
-    public async void PopulateSpecialPlayers()
-    {
-        //get http results
-        var request = (HttpWebRequest)WebRequest.Create(PhotonExtensions.SPECIALS_URL);
-        request.Accept = "application/json";
-        request.UserAgent = "vlcoo/VicMvsLO";
-
-        var response = (HttpWebResponse)await request.GetResponseAsync();
-
-        if (response.StatusCode != HttpStatusCode.OK)
-            return;
-
-        var json = await new StreamReader(response.GetResponseStream()!).ReadToEndAsync();
-        var deserializedJson = JsonConvert.DeserializeObject<Dictionary<string, string>>(json);
-        if (deserializedJson == null) return;
-
-        SPECIAL_PLAYERS.Clear();
-        foreach (var player in deserializedJson)
-        {
-            var sp = new SpecialPlayer(player.Key.Split("|")[1], int.Parse(player.Value));
-            SPECIAL_PLAYERS.Add(sp);
-        }
     }
 
     private void PopulateEmoteNames()

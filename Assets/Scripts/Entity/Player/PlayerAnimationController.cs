@@ -452,10 +452,7 @@ public class PlayerAnimationController : MonoBehaviourPun
             return;
         }
 
-        if (GameManager.Instance.Togglerizer.currentEffects.Contains("FastDeath"))
-            deathTimer = 3f;
-        else
-            deathTimer += Time.fixedDeltaTime;
+        deathTimer += Time.fixedDeltaTime;
 
         if (deathTimer < deathUpTime)
         {
@@ -575,7 +572,6 @@ public class PlayerAnimationController : MonoBehaviourPun
             animator.SetTrigger("door");
             if (de.otherDoor.isGoal)
             {
-                GameManager.Instance.WinByGoal(controller);
                 return;
             }
 

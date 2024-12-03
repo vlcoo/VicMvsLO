@@ -90,7 +90,6 @@ public class BulletBillMover : KillableEntity
         {
             if (!(player.state == Enums.PowerupState.MiniMushroom && !player.groundpound))
             {
-                GameManager.Instance.MatchConditioner.ConditionActioned(player, "SteppedOnEnemy");
                 photonView.RPC(nameof(Kill), RpcTarget.All);
             }
 

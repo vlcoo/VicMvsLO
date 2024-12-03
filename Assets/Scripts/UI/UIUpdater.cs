@@ -8,18 +8,17 @@ using UnityEngine.UI;
 public class UIUpdater : MonoBehaviour
 {
     public static UIUpdater Instance;
-    public GameObject playerTrackTemplate, starTrackTemplate, goalTrackIcon;
-    public TrackIcon checkpointTrackIcon;
+    public GameObject playerTrackTemplate, starTrackTemplate;
     public PlayerController player;
     public Sprite storedItemNull;
-    public TMP_Text uiStars, uiCoins, uiDebug, uiLives, uiCountdown, uiLaps;
+    public TMP_Text uiStars, uiCoins, uiDebug, uiLives, uiCountdown;
     public Image itemReserve, itemColor;
     public float pingSample, fpsSample;
     private readonly List<Image> backgrounds = new();
     private bool checkpoint;
 
-    private int coins = -1, stars = -1, lives = -1, timer = -1, laps = -1;
-    private GameObject starsParent, coinsParent, livesParent, timerParent, lapsParent;
+    private int coins = -1, stars = -1, lives = -1, timer = -1;
+    private GameObject starsParent, coinsParent, livesParent, timerParent;
 
     private Material timerMaterial;
     private bool uiHidden, invis;
@@ -33,21 +32,17 @@ public class UIUpdater : MonoBehaviour
         coinsParent = uiCoins.transform.parent.gameObject;
         livesParent = uiLives.transform.parent.gameObject;
         timerParent = uiCountdown.transform.parent.gameObject;
-        lapsParent = uiLaps.transform.parent.gameObject;
 
         backgrounds.Add(starsParent.GetComponentInChildren<Image>());
         backgrounds.Add(coinsParent.GetComponentInChildren<Image>());
         backgrounds.Add(livesParent.GetComponentInChildren<Image>());
         backgrounds.Add(timerParent.GetComponentInChildren<Image>());
-        backgrounds.Add(lapsParent.GetComponentInChildren<Image>());
 
         foreach (var bg in backgrounds)
             bg.color = GameManager.Instance.levelUIColor;
         itemColor.color = new Color(GameManager.Instance.levelUIColor.r - 0.2f,
             GameManager.Instance.levelUIColor.g - 0.2f, GameManager.Instance.levelUIColor.b - 0.2f,
             GameManager.Instance.levelUIColor.a);
-
-        goalTrackIcon.SetActive(GameManager.Instance.raceLevel);
     }
 
     public void Update()
@@ -62,7 +57,7 @@ public class UIUpdater : MonoBehaviour
 
             var signalStrength = pingSample switch
             {
-                < 0 => "connection_great",
+                < 40 => "connection_great",
                 < 80 => "connection_good",
                 < 120 => "connection_fair",
                 < 180 => "connection_bad",
@@ -104,17 +99,10 @@ public class UIUpdater : MonoBehaviour
         livesParent.SetActive(!hidden);
         coinsParent.SetActive(!hidden);
         timerParent.SetActive(!hidden);
-        lapsParent.SetActive(!hidden);
     }
 
     private void UpdateStoredItemUI()
     {
-        if (GameManager.Instance.Togglerizer.currentEffects.Contains("NoReserve"))
-        {
-            itemReserve.gameObject.SetActive(false);
-            invis = true;
-        }
-
         itemReserve.sprite = player.storedPowerup != null ? player.storedPowerup.reserveSprite : storedItemNull;
     }
 
@@ -136,21 +124,6 @@ public class UIUpdater : MonoBehaviour
         else
         {
             starsParent.SetActive(false);
-        }
-
-        if (GameManager.Instance.raceLevel && GameManager.Instance.lapRequirement > 1)
-        {
-            if (player.laps != laps)
-            {
-                laps = player.laps;
-                uiLaps.text = "<sprite name=\"hudnumber_laps\"><sprite name=\"hudnumber_x\">" +
-                              Utils.GetNumberString(laps) + "<sprite name=\"hudnumber_slash\">" +
-                              Utils.GetNumberString(GameManager.Instance.lapRequirement);
-            }
-        }
-        else
-        {
-            lapsParent.SetActive(false);
         }
 
         if (player.coins != coins)
@@ -208,15 +181,6 @@ public class UIUpdater : MonoBehaviour
         {
             timerParent.SetActive(false);
         }
-
-        if (player.gotCheckpoint != checkpoint)
-        {
-            checkpoint = player.gotCheckpoint;
-            checkpointTrackIcon.gameObject.SetActive(checkpoint);
-            if (checkpoint)
-                checkpointTrackIcon.SetPositionFromLevelCoords(GameManager.Instance.checkpoint);
-            checkpointTrackIcon.animator.enabled = checkpoint;
-        }
     }
 
     public GameObject CreatePlayerIcon(PlayerController player)
@@ -225,7 +189,7 @@ public class UIUpdater : MonoBehaviour
         var icon = trackObject.GetComponent<TrackIcon>();
         icon.target = player.gameObject;
 
-        trackObject.SetActive(!GameManager.Instance.hideMap);
+        trackObject.SetActive(true);
 
         return trackObject;
     }
