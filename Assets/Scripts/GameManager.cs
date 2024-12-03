@@ -1075,87 +1075,54 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         var starGame = starRequirement != -1;
         var timeUp = endServerTime != -1 && endServerTime - Time.deltaTime - PhotonNetwork.ServerTimestamp < 0;
         var winningStars = -1;
-        var winningLives = -1;
         List<PlayerController> winningPlayers = new();
         List<PlayerController> alivePlayers = new();
-        foreach (var player in players)
-        {
+        foreach (var player in players) {
             if (player == null || player.lives == 0)
                 continue;
 
             alivePlayers.Add(player);
 
-            if ((starGame && player.stars >= starRequirement) || (starGame && timeUp))
-            {
+            if ((starGame && player.stars >= starRequirement) || timeUp) {
                 //we're in a state where this player would win.
                 //check if someone has more stars
-                if (player.stars > winningStars)
-                {
+                if (player.stars > winningStars) {
                     winningPlayers.Clear();
                     winningStars = player.stars;
                     winningPlayers.Add(player);
-                }
-                else if (player.stars == winningStars)
-                {
-                    winningPlayers.Add(player);
-                }
-            }
-
-            if (!starGame && timeUp)
-            {
-                if (player.lives >= 1)
-                    break;
-
-                if (player.lives > winningLives)
-                {
-                    winningPlayers.Clear();
-                    winningLives = player.lives;
-                    winningPlayers.Add(player);
-                }
-                else if (player.lives == winningLives)
-                {
+                } else if (player.stars == winningStars) {
                     winningPlayers.Add(player);
                 }
             }
         }
-
         //LIVES CHECKS
-        if (alivePlayers.Count == 0)
-        {
+        if (alivePlayers.Count == 0) {
             //everyone's dead...? ok then, draw?
-            PhotonNetwork.RaiseEvent((byte)Enums.NetEventIds.EndGame, null, NetworkUtils.EventAll,
-                SendOptions.SendReliable);
+            PhotonNetwork.RaiseEvent((byte) Enums.NetEventIds.EndGame, null, NetworkUtils.EventAll, SendOptions.SendReliable);
             return;
         }
 
-        if (alivePlayers.Count == 1)
-        {
+        if (alivePlayers.Count == 1 && playerCount >= 2) {
             //one player left alive (and not in a solo game). winner!
-            PhotonNetwork.RaiseEvent((byte)Enums.NetEventIds.EndGame, alivePlayers[0].photonView.Owner,
-                NetworkUtils.EventAll, SendOptions.SendReliable);
+            PhotonNetwork.RaiseEvent((byte) Enums.NetEventIds.EndGame, alivePlayers[0].photonView.Owner, NetworkUtils.EventAll, SendOptions.SendReliable);
             return;
         }
-
         //TIMED CHECKS
-        if (timeUp)
-        {
+        if (timeUp) {
             Utils.GetCustomProperty(Enums.NetRoomProperties.DrawTime, out bool draw);
             //time up! check who has most stars, if a tie keep playing, if draw is on end game in a draw
             if (draw)
                 // it's a draw! Thanks for playing the demo!
-                PhotonNetwork.RaiseEvent((byte)Enums.NetEventIds.EndGame, null, NetworkUtils.EventAll,
-                    SendOptions.SendReliable);
+                PhotonNetwork.RaiseEvent((byte) Enums.NetEventIds.EndGame, null, NetworkUtils.EventAll, SendOptions.SendReliable);
             else if (winningPlayers.Count == 1)
-                PhotonNetwork.RaiseEvent((byte)Enums.NetEventIds.EndGame, winningPlayers[0].photonView.Owner,
-                    NetworkUtils.EventAll, SendOptions.SendReliable);
+                PhotonNetwork.RaiseEvent((byte) Enums.NetEventIds.EndGame, winningPlayers[0].photonView.Owner, NetworkUtils.EventAll, SendOptions.SendReliable);
 
             return;
         }
-
-        if (starGame && winningStars >= starRequirement)
+        if (starGame && winningStars >= starRequirement) {
             if (winningPlayers.Count == 1)
-                PhotonNetwork.RaiseEvent((byte)Enums.NetEventIds.EndGame, winningPlayers[0].photonView.Owner,
-                    NetworkUtils.EventAll, SendOptions.SendReliable);
+                PhotonNetwork.RaiseEvent((byte) Enums.NetEventIds.EndGame, winningPlayers[0].photonView.Owner, NetworkUtils.EventAll, SendOptions.SendReliable);
+        }
     }
 
     private void SetMusicState(Enums.MusicState state)

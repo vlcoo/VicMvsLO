@@ -74,8 +74,7 @@ public class Settings : Singleton<Settings>
         {
             var possibleNicks = new[]
             {
-                "mario", "luigi", "hopper", "broozer", "bully", "bones", "goombud", "bro", "kabomb", "moneybag",
-                "monty", "nabbit", "rex", "shyguy", "spike", "splunkin"
+                "Player"
             };
             nickname = possibleNicks[Random.Range(0, possibleNicks.Length)] + Random.Range(10, 100);
         }

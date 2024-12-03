@@ -67,7 +67,6 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     public Toggle ndsResolutionToggle,
         fullscreenToggle,
         livesEnabled,
-        powerupsEnabled,
         timeEnabled,
         starsEnabled,
         coinsEnabled,
@@ -89,7 +88,6 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
     public TMP_InputField nicknameField,
         starsText,
-        lapsText,
         coinsText,
         livesField,
         timeField,
@@ -450,7 +448,6 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         AttemptToUpdateProperty<int>(updatedProperties, Enums.NetRoomProperties.StarRequirement, ChangeStarRequirement);
         AttemptToUpdateProperty<int>(updatedProperties, Enums.NetRoomProperties.CoinRequirement, ChangeCoinRequirement);
         AttemptToUpdateProperty<int>(updatedProperties, Enums.NetRoomProperties.Lives, ChangeLives);
-        AttemptToUpdateProperty<bool>(updatedProperties, Enums.NetRoomProperties.NewPowerups, ChangeNewPowerups);
         AttemptToUpdateProperty<int>(updatedProperties, Enums.NetRoomProperties.Time, ChangeTime);
         AttemptToUpdateProperty<bool>(updatedProperties, Enums.NetRoomProperties.DrawTime, ChangeDrawTime);
         AttemptToUpdateProperty<string>(updatedProperties, Enums.NetRoomProperties.HostName, ChangeLobbyHeader);
@@ -1103,11 +1100,6 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         //start game with all players
         RaiseEventOptions options = new() { Receivers = ReceiverGroup.All };
         PhotonNetwork.RaiseEvent((byte)Enums.NetEventIds.StartGame, null, options, SendOptions.SendReliable);
-    }
-
-    public void ChangeNewPowerups(bool value)
-    {
-        powerupsEnabled.SetIsOnWithoutNotify(value);
     }
 
     public void ChangeLives(int lives)
@@ -1769,7 +1761,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
     private IEnumerator FinishQuitting()
     {
-        var clip = Enums.Sounds.UI_Quit.GetClip();
+        var clip = Enums.Sounds.UI_Decide.GetClip();
         sfx.PlayOneShot(clip);
         quit = true;
 
