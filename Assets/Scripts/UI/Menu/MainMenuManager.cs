@@ -614,6 +614,8 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
             $"<u><i>{level.Title}</i></u>  by  <i>{level.UserName}</i><size=8>\n\n- - -\n </size>\n<color=#ffffff60><size=16>{level.Description}</size></color>";
         SetLevelIndex(10);
         OpenPrompt(levelDownloadedBox, levelDownloadedBoxSelected);
+
+        PhotonNetwork.RaiseEvent((byte)Enums.NetEventIds.DownloadedLevel, level, NetworkUtils.EventOthers, SendOptions.SendReliable);
     }
 
     // CUSTOM EVENT CALLBACKS
@@ -683,6 +685,17 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
             case (byte)Enums.NetEventIds.ChangePrivate:
             {
                 ChangePrivate();
+                break;
+            }
+            case (byte)Enums.NetEventIds.DownloadedLevel:
+            {
+                var level = e.CustomData as LevelModel;
+                CurrentDownloadedLevel = level;
+                dlMapText.text = "Level downloaded. Ready to start!!";
+                levelDownloadedDetailText.text =
+                    $"<u><i>{level.Title}</i></u>  by  <i>{level.UserName}</i><size=8>\n\n- - -\n </size>\n<color=#ffffff60><size=16>{level.Description}</size></color>";
+                OpenPrompt(levelDownloadedBox, levelDownloadedBoxSelected);
+
                 break;
             }
         }

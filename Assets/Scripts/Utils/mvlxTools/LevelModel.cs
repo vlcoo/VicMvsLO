@@ -19,6 +19,7 @@ public record LevelModel
     public LevelModel(Dictionary<string, object> levelDict)
     {
         UserName = levelDict.GetValueOrDefault("user_name") as string;
+        if (string.IsNullOrEmpty(UserName)) UserName = "Unknown";
         UserName = UserName.SanitizeForRichTextbox();
         Title = levelDict.GetValueOrDefault("title") as string;
         Title = Title.SanitizeForRichTextbox();
