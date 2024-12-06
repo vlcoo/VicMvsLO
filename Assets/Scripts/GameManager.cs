@@ -78,7 +78,6 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
     private ParticleSystem brickBreak;
 
     private GameObject[] coins;
-    private GoalFlagpole goal;
 
     //lazy mofo
     private float? middleX, minX, minY, maxX, maxY;

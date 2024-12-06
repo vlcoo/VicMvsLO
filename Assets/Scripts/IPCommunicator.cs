@@ -37,6 +37,7 @@ public class IPCommunicator : MonoBehaviour
     }
 
     public LevelModel CurrentDownloadedLevel;
+    public bool AcceptsIncomingLevel = false;
 
     private void Start()
     {
@@ -63,13 +64,27 @@ public class IPCommunicator : MonoBehaviour
         client.Initialize(PortEditor);
     }
 
-    public void SendOutgoingMessage(string message)
+    public bool SendOutgoingMessage(string message)
     {
-        var response = client.Send(message);
+        // returns true if the other end received the message, no matter the response. false would mean the other side is unreachable or not running.
+        string response;
+        try
+        {
+            response = client.Send(message);
+        }
+        catch (System.Exception e)
+        {
+            while (e != null)
+            {
+                Debug.LogError(e.Message);
+                e = e.InnerException;
+            }
+            return false;
+        }
         if (response is null)
         {
             Debug.LogError($"Other end never responded!");
-            return;
+            return false;
         }
 
         if (response == Enums.IpcMessages.GenericAccept)
@@ -80,6 +95,7 @@ public class IPCommunicator : MonoBehaviour
         {
             Debug.LogError($"Other end rejected the message!");
         }
+        return true;
     }
 
     private IEnumerator HandleIncomingMessage(string request)
@@ -88,7 +104,7 @@ public class IPCommunicator : MonoBehaviour
         var response = "";
 
         // check for specific messages in specific situations.
-        if (request.StartsWith("{"))
+        if (request.StartsWith("{") && AcceptsIncomingLevel)
         {
             // level transmission began last message. this one must contain a stringified json of the contents.
             Debug.Log("deserializing lvl!");

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -16,6 +17,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
+using Debug = UnityEngine.Debug;
 using Hashtable = ExitGames.Client.Photon.Hashtable;
 using Random = System.Random;
 
@@ -289,6 +291,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         joinRoomBtn.interactable = connected && validName;
         createRoomBtn.interactable = connected && validName;
         region.interactable = connected;
+        GlobalController.Instance.Ipc.AcceptsIncomingLevel = PhotonNetwork.IsMasterClient && inLobbyMenu.activeInHierarchy;
 
         if (pingsReceived)
         {
@@ -609,17 +612,18 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
     public void OnDownloadedLevelSelected(LevelModel level)
     {
-        if (!PhotonNetwork.IsMasterClient)
+        if (!GlobalController.Instance.Ipc.AcceptsIncomingLevel)
             return;
         
         dlMapText.text = "Level downloaded. Ready to start!!";
+        dlMapText.transform.GetChild(0).gameObject.SetActive(false);
         levelDownloadedDetailText.text =
             $"<u><i>{level.Title}</i></u>  by  <i>{level.UserName}</i><size=8>\n\n- - -\n </size>\n<color=#ffffff60><size=16>{level.Description}</size></color>";
         SetLevelIndex(10);
         OpenPrompt(levelDownloadedBox, levelDownloadedBoxSelected);
 
         PhotonNetwork.RaiseEvent((byte)Enums.NetEventIds.DownloadedLevel, level.ToHashtable(), NetworkUtils.EventOthers, SendOptions.SendReliable);
-        StartGame();
+        // StartGame();
     }
 
     // CUSTOM EVENT CALLBACKS
@@ -696,6 +700,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
                 var level = LevelModel.FromHashtable(e.CustomData as Hashtable);
                 CurrentDownloadedLevel = level;
                 dlMapText.text = "Level downloaded. Ready to start!!";
+                dlMapText.transform.GetChild(0).gameObject.SetActive(true);
                 levelDownloadedDetailText.text =
                     $"<u><i>{level.Title}</i></u>  by  <i>{level.UserName}</i><size=8>\n\n- - -\n </size>\n<color=#ffffff60><size=16>{level.Description}</size></color>";
                 OpenPrompt(levelDownloadedBox, levelDownloadedBoxSelected);
@@ -825,6 +830,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         OpenInLobbyMenu();
         characterDropdown.SetValueWithoutNotify(Utils.GetCharacterIndex());
         dlMapText.text = "No level chosen... Pls download a stage!";
+        dlMapText.transform.GetChild(0).gameObject.SetActive(true);
         CurrentDownloadedLevel = null;
 
         Utils.GetCustomProperty(Enums.NetPlayerProperties.PlayerColor, out int value,
@@ -2053,5 +2059,24 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     public void SendTestIPC()
     {
         GlobalController.Instance.Ipc.SendOutgoingMessage(Enums.IpcMessages.CheckHealth);
+    }
+
+    public void TryLaunchEditor()
+    {
+        if (!GlobalController.Instance.Ipc.SendOutgoingMessage(Enums.IpcMessages.CheckHealth))
+        {
+            // launch executable from the built unity game's directory.
+            var path = Path.Combine(Application.dataPath, "maker-editor.exe");
+            // if file exists, run it in a new process:
+            if (File.Exists(path))
+            {
+                Process.Start(path);
+            }
+            else OpenErrorBox("Editor not found! Installation is corrupted? Try launching the editor manually or reinstalling the mod.");
+        }
+        else
+        {
+            GlobalController.Instance.Ipc.SendOutgoingMessage(Enums.IpcMessages.GenericGiveFocus);
+        }
     }
 }
