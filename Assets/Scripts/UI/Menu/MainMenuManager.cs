@@ -50,6 +50,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         privatePrompt,
         updateBox,
         webglWarningBox,
+        disclaimerBox,
         emoteListPrompt,
         stagePrompt,
         levelDownloadedBox;
@@ -109,6 +110,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         reconnectSelected,
         updateBoxSelected,
         webglWarningBoxSelected,
+        disclaimerBoxSelected,
         emoteListSelected,
         stageSelected,
         levelDownloadedBoxSelected;
@@ -441,6 +443,10 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
         LocalChatMessage($"<i>{newPlayer.GetUniqueNickname()}</i> just joined.", SYSTEM_MESSAGE_COLOR);
         sfx.PlayOneShot(Enums.Sounds.UI_PlayerConnect.GetClip());
+
+        if (CurrentDownloadedLevel != null)
+            PhotonNetwork.RaiseEvent((byte)Enums.NetEventIds.DownloadedLevel, CurrentDownloadedLevel.ToHashtable(),
+                new RaiseEventOptions { TargetActors = new[] { newPlayer.ActorNumber } }, SendOptions.SendReliable);
     }
 
     public void OnPlayerLeftRoom(Player otherPlayer)
@@ -621,6 +627,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
             $"<u><i>{level.Title}</i></u>  by  <i>{level.UserName}</i><size=8>\n\n- - -\n </size>\n<color=#ffffff60><size=16>{level.Description}</size></color>";
         SetLevelIndex(10);
         OpenPrompt(levelDownloadedBox, levelDownloadedBoxSelected);
+        sfx.PlayOneShot(Enums.Sounds.World_Coin_Collect.GetClip());
 
         PhotonNetwork.RaiseEvent((byte)Enums.NetEventIds.DownloadedLevel, level.ToHashtable(), NetworkUtils.EventOthers, SendOptions.SendReliable);
         // StartGame();
@@ -700,10 +707,11 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
                 var level = LevelModel.FromHashtable(e.CustomData as Hashtable);
                 CurrentDownloadedLevel = level;
                 dlMapText.text = "Level downloaded. Ready to start!!";
-                dlMapText.transform.GetChild(0).gameObject.SetActive(true);
+                dlMapText.transform.GetChild(0).gameObject.SetActive(false);
                 levelDownloadedDetailText.text =
                     $"<u><i>{level.Title}</i></u>  by  <i>{level.UserName}</i><size=8>\n\n- - -\n </size>\n<color=#ffffff60><size=16>{level.Description}</size></color>";
                 OpenPrompt(levelDownloadedBox, levelDownloadedBoxSelected);
+                sfx.PlayOneShot(Enums.Sounds.World_Coin_Collect.GetClip());
 
                 break;
             }
@@ -829,7 +837,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
         OpenInLobbyMenu();
         characterDropdown.SetValueWithoutNotify(Utils.GetCharacterIndex());
-        dlMapText.text = "No level chosen... Pls download a stage!";
+        dlMapText.text = "Pls load or build a stage!";
         dlMapText.transform.GetChild(0).gameObject.SetActive(true);
         CurrentDownloadedLevel = null;
 
@@ -1012,6 +1020,11 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         ClosePrompt(privatePrompt);
 
         EventSystem.current.SetSelectedGameObject(creditsSelected);
+    }
+    
+    public void OpenDisclaimer()
+    {
+        OpenPrompt(disclaimerBox, disclaimerBoxSelected); 
     }
 
     public void OpenInLobbyMenu()
@@ -2070,9 +2083,10 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
             // if file exists, run it in a new process:
             if (File.Exists(path))
             {
-                Process.Start(path);
+                if (Process.Start(path) == null)
+                    OpenErrorBox("Editor failed to launch! Your OS is incompatible? Please report this, then try launching the editor manually from the <i>_data</i> folder.");
             }
-            else OpenErrorBox("Editor not found! Installation is corrupted? Try launching the editor manually or reinstalling the mod.");
+            else OpenErrorBox("Editor not found! Installation is corrupted? Try launching the editor manually from the <i>_data</i> folder or reinstalling the mod.");
         }
         else
         {

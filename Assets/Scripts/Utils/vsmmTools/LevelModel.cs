@@ -5,7 +5,6 @@ using ExitGames.Client.Photon.StructWrapping;
 using NSMB.Utils;
 using UnityEngine;
 
-[System.Serializable]
 public class LevelModel
 {
     public string UserName, Title, Description;

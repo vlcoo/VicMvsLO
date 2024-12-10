@@ -30,7 +30,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
     public Vector3 spawnpoint;
     public Vector3 checkpoint;
     public Tilemap tilemap, tilemapBackground, tilemapSemisolid, tilemapSquishy;
-    public Transform backgroundsHolder, pitsHolder;
+    public Transform backgroundsHolder, pitsHolder, lightsHolder;
     [ColorUsage(false)] public Color levelUIColor = new(24, 178, 170);
     public bool spawnBigPowerups = true, spawnVerticalPowerups = true;
     public string levelDesigner = "", richPresenceId = "", levelName = "Unknown";

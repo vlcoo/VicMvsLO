@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Photon.Pun;
+using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 // ReSharper disable UsageOfDefaultStructEquality
@@ -46,12 +47,14 @@ public class LevelContentConverter : MonoBehaviour
         public readonly string TilePalettePrefabPath;
         public readonly int TileIdX;
         public readonly int TileIdY;
+        public readonly bool NeedsSemisolidity;
 
-        public UnityTileObject(string tilePalettePrefabPath, int tileIdX, int tileIdY)
+        public UnityTileObject(string tilePalettePrefabPath, int tileIdX, int tileIdY, bool needsSemisolidity = false)
         {
             TilePalettePrefabPath = tilePalettePrefabPath;
             TileIdX = tileIdX;
             TileIdY = tileIdY;
+            NeedsSemisolidity = needsSemisolidity;
         }
 
         public UnityTileObject X(int increment) => new(TilePalettePrefabPath, TileIdX + increment, TileIdY);
@@ -153,7 +156,7 @@ public class LevelContentConverter : MonoBehaviour
         { new GdTileObject(127, 0, 1), new UnityTileObject("Tilemaps/Palettes/Basic Blocks", -3, 1) },
         { new GdTileObject(127, 0, 2), new UnityTileObject("Tilemaps/Palettes/Basic Blocks", -4, 4) },
         { new GdTileObject(127, 0, 3), new UnityTileObject("Tilemaps/Palettes/Basic Blocks", -5, 3) },
-        { new GdTileObject(127, 0, 4), new UnityTileObject("Tilemaps/Palettes/Basic Blocks", -2, 3) },
+        { new GdTileObject(127, 0, 4), new UnityTileObject("Tilemaps/Palettes/Basic Blocks", -2, 1) },
         { new GdTileObject(127, 0, 5), new UnityTileObject("Tilemaps/Palettes/Basic Blocks", -5, 4) },
         { new GdTileObject(127, 0, 6), new UnityTileObject("Tilemaps/Palettes/Basic Blocks", -6, 3) },
         { new GdTileObject(127, 0, 7), new UnityTileObject("Tilemaps/Palettes/Basic Blocks", -1, 3) },
@@ -200,7 +203,7 @@ public class LevelContentConverter : MonoBehaviour
         { new GdTileObject(0, 10, 1), new UnityTileObject("Tilemaps/Palettes/Grassland", 6, -9) },
         { new GdTileObject(0, 7, 2), new UnityTileObject("Tilemaps/Palettes/Grassland", 1, -9) },
         { new GdTileObject(0, 7, 3), new UnityTileObject("Tilemaps/Palettes/Grassland", 1, -10) },
-        { new GdTileObject(0, 6, 5), new UnityTileObject("Tilemaps/Palettes/Grassland", 0, -7) },
+        { new GdTileObject(0, 6, 5), new UnityTileObject("Tilemaps/Palettes/Grassland", 0, -7, true) },
         { new GdTileObject(0, 5, 3), new UnityTileObject("Tilemaps/Palettes/Grassland", 5, -3) },
         { new GdTileObject(0, 6, 3), new UnityTileObject("Tilemaps/Palettes/Grassland", 6, -3) },
         { new GdTileObject(0, 8, 2), new UnityTileObject("Tilemaps/Palettes/Grassland", -1, -4) },
@@ -381,7 +384,7 @@ public class LevelContentConverter : MonoBehaviour
         { new GdTileObject(1, 7, 0, 1), new UnityTileObject("Tilemaps/Palettes/Cave with Ice", -1, 1) },
         { new GdTileObject(1, 8, 0, 1), new UnityTileObject("Tilemaps/Palettes/Cave with Ice", -1, 1) },
         { new GdTileObject(1, 9, 0, 1), new UnityTileObject("Tilemaps/Palettes/Cave with Ice", -1, 1) },
-        { new GdTileObject(3, 5, 3), new UnityTileObject("Tilemaps/Palettes/Cave with Ice", -2, -3) },
+        { new GdTileObject(3, 5, 3), new UnityTileObject("Tilemaps/Palettes/Castle", 7, 0, true) },
         { new GdTileObject(7, 7, 2), new UnityTileObject("Tilemaps/Palettes/Volcano", 1, 3) },
         { new GdTileObject(7, 5, 3), new UnityTileObject("Tilemaps/Palettes/Volcano", 4, 3) },
         { new GdTileObject(7, 6, 3), new UnityTileObject("Tilemaps/Palettes/Volcano", 4, 2) },
@@ -591,17 +594,18 @@ public class LevelContentConverter : MonoBehaviour
 
         parent.levelWidthTile = Convert.ToInt32((long)properties["w"]);
         parent.levelHeightTile = Convert.ToInt32((long)properties["h"]) + 3;    // compensate for the deathplane.
+        parent.cameraMinX = 0;
         parent.cameraMaxX = (float)(parent.levelWidthTile / 2.0);
-        parent.cameraHeightY = (float)(Convert.ToDouble((long)properties["h"]) / 2.0);
+        var camHeight = Convert.ToDouble((long)properties["h"]);
+        parent.cameraHeightY = camHeight <= 14 ? 0 : (float)(camHeight / 2.0);
 
         var themeIndex = Convert.ToInt32((long)properties["t"]);
-        for (var i = 0; i < parent.backgroundsHolder.childCount; i++)
-        {
-            var bgLayer = parent.backgroundsHolder.GetChild(i).gameObject;
-            if (i != themeIndex) continue;
-            bgLayer.SetActive(true);
-            GameObject.FindGameObjectWithTag("MainCamera").GetComponent<BackgroundLoop>().InitializeBackground(bgLayer.transform);
-        }
+        parent.MusicSynth.CurrentSong = parent.MusicSynth.songs[themeIndex];
+        var backgroundObject = parent.backgroundsHolder.GetChild(themeIndex).gameObject;
+        backgroundObject.SetActive(true);
+        GameObject.FindGameObjectWithTag("MainCamera").GetComponent<BackgroundLoop>().InitializeBackground(backgroundObject.transform);
+        var lightObject = parent.lightsHolder.GetChild(themeIndex).gameObject;
+        lightObject.SetActive(true);
 
         var pitType = Convert.ToInt32((long)properties["p"]);
         for (var i = 0; i < parent.pitsHolder.childCount; i++)
@@ -640,7 +644,9 @@ public class LevelContentConverter : MonoBehaviour
                 // ...target is tile. examples: ground, wall, terrain.
                 case UnityTileObject tileObject:
                 {
-                    PutTile(tileObject, targetPosition.GdTileToUnityTile(), background ? GridTypes.Background : GridTypes.Normal);
+                    PutTile(tileObject, targetPosition.GdTileToUnityTile(),
+                        background ? GridTypes.Background :
+                        tileObject.NeedsSemisolidity ? GridTypes.Semisolid : GridTypes.Normal);
                     break;
                 }
 
@@ -713,16 +719,27 @@ public class LevelContentConverter : MonoBehaviour
                         case ItemTypes.PlatMariobros:
                         {
                             // same jazz, but there are some properties to be set too.
-                            var platform = PutPrefab(itemObject, targetPos.GdWorldToUnityWorld() + new Vector3(1, -0.25f, 0), platformsFolder, "MarioBrosPlatform") as MarioBrosPlatform;
-                            if (itemProperties != null && platform) platform.platformWidth = Convert.ToInt32((long)itemProperties["width"]) + 1;
+                            var platform = PutPrefab(itemObject, targetPos.GdWorldToUnityWorld(), platformsFolder, "MarioBrosPlatform") as MarioBrosPlatform;
+                            if (itemProperties != null && platform)
+                            {
+                                platform.platformWidth = Convert.ToInt32((long)itemProperties["width"]) / 2.0f + 2;
+                                var pos = platform.transform.position;
+                                pos.x += platform.platformWidth / 4.0f;
+                                platform.transform.position = pos;
+                            }
                             break;
                         }
                         case ItemTypes.PlatCloud:
                         {
-                            var platform = PutPrefab(itemObject, targetPos.GdWorldToUnityWorld() - Vector3.one * 0.5f, platformsFolder, "CloudPlatform") as CloudPlatform;
+                            var platform = PutPrefab(itemObject, targetPos.GdWorldToUnityWorld(), platformsFolder, "CloudPlatform") as CloudPlatform;
                             if (itemProperties != null && platform)
                             {
-                                platform.platformWidth = Convert.ToInt32((long)itemProperties["width"]) + 3;
+                                // we skip every three widths because the cloud sprite cuts off at those values:
+                                var width = Convert.ToInt32((long)itemProperties["width"]);
+                                platform.platformWidth = (int)(width + 2 + math.floor(width / 2.0f));
+                                var pos = platform.transform.position;
+                                pos.y -= 0.5f;
+                                platform.transform.position = pos;
                             }
                             break;
                         }

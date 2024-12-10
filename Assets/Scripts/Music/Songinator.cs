@@ -41,14 +41,17 @@ public class Songinator : MonoBehaviour
     private void Start()
     {
         // Load in the current song from the list of candidates.
-        if (songs.Count > 1)
+        if (CurrentSong is null)
         {
-            for (var i = 0; i < songs.Count; i++) weightedList.Add(songs[i], chances[i]);
-            CurrentSong = weightedList.Next();
-        }
-        else
-        {
-            CurrentSong = songs[0];
+            if (songs.Count > 1)
+            {
+                for (var i = 0; i < songs.Count; i++) weightedList.Add(songs[i], chances[i]);
+                CurrentSong = weightedList.Next();
+            }
+            else
+            {
+                CurrentSong = songs[0];
+            }
         }
 
         InitializeMeltySynth();

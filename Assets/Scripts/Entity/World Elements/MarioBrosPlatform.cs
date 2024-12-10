@@ -7,7 +7,8 @@ public class MarioBrosPlatform : MonoBehaviourPun
 {
     private static readonly Vector2 BUMP_OFFSET = new(-0.25f, -0.1f);
 
-    [Delayed] public int platformWidth = 8, samplesPerTile = 8, bumpWidthPoints = 3, bumpBlurPoints = 6;
+    [Delayed] public int samplesPerTile = 8, bumpWidthPoints = 3, bumpBlurPoints = 6;
+    [Delayed] public float platformWidth = 8.0f;
 
     public float bumpDuration = 0.4f;
     public bool changeCollider = true;
@@ -81,8 +82,8 @@ public class MarioBrosPlatform : MonoBehaviourPun
         if (changeCollider)
             GetComponent<BoxCollider2D>().size = new Vector2(platformWidth, 5f / 8f);
 
-        displacementMap = new Texture2D(platformWidth * samplesPerTile, 1);
-        pixels = new Color32[platformWidth * samplesPerTile];
+        displacementMap = new Texture2D((int)(platformWidth * samplesPerTile), 1);
+        pixels = new Color32[(int)(platformWidth * samplesPerTile)];
 
         mpb = new MaterialPropertyBlock();
         spriteRenderer.GetPropertyBlock(mpb);
