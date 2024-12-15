@@ -86,7 +86,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         scoreboardToggle,
         filterToggle;
 
-    public GameObject playersContent, playersPrefab, chatContent, chatPrefab;
+    public GameObject playersContent, playersPrefab, chatContent, chatPrefab, chatOpinionAlert;
 
     public TMP_InputField nicknameField,
         starsText,
@@ -221,9 +221,17 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         {
             if (PhotonNetwork.InRoom)
             {
+                // we just got back from a match
                 EnterRoom();
                 nicknameField.SetTextWithoutNotify(Settings.Instance.nickname);
                 UpdateNickname();
+
+                if (CurrentDownloadedLevel.Id > 0)
+                {
+                    chatOpinionAlert.SetActive(true);
+                    chatOpinionAlert.transform.GetComponentInChildren<Button>().onClick.AddListener(() =>
+                        TryLaunchEditorWithArgs($"opinion,{CurrentDownloadedLevel.Id}"));
+                }
             }
             else
             {
@@ -402,7 +410,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
     {
         // increase or remove when toadette or another character is added
         Utils.GetCustomProperty(Enums.NetRoomProperties.Debug, out bool debug);
-        if (PhotonNetwork.IsMasterClient && Utils.GetCharacterIndex(player) > 9 && !debug)
+        if (PhotonNetwork.IsMasterClient && Utils.GetCharacterIndex(player) > 3)
             SwapCharacterExplicit(0);
         UpdateSettingEnableStates();
     }
@@ -839,7 +847,7 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
         characterDropdown.SetValueWithoutNotify(Utils.GetCharacterIndex());
         dlMapText.text = "Pls load or build a stage!";
         dlMapText.transform.GetChild(0).gameObject.SetActive(true);
-        CurrentDownloadedLevel = null;
+        // CurrentDownloadedLevel = null;
 
         Utils.GetCustomProperty(Enums.NetPlayerProperties.PlayerColor, out int value,
             PhotonNetwork.LocalPlayer.CustomProperties);
@@ -2076,21 +2084,22 @@ public class MainMenuManager : MonoBehaviour, ILobbyCallbacks, IInRoomCallbacks,
 
     public void TryLaunchEditor()
     {
+        TryLaunchEditorWithArgs("");
+    }
+
+    public void TryLaunchEditorWithArgs(string extraMessage)
+    {
         if (!GlobalController.Instance.Ipc.SendOutgoingMessage(Enums.IpcMessages.CheckHealth))
         {
-            // launch executable from the built unity game's directory.
-            var path = Path.Combine(Application.dataPath, "maker-editor.exe");
-            // if file exists, run it in a new process:
-            if (File.Exists(path))
-            {
-                if (Process.Start(path) == null)
-                    OpenErrorBox("Editor failed to launch! Your OS is incompatible? Please report this, then try launching the editor manually from the <i>_data</i> folder.");
-            }
-            else OpenErrorBox("Editor not found! Installation is corrupted? Try launching the editor manually from the <i>_data</i> folder or reinstalling the mod.");
+            GlobalController.Instance.MakerProcess.StartInfo.Arguments = !string.IsNullOrEmpty(extraMessage) ? extraMessage : "";
+            if (!GlobalController.Instance.MakerProcess.Start())
+                OpenErrorBox("Editor failed to launch! Your OS is incompatible or mod installation is corrupted? Please report this, then try launching the editor manually from the <i>_data</i> folder.");
         }
         else
         {
             GlobalController.Instance.Ipc.SendOutgoingMessage(Enums.IpcMessages.GenericGiveFocus);
+            if (!string.IsNullOrEmpty(extraMessage))
+                GlobalController.Instance.Ipc.SendOutgoingMessage(extraMessage);
         }
     }
 }

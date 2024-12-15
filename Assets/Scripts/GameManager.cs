@@ -62,7 +62,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
     public List<PlayerController> players = new();
     public EnemySpawnpoint[] enemySpawnpoints;
     public FadeOutManager fader;
-    private LevelContentConverter mvlxTools;
+    private LevelContentConverter vsmmTools;
     public LevelModel CurrentDownloadedLevel => GlobalController.Instance.Ipc.CurrentDownloadedLevel;
 
     public float size = 1.39f, ySize = 0.8f;
@@ -113,10 +113,10 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
     public void Awake()
     {
         Instance = this;
-        mvlxTools = GetComponent<LevelContentConverter>();
-        if (mvlxTools && GlobalController.Instance.Ipc.CurrentDownloadedLevel != null)
+        vsmmTools = GetComponent<LevelContentConverter>();
+        if (vsmmTools && GlobalController.Instance.Ipc.CurrentDownloadedLevel != null)
         {
-            mvlxTools.BuildLevelFromContents(CurrentDownloadedLevel.Contents);
+            vsmmTools.BuildLevelFromContents(CurrentDownloadedLevel.Contents);
         }
     }
 
@@ -471,13 +471,13 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
                 //Debug.Log((sender.IsMasterClient ? "[H] " : "") + sender.NickName + " (" + sender.UserId + ") - Instantiating " + prefab);
 
                 //even the host can't be trusted...
-                if ((sender?.IsMasterClient ?? false) && (prefab.Contains("Static") || prefab.Contains("1-Up") ||
-                                                          (musicEnabled && prefab.Contains("Player"))))
-                {
-                    //abandon ship
-                    PhotonNetwork.Disconnect();
-                    return;
-                }
+                // if ((sender?.IsMasterClient ?? false) && (prefab.Contains("Static") || prefab.Contains("1-Up") ||
+                //                                           (musicEnabled && prefab.Contains("Player"))))
+                // {
+                //     //abandon ship
+                //     PhotonNetwork.Disconnect();
+                //     return;
+                // }
 
                 //server room instantiation
                 if (sender is not { IsMasterClient: not true })
@@ -557,7 +557,14 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
                     return;
 
                 tilemap.SetTilesBlock(origin, originalTiles);
-
+                
+                foreach (var coin in coins)
+                {
+                    //dont use setactive cause it breaks animation cycles being synced
+                    coin.GetComponent<SpriteRenderer>().enabled = true;
+                    coin.GetComponent<BoxCollider2D>().enabled = true;
+                }
+                
                 StartCoroutine(BigStarRespawn());
 
                 if (!PhotonNetwork.IsMasterClient)

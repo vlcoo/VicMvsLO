@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.Runtime.InteropServices;
@@ -37,6 +38,14 @@ public class GlobalController : Singleton<GlobalController>, IInRoomCallbacks, I
     public DiscordController DiscordController { get; private set; }
     public DeviceRumbler Rumbler { get; private set; }
     public IPCommunicator Ipc { get; private set; }
+
+    public Process MakerProcess { get; } = new()
+    {
+        StartInfo =
+        {
+            FileName = Path.Combine(Application.dataPath, "maker-editor.exe"),
+        }
+    };
 
 
     public void Awake()

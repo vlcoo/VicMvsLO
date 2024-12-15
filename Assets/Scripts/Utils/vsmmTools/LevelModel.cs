@@ -7,11 +7,13 @@ using UnityEngine;
 
 public class LevelModel
 {
+    public int Id;
     public string UserName, Title, Description;
     public Dictionary<string, object> Contents;
 
-    public LevelModel(string userName, string title, string description, Dictionary<string, object> contents)
+    public LevelModel(string userName, string title, string description, Dictionary<string, object> contents, int id = -1)
     {
+        Id = id;
         UserName = userName.SanitizeForRichTextbox();
         Title = title.SanitizeForRichTextbox();
         Description = description.SanitizeForRichTextbox();
@@ -25,7 +27,8 @@ public class LevelModel
             Debug.LogError("Invalid level content format");
             return;
         }
-        
+
+        Id = int.Parse(identifiers.GetValueOrDefault("id").ToString());
         UserName = identifiers.GetValueOrDefault("user_name") as string;
         if (string.IsNullOrEmpty(UserName)) UserName = "Unknown";
         UserName = UserName.SanitizeForRichTextbox();

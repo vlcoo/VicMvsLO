@@ -1070,6 +1070,7 @@ public class LevelContentConverter : MonoBehaviour
     private Component PutPrefab(string prefabPath, Vector3 targetPos, GameObject parentFolder, string componentName = null, bool networked = false)
     {
         if (networked && !PhotonNetwork.IsMasterClient) return null;
+        Debug.Log($"trying to put prefab {prefabPath} (is {networked} networked)");
         var itemInstance = networked
             ? PhotonNetwork.InstantiateRoomObject(prefabPath, targetPos, Quaternion.identity)
             : Instantiate(Resources.Load<GameObject>(prefabPath), targetPos, Quaternion.identity);
