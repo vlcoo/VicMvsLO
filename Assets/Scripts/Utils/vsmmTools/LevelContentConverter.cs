@@ -14,7 +14,7 @@ public class LevelContentConverter : MonoBehaviour
 
     private enum ItemTypes
     {
-        KoopaGreen, KoopaRed, KoopaBlue, Goomba, Spiny, BulletLauncher, Squishy, Star, Spinner, Pipe, PipeMini, SemiMushroom, SemiMushroomMini, PlatMariobros, PlatCloud, Spawn
+        KoopaGreen, KoopaRed, KoopaBlue, Goomba, Spiny, BulletLauncher, Squishy, Star, Spinner, Pipe, PipeMini, SemiMushroom, SemiMushroomMini, PlatMariobros, PlatCloud, Spawn, Bobomb, Sun
     }
     private enum GridTypes {Normal, Background, Semisolid, Squishy}
 
@@ -80,15 +80,6 @@ public class LevelContentConverter : MonoBehaviour
 
     private static readonly Dictionary<GdTileObject, IUnityObject> TileMapping = new()    // tile in gd (tileset and palette pos)
     {
-        { new GdTileObject(5, 13, 4), new UnityTileObject("Tilemaps/Palettes/Desert", -4, -5) },
-        { new GdTileObject(5, 14, 4), new UnityTileObject("Tilemaps/Palettes/Desert", -4, -5) },
-        { new GdTileObject(5, 15, 4), new UnityTileObject("Tilemaps/Palettes/Desert", -4, -5) },
-        { new GdTileObject(5, 13, 5), new UnityTileObject("Tilemaps/Palettes/Desert", -4, -5) },
-        { new GdTileObject(5, 14, 5), new UnityTileObject("Tilemaps/Palettes/Desert", -4, -5) },
-        { new GdTileObject(5, 15, 5), new UnityTileObject("Tilemaps/Palettes/Desert", -4, -5) },
-        { new GdTileObject(5, 13, 6), new UnityTileObject("Tilemaps/Palettes/Desert", -4, -5) },
-        { new GdTileObject(5, 14, 6), new UnityTileObject("Tilemaps/Palettes/Desert", -4, -5) },
-        { new GdTileObject(5, 15, 6), new UnityTileObject("Tilemaps/Palettes/Desert", -4, -5) },
         { new GdTileObject(5, 14, 3), new UnityTileObject("Tilemaps/Palettes/Desert", -5, -1) },
         { new GdTileObject(5, 14, 2), new UnityTileObject("Tilemaps/Palettes/Desert", -5, 0) },
         { new GdTileObject(5, 15, 2), new UnityTileObject("Tilemaps/Palettes/Desert", -4, 0) },
@@ -159,7 +150,6 @@ public class LevelContentConverter : MonoBehaviour
         { new GdTileObject(127, 0, 4), new UnityTileObject("Tilemaps/Palettes/Basic Blocks", -2, 1) },
         { new GdTileObject(127, 0, 5), new UnityTileObject("Tilemaps/Palettes/Basic Blocks", -5, 4) },
         { new GdTileObject(127, 0, 6), new UnityTileObject("Tilemaps/Palettes/Basic Blocks", -6, 3) },
-        { new GdTileObject(127, 0, 7), new UnityTileObject("Tilemaps/Palettes/Basic Blocks", -1, 3) },
         { new GdTileObject(127, 0, 8), new UnityTileObject("Tilemaps/Palettes/Basic Blocks", -6, 4) },
         { new GdTileObject(127, 0, 9), new UnityTileObject("Tilemaps/Palettes/Basic Blocks", -7, 3) },
         { new GdTileObject(127, 0, 10), new UnityTileObject("Tilemaps/Palettes/Clown", -4, -1) },
@@ -172,8 +162,6 @@ public class LevelContentConverter : MonoBehaviour
         { new GdTileObject(126, 0, 1), new UnityTileObject("Tilemaps/Palettes/Basic Blocks", -5, 2) },
         { new GdTileObject(126, 0, 2), new UnityTileObject("Tilemaps/Palettes/Basic Blocks", -2, 3) },
         { new GdTileObject(126, 0, 3), new UnityTileObject("Tilemaps/Palettes/Basic Blocks", -2, 2) },
-        { new GdTileObject(126, 0, 4), new UnityTileObject("Tilemaps/Palettes/Basic Blocks", -1, 3) },
-        { new GdTileObject(126, 0, 5), new UnityTileObject("Tilemaps/Palettes/Basic Blocks", -1, 1) },
         { new GdTileObject(0, 0, 0), new UnityTileObject("Tilemaps/Palettes/Grassland", 6, -9) },
         { new GdTileObject(0, 1, 0), new UnityTileObject("Tilemaps/Palettes/Grassland", 6, -9) },
         { new GdTileObject(0, 2, 0), new UnityTileObject("Tilemaps/Palettes/Grassland", 6, -9) },
@@ -279,10 +267,6 @@ public class LevelContentConverter : MonoBehaviour
         { new GdTileObject(4, 3, 4), new UnityTileObject("Tilemaps/Palettes/Sky", -4, 11) },
         { new GdTileObject(4, 8, 1, 1), new UnityTileObject("Tilemaps/Palettes/Sky", -4, 11) },
         { new GdTileObject(4, 8, 2, 1), new UnityTileObject("Tilemaps/Palettes/Sky", -4, 11) },
-        { new GdTileObject(2, 12, 4), new UnityTileObject("Tilemaps/Palettes/Snow", 0, -1) },
-        { new GdTileObject(2, 13, 4), new UnityTileObject("Tilemaps/Palettes/Snow", 1, -1) },
-        { new GdTileObject(2, 14, 4), new UnityTileObject("Tilemaps/Palettes/Snow", 2, -1) },
-        { new GdTileObject(2, 15, 4), new UnityTileObject("Tilemaps/Palettes/Snow", 3, -1) },
         { new GdTileObject(2, 0, 0), new UnityTileObject("Tilemaps/Palettes/Snow", -1, 1) },
         { new GdTileObject(2, 1, 0), new UnityTileObject("Tilemaps/Palettes/Snow", -1, 1) },
         { new GdTileObject(2, 2, 0), new UnityTileObject("Tilemaps/Palettes/Snow", -1, 1) },
@@ -322,7 +306,6 @@ public class LevelContentConverter : MonoBehaviour
         { new GdTileObject(2, 10, 1), new UnityTileObject("Tilemaps/Palettes/Snow", -2, -1) },
         { new GdTileObject(2, 8, 5), new UnityTileObject("Tilemaps/Palettes/Snow", -1, -3) },
         { new GdTileObject(2, 9, 5), new UnityTileObject("Tilemaps/Palettes/Snow", 1, -3) },
-        { new GdTileObject(2, 0, 6), new UnityTileObject("Tilemaps/Palettes/Snow", 0, -7) },
         { new GdTileObject(2, 6, 0, 1), new UnityTileObject("Tilemaps/Palettes/Snow", -1, 1) },
         { new GdTileObject(2, 7, 0, 1), new UnityTileObject("Tilemaps/Palettes/Snow", -1, 1) },
         { new GdTileObject(2, 8, 0, 1), new UnityTileObject("Tilemaps/Palettes/Snow", -1, 1) },
@@ -432,7 +415,6 @@ public class LevelContentConverter : MonoBehaviour
         { new GdTileObject(8, 2, 3), new UnityTileObject("Tilemaps/Palettes/Clown", -4, -4) },
         { new GdTileObject(8, 3, 3), new UnityTileObject("Tilemaps/Palettes/Clown", -3, -4) },
         { new GdTileObject(8, 4, 0), new UnityTileObject("Tilemaps/Palettes/Clown", -3, -6) },
-        { new GdTileObject(8, 4, 1), new UnityTileObject("Tilemaps/Palettes/Clown", 2, -7) },
         { new GdTileObject(8, 4, 3), new UnityTileObject("Tilemaps/Palettes/Clown", 3, -6) },
         { new GdTileObject(8, 0, 2), new UnityTileObject("Tilemaps/Palettes/Clown", -1, -6) },
         { new GdTileObject(8, 1, 2), new UnityTileObject("Tilemaps/Palettes/Clown", 0, -6) },
@@ -459,28 +441,11 @@ public class LevelContentConverter : MonoBehaviour
         { new GdTileObject(5, 6, 2), new UnityTileObject("Tilemaps/Palettes/Desert", -1, 4) },
         { new GdTileObject(5, 5, 3), new UnityTileObject("Tilemaps/Palettes/Desert", -2, 3) },
         { new GdTileObject(5, 6, 3), new UnityTileObject("Tilemaps/Palettes/Desert", -1, 3) },
-        { new GdTileObject(3, 2, 2), new UnityTileObject("Tilemaps/Palettes/Snow", 0, 1) },
         { new GdTileObject(4, 8, 4), new UnityTileObject("Tilemaps/Palettes/Sky", 4, 11) },
         { new GdTileObject(4, 9, 4), new UnityTileObject("Tilemaps/Palettes/Sky", 5, 11) },
         { new GdTileObject(4, 8, 5), new UnityTileObject("Tilemaps/Palettes/Sky", 4, 10) },
         { new GdTileObject(4, 9, 5), new UnityTileObject("Tilemaps/Palettes/Sky", 5, 10) },
         { new GdTileObject(1, 15, 4), new UnityTileObject("Tilemaps/Palettes/Snow", 0, 1) },
-        { new GdTileObject(8, 0, 5), new UnityTileObject("Tilemaps/Palettes/Clown", 1, -6) },
-        { new GdTileObject(8, 1, 5), new UnityTileObject("Tilemaps/Palettes/Clown", 1, -6) },
-        { new GdTileObject(8, 2, 5), new UnityTileObject("Tilemaps/Palettes/Clown", 1, -6) },
-        { new GdTileObject(8, 0, 6), new UnityTileObject("Tilemaps/Palettes/Clown", 1, -6) },
-        { new GdTileObject(8, 1, 6), new UnityTileObject("Tilemaps/Palettes/Clown", 1, -6) },
-        { new GdTileObject(8, 2, 6), new UnityTileObject("Tilemaps/Palettes/Clown", 1, -6) },
-        { new GdTileObject(8, 0, 7), new UnityTileObject("Tilemaps/Palettes/Clown", 1, -6) },
-        { new GdTileObject(8, 1, 7), new UnityTileObject("Tilemaps/Palettes/Clown", 1, -6) },
-        { new GdTileObject(8, 2, 7), new UnityTileObject("Tilemaps/Palettes/Clown", 1, -6) },
-        { new GdTileObject(8, 3, 5), new UnityTileObject("Tilemaps/Palettes/Clown", 3, -6) },
-        { new GdTileObject(8, 3, 6), new UnityTileObject("Tilemaps/Palettes/Clown", 3, -6) },
-        { new GdTileObject(8, 3, 7), new UnityTileObject("Tilemaps/Palettes/Clown", 3, -6) },
-        { new GdTileObject(8, 0, 8), new UnityTileObject("Tilemaps/Palettes/Clown", 3, -6) },
-        { new GdTileObject(8, 1, 8), new UnityTileObject("Tilemaps/Palettes/Clown", 3, -6) },
-        { new GdTileObject(8, 2, 8), new UnityTileObject("Tilemaps/Palettes/Clown", 3, -6) },
-        { new GdTileObject(8, 3, 8), new UnityTileObject("Tilemaps/Palettes/Clown", 3, -6) },
         { new GdTileObject(0, 0, 5), new UnityTileObject("Tilemaps/Palettes/Grassland", 6, -9) },
         { new GdTileObject(0, 1, 5), new UnityTileObject("Tilemaps/Palettes/Grassland", 6, -9) },
         { new GdTileObject(0, 2, 5), new UnityTileObject("Tilemaps/Palettes/Grassland", 6, -9) },
@@ -554,6 +519,120 @@ public class LevelContentConverter : MonoBehaviour
         { new GdTileObject(6, 12, 3), new UnityTileObject("Tilemaps/Palettes/Jungle", -1, 1) },
         { new GdTileObject(6, 13, 2), new UnityTileObject("Tilemaps/Palettes/Jungle", -1, 1) },
         { new GdTileObject(6, 14, 2), new UnityTileObject("Tilemaps/Palettes/Jungle", -1, 1) },
+        { new GdTileObject(127, 0, 7), new UnityTileObject("Tilemaps/Palettes/Basic Blocks", -1, 1) },
+        { new GdTileObject(126, 0, 5), new UnityTileObject("Tilemaps/Palettes/Basic Blocks", -1, 2) },
+        { new GdTileObject(126, 0, 4), new UnityTileObject("Tilemaps/Palettes/Basic Blocks", -1, 3) },
+        { new GdTileObject(8, 4, 2), new UnityTileObject("Tilemaps/Palettes/Clown", 2, -7) },
+        { new GdTileObject(8, 4, 1), new UnityTileObject("Tilemaps/Palettes/Clown", 1, -7) },
+        { new GdTileObject(8, 3, 5), new UnityTileObject("Tilemaps/Palettes/Clown", -3, -9) },
+        { new GdTileObject(8, 3, 6), new UnityTileObject("Tilemaps/Palettes/Clown", -3, -10) },
+        { new GdTileObject(8, 3, 7), new UnityTileObject("Tilemaps/Palettes/Clown", -3, -11) },
+        { new GdTileObject(8, 3, 8), new UnityTileObject("Tilemaps/Palettes/Clown", -3, -12) },
+        { new GdTileObject(8, 0, 8), new UnityTileObject("Tilemaps/Palettes/Clown", -2, -12) },
+        { new GdTileObject(8, 1, 8), new UnityTileObject("Tilemaps/Palettes/Clown", -1, -12) },
+        { new GdTileObject(8, 2, 8), new UnityTileObject("Tilemaps/Palettes/Clown", 0, -12) },
+        { new GdTileObject(8, 1, 6), new UnityTileObject("Tilemaps/Palettes/Clown", -1, -10) },
+        { new GdTileObject(8, 1, 5), new UnityTileObject("Tilemaps/Palettes/Clown", -1, -9) },
+        { new GdTileObject(8, 1, 7), new UnityTileObject("Tilemaps/Palettes/Clown", -1, -11) },
+        { new GdTileObject(8, 0, 5), new UnityTileObject("Tilemaps/Palettes/Clown", -2, -9) },
+        { new GdTileObject(8, 0, 6), new UnityTileObject("Tilemaps/Palettes/Clown", -2, -10) },
+        { new GdTileObject(8, 0, 7), new UnityTileObject("Tilemaps/Palettes/Clown", -2, -11) },
+        { new GdTileObject(8, 2, 5), new UnityTileObject("Tilemaps/Palettes/Clown", 0, -9) },
+        { new GdTileObject(8, 2, 6), new UnityTileObject("Tilemaps/Palettes/Clown", 0, -10) },
+        { new GdTileObject(8, 2, 7), new UnityTileObject("Tilemaps/Palettes/Clown", 0, -11) },
+        { new GdTileObject(3, 11, 3), new UnityItemObject("Prefabs/Static/SpikeTile") },
+        { new GdTileObject(3, 12, 4), new UnityItemObject("Prefabs/Static/SpikeSideNTile")},
+        { new GdTileObject(3, 12, 5), new UnityItemObject("Prefabs/Static/SpikeSideWTile")},
+        { new GdTileObject(3, 11, 4), new UnityItemObject("Prefabs/Static/SpikeSideSTile")},
+        { new GdTileObject(3, 11, 5), new UnityItemObject("Prefabs/Static/SpikeSideETile")},
+        { new GdTileObject(3, 13, 0), new UnityTileObject("Tilemaps/Palettes/Dark World", 9, -7) },
+        { new GdTileObject(3, 14, 0), new UnityTileObject("Tilemaps/Palettes/Dark World", 10, -7) },
+        { new GdTileObject(3, 13, 1), new UnityTileObject("Tilemaps/Palettes/Dark World", 9, -8) },
+        { new GdTileObject(3, 13, 2), new UnityTileObject("Tilemaps/Palettes/Dark World", 9, -9) },
+        { new GdTileObject(3, 13, 3), new UnityTileObject("Tilemaps/Palettes/Dark World", 9, -10) },
+        { new GdTileObject(3, 14, 1), new UnityTileObject("Tilemaps/Palettes/Dark World", 10, -8) },
+        { new GdTileObject(3, 14, 2), new UnityTileObject("Tilemaps/Palettes/Dark World", 10, -9) },
+        { new GdTileObject(3, 14, 3), new UnityTileObject("Tilemaps/Palettes/Dark World", 10, -10) },
+        { new GdTileObject(3, 15, 0), new UnityTileObject("Tilemaps/Palettes/Dark World", 9, -11) },
+        { new GdTileObject(3, 15, 1), new UnityTileObject("Tilemaps/Palettes/Dark World", 9, -12) },
+        { new GdTileObject(3, 15, 2), new UnityTileObject("Tilemaps/Palettes/Dark World", 9, -13) },
+        { new GdTileObject(3, 15, 3), new UnityTileObject("Tilemaps/Palettes/Dark World", 9, -14) },
+        { new GdTileObject(3, 16, 0), new UnityTileObject("Tilemaps/Palettes/Dark World", 10, -11) },
+        { new GdTileObject(3, 16, 1), new UnityTileObject("Tilemaps/Palettes/Dark World", 10, -12) },
+        { new GdTileObject(3, 16, 2), new UnityTileObject("Tilemaps/Palettes/Dark World", 10, -13) },
+        { new GdTileObject(3, 16, 3), new UnityTileObject("Tilemaps/Palettes/Dark World", 10, -14) },
+        { new GdTileObject(3, 0, 0), new UnityTileObject("Tilemaps/Palettes/Dark World", 8, -1) },
+        { new GdTileObject(3, 1, 0), new UnityTileObject("Tilemaps/Palettes/Dark World", 9, -1) },
+        { new GdTileObject(3, 0, 1), new UnityTileObject("Tilemaps/Palettes/Dark World", 8, -2) },
+        { new GdTileObject(3, 1, 1), new UnityTileObject("Tilemaps/Palettes/Dark World", 9, -2) },
+        { new GdTileObject(3, 2, 0), new UnityTileObject("Tilemaps/Palettes/Dark World", 10, -1) },
+        { new GdTileObject(3, 3, 0), new UnityTileObject("Tilemaps/Palettes/Dark World", 11, -1) },
+        { new GdTileObject(3, 4, 0), new UnityTileObject("Tilemaps/Palettes/Dark World", 10, -2) },
+        { new GdTileObject(3, 4, 1), new UnityTileObject("Tilemaps/Palettes/Dark World", 10, -3) },
+        { new GdTileObject(3, 5, 0), new UnityTileObject("Tilemaps/Palettes/Dark World", 11, -2) },
+        { new GdTileObject(3, 3, 1), new UnityTileObject("Tilemaps/Palettes/Dark World", 11, -3) },
+        { new GdTileObject(5, 13, 4), new UnityTileObject("Tilemaps/Palettes/Desert", 1, -8) },
+        { new GdTileObject(5, 14, 4), new UnityTileObject("Tilemaps/Palettes/Desert", 2, -8) },
+        { new GdTileObject(5, 15, 4), new UnityTileObject("Tilemaps/Palettes/Desert", 3, -8) },
+        { new GdTileObject(5, 13, 5), new UnityTileObject("Tilemaps/Palettes/Desert", 1, -9) },
+        { new GdTileObject(5, 14, 5), new UnityTileObject("Tilemaps/Palettes/Desert", 2, -9) },
+        { new GdTileObject(5, 15, 5), new UnityTileObject("Tilemaps/Palettes/Desert", 3, -9) },
+        { new GdTileObject(5, 13, 6), new UnityTileObject("Tilemaps/Palettes/Desert", 1, -10) },
+        { new GdTileObject(5, 14, 6), new UnityTileObject("Tilemaps/Palettes/Desert", 2, -10) },
+        { new GdTileObject(5, 15, 6), new UnityTileObject("Tilemaps/Palettes/Desert", 3, -10) },
+        { new GdTileObject(5, 13, 7), new UnityTileObject("Tilemaps/Palettes/Desert", 1, -11) },
+        { new GdTileObject(5, 13, 8), new UnityTileObject("Tilemaps/Palettes/Desert", 1, -12) },
+        { new GdTileObject(5, 14, 7), new UnityTileObject("Tilemaps/Palettes/Desert", 2, -11) },
+        { new GdTileObject(5, 14, 8), new UnityTileObject("Tilemaps/Palettes/Desert", 2, -12) },
+        { new GdTileObject(5, 15, 7), new UnityTileObject("Tilemaps/Palettes/Desert", 3, -11) },
+        { new GdTileObject(5, 15, 8), new UnityTileObject("Tilemaps/Palettes/Desert", 3, -12) },
+        { new GdTileObject(2, 13, 3), new UnityTileObject("Tilemaps/Palettes/Snow", -6, -4) },
+        { new GdTileObject(2, 14, 3), new UnityTileObject("Tilemaps/Palettes/Snow", -5, -4) },
+        { new GdTileObject(2, 15, 3), new UnityTileObject("Tilemaps/Palettes/Snow", -4, -4) },
+        { new GdTileObject(2, 13, 4), new UnityTileObject("Tilemaps/Palettes/Snow", -6, -5) },
+        { new GdTileObject(2, 13, 5), new UnityTileObject("Tilemaps/Palettes/Snow", -6, -6) },
+        { new GdTileObject(2, 13, 6), new UnityTileObject("Tilemaps/Palettes/Snow", -6, -7) },
+        { new GdTileObject(2, 14, 6), new UnityTileObject("Tilemaps/Palettes/Snow", -5, -7) },
+        { new GdTileObject(2, 14, 5), new UnityTileObject("Tilemaps/Palettes/Snow", -5, -6) },
+        { new GdTileObject(2, 14, 4), new UnityTileObject("Tilemaps/Palettes/Snow", -5, -5) },
+        { new GdTileObject(2, 15, 4), new UnityTileObject("Tilemaps/Palettes/Snow", -4, -5) },
+        { new GdTileObject(2, 15, 5), new UnityTileObject("Tilemaps/Palettes/Snow", -4, -6) },
+        { new GdTileObject(2, 15, 6), new UnityTileObject("Tilemaps/Palettes/Snow", -4, -7) },
+        { new GdTileObject(2, 9, 4), new UnityTileObject("Tilemaps/Palettes/Snow", 0, -1) },
+        { new GdTileObject(2, 10, 4), new UnityTileObject("Tilemaps/Palettes/Snow", 1, -1) },
+        { new GdTileObject(2, 11, 4), new UnityTileObject("Tilemaps/Palettes/Snow", 2, -1) },
+        { new GdTileObject(2, 12, 4), new UnityTileObject("Tilemaps/Palettes/Snow", 3, -1) },
+        { new GdTileObject(3, 1, 2), new UnityTileObject("Tilemaps/Palettes/Snow", 6, 0) },
+        { new GdTileObject(3, 0, 2), new UnityTileObject("Tilemaps/Palettes/Snow", 5, 0) },
+        { new GdTileObject(3, 0, 3), new UnityTileObject("Tilemaps/Palettes/Snow", 5, -1) },
+        { new GdTileObject(3, 1, 3), new UnityTileObject("Tilemaps/Palettes/Snow", 6, -1) },
+        { new GdTileObject(3, 3, 2), new UnityTileObject("Tilemaps/Palettes/Snow", 5, -3) },
+        { new GdTileObject(3, 3, 3), new UnityTileObject("Tilemaps/Palettes/Snow", 5, -4) },
+        { new GdTileObject(3, 4, 2), new UnityTileObject("Tilemaps/Palettes/Snow", 5, -6) },
+        { new GdTileObject(3, 5, 2), new UnityTileObject("Tilemaps/Palettes/Snow", 6, -6) },
+        { new GdTileObject(3, 2, 2), new UnityTileObject("Tilemaps/Palettes/Snow", 5, -8) },
+        { new GdTileObject(2, 0, 5), new UnityTileObject("Tilemaps/Palettes/Snow", 0, 1) },
+        { new GdTileObject(2, 1, 5), new UnityTileObject("Tilemaps/Palettes/Snow", 0, 1) },
+        { new GdTileObject(2, 2, 5), new UnityTileObject("Tilemaps/Palettes/Snow", 0, 1) },
+        { new GdTileObject(2, 3, 5), new UnityTileObject("Tilemaps/Palettes/Snow", 0, 1) },
+        { new GdTileObject(2, 4, 5), new UnityTileObject("Tilemaps/Palettes/Snow", 0, 1) },
+        { new GdTileObject(2, 5, 5), new UnityTileObject("Tilemaps/Palettes/Snow", 0, 1) },
+        { new GdTileObject(2, 6, 5), new UnityTileObject("Tilemaps/Palettes/Snow", 0, 1) },
+        { new GdTileObject(2, 7, 5), new UnityTileObject("Tilemaps/Palettes/Snow", 0, 1) },
+        { new GdTileObject(2, 7, 6), new UnityTileObject("Tilemaps/Palettes/Snow", 0, 1) },
+        { new GdTileObject(2, 7, 5, 1), new UnityTileObject("Tilemaps/Palettes/Snow", 0, 1) },
+        { new GdTileObject(2, 7, 6, 1), new UnityTileObject("Tilemaps/Palettes/Snow", 0, 1) },
+        { new GdTileObject(2, 0, 6), new UnityTileObject("Tilemaps/Palettes/Snow", 0, 1) },
+        { new GdTileObject(2, 1, 6), new UnityTileObject("Tilemaps/Palettes/Snow", 0, 1) },
+        { new GdTileObject(2, 2, 6), new UnityTileObject("Tilemaps/Palettes/Snow", 0, 1) },
+        { new GdTileObject(2, 4, 6), new UnityTileObject("Tilemaps/Palettes/Snow", 0, 1) },
+        { new GdTileObject(2, 5, 6), new UnityTileObject("Tilemaps/Palettes/Snow", 0, 1) },
+        { new GdTileObject(2, 6, 6), new UnityTileObject("Tilemaps/Palettes/Snow", 0, 1) },
+        { new GdTileObject(2, 8, 6), new UnityTileObject("Tilemaps/Palettes/Snow", 0, 1) },
+        { new GdTileObject(2, 9, 6), new UnityTileObject("Tilemaps/Palettes/Snow", 0, 1) },
+        { new GdTileObject(2, 10, 6), new UnityTileObject("Tilemaps/Palettes/Snow", 0, 1) },
+        { new GdTileObject(2, 11, 6), new UnityTileObject("Tilemaps/Palettes/Snow", 0, 1) },
+        { new GdTileObject(2, 12, 6), new UnityTileObject("Tilemaps/Palettes/Snow", 0, 1) },
         { new GdTileObject(127, 0, 18), new UnityItemObject("Prefabs/FloatingCoin", true) },
         { new GdTileObject(127, 1, 17), new UnityItemObject("Prefabs/Static/RespawningInvisibleBlock") }
     };
@@ -565,12 +644,13 @@ public class LevelContentConverter : MonoBehaviour
         { ItemTypes.KoopaBlue, new UnityItemObject("Prefabs/Enemy/BlueKoopa") },
         { ItemTypes.Goomba, new UnityItemObject("Prefabs/Enemy/Goomba") },
         { ItemTypes.Spiny, new UnityItemObject("Prefabs/Enemy/Spiny") },
+        { ItemTypes.Bobomb , new UnityItemObject("Prefabs/Enemy/Bobomb") },
         { ItemTypes.Spinner, new UnityItemObject("Prefabs/Static/Spinner") },
         { ItemTypes.PlatMariobros, new UnityItemObject("Prefabs/Static/MarioBrosPlatform", true) },
-        { ItemTypes.PlatCloud, new UnityItemObject("Prefabs/Static/CloudPlatform") }
+        { ItemTypes.PlatCloud, new UnityItemObject("Prefabs/Static/CloudPlatform") },
     };
 
-    private static readonly UnityTileObject DefaultTile = new UnityTileObject("Tilemaps/Palettes/Clown", 3, -7);
+    private static readonly UnityTileObject DefaultTile = new("Tilemaps/Palettes/Clown", 3, -7);
 
     // stars: empty gameobject with StarSpawn tag
     // spinner: prefab instance
@@ -697,6 +777,7 @@ public class LevelContentConverter : MonoBehaviour
                         case ItemTypes.KoopaBlue:
                         case ItemTypes.Goomba:
                         case ItemTypes.Spiny:
+                        case ItemTypes.Bobomb:
                         {
                             // gameobject with enemyspawnpoint component.
                             var enemySpawnpoint = new GameObject("EnemySpawn")
@@ -780,7 +861,11 @@ public class LevelContentConverter : MonoBehaviour
             }
             case ItemTypes.Spawn:
             {
-                parent.spawnpoint = targetPos.GdWorldToUnityWorld();
+                parent.spawnpoint = targetPos.GdWorldToUnityWorld() + new Vector3(0, 0.25f, 0);
+                return true;
+            }
+            case ItemTypes.Sun:
+            {
                 return true;
             }
             case ItemTypes.Star:
@@ -837,6 +922,8 @@ public class LevelContentConverter : MonoBehaviour
                 var rotation = Convert.ToInt32((long)properties["rotation"]);   // 0 Up, 1 Right, 2 Down, 3 Left
                 var height = Convert.ToInt32((long)properties["height"]);
                 var enterable = (bool)properties["enterable"];
+                var hasPiranha = (bool)properties["piranha"];
+                var warpTarget = properties["warp_pipe_target"].ToString();
                 var pipeUpLeft = new UnityTileObject("Tilemaps/Palettes/Basic Blocks", 4, 1).Y(-4 * color);
                 var pipeUpRight = pipeUpLeft.X(1);
                 var pipeVertLeft = pipeUpLeft.Y(-1);
@@ -928,17 +1015,25 @@ public class LevelContentConverter : MonoBehaviour
                             break;
                     }
                 }
+
+                if (hasPiranha)
+                {
+                    PutPrefab("Prefabs/Enemy/PiranhaPlant", targetPosWorld + new Vector3(0, 1.0f, 0),
+                        spawnsFolder);
+                }
                 return true;
             }
             case ItemTypes.PipeMini:
             {
+                var color = Convert.ToInt32((long)properties["color"]) - 1;     // 0 Green, 1 Yellow, 2 Red, 3 Blue
                 var rotation = Convert.ToInt32((long)properties["rotation"]);   // 0 Up, 1 Right, 2 Down, 3 Left
                 var height = Convert.ToInt32((long)properties["height"]);
                 var enterable = (bool)properties["enterable"];
-                var pipeUp = new UnityTileObject("Tilemaps/Palettes/Basic Blocks", -2, -4);
+                var warpTarget = properties["warp_pipe_target"].ToString();
+                var pipeUp = new UnityTileObject("Tilemaps/Palettes/Basic Blocks", -20, -4).X(6 * color);
                 var pipeVert = pipeUp.Y(-1);
                 var pipeDown = pipeVert.Y(-1);
-                var pipeLeft = new UnityTileObject("Tilemaps/Palettes/Basic Blocks", 0, -4);
+                var pipeLeft = new UnityTileObject("Tilemaps/Palettes/Basic Blocks", -18, -4).X(6 * color);
                 var pipeHoriz = pipeLeft.X(1);
                 var pipeRight = pipeHoriz.X(1);
                 // all four rotations are possible. up and down are breakable, left and right are not.
