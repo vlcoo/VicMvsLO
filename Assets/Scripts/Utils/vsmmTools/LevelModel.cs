@@ -44,6 +44,7 @@ public class LevelModel
     {
         return new ExitGames.Client.Photon.Hashtable
         {
+            {"id", Id},
             {"user_name", UserName},
             {"title", Title},
             {"description", Description},
@@ -56,6 +57,7 @@ public class LevelModel
         return new LevelModel(levelHashtable.GetValueOrDefault("user_name") as string,
             levelHashtable.GetValueOrDefault("title") as string,
             levelHashtable.GetValueOrDefault("description") as string,
-            levelHashtable.GetValueOrDefault("contents") as Dictionary<string, object>);
+            levelHashtable.GetValueOrDefault("contents") as Dictionary<string, object>,
+            levelHashtable.ContainsKey("id") ? (int) levelHashtable.GetValueOrDefault("id") : -1);
     }
 }

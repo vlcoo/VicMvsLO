@@ -922,7 +922,7 @@ public class LevelContentConverter : MonoBehaviour
                 var rotation = Convert.ToInt32((long)properties["rotation"]);   // 0 Up, 1 Right, 2 Down, 3 Left
                 var height = Convert.ToInt32((long)properties["height"]);
                 var enterable = (bool)properties["enterable"];
-                var hasPiranha = (bool)properties["piranha"];
+                var hasPiranha = properties.ContainsKey("piranha") && (bool)properties["piranha"];
                 var warpTarget = properties["warp_pipe_target"].ToString();
                 var pipeUpLeft = new UnityTileObject("Tilemaps/Palettes/Basic Blocks", 4, 1).Y(-4 * color);
                 var pipeUpRight = pipeUpLeft.X(1);
@@ -1025,7 +1025,7 @@ public class LevelContentConverter : MonoBehaviour
             }
             case ItemTypes.PipeMini:
             {
-                var color = Convert.ToInt32((long)properties["color"]) - 1;     // 0 Green, 1 Yellow, 2 Red, 3 Blue
+                var color = properties.ContainsKey("color") ? Convert.ToInt32((long)properties["color"]) : 0;     // 0 Green, 1 Yellow, 2 Red, 3 Blue
                 var rotation = Convert.ToInt32((long)properties["rotation"]);   // 0 Up, 1 Right, 2 Down, 3 Left
                 var height = Convert.ToInt32((long)properties["height"]);
                 var enterable = (bool)properties["enterable"];
