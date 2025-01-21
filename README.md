@@ -20,4 +20,4 @@ Go to the repository's releases or use these shortcuts to the latest builds:
 [**Join the discord**](https://discord.gg/dgKVaUKpj5) of the original game to keep up to date with its development, make feature suggestions, report bugs (if you're too lazy to use issues...), get technical support, look for people to play with, and just talk about the game!
 
 ## For developers...
-Want to use vcmi as a base for your own creations? I recommend you use the [**v17 Cleansed**](https://github.com/vlcoo/VicMvsLO/archive/refs/heads/vcmi-17-cleansed.zip) branch, which is super clean and stable - ready for modding further! Please credit properly.
+Want to use vcmi as a base for your own creations? I recommend you use the [**v17 Cleansed**](https://github.com/vlcoo/VicMvsLO/archive/refs/heads/cleansed-17.zip) branch, which is super clean and stable - ready for modding further! Please credit properly.
