@@ -50,11 +50,53 @@ namespace Quantum.Prototypes {
   #endif //;
   
   [System.SerializableAttribute()]
+  [Quantum.Prototypes.Prototype(typeof(Quantum.BetterPhysicsContact))]
+  public unsafe class BetterPhysicsContactPrototype : StructPrototype {
+    public MapEntityId Entity;
+    public FPVector2 Point;
+    public FPVector2 Normal;
+    public FP Overlap;
+    public QBoolean HasOverlap;
+    public void Materialize(Frame frame, ref Quantum.BetterPhysicsContact result, in PrototypeMaterializationContext context = default) {
+        PrototypeValidator.FindMapEntity(this.Entity, in context, out result.Entity);
+        result.Point = this.Point;
+        result.Normal = this.Normal;
+        result.Overlap = this.Overlap;
+        result.HasOverlap = this.HasOverlap;
+    }
+  }
+  [System.SerializableAttribute()]
+  [Quantum.Prototypes.Prototype(typeof(Quantum.BetterPhysicsObject))]
+  public unsafe class BetterPhysicsObjectPrototype : ComponentPrototype<Quantum.BetterPhysicsObject> {
+    public Shape2D Shape;
+    [DynamicCollectionAttribute()]
+    public Quantum.Prototypes.BetterPhysicsContactPrototype[] Contacts = {};
+    public QBoolean ColliderDisabled;
+    public override Boolean AddToEntity(FrameBase f, EntityRef entity, in PrototypeMaterializationContext context) {
+        Quantum.BetterPhysicsObject component = default;
+        Materialize((Frame)f, ref component, in context);
+        return f.Set(entity, component) == SetResult.ComponentAdded;
+    }
+    public void Materialize(Frame frame, ref Quantum.BetterPhysicsObject result, in PrototypeMaterializationContext context = default) {
+        result.Shape = this.Shape;
+        if (this.Contacts.Length == 0) {
+          result.Contacts = default;
+        } else {
+          var list = frame.AllocateList(out result.Contacts, this.Contacts.Length);
+          for (int i = 0; i < this.Contacts.Length; ++i) {
+            Quantum.BetterPhysicsContact tmp = default;
+            this.Contacts[i].Materialize(frame, ref tmp, in context);
+            list.Add(tmp);
+          }
+        }
+        result.ColliderDisabled = this.ColliderDisabled;
+    }
+  }
+  [System.SerializableAttribute()]
   [Quantum.Prototypes.Prototype(typeof(Quantum.BigStar))]
   public unsafe partial class BigStarPrototype : ComponentPrototype<Quantum.BigStar> {
     public QBoolean IsStationary;
     public UInt16 Lifetime;
-    public Byte PassthroughFrames;
     public Byte UncollectableFrames;
     public FP Speed;
     public FP BounceForce;
@@ -67,7 +109,6 @@ namespace Quantum.Prototypes {
     public void Materialize(Frame frame, ref Quantum.BigStar result, in PrototypeMaterializationContext context = default) {
         result.IsStationary = this.IsStationary;
         result.Lifetime = this.Lifetime;
-        result.PassthroughFrames = this.PassthroughFrames;
         result.UncollectableFrames = this.UncollectableFrames;
         result.Speed = this.Speed;
         result.BounceForce = this.BounceForce;
@@ -630,6 +671,7 @@ namespace Quantum.Prototypes {
     public Byte RequestedTeam;
     public QBoolean IsSpectator;
     public QBoolean ManualSpectator;
+    public QBoolean VotedToContinue;
     public Int32 Wins;
     public Byte RealTeam;
     public Int32 LastChatMessage;
@@ -652,6 +694,7 @@ namespace Quantum.Prototypes {
         result.RequestedTeam = this.RequestedTeam;
         result.IsSpectator = this.IsSpectator;
         result.ManualSpectator = this.ManualSpectator;
+        result.VotedToContinue = this.VotedToContinue;
         result.Wins = this.Wins;
         result.RealTeam = this.RealTeam;
         result.LastChatMessage = this.LastChatMessage;
@@ -659,6 +702,30 @@ namespace Quantum.Prototypes {
         result.IsInSettings = this.IsInSettings;
         result.JoinTick = this.JoinTick;
         result.Ping = this.Ping;
+        MaterializeUser(frame, ref result, in context);
+    }
+  }
+  [System.SerializableAttribute()]
+  [Quantum.Prototypes.Prototype(typeof(Quantum.PlayerInformation))]
+  public unsafe partial class PlayerInformationPrototype : StructPrototype {
+    public PlayerRef PlayerRef;
+    [MaxStringByteCount(46, "Unicode")]
+    public string Nickname;
+    [MaxStringByteCount(14, "Unicode")]
+    public string NicknameColor;
+    public Byte Team;
+    public Byte Character;
+    public QBoolean Disconnected;
+    public QBoolean Disqualified;
+    partial void MaterializeUser(Frame frame, ref Quantum.PlayerInformation result, in PrototypeMaterializationContext context);
+    public void Materialize(Frame frame, ref Quantum.PlayerInformation result, in PrototypeMaterializationContext context = default) {
+        result.PlayerRef = this.PlayerRef;
+        PrototypeValidator.AssignQString(this.Nickname, 48, in context, out result.Nickname);
+        PrototypeValidator.AssignQString(this.NicknameColor, 16, in context, out result.NicknameColor);
+        result.Team = this.Team;
+        result.Character = this.Character;
+        result.Disconnected = this.Disconnected;
+        result.Disqualified = this.Disqualified;
         MaterializeUser(frame, ref result, in context);
     }
   }

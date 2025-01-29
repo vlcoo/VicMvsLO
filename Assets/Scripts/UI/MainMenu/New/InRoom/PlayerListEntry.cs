@@ -30,8 +30,8 @@ namespace NSMB.UI.MainMenu {
         //---Serialized Variables
         [SerializeField] private MainMenuCanvas canvas;
         [SerializeField] private PlayerListHandler handler;
-        [SerializeField] private TMP_Text nameText, pingText, winsText, muteButtonText;
-        [SerializeField] private Image colorStrip;
+        [SerializeField] private TMP_Text nameText, winsText, muteButtonText;
+        [SerializeField] private Image colorStrip, pingImage;
         [SerializeField] private RectTransform background, dropdownBackgroundImage;
         [SerializeField] private GameObject blockerTemplate, dropdownOptions, firstButton, chattingIcon, settingsIcon, readyIcon;
         [SerializeField] private LayoutElement layout;
@@ -42,9 +42,11 @@ namespace NSMB.UI.MainMenu {
         private GameObject blockerInstance;
         private EntityRef playerDataEntity;
         private string userId;
+        private string cachedNickname;
         private string nicknameColor;
         private bool constantNicknameColor;
         private int orderIndex;
+        private int cachedWins;
 
         public void OnEnable() {
             Settings.OnColorblindModeChanged += OnColorblindModeChanged;
@@ -72,6 +74,7 @@ namespace NSMB.UI.MainMenu {
             QuantumEvent.Subscribe<EventPlayerDataChanged>(this, OnPlayerDataChanged, onlyIfActiveAndEnabled: true);
             QuantumEvent.Subscribe<EventGameStateChanged>(this, OnGameStateChanged);
             QuantumEvent.Subscribe<EventPlayerStartedTyping>(this, OnPlayerStartedTyping);
+            QuantumEvent.Subscribe<EventPlayerRemoved>(this, OnPlayerRemoved);
             QuantumCallback.Subscribe<CallbackUpdateView>(this, OnUpdateView, onlyIfActiveAndEnabled: true);
 
             if (!player.IsValid) {
@@ -97,6 +100,7 @@ namespace NSMB.UI.MainMenu {
             this.player = player;
             RuntimePlayer runtimePlayer = NetworkHandler.Game.Frames.Predicted.GetPlayerData(player);
             nicknameColor = runtimePlayer?.NicknameColor ?? "#FFFFFF";
+            cachedNickname = runtimePlayer.PlayerNickname.ToValidUsername(f, player);
             userId = runtimePlayer?.UserId;
             nameText.color = Utils.Utils.SampleNicknameColor(nicknameColor, out constantNicknameColor);
 
@@ -115,7 +119,7 @@ namespace NSMB.UI.MainMenu {
             dropdownOptions.SetActive(false);
         }
 
-        private static readonly StringBuilder Builder = new();
+        private readonly StringBuilder builder = new();
         public unsafe void UpdateText(Frame f) {
             colorStrip.color = Utils.Utils.GetPlayerColor(f, player);
             var playerData = QuantumUtils.GetPlayerData(f, player);
@@ -126,38 +130,42 @@ namespace NSMB.UI.MainMenu {
             }
 
             // Wins text
-            if (playerData->Wins == 0) {
-                winsText.text = "";
-            } else {
-                winsText.text = "<sprite name=room_wins> " + playerData->Wins;
+            if (cachedWins != playerData->Wins) {
+                if (playerData->Wins == 0) {
+                    winsText.text = "";
+                } else {
+                    builder.Clear();
+                    winsText.text = builder.Append("<sprite name=room_wins> ").Append(playerData->Wins).ToString();
+                }
+                cachedWins = playerData->Wins;
             }
 
             // Ping text
-            pingText.text = $"{playerData->Ping}ms {Utils.Utils.GetPingSymbol(playerData->Ping)}";
+            pingImage.sprite = Utils.Utils.GetPingSprite(playerData->Ping);
 
             // Name text
             RuntimePlayer runtimePlayer = f.GetPlayerData(player);
-            Builder.Clear();
+            builder.Clear();
 
             if (ChatManager.Instance.mutedPlayers.Contains(runtimePlayer.UserId)) {
-                Builder.Append("<sprite name=player_muted>");
+                builder.Append("<sprite name=player_muted>");
             }
 
             if (playerData->IsRoomHost) {
-                Builder.Append("<sprite name=room_host>");
+                builder.Append("<sprite name=room_host>");
             }
 
             int characterIndex = playerData->Character;
             characterIndex %= GlobalController.Instance.config.CharacterDatas.Length;
-            Builder.Append(GlobalController.Instance.config.CharacterDatas[characterIndex].UiString);
+            builder.Append(GlobalController.Instance.config.CharacterDatas[characterIndex].UiString);
 
             if (f.Global->Rules.TeamsEnabled && Settings.Instance.GraphicsColorblind && !playerData->ManualSpectator) {
                 TeamAsset team = f.SimulationConfig.Teams[playerData->RequestedTeam];
-                Builder.Append(team.textSpriteColorblindBig);
+                builder.Append(team.textSpriteColorblindBig);
             }
 
-            Builder.Append(runtimePlayer.PlayerNickname.ToValidUsername(f, player));
-            nameText.text = Builder.ToString();
+            builder.Append(cachedNickname);
+            nameText.text = builder.ToString();
 
             Transform parent = transform.parent;
             orderIndex = 0;
@@ -343,7 +351,7 @@ namespace NSMB.UI.MainMenu {
             var playerData = QuantumUtils.GetPlayerData(e.Frame, e.Player);
             readyIcon.SetActive(playerData->IsReady);
             settingsIcon.SetActive(playerData->IsInSettings);
-            handler.UpdateAllPlayerEntries(e.Frame);
+            handler.GetPlayerEntry(e.Player).UpdateText(e.Frame);
         }
 
         public void OnSelect(BaseEventData eventData) {
@@ -360,6 +368,15 @@ namespace NSMB.UI.MainMenu {
             if (player == data.player) {
                 typingCounter = 0;
             }
+        }
+
+        private void OnPlayerRemoved(EventPlayerRemoved e) {
+            RuntimePlayer runtimePlayer;
+            if (!player.IsValid || (runtimePlayer = e.Frame.GetPlayerData(player)) == null) {
+                return;
+            }
+
+            cachedNickname = runtimePlayer.PlayerNickname.ToValidUsername(e.Frame, player);
         }
     }
 }

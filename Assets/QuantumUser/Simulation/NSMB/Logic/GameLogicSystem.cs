@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace Quantum {
     public unsafe class GameLogicSystem : SystemMainThread, ISignalOnPlayerAdded, ISignalOnPlayerRemoved, ISignalOnMarioPlayerDied,
-        ISignalOnLoadingComplete, ISignalOnMarioPlayerCollectedStar, ISignalOnReturnToRoom {
+        ISignalOnLoadingComplete, ISignalOnMarioPlayerCollectedStar, ISignalOnReturnToRoom, ISignalOnComponentRemoved<MarioPlayer> {
 
         public override void OnInit(Frame f) {
             var config = f.RuntimeConfig;
@@ -53,30 +53,33 @@ namespace Quantum {
                 }
                 break;
             case GameState.WaitingForPlayers:
-                bool allPlayersLoaded = true;
                 var playerDataFilter = f.Filter<PlayerData>();
-                byte players = 0;
+                int validPlayers = 0;
+                int loadedPlayers = 0;
                 while (playerDataFilter.NextUnsafe(out _, out PlayerData* data)) {
                     if (!f.RuntimeConfig.IsRealGame) {
                         data->IsLoaded = true;
                         data->IsSpectator = false;
                     }
 
-                    allPlayersLoaded &= data->IsSpectator || data->IsLoaded;
                     if (!data->IsSpectator) {
-                        players++;
+                        validPlayers++;
+                    }
+                    if (data->IsLoaded) {
+                        loadedPlayers++;
                     }
                 }
-                f.Global->RealPlayers = players;
+                f.Global->RealPlayers = (byte) validPlayers;
 
-                if (players <= 0) {
+                if (validPlayers <= 0) {
                     break;
                 }
 
-                if (QuantumUtils.Decrement(ref f.Global->PlayerLoadFrames) || !f.RuntimeConfig.IsRealGame || allPlayersLoaded) {
+                if (QuantumUtils.Decrement(ref f.Global->PlayerLoadFrames) || !f.RuntimeConfig.IsRealGame || (validPlayers == loadedPlayers)) {
                     // Progress to next stage.
+                    f.Global->RealPlayers = (byte) loadedPlayers;
                     f.Global->GameState = GameState.Starting;
-                    f.Global->GameStartFrames = 3 * 60 + 120 + 60;
+                    f.Global->GameStartFrames = 6 * 60;
                     f.Global->Timer = f.Global->Rules.TimerSeconds;
 
                     f.Signals.OnLoadingComplete();
@@ -117,7 +120,12 @@ namespace Quantum {
                 break;
 
             case GameState.Ended:
-                if (QuantumUtils.Decrement(ref f.Global->GameStartFrames)) {
+                QuantumUtils.Decrement(ref f.Global->GameStartFrames);
+                if (f.Global->GameStartFrames == 30) {
+                    f.Events.StartGameEndFade(f);
+                }
+
+                if (f.Global->GameStartFrames == 0) {
                     // Move back to lobby.
                     f.Global->TotalGamesPlayed++;
                     if (f.IsVerified) {
@@ -204,6 +212,9 @@ namespace Quantum {
                 return;
             }
 
+            f.Global->WinningTeam = winningTeam.GetValueOrDefault();
+            f.Global->HasWinner = winningTeam.HasValue;
+
             f.Signals.OnGameEnding(winningTeam.GetValueOrDefault(), winningTeam.HasValue);
             f.Events.GameEnded(f, winningTeam.GetValueOrDefault(), winningTeam.HasValue);
 
@@ -218,7 +229,7 @@ namespace Quantum {
 
             f.Global->GameState = GameState.Ended;
             f.Events.GameStateChanged(f, GameState.Ended);
-            f.Global->GameStartFrames = (ushort) (6 * f.UpdateRate);
+            f.Global->GameStartFrames = (ushort) (21 * f.UpdateRate);
             f.SystemDisable<StartDisabledSystemGroup>();
         }
 
@@ -227,6 +238,7 @@ namespace Quantum {
         }
 
         public void OnPlayerAdded(Frame f, PlayerRef player, bool firstTime) {
+            RuntimePlayer runtimePlayer = f.GetPlayerData(player);
             EntityRef newEntity = f.Create();
             f.Add(newEntity, out PlayerData* newData);
             newData->PlayerRef = player;
@@ -237,8 +249,8 @@ namespace Quantum {
             // Get team counts
             int teams = f.SimulationConfig.Teams.Length;
             Span<byte> teamCounts = stackalloc byte[teams];
-            var otherPlayerDatas = f.ResolveDictionary(f.Global->PlayerDatas);
-            foreach ((_, EntityRef otherEntity) in otherPlayerDatas) {
+            var playerDatas = f.ResolveDictionary(f.Global->PlayerDatas);
+            foreach ((PlayerRef otherPlayer, EntityRef otherEntity) in playerDatas) {
                 var data = f.Unsafe.GetPointer<PlayerData>(otherEntity);
                 if (data->RequestedTeam < teams) {
                     teamCounts[data->RequestedTeam]++;
@@ -257,37 +269,50 @@ namespace Quantum {
             newData->RequestedTeam = (byte) lowestTeamIndex;
 
             // Other bookkeeping
-            RuntimePlayer runtimePlayer = f.GetPlayerData(player);
             newData->Character = runtimePlayer.Character;
             newData->Palette = runtimePlayer.Palette;
 
-            if (otherPlayerDatas.Count == 0) {
+            if (playerDatas.Count == 0) {
                 // First player is host
                 newData->IsRoomHost = true;
                 f.Events.HostChanged(f, player);
             }
 
-            otherPlayerDatas[player] = newEntity;
+            foreach ((_, EntityRef otherEntity) in playerDatas) {
+                var data = f.Unsafe.GetPointer<PlayerData>(otherEntity);
+                if (data->RequestedTeam < teams) {
+                    teamCounts[data->RequestedTeam]++;
+                }
+            }
+
+            playerDatas[player] = newEntity;
             f.Events.PlayerAdded(f, player);
             f.Events.PlayerDataChanged(f, player);
         }
 
         public void OnPlayerRemoved(Frame f, PlayerRef player) {
-            var datas = f.ResolveDictionary(f.Global->PlayerDatas);
+            var playerDatas = f.ResolveDictionary(f.Global->PlayerDatas);
             bool hostChanged = false;
 
-            if (datas.TryGetValue(player, out EntityRef entity)) {
-                var deletedPlayerData = f.Unsafe.GetPointer<PlayerData>(entity);
+            for (int i = 0; i < f.Global->RealPlayers; i++) {
+                ref PlayerInformation info = ref f.Global->PlayerInfo[i];
+                if (info.PlayerRef == player) {
+                    info.PlayerRef = PlayerRef.None;
+                }
+            }
+
+            if (playerDatas.TryGetValue(player, out EntityRef entity)
+                && f.Unsafe.TryGetPointer(entity, out PlayerData* deletedPlayerData)) {
 
                 if (deletedPlayerData->IsRoomHost) {
                     // Give the host to the youngest player.
-                    var playerDataFilter = f.Filter<PlayerData>();
                     PlayerData* youngestPlayer = null;
-                    while (playerDataFilter.NextUnsafe(out _, out PlayerData* otherPlayerData)) {
+                    foreach ((_, EntityRef otherEntity) in playerDatas) {
+                        PlayerData* otherPlayerData = f.Unsafe.GetPointer<PlayerData>(otherEntity);
                         if (deletedPlayerData == otherPlayerData) {
                             continue;
                         }
-                        
+
                         if (youngestPlayer == null || otherPlayerData->JoinTick < youngestPlayer->JoinTick) {
                             youngestPlayer = otherPlayerData;
                         }
@@ -302,13 +327,30 @@ namespace Quantum {
                 }
 
                 f.Destroy(entity);
-                datas.Remove(player);
+                playerDatas.Remove(player);
             }
 
             f.Events.PlayerRemoved(f, player);
 
-            if (f.Global->GameStartFrames > 0 && (hostChanged || !QuantumUtils.IsGameStartable(f))) {
-                StopCountdown(f);
+            switch (f.Global->GameState) {
+            case GameState.PreGameRoom:
+                if (f.Global->GameStartFrames > 0 && (hostChanged || !QuantumUtils.IsGameStartable(f))) {
+                    StopCountdown(f);
+                }
+                break;
+            case GameState.Starting:
+            case GameState.Playing:
+                for (int i = 0; i < f.Global->RealPlayers; i++) {
+                    ref PlayerInformation info = ref f.Global->PlayerInfo[i];
+                    if (info.PlayerRef != player) {
+                        continue;
+                    }
+
+                    info.Disconnected = true;
+                    info.Disqualified = true;
+                    break;
+                }
+                break;
             }
         }
 
@@ -316,9 +358,10 @@ namespace Quantum {
             // Spawn players
             var config = f.SimulationConfig;
             var stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
-            int teamCounter = 0;
+            int teamCount = 0;
 
             var playerDatas = f.Filter<PlayerData>();
+            int playerCount = 0;
             while (playerDatas.NextUnsafe(out _, out PlayerData* data)) {
                 if (!data->IsLoaded) {
                     // Force spectator, didn't load in time
@@ -336,10 +379,20 @@ namespace Quantum {
                 EntityRef newPlayer = f.Create(character.Prototype);
                 var mario = f.Unsafe.GetPointer<MarioPlayer>(newPlayer);
                 mario->PlayerRef = data->PlayerRef;
-                data->RealTeam = (byte) (f.Global->Rules.TeamsEnabled ? data->RequestedTeam : teamCounter++);
+                data->RealTeam = (byte) (f.Global->Rules.TeamsEnabled ? data->RequestedTeam : teamCount++);
 
                 var newTransform = f.Unsafe.GetPointer<Transform2D>(newPlayer);
                 newTransform->Position = stage.Spawnpoint;
+
+                // Save runtimeplayer info for late joiners, in case this player DCs
+                RuntimePlayer runtimePlayer = f.GetPlayerData(data->PlayerRef);
+                f.Global->PlayerInfo[playerCount++] = new PlayerInformation {
+                    PlayerRef = data->PlayerRef,
+                    Nickname = runtimePlayer.PlayerNickname,
+                    NicknameColor = runtimePlayer.NicknameColor,
+                    Character = (byte) characterIndex,
+                    Team = data->RealTeam,
+                };
             }
 
             // Assign random spawnpoints
@@ -375,12 +428,29 @@ namespace Quantum {
 
             // Reset variables
             f.Global->Timer = 0;
+            for (int i = 0; i < f.Global->PlayerInfo.Length; i++) {
+                f.Global->PlayerInfo[i] = default;
+            }
 
             var playerDatas = f.Filter<PlayerData>();
             while (playerDatas.NextUnsafe(out _, out PlayerData* data)) {
                 data->IsLoaded = false;
                 data->IsReady = false;
+                data->IsSpectator = false;
+                data->VotedToContinue = false;
                 data->RealTeam = 255;
+            }
+        }
+
+        public void OnRemoved(Frame f, EntityRef entity, MarioPlayer* component) {
+            for (int i = 0; i < f.Global->RealPlayers; i++) {
+                ref PlayerInformation info = ref f.Global->PlayerInfo[i];
+                if (info.PlayerRef != component->PlayerRef) {
+                    continue;
+                }
+
+                info.Disqualified = true;
+                break;
             }
         }
     }

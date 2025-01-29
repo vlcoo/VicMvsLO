@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace NSMB.Utils {
     public class Utils {
@@ -105,6 +106,20 @@ namespace NSMB.Utils {
             ['8'] = "room_smallnumber_8",
             ['9'] = "room_smallnumber_9",
         };
+        public static readonly Dictionary<char, string> resultsSymbols = new() {
+            ['0'] = "results_0",
+            ['1'] = "results_1",
+            ['2'] = "results_2",
+            ['3'] = "results_3",
+            ['4'] = "results_4",
+            ['5'] = "results_5",
+            ['6'] = "results_6",
+            ['7'] = "results_7",
+            ['8'] = "results_8",
+            ['9'] = "results_9",
+            ['S'] = "results_star",
+            ['O'] = "results_out",
+        };
 
         private static StringBuilder symbolStringBuilder = new();
         public static string GetSymbolString(ReadOnlySpan<char> str, Dictionary<char, string> dict = null) {
@@ -122,7 +137,7 @@ namespace NSMB.Utils {
         }
 
         private static readonly Color spectatorColor = new(0.8f, 0.8f, 0.8f, 0.7f);
-        public unsafe static Color GetPlayerColor(Frame f, PlayerRef player, float s = 1, float v = 1) {
+        public unsafe static Color GetPlayerColor(Frame f, PlayerRef player, float s = 1, float v = 1, bool considerDisqualifications = true) {
             if (f == null || player == PlayerRef.None) {
                 return spectatorColor;
             }
@@ -137,7 +152,7 @@ namespace NSMB.Utils {
             }
 
             // Or dead marios
-            if (f.Global->GameState > GameState.WaitingForPlayers) {
+            if (f.Global->GameState > GameState.WaitingForPlayers && considerDisqualifications) {
                 var marioFilter = f.Filter<MarioPlayer>();
                 marioFilter.UseCulling = false;
                 MarioPlayer* existingMario = null;
@@ -215,6 +230,18 @@ namespace NSMB.Utils {
                 < 210 => "<sprite name=connection_fair>",
                 _ => "<sprite name=connection_bad>"
             };
+        }
+
+        public static Sprite GetPingSprite(int ping) {
+            int index = ping switch {
+                < 0 => 0,
+                0 => 1,
+                < 70 => 2,
+                < 140 => 3,
+                < 210 => 4,
+                _ => 5
+            };
+            return GlobalController.Instance.pingIndicators[index];
         }
 
         public static string BytesToString(long byteCount) {

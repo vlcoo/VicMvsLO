@@ -13,6 +13,7 @@ namespace Quantum {
             public Powerup* Powerup;
             public PhysicsObject* PhysicsObject;
             public PhysicsCollider2D* Collider;
+            public Interactable* Interactable;
         }
 
         public override void OnInit(Frame f) {
@@ -24,48 +25,59 @@ namespace Quantum {
             var physicsObject = filter.PhysicsObject;
             var transform = filter.Transform;
 
-            if (f.Exists(powerup->ParentMarioPlayer)) {
-                // Attached to a player. Don't interact, and follow the player.
-                var marioTransform = f.Unsafe.GetPointer<Transform2D>(powerup->ParentMarioPlayer);
-                var marioCamera = f.Unsafe.GetPointer<CameraController>(powerup->ParentMarioPlayer);
+            if (powerup->SpawnAnimationFrames > 0) {
+                if (f.Exists(powerup->ParentMarioPlayer)) {
+                    // Attached to a player. Don't interact, and follow the player.
+                    var marioTransform = f.Unsafe.GetPointer<Transform2D>(powerup->ParentMarioPlayer);
+                    var marioCamera = f.Unsafe.GetPointer<CameraController>(powerup->ParentMarioPlayer);
 
-                // TODO magic value
-                transform->Position = new FPVector2(marioTransform->Position.X, marioCamera->CurrentPosition.Y + CameraYOffset);
+                    // TODO magic value
+                    transform->Position = new FPVector2(marioTransform->Position.X, marioCamera->CurrentPosition.Y + CameraYOffset);
 
-                if (QuantumUtils.Decrement(ref powerup->SpawnAnimationFrames)) {
-                    powerup->ParentMarioPlayer = EntityRef.None;
-                    physicsObject->IsFrozen = false;
-                    f.Events.PowerupBecameActive(f, filter.Entity);
-                } else {
-                    return;
-                }
-            } else if (powerup->BlockSpawn) {
-                // Spawning from a block. Lerp between origin & destination.
-                FP t = 1 - ((FP) powerup->SpawnAnimationFrames / (FP) powerup->BlockSpawnAnimationLength);
-                transform->Position = FPVector2.Lerp(powerup->BlockSpawnOrigin, powerup->BlockSpawnDestination, t);
-
-                if (QuantumUtils.Decrement(ref powerup->SpawnAnimationFrames)) {
-                    if (PhysicsObjectSystem.BoxInGround((FrameThreadSafe) f, transform->Position, filter.Collider->Shape, false, stage, filter.Entity)) {
-                        // TODO: poof effect.
-                        f.Destroy(filter.Entity);
+                    if (QuantumUtils.Decrement(ref powerup->SpawnAnimationFrames)) {
+                        powerup->ParentMarioPlayer = EntityRef.None;
+                        filter.Interactable->ColliderDisabled = false;
+                        physicsObject->IsFrozen = false;
+                        f.Events.PowerupBecameActive(f, filter.Entity);
+                    } else {
                         return;
                     }
-                    powerup->BlockSpawn = false;
-                    physicsObject->IsFrozen = false;
-                    f.Events.PowerupBecameActive(f, filter.Entity);
-                } else {
+                } else if (powerup->BlockSpawn) {
+                    // Spawning from a block. Lerp between origin & destination.
+                    FP t = 1 - ((FP) powerup->SpawnAnimationFrames / (FP) powerup->BlockSpawnAnimationLength);
+                    transform->Position = FPVector2.Lerp(powerup->BlockSpawnOrigin, powerup->BlockSpawnDestination, t);
+
+                    if (powerup->SpawnAnimationFrames == 7) {
+                        filter.Interactable->ColliderDisabled = false;
+                    }
+
+                    if (QuantumUtils.Decrement(ref powerup->SpawnAnimationFrames)) {
+                        if (PhysicsObjectSystem.BoxInGround((FrameThreadSafe) f, transform->Position, filter.Collider->Shape, false, stage, filter.Entity)) {
+                            // TODO: poof effect.
+                            f.Destroy(filter.Entity);
+                            return;
+                        }
+                        powerup->BlockSpawn = false;
+                        physicsObject->IsFrozen = false;
+                        filter.Interactable->ColliderDisabled = false;
+                        f.Events.PowerupBecameActive(f, filter.Entity);
+                    } else {
+                        return;
+                    }
                     return;
+                } else if (powerup->LaunchSpawn) {
+                    // Back to normal layers
+                    if (QuantumUtils.Decrement(ref powerup->SpawnAnimationFrames)) {
+                        powerup->LaunchSpawn = false;
+                        physicsObject->DisableCollision = false;
+                        filter.Interactable->ColliderDisabled = false;
+                        f.Events.PowerupBecameActive(f, filter.Entity);
+                    }
+                } else {
+                    if (QuantumUtils.Decrement(ref powerup->SpawnAnimationFrames)) {
+                        filter.Interactable->ColliderDisabled = false;
+                    }
                 }
-                return;
-            } else if (powerup->LaunchSpawn) {
-                // Back to normal layers
-                if (QuantumUtils.Decrement(ref powerup->SpawnAnimationFrames)) {
-                    powerup->LaunchSpawn = false;
-                    physicsObject->DisableCollision = false;
-                    f.Events.PowerupBecameActive(f, filter.Entity);
-                }
-            } else {
-                QuantumUtils.Decrement(ref powerup->SpawnAnimationFrames);
             }
 
             var asset = f.FindAsset(powerup->Scriptable);
@@ -145,17 +157,12 @@ namespace Quantum {
         }
 
         public void OnPowerupMarioInteraction(Frame f, EntityRef powerupEntity, EntityRef marioEntity) {
-            if (f.DestroyPending(powerupEntity)) {
+            if (!f.Exists(powerupEntity) || f.DestroyPending(powerupEntity)) {
                 // Already collected
                 return;
             }
 
             var powerup = f.Unsafe.GetPointer<Powerup>(powerupEntity);
-
-            // Don't be collectable if we're following a player / spawning
-            if ((powerup->BlockSpawn && (powerup->SpawnAnimationFrames) > 6) || (!powerup->BlockSpawn && powerup->SpawnAnimationFrames > 0)) {
-                return;
-            }
 
             // Don't collect if we're ignoring players (usually, after blue shell spawns from a blue koopa,
             // so we dont collect it instantly)

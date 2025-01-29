@@ -28,9 +28,12 @@ public class MusicManager : MonoBehaviour {
         LoadingCanvas.OnLoadingEnded += OnLoadingEnded;
 
         QuantumGame game = NetworkHandler.Game;
-        if (game != null && game.Frames.Predicted.Global->GameState == GameState.Playing) {
-            // Already in a game
-            HandleMusic(game, true);
+        if (game != null) {
+            GameState state = game.Frames.Predicted.Global->GameState;
+            if (state == GameState.Starting || state == GameState.Playing) {
+                // Already in a game
+                HandleMusic(game, true);
+            }
         }
     }
 
@@ -38,8 +41,10 @@ public class MusicManager : MonoBehaviour {
         LoadingCanvas.OnLoadingEnded -= OnLoadingEnded;
     }
 
-    public void OnUpdateView(CallbackUpdateView e) {
-        HandleMusic(e.Game, false);
+    public unsafe void OnUpdateView(CallbackUpdateView e) {
+        if (e.Game.Frames.Predicted.Global->GameState == GameState.Playing) {
+            HandleMusic(e.Game, false);
+        }
     }
 
     private void OnLoadingEnded(bool validPlayer) {

@@ -111,6 +111,8 @@ namespace NSMB.Entities.Player {
         private float lastStompSoundTime = -1;
         private float waterSurfaceMovementDistance;
         private Vector3 previousPosition;
+        private bool forceUpdate;
+        private GameObject activeRespawnParticle;
 
         public void OnValidate() {
             this.SetIfNull(ref animator);
@@ -126,6 +128,7 @@ namespace NSMB.Entities.Player {
 
             RenderPipelineManager.beginCameraRendering += URPOnPreRender;
 
+            QuantumCallback.Subscribe<CallbackGameResynced>(this, OnGameResynced);
             QuantumEvent.Subscribe<EventMarioPlayerJumped>(this, OnMarioPlayerJumped, NetworkHandler.FilterOutReplayFastForward);
             QuantumEvent.Subscribe<EventMarioPlayerGroundpounded>(this, OnMarioPlayerGroundpounded, NetworkHandler.FilterOutReplayFastForward);
             QuantumEvent.Subscribe<EventMarioPlayerGroundpoundStarted>(this, OnMarioPlayerGroundpoundStarted, NetworkHandler.FilterOutReplayFastForward);
@@ -154,6 +157,7 @@ namespace NSMB.Entities.Player {
             QuantumEvent.Subscribe<EventPlayBumpSound>(this, OnPlayBumpSound, NetworkHandler.FilterOutReplayFastForward);
             QuantumEvent.Subscribe<EventMarioPlayerStompedByTeammate>(this, OnMarioPlayerStompedByTeammate, NetworkHandler.FilterOutReplayFastForward);
             QuantumEvent.Subscribe<EventPhysicsObjectLanded>(this, OnPhysicsObjectLanded, NetworkHandler.FilterOutReplayFastForward);
+            QuantumEvent.Subscribe<EventMarioPlayerLandedWithAnimation>(this, OnMarioPlayerLandedWithAnimation);
         }
 
         public override void OnActivate(Frame f) {
@@ -178,6 +182,9 @@ namespace NSMB.Entities.Player {
             AllMarioPlayers.RemoveWhere(ma => ma == null);
             AllMarioPlayers.Add(this);
             MarioPlayerInitialized?.Invoke(Game, f, this);
+
+            forceUpdate = true;
+            OnUpdateView();
         }
 
         public override void OnDeactivate() {
@@ -201,7 +208,7 @@ namespace NSMB.Entities.Player {
 
             var mario = f.Unsafe.GetPointer<MarioPlayer>(EntityRef);
 
-            if (f.Global->GameState >= GameState.Ended) {
+            if (f.Global->GameState >= GameState.Ended && !forceUpdate) {
                 animator.speed = 0;
                 models.SetActive(!mario->IsRespawning);
                 SetParticleEmission(drillParticle, false);
@@ -232,6 +239,7 @@ namespace NSMB.Entities.Player {
             UpdateAnimatorVariables(f, mario, physicsObject, freezable, ref inputs);
 
             previousPosition = transform.position;
+            forceUpdate = false;
         }
 
         public void HandleAnimations(Frame f, MarioPlayer* mario, PhysicsObject* physicsObject, Freezable* freezable) {
@@ -850,12 +858,12 @@ namespace NSMB.Entities.Player {
             }
 
             var marioTransform = e.Frame.Unsafe.GetPointer<Transform2D>(e.Entity);
-            GameObject respawn = SpawnParticle(respawnParticle, marioTransform->Position.ToUnityVector3());
-            foreach (ParticleSystem particle in respawn.GetComponentsInChildren<ParticleSystem>()) {
+            activeRespawnParticle = SpawnParticle(respawnParticle, marioTransform->Position.ToUnityVector3());
+            foreach (ParticleSystem particle in activeRespawnParticle.GetComponentsInChildren<ParticleSystem>()) {
                 var main = particle.main;    
                 main.startColor = GlowColor;
             }
-            PlaySound(SoundEffect.Player_Sound_Respawn);
+            //PlaySound(SoundEffect.Player_Sound_Respawn);
         }
 
         private void OnMarioPlayerDied(EventMarioPlayerDied e) {
@@ -1149,6 +1157,20 @@ namespace NSMB.Entities.Player {
             }
 
             PlaySound(SoundEffect.Player_Voice_SpinnerLaunch);
+        }
+
+        private void OnGameResynced(CallbackGameResynced e) {
+            if (activeRespawnParticle) {
+                Destroy(activeRespawnParticle);
+            }
+        }
+
+        private void OnMarioPlayerLandedWithAnimation(EventMarioPlayerLandedWithAnimation e) {
+            if (e.Entity != EntityRef) {
+                return;
+            }
+
+            animator.Play("jumplanding");
         }
     }
 }

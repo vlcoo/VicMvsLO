@@ -4,15 +4,14 @@ using NSMB.Translation;
 using NSMB.UI.Game.Scoreboard;
 using NSMB.Utils;
 using Quantum;
-using System;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
-using UnityEngine.UI;
 
 namespace NSMB.UI.Game {
-    public class PlayerElements : MonoBehaviour {
+    public class PlayerElements : QuantumSceneViewComponent {
 
         public static HashSet<PlayerElements> AllPlayerElements = new();
 
@@ -23,6 +22,7 @@ namespace NSMB.UI.Game {
         public Camera Camera => ourCamera;
         public CameraAnimator CameraAnimator => cameraAnimator;
         public ReplayUI ReplayUi => replayUi;
+        public bool IsSpectating => spectating;
 
         //---Serialized Variables
         [SerializeField] private UIUpdater uiUpdater;
@@ -32,7 +32,7 @@ namespace NSMB.UI.Game {
         [SerializeField] private ScoreboardUpdater scoreboardUpdater;
         [SerializeField] private ReplayUI replayUi;
 
-        [SerializeField] private GameObject spectationUI;
+        [SerializeField] public GameObject spectationUI;
         [SerializeField] private TMP_Text spectatingText;
         [SerializeField] private PlayerNametag nametagPrefab;
         [SerializeField] public GameObject nametagCanvas;
@@ -41,6 +41,7 @@ namespace NSMB.UI.Game {
         private PlayerRef player;
         private EntityRef entity;
 
+        private bool initialized;
         private bool spectating;
         private EntityRef spectatingEntity;
         private Vector2 previousNavigate;
@@ -54,7 +55,7 @@ namespace NSMB.UI.Game {
             this.SetIfNull(ref replayUi, UnityExtensions.GetComponentType.Children);
         }
 
-        public void OnEnable() {
+        public override void OnActivate(Frame f) {
             AllPlayerElements.Add(this);
             Settings.Controls.UI.Navigate.performed += OnNavigate;
             Settings.Controls.UI.SpectatePlayerByIndex.performed += SpectatePlayerIndex;
@@ -63,7 +64,7 @@ namespace NSMB.UI.Game {
             TranslationManager.OnLanguageChanged += OnLanguageChanged;
         }
 
-        public void OnDisable() {
+        public override void OnDeactivate() {
             AllPlayerElements.Remove(this);
             Settings.Controls.UI.Navigate.performed -= OnNavigate;
             Settings.Controls.UI.SpectatePlayerByIndex.performed -= SpectatePlayerIndex;
@@ -74,7 +75,6 @@ namespace NSMB.UI.Game {
 
         public void Start() {
             nametagCanvas.SetActive(Settings.Instance.GraphicsPlayerNametags);
-            QuantumCallback.Subscribe<CallbackUpdateView>(this, OnUpdateView);
         }
 
         public void Initialize(QuantumGame game, Frame f, EntityRef entity, PlayerRef player) {
@@ -89,6 +89,7 @@ namespace NSMB.UI.Game {
             foreach (var mario in MarioPlayerAnimator.AllMarioPlayers) {
                 MarioPlayerInitialized(game, f, mario);
             }
+            initialized = true;
             MarioPlayerAnimator.MarioPlayerInitialized += MarioPlayerInitialized;
         }
 
@@ -101,10 +102,13 @@ namespace NSMB.UI.Game {
             newNametag.Initialize(game, f, this, mario);
         }
 
-        public void OnUpdateView(CallbackUpdateView e) {
-            Frame f = e.Game.Frames.Predicted;
+        public override unsafe void OnUpdateView() {
+            if (!initialized) {
+                return;
+            }
 
-            if (!spectating && !f.Exists(entity)) {
+            Frame f = PredictedFrame;
+            if (!spectating && !f.Exists(entity) && f.Global->GameState == GameState.Starting) {
                 // Spectating
                 StartSpectating();
             }
@@ -116,7 +120,7 @@ namespace NSMB.UI.Game {
         }
 
         public unsafe void UpdateSpectateUI() {
-            Frame f = QuantumRunner.DefaultGame.Frames.Predicted;
+            Frame f = PredictedFrame;
             var mario = f.Unsafe.GetPointer<MarioPlayer>(spectatingEntity);
 
             RuntimePlayer runtimePlayer = f.GetPlayerData(mario->PlayerRef);
@@ -128,11 +132,10 @@ namespace NSMB.UI.Game {
 
         public void StartSpectating() {
             spectating = true;
-
+            spectationUI.SetActive(true);
             if (!NetworkHandler.IsReplay) {
-                spectationUI.SetActive(true);
                 if (GlobalController.Instance.loadingCanvas.isActiveAndEnabled) {
-                    GlobalController.Instance.loadingCanvas.EndLoading(QuantumRunner.DefaultGame);
+                    GlobalController.Instance.loadingCanvas.EndLoading(NetworkHandler.Game);
                 }
             }
 
@@ -148,31 +151,23 @@ namespace NSMB.UI.Game {
         }
 
         public unsafe void SpectateNextPlayer() {
-            Frame f = QuantumRunner.DefaultGame.Frames.Predicted;
+            Frame f = PredictedFrame;
 
             int marioCount = f.ComponentCount<MarioPlayer>();
             if (marioCount <= 0) {
                 return;
             }
 
-            Span<EntityRef> marios = stackalloc EntityRef[marioCount];
+            List<EntityRef> marios = new(marioCount);
             var marioFilter = f.Filter<MarioPlayer>();
             marioFilter.UseCulling = false;
-
-            int index = 0;
             while (marioFilter.NextUnsafe(out EntityRef entity, out _)) {
-                marios[index++] = entity;
+                marios.Add(entity);
             }
-
-            int currentIndex = -1;
-            for (int i = 0; i < marioCount; i++) {
-                if (spectatingEntity == marios[i]
-                    || marios[i].Index > spectatingEntity.Index) {
-
-                    currentIndex = i;
-                    break;
-                }
-            }
+            marios.Sort((a, b) => {
+                return a.Index - b.Index;
+            });
+            int currentIndex = marios.IndexOf(spectatingEntity);
             spectatingEntity = marios[(currentIndex + 1) % marioCount];
             UpdateSpectateUI();
         }
@@ -182,41 +177,33 @@ namespace NSMB.UI.Game {
                 return;
             }
 
-            SpectateNextPlayer();
+            SpectatePreviousPlayer();
         }
 
         public unsafe void SpectatePreviousPlayer() {
-            Frame f = QuantumRunner.DefaultGame.Frames.Predicted;
+            Frame f = PredictedFrame;
 
             int marioCount = f.ComponentCount<MarioPlayer>();
             if (marioCount <= 0) {
                 return;
             }
 
-            Span<EntityRef> marios = stackalloc EntityRef[marioCount];
+            List<EntityRef> marios = new(marioCount);
             var marioFilter = f.Filter<MarioPlayer>();
             marioFilter.UseCulling = false;
-
-            int index = 0;
             while (marioFilter.NextUnsafe(out EntityRef entity, out _)) {
-                marios[index++] = entity;
+                marios.Add(entity);
             }
-
-            int currentIndex = -1;
-            for (int i = marioCount - 1; i >= 0; i--) {
-                if (spectatingEntity == marios[i]
-                    || marios[i].Index < spectatingEntity.Index) {
-
-                    currentIndex = i;
-                    break;
-                }
-            }
+            marios.Sort((a, b) => {
+                return a.Index - b.Index;
+            });
+            int currentIndex = marios.IndexOf(spectatingEntity);
             spectatingEntity = marios[(currentIndex - 1 + marioCount) % marioCount];
             UpdateSpectateUI();
         }
 
         private void OnNavigate(InputAction.CallbackContext context) {
-            if (!spectating) {
+            if (!spectating || EventSystem.current != spectationUI) {
                 return;
             }
 

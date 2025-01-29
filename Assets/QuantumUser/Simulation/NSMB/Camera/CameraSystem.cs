@@ -1,8 +1,14 @@
+#define MULTITHREADED
+
 using Photon.Deterministic;
 using Quantum.Task;
 
 namespace Quantum {
+#if MULTITHREADED
     public unsafe class CameraSystem : SystemArrayFilter<CameraSystem.Filter> {
+#else
+    public unsafe class CameraSystem : SystemMainThreadFilterStage<CameraSystem.Filter> {
+#endif
         public struct Filter {
             public EntityRef Entity;
             public Transform2D* Transform;
@@ -12,12 +18,21 @@ namespace Quantum {
             public PhysicsCollider2D* Collider;
         }
 
+#if MULTITHREADED
         public override void Update(FrameThreadSafe f, ref Filter filter) {
             UpdateCameraSize(f, ref filter);
             if (!filter.Mario->IsDead) {
                 filter.Camera->CurrentPosition = CalculateNewPosition(f, ref filter, f.FindAsset<VersusStageData>(f.Map.UserAsset));
             }
         }
+#else
+        public override void Update(Frame f, ref Filter filter, VersusStageData stage) {
+            UpdateCameraSize((FrameThreadSafe) f, ref filter);
+            if (!filter.Mario->IsDead) {
+                filter.Camera->CurrentPosition = CalculateNewPosition((FrameThreadSafe) f, ref filter, stage);
+            }
+        }
+#endif
 
         private void UpdateCameraSize(FrameThreadSafe f, ref Filter filter) {
             var mario = filter.Mario;
@@ -44,7 +59,7 @@ namespace Quantum {
                 camera->LastPlayerPosition = transform->Position;
             }
 
-            FP vOrtho = Constants._3_50;
+            FP vOrtho = camera->OrthographicSize / 2;
             FP xOrtho = vOrtho * Constants.SixteenOverNine;
             FPVector2 newCameraPosition = camera->CurrentPosition;
 
@@ -111,13 +126,12 @@ namespace Quantum {
                 camera->SmoothDampVelocity = FPVector2.Zero;
             }
 
-            newCameraPosition = Clamp(stage, newCameraPosition);
+            newCameraPosition = Clamp(stage, newCameraPosition, vOrtho);
 
             return newCameraPosition;
         }
 
-        public static FPVector2 Clamp(VersusStageData stage, FPVector2 position) {
-            FP vOrtho = Constants._3_50;
+        public static FPVector2 Clamp(VersusStageData stage, FPVector2 position, FP vOrtho) {
             FP xOrtho = vOrtho * Constants.SixteenOverNine;
 
             // Clamping to within level bounds

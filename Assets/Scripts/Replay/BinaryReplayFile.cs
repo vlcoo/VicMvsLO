@@ -67,6 +67,8 @@ public class BinaryReplayFile {
         // Players
         writer.Write(Players);
         writer.Write(WinningTeam);
+
+        // TODO: change to Information struct ?
         for (int i = 0; i < Players; i++) {
             writer.Write(PlayerNames[i]);
             writer.Write(PlayerStars[i]);
@@ -164,8 +166,8 @@ public class BinaryReplayFile {
             result.CompressedInputData = reader.ReadBytes(inputDataSize);
 
             return true;
-        } catch (Exception e) {
-            Debug.LogWarning(e);
+        } catch /* (Exception e) */ {
+            // Debug.LogWarning("Failed to parse replay: " + e);
             // result = null;
             return false;
         }

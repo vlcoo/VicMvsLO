@@ -26,13 +26,11 @@ public class VolumeWithDistance : MonoBehaviour {
     public void Start() {
         soundRangeInverse = 1f / soundRange;
         originalVolumes = new float[audioSources.Length];
-
         for (int i = 0; i < audioSources.Length; i++) {
             originalVolumes[i] = audioSources[i].volume;
         }
 
         stage = (VersusStageData) QuantumUnityDB.GetGlobalAsset(FindObjectOfType<QuantumMapData>().Asset.UserAsset);
-        LateUpdate();
     }
 
     public void LateUpdate() {

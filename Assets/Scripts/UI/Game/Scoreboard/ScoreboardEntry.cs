@@ -12,15 +12,14 @@ namespace NSMB.UI.Game.Scoreboard {
         public EntityRef Target { get; private set; }
 
         //---Serialized Variables
-        [SerializeField] private Image background;
+        [SerializeField] private Image background, pingIndicator;
         [SerializeField] private TMP_Text nicknameText, scoreText;
 
         //---Private Variables
         private ScoreboardUpdater updater;
-        private string nickname = "noname";
-        private bool isValidPlayer;
-        private string nicknameColor = "#FFFFFF";
-        private bool constantNicknameColor = true;
+        private int informationIndex;
+        private string cachedNickname, nicknameColor, cachedPingSymbol;
+        private bool constantNicknameColor = true, nicknameMayHaveChanged;
 
         public void Start() {
             QuantumCallback.Subscribe<CallbackGameResynced>(this, OnGameResynced);
@@ -28,21 +27,25 @@ namespace NSMB.UI.Game.Scoreboard {
             QuantumEvent.Subscribe<EventMarioPlayerCollectedStar>(this, OnMarioPlayerCollectedStar);
             QuantumEvent.Subscribe<EventMarioPlayerDroppedStar>(this, OnMarioPlayerDroppedStar);
             QuantumEvent.Subscribe<EventMarioPlayerPreRespawned>(this, OnMarioPlayerPreRespawned);
+            QuantumEvent.Subscribe<EventMarioPlayerDestroyed>(this, OnMarioPlayerDestroyed);
+            QuantumEvent.Subscribe<EventPlayerRemoved>(this, OnPlayerRemoved);
+
+            if (NetworkHandler.Game != null) {
+                UpdateEntry(NetworkHandler.Game.Frames.Predicted);
+            }
         }
 
-        public unsafe void Initialize(Frame f, EntityRef target, ScoreboardUpdater updater) {
+        public unsafe void Initialize(Frame f, int index, EntityRef target, ScoreboardUpdater updater) {
             Target = target;
             this.updater = updater;
 
-            if (f.Unsafe.TryGetPointer(target, out MarioPlayer* mario)) {
-                RuntimePlayer runtimePlayer = f.GetPlayerData(mario->PlayerRef);
-                if (runtimePlayer != null) {
-                    nickname = runtimePlayer.PlayerNickname;
-                    isValidPlayer = true;
-                    nicknameColor = runtimePlayer.NicknameColor;
-                    nicknameText.color = Utils.Utils.SampleNicknameColor(nicknameColor, out constantNicknameColor);
-                }
-            }
+            informationIndex = index;
+            ref PlayerInformation info = ref f.Global->PlayerInfo[index];
+            cachedNickname = info.Nickname.ToString().ToValidUsername(f, info.PlayerRef);
+            nicknameColor = info.NicknameColor;
+            nicknameText.color = Utils.Utils.SampleNicknameColor(nicknameColor, out constantNicknameColor);
+            nicknameMayHaveChanged = true;
+
             UpdateEntry(f);
             gameObject.SetActive(true);
         }
@@ -54,31 +57,36 @@ namespace NSMB.UI.Game.Scoreboard {
         }
 
         public unsafe void UpdateEntry(Frame f) {
-            if (!f.Unsafe.TryGetPointer(Target, out MarioPlayer* mario)) {
-                Color dcColor = Utils.Utils.GetPlayerColor(f, PlayerRef.None);
-                dcColor.a = 0.5f;
-                background.color = dcColor;
-                return;
+            ref PlayerInformation info = ref f.Global->PlayerInfo[informationIndex];
+
+            var playerData = QuantumUtils.GetPlayerData(f, info.PlayerRef);
+            int ping = (!info.Disconnected && playerData != null) ? playerData->Ping : -1;
+            pingIndicator.sprite = Utils.Utils.GetPingSprite(ping);
+            if (nicknameMayHaveChanged) {
+                nicknameText.text = cachedNickname;
+                nicknameMayHaveChanged = false;
             }
 
-            var playerData = QuantumUtils.GetPlayerData(f, mario->PlayerRef);
+            Color backgroundColor = Utils.Utils.GetPlayerColor(f, info.PlayerRef, considerDisqualifications: true);
+            backgroundColor.a = 0.5f;
+            background.color = backgroundColor;
 
-            int ping = playerData != null ? playerData->Ping : (isValidPlayer ? -1 : 0);
-            nicknameText.text = Utils.Utils.GetPingSymbol(ping) + nickname.ToValidUsername(f, mario->PlayerRef);
+            var character = f.SimulationConfig.CharacterDatas[info.Character];
+            int stars = 0;
+            int lives = 0;
+            if (f.Unsafe.TryGetPointer(Target, out MarioPlayer* mario)) {
+                stars = mario->Stars;
+                lives = mario->Lives;
+            }
 
             StringBuilder scoreBuilder = new();
             if (f.Global->Rules.IsLivesEnabled) {
-                var character = f.FindAsset(mario->CharacterAsset);
-                scoreBuilder.Append(character.UiString).Append(Utils.Utils.GetSymbolString(mario->Lives.ToString()));
+                scoreBuilder.Append(character.UiString).Append(Utils.Utils.GetSymbolString(lives.ToString()));
             }
-            scoreBuilder.Append(Utils.Utils.GetSymbolString('S' + mario->Stars.ToString()));
+            scoreBuilder.Append(Utils.Utils.GetSymbolString('S' + stars.ToString()));
 
             scoreText.text = scoreBuilder.ToString();
             updater.RequestSorting = true;
-
-            Color backgroundColor = Utils.Utils.GetPlayerColor(f, mario->PlayerRef);
-            backgroundColor.a = 0.5f;
-            background.color = backgroundColor;
         }
 
         private void OnMarioPlayerDied(EventMarioPlayerDied e) {
@@ -113,8 +121,24 @@ namespace NSMB.UI.Game.Scoreboard {
             UpdateEntry(e.Frame);
         }
 
+        private void OnMarioPlayerDestroyed(EventMarioPlayerDestroyed e) {
+            if (e.Entity != Target) {
+                return;
+            }
+
+            UpdateEntry(e.Frame);
+        }
+
         private void OnGameResynced(CallbackGameResynced e) {
             UpdateEntry(e.Game.Frames.Predicted);
+        }
+
+        private unsafe void OnPlayerRemoved(EventPlayerRemoved e) {
+            ref PlayerInformation info = ref e.Frame.Global->PlayerInfo[informationIndex];
+            cachedNickname = info.Nickname.ToString().ToValidUsername(e.Frame, info.PlayerRef);
+            nicknameMayHaveChanged = true;
+
+            UpdateEntry(e.Frame);
         }
     }
 }

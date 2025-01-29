@@ -26,6 +26,10 @@ namespace Quantum {
                 physicsObject->IsFrozen = true;
             }
 
+            if (f.Unsafe.TryGetPointer(childEntity, out Interactable* childInteractable)) {
+                childInteractable->ColliderDisabled = true;
+            }
+
             // Set location
             ChildOffset = new FPVector2(0, childPhysicsCollider->Shape.Centroid.Y - childPhysicsCollider->Shape.Box.Extents.Y - FP._0_05);
             transform->Position = childTransform->Position + ChildOffset + child->Offset + (FPVector2.Up * FP._0_05);
