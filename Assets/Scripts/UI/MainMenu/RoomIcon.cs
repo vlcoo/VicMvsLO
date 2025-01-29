@@ -54,23 +54,23 @@ namespace NSMB.UI.MainMenu {
             StringBuilder symbols = new();
 
             if (boolProperties.CustomPowerups) {
-                symbols.Append("<sprite name=room_powerups>");
+                symbols.Append(" <sprite name=room_powerups>");
             }
 
             if (boolProperties.Teams) {
-                symbols.Append("<sprite name=room_teams>");
+                symbols.Append(" <sprite name=room_teams>");
             }
 
             if (intProperties.Timer > 0) {
-                symbols.Append("<sprite name=room_timer>").Append(Utils.Utils.GetSymbolString(intProperties.Timer.ToString(), Utils.Utils.smallSymbols));
+                symbols.Append(" <sprite name=room_timer>").Append(Utils.Utils.GetSymbolString(intProperties.Timer.ToString(), Utils.Utils.smallSymbols));
             }
 
             if (intProperties.Lives > 0) {
-                symbols.Append("<sprite name=room_lives>").Append(Utils.Utils.GetSymbolString(intProperties.Lives.ToString(), Utils.Utils.smallSymbols));
+                symbols.Append(" <sprite name=room_lives>").Append(Utils.Utils.GetSymbolString(intProperties.Lives.ToString(), Utils.Utils.smallSymbols));
             }
 
-            symbols.Append("<sprite name=room_stars>").Append(Utils.Utils.GetSymbolString(intProperties.StarRequirement.ToString(), Utils.Utils.smallSymbols));
-            symbols.Append("<sprite name=room_coins>").Append(Utils.Utils.GetSymbolString(intProperties.CoinRequirement.ToString(), Utils.Utils.smallSymbols));
+            symbols.Append(" <sprite name=room_stars>").Append(Utils.Utils.GetSymbolString(intProperties.StarRequirement.ToString(), Utils.Utils.smallSymbols));
+            symbols.Append(" <sprite name=room_coins>").Append(Utils.Utils.GetSymbolString(intProperties.CoinRequirement.ToString(), Utils.Utils.smallSymbols));
             symbolsText.text = symbols.ToString();
 
             string stageName;

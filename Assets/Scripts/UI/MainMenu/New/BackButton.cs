@@ -81,6 +81,7 @@ namespace NSMB.UI.MainMenu {
                         backButtonSfx.Stop();
                         backButtonSfx.clip = shrinkClip;
                         backButtonSfx.Play();
+                        backButtonSfx.time = timer;
                     }
 
                     if ((timer -= Time.deltaTime) <= 0) {

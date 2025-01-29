@@ -72,5 +72,9 @@ namespace NSMB.Utils {
 
             return input;
         }
+
+        public static string SanitizeRichText(this string input) {
+            return input.Replace("<noparse>", "").Replace("</noparse>", "");
+        }
     }
 }

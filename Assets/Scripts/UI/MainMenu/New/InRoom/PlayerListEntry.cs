@@ -129,11 +129,11 @@ namespace NSMB.UI.MainMenu {
             if (playerData->Wins == 0) {
                 winsText.text = "";
             } else {
-                winsText.text = "<sprite name=room_wins>" + playerData->Wins;
+                winsText.text = "<sprite name=room_wins> " + playerData->Wins;
             }
 
             // Ping text
-            pingText.text = Utils.Utils.GetPingSymbol(playerData->Ping);
+            pingText.text = $"{playerData->Ping}ms {Utils.Utils.GetPingSymbol(playerData->Ping)}";
 
             // Name text
             RuntimePlayer runtimePlayer = f.GetPlayerData(player);

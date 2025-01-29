@@ -164,7 +164,7 @@ public class ReplayListManager : Selectable {
         builder.Append("<sprite name=room_teams>").AppendLine(file.Rules.TeamsEnabled ? on : off);
 
         // Add date
-        builder.Append("<color=#aaa>").Append(DateTime.UnixEpoch.AddSeconds(file.UnixTimestamp).ToLocalTime().ToString()).Append(" - ");
+        builder.Append("<color=#aaa>").Append(DateTime.UnixEpoch.AddSeconds(file.UnixTimestamp).ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss")).Append(" - ");
         builder.Append(Utils.SecondsToMinuteSeconds(file.ReplayLengthInFrames / 60)).Append(" - ").Append(Utils.BytesToString(file.FileSize));
 
         replayInformation.text = builder.ToString();

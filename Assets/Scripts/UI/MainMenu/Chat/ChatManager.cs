@@ -48,6 +48,7 @@ public class ChatManager : MonoBehaviour {
 
         ChatMessageData data = new() {
             isSystemMessage = false,
+            userName = f.GetPlayerData(player).PlayerNickname,
             player = player,
             userId = f.GetPlayerData(player).UserId,
             color = color ?? Color.black,
@@ -95,7 +96,7 @@ public class ChatManager : MonoBehaviour {
 
         // Add username
         RuntimePlayer runtimeData = e.Frame.GetPlayerData(e.Player);
-        message = runtimeData.PlayerNickname.ToValidUsername(e.Frame, e.Player) + ": " + message.Filter();
+        message = runtimeData.PlayerNickname.ToValidUsername(e.Frame, e.Player) + ": " + message.SanitizeRichText().Filter();
 
         AddChatMessage(message, e.Player, e.Frame);
     }
@@ -125,6 +126,7 @@ public class ChatManager : MonoBehaviour {
 
     public class ChatMessageData {
         public PlayerRef player;
+        public string userName = "";
         public string userId;
         public Color color;
         public bool isSystemMessage;

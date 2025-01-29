@@ -6,6 +6,7 @@ using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using WebSocketSharp;
 using static ChatManager;
 
 public class ChatMessage : MonoBehaviour {
@@ -34,8 +35,11 @@ public class ChatMessage : MonoBehaviour {
             TranslationManager.OnLanguageChanged += OnLanguageChanged;
             OnLanguageChanged(GlobalController.Instance.translationManager);
         } else {
-            chatText.richText = false;
-            chatText.text = data.message;
+            // chatText.richText = false;
+            var text = "";
+            if (!data.userName.IsNullOrEmpty()) text += $"<size=12><i>{data.userName}</i></size>\n";
+            text += $"<noparse>{data.message}</noparse>";
+            chatText.text = text;
         }
 
         UpdateVisibleState();
