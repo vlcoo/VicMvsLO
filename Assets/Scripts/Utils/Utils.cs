@@ -64,7 +64,7 @@ namespace NSMB.Utils {
             return x < 0.5f ? 2 * x * x : 1 - ((-2 * x + 2) * (-2 * x + 2) / 2);
         }
 
-        private static readonly Dictionary<char, string> uiSymbols = new() {
+        public static readonly Dictionary<char, string> uiSymbols = new() {
             ['0'] = "hudnumber_0",
             ['1'] = "hudnumber_1",
             ['2'] = "hudnumber_2",

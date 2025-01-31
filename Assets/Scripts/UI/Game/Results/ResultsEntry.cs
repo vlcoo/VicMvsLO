@@ -33,10 +33,10 @@ public class ResultsEntry : MonoBehaviour {
             characterIcon.sprite = f.SimulationConfig.CharacterDatas[info.Value.Character].ReadySprite;
 
             if (stars < 0) {
-                starCountText.text = "<sprite name=results_out>";
+                starCountText.text = "<sprite name=hudnumber_x>";
                 rightHalf.color = unrankedColor;
             } else {
-                starCountText.text = Utils.GetSymbolString("S" + stars.ToString(), Utils.resultsSymbols);
+                starCountText.text = Utils.GetSymbolString("S" + stars.ToString(), Utils.uiSymbols);
                 rightHalf.color = ranking switch {
                     1 => firstPlaceColor,
                     2 => secondPlaceColor,

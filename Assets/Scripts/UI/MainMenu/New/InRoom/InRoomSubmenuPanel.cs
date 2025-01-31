@@ -25,7 +25,7 @@ namespace NSMB.UI.MainMenu.Submenus {
             }
             header.color = selectedColor;
 
-            if (setDefault) {
+            if (setDefault && DefaultSelectedObject != null) {
                 menu.Canvas.EventSystem.SetSelectedGameObject(DefaultSelectedObject);
             }
         }

@@ -30,7 +30,7 @@ namespace NSMB.UI.MainMenu {
         //---Serialized Variables
         [SerializeField] private MainMenuCanvas canvas;
         [SerializeField] private PlayerListHandler handler;
-        [SerializeField] private TMP_Text nameText, winsText, muteButtonText;
+        [SerializeField] private TMP_Text nameText, winsText, muteButtonText, pingText;
         [SerializeField] private Image colorStrip, pingImage;
         [SerializeField] private RectTransform background, dropdownBackgroundImage;
         [SerializeField] private GameObject blockerTemplate, dropdownOptions, firstButton, chattingIcon, settingsIcon, readyIcon;
@@ -141,7 +141,8 @@ namespace NSMB.UI.MainMenu {
             }
 
             // Ping text
-            pingImage.sprite = Utils.Utils.GetPingSprite(playerData->Ping);
+            // pingImage.sprite = Utils.Utils.GetPingSprite(playerData->Ping);
+            pingText.text = $"{playerData->Ping}ms {Utils.Utils.GetPingSymbol(playerData->Ping)}";
 
             // Name text
             RuntimePlayer runtimePlayer = f.GetPlayerData(player);
