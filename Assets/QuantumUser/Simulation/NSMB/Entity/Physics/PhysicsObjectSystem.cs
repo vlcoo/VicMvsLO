@@ -1,7 +1,6 @@
 using Photon.Deterministic;
 using Quantum.Collections;
 using Quantum.Profiling;
-using Quantum.Task;
 using System;
 using UnityEngine;
 
@@ -964,7 +963,7 @@ namespace Quantum {
         public static bool BoxInGround(FrameThreadSafe f, FPVector2 position, Shape2D shape, bool includeMegaBreakable = true, VersusStageData stage = null, EntityRef entity = default, bool includeCeilingCrushers = true) {
             using var profilerScope = HostProfiler.Start("PhysicsObjectSystem.BoxInGround");
             // In a solid hitbox
-            var hits = f.Physics2D.OverlapShape(position, 0, shape, ((Frame) f).Context.ExcludeEntityAndPlayerMask, ~QueryOptions.HitTriggers);
+            var hits = f.Physics2D.OverlapShape(position, 0, shape, ((Frame) f).Context.ExcludeEntityAndPlayerMask, QueryOptions.HitKinematics | QueryOptions.ComputeDetailedInfo);
             f.TryGetPointer(entity, out MarioPlayer* mario);
             for (int i = 0; i < hits.Count; i++) {
                 var hit = hits.HitsBuffer[i];
@@ -988,7 +987,7 @@ namespace Quantum {
                 return true;
             }
 
-            if (!stage) {
+            if (stage == null) {
                 stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
             }
             var extents = shape.Box.Extents;
@@ -1013,7 +1012,7 @@ namespace Quantum {
             for (int i = 0; i < overlappingTiles; i++) {
                 StageTileInstance tile = tiles[i].Tile;
                 StageTile stageTile = f.FindAsset(tile.Tile);
-                if (!stageTile
+                if (stageTile == null
                     || !stageTile.IsPolygon
                     || (!includeMegaBreakable && stageTile is BreakableBrickTile breakable && breakable.BreakingRules.HasFlag(BreakableBrickTile.BreakableBy.MegaMario))) {
                     continue;
@@ -1055,7 +1054,7 @@ namespace Quantum {
 
         public static int GetTilesOverlappingHitbox(FrameThreadSafe f, FPVector2 position, Shape2D shape, Span<LocationTilePair> buffer, VersusStageData stage = null) {
             using var profilerScope = HostProfiler.Start("PhysicsObjectSystem.GetTilesOverlappingHitbox");
-            if (!stage) {
+            if (stage == null) {
                 stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
             }
             var extents = shape.Box.Extents;
@@ -1084,11 +1083,11 @@ namespace Quantum {
             var transform = f.GetPointer<Transform2D>(entity);
             var collider = f.GetPointer<PhysicsCollider2D>(entity);
 
-            if (!stage) {
+            if (stage == null) {
                 stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
             }
 
-            if (!BoxInGround((FrameThreadSafe) f, transform->Position, collider->Shape, stage: stage, entity: entity)) {
+            if (!BoxInGround(f, transform->Position, collider->Shape, stage: stage, entity: entity)) {
                 return true;
             }
 
