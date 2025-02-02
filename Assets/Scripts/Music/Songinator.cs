@@ -163,15 +163,15 @@ public class Songinator : MonoBehaviour
 
     private IEnumerator SwitchToSongCoroutine(int index, bool startPlayback = false, float secondsFading = 0f)
     {
-        if (index < 0 || index >= songs.Count)
+        if (index < -1 || index >= songs.Count)
         {
             Debug.LogWarning("Invalid song index (out of bounds).");
             yield return null;
         }
+        CurrentSong = index == -1 ? weightedList.Next() : songs[index];
 
         timeAtPause = TimeSpan.Zero;
         yield return SetPlaybackState(PlaybackState.STOPPED, secondsFading);
-        CurrentSong = songs[index];
         InitializeMeltySynth();
         autoStart = startPlayback;
         if (autoStart) yield return SetPlaybackState(PlaybackState.PLAYING, secondsFading);

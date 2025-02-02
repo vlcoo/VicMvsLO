@@ -27,6 +27,7 @@ namespace NSMB.UI.MainMenu {
         [SerializeField] private AudioSource sfx;
         [SerializeField] private MainMenuSubmenu goToSubmenuOnError;
         [SerializeField] private ErrorPromptSubmenu errorSubmenu;
+        [SerializeField] private Songinator musicPlayer;
 
         [Header("Header")]
         [SerializeField] private GameObject header;
