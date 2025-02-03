@@ -29,6 +29,7 @@ public class Songinator : MonoBehaviour
 
     private MidiFile _currentMidiFile;
     private int currentlyMutedChannels;
+    private bool initted = false;
 
     [NonSerialized] public MIDISong CurrentSong;
     [NonSerialized] private MidiFileSequencer Sequencer;
@@ -40,9 +41,29 @@ public class Songinator : MonoBehaviour
 
     private void Start()
     {
+        // CalculateCurrentSong();
+    }
+
+    private void OnEnable() 
+    {
+        CalculateCurrentSong();
+    }
+
+    private void CalculateCurrentSong(bool discardInitializedSynth = false)
+    {
+        SetPlaybackState(PlaybackState.STOPPED);
+        if (discardInitializedSynth && initted) {
+            StopCoroutine(switchToSongCoroutine);
+            Sequencer.Stop();
+            Sequencer = null;
+            Synth = null;
+            initted = false;
+        }
+        
         // Load in the current song from the list of candidates.
         if (songs.Count > 1)
         {
+            weightedList.Clear();
             for (var i = 0; i < songs.Count; i++) weightedList.Add(songs[i], chances[i]);
             CurrentSong = weightedList.Next();
         }
@@ -80,6 +101,8 @@ public class Songinator : MonoBehaviour
         Sequencer.EndLoopTicks = CurrentSong.endTicks;
         Source.pitch = OriginalPitch + CurrentSong.pitchDeltaNormal;
         currentlyMutedChannels = CurrentSong.mutedChannelsNormal;
+        
+        initted = true;
     }
 
     public YieldInstruction SetPlaybackState(PlaybackState newState, float secondsFading = 0f)
@@ -92,23 +115,22 @@ public class Songinator : MonoBehaviour
 
         if (newState == state) return null;
 
-        if (secondsFading > 0f)
-        {
+        if (secondsFading > 0f) {
             // Ugly! If fading to STOPPED or PAUSED, change the volume first and then actually stop.
             // If fading from PLAYING, actually start playing at volume 0 then tween it in.
             // This is a recursive function, so the "SetPlaybackState" calls in this if block
             // must not have a fade so we don't fall into an infinite loop.
-            if ((int)newState > 0)
-            {
+            if ((int) newState > 0) {
                 Source.volume = 0.0f;
                 SetPlaybackState(newState);
             }
 
-            return FadeVolume((int)newState, secondsFading, () =>
-            {
-                if ((int)newState < 0) SetPlaybackState(newState);
+            return FadeVolume((int) newState, secondsFading, () => {
+                if ((int) newState < 0) SetPlaybackState(newState);
             });
         }
+
+        Source.volume = 1.0f;
 
         state = newState;
         switch (state)

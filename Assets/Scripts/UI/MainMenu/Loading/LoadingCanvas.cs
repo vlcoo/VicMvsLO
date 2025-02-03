@@ -13,8 +13,9 @@ namespace NSMB.Loading {
         public static event Action<bool> OnLoadingEnded;
 
         //---Serialized Variables
-        [SerializeField] private AudioListener audioListener;
-        [SerializeField] private AudioSource audioSource;
+        // [SerializeField] private AudioListener audioListener;
+        // [SerializeField] private AudioSource audioSource;
+        [SerializeField] private Songinator musicPlayer;
         [SerializeField] private MarioLoader mario;
 
         [SerializeField] private Animator animator;
@@ -72,14 +73,14 @@ namespace NSMB.Loading {
 
             animator.Play("waiting");
 
-            audioSource.volume = 0;
-            audioSource.Play();
+            // audioSource.volume = 0;
+            // audioSource.Play();
 
             if (fadeVolumeCoroutine != null) {
                 StopCoroutine(fadeVolumeCoroutine);
             }
 
-            fadeVolumeCoroutine = StartCoroutine(FadeVolume(0.1f, true));
+            // fadeVolumeCoroutine = StartCoroutine(FadeVolume(0.1f, true));
             running = true;
         }
 
@@ -117,8 +118,9 @@ namespace NSMB.Loading {
                 StopCoroutine(fadeVolumeCoroutine);
             }
 
-            fadeVolumeCoroutine = StartCoroutine(FadeVolume(0.1f, false));
+            // fadeVolumeCoroutine = StartCoroutine(FadeVolume(0.1f, false));
             //audioListener.enabled = false;
+            musicPlayer.SetPlaybackState(Songinator.PlaybackState.STOPPED, 2f);
 
             OnLoadingEnded?.Invoke(validPlayer);
             running = false;
@@ -129,25 +131,25 @@ namespace NSMB.Loading {
             gameObject.SetActive(false);
         }
 
-        private IEnumerator FadeVolume(float fadeTime, bool fadeIn) {
-            float currentVolume = audioSource.volume;
-            float fadeRate = 1f / fadeTime;
-
-            while (true) {
-                currentVolume += fadeRate * Time.deltaTime * (fadeIn ? 1 : -1);
-
-                if (currentVolume < 0 || currentVolume > 1) {
-                    audioSource.volume = Mathf.Clamp01(currentVolume);
-                    break;
-                }
-
-                audioSource.volume = currentVolume;
-                yield return null;
-            }
-
-            if (!fadeIn) {
-                audioSource.Stop();
-            }
-        }
+        // private IEnumerator FadeVolume(float fadeTime, bool fadeIn) {
+        //     float currentVolume = audioSource.volume;
+        //     float fadeRate = 1f / fadeTime;
+        //
+        //     while (true) {
+        //         currentVolume += fadeRate * Time.deltaTime * (fadeIn ? 1 : -1);
+        //
+        //         if (currentVolume < 0 || currentVolume > 1) {
+        //             audioSource.volume = Mathf.Clamp01(currentVolume);
+        //             break;
+        //         }
+        //
+        //         audioSource.volume = currentVolume;
+        //         yield return null;
+        //     }
+        //
+        //     if (!fadeIn) {
+        //         audioSource.Stop();
+        //     }
+        // }
     }
 }

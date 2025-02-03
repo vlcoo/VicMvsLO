@@ -13,7 +13,7 @@ public class ResultsHandler : MonoBehaviour {
     [SerializeField] private ResultsEntry[] entries;
     [SerializeField] private RectTransform header, ui;
     [SerializeField] private CanvasGroup fadeGroup; 
-    [SerializeField] private LoopingMusicData musicData;
+    // [SerializeField] private LoopingMusicData musicData;
     [SerializeField] private float delayUntilStart = 5.5f, delayPerEntry = 0.05f;
 
     //---Private Variables
@@ -40,7 +40,7 @@ public class ResultsHandler : MonoBehaviour {
         yield return new WaitForSeconds(delay);
 
         parent.SetActive(true);
-        FindObjectOfType<LoopingMusicPlayer>().Play(musicData);
+        // FindObjectOfType<LoopingMusicPlayer>().Play(musicData);
         InitializeResultsEntries(f);
         moveHeaderCoroutine = StartCoroutine(MoveObjectToTarget(header, -500, 0, 1/3f));
         moveUiCoroutine = StartCoroutine(MoveObjectToTarget(ui, 500, 0, 1/3f));
