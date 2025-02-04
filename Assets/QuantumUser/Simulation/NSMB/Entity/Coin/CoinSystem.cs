@@ -100,7 +100,7 @@ namespace Quantum {
 
         public void OnMarioPlayerCollectedCoin(Frame f, EntityRef marioEntity, MarioPlayer* mario, FPVector2 worldLocation, QBoolean fromBlock, QBoolean downwards) {
             byte newCoins = (byte) (mario->Coins + 1);
-            bool item = newCoins == f.Global->Rules.CoinsForPowerup;
+            bool item = f.Global->Rules.CoinsForPowerup > 0 && newCoins == f.Global->Rules.CoinsForPowerup;
             if (item) {
                 mario->Coins = 0;
                 MarioPlayerSystem.SpawnItem(f, marioEntity, mario, default);

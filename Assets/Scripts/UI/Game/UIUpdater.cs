@@ -233,6 +233,8 @@ namespace NSMB.UI.Game {
 
             int starRequirement = rules.StarsToWin;
             int coinRequirement = rules.CoinsForPowerup;
+            bool starsEnabled = starRequirement > 0;
+            bool coinsEnabled = coinRequirement > 0;
             bool teamsEnabled = rules.TeamsEnabled;
             bool livesEnabled = rules.IsLivesEnabled;
             bool timerEnabled = rules.TimerSeconds > 0;
@@ -243,7 +245,7 @@ namespace NSMB.UI.Game {
                 if (cachedTeamStars != teamStars) {
                     cachedTeamStars = teamStars;
                     TeamAsset team = f.SimulationConfig.Teams[teamIndex];
-                    uiTeamStars.text = (Settings.Instance.GraphicsColorblind ? team.textSpriteColorblind : team.textSpriteNormal) + Utils.Utils.GetSymbolString("x" + cachedTeamStars + "/" + starRequirement);
+                    uiTeamStars.text = (Settings.Instance.GraphicsColorblind ? team.textSpriteColorblind : team.textSpriteNormal) + Utils.Utils.GetSymbolString("x" + cachedTeamStars + (starsEnabled ? "/" + starRequirement : ""));
                 }
             } else {
                 teamsParent.SetActive(false);
@@ -252,7 +254,7 @@ namespace NSMB.UI.Game {
             if (mario->Stars != cachedStars) {
                 cachedStars = mario->Stars;
                 string starString = "Sx" + cachedStars;
-                if (!teamsEnabled) {
+                if (starsEnabled && !teamsEnabled) {
                     starString += "/" + starRequirement;
                 }
 
@@ -260,7 +262,7 @@ namespace NSMB.UI.Game {
             }
             if (mario->Coins != cachedCoins) {
                 cachedCoins = mario->Coins;
-                uiCoins.text = Utils.Utils.GetSymbolString("Cx" + cachedCoins + "/" + coinRequirement);
+                uiCoins.text = Utils.Utils.GetSymbolString("Cx" + cachedCoins + (coinsEnabled ? "/" + coinRequirement : ""));
             }
 
             if (livesEnabled) {

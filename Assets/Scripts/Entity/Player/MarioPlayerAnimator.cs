@@ -959,12 +959,15 @@ namespace NSMB.Entities.Player {
                 return;
             }
 
-            GameObject number = Instantiate(coinNumberParticle, e.CoinLocation.ToUnityVector3(), Quaternion.identity);
-            number.GetComponentInChildren<NumberParticle>().Initialize(
-                Utils.Utils.GetSymbolString(e.Coins.ToString(), Utils.Utils.numberSymbols),
-                Utils.Utils.GetPlayerColor(e.Frame, e.Mario.PlayerRef),
-                e.ItemSpawned
-            );
+            if (e.Frame.Global->Rules.CoinsForPowerup > 0) {
+                GameObject number = Instantiate(coinNumberParticle, e.CoinLocation.ToUnityVector3(),
+                    Quaternion.identity);
+                number.GetComponentInChildren<NumberParticle>().Initialize(
+                    Utils.Utils.GetSymbolString(e.Coins.ToString(), Utils.Utils.numberSymbols),
+                    Utils.Utils.GetPlayerColor(e.Frame, e.Mario.PlayerRef),
+                    e.ItemSpawned
+                );
+            }
 
             PlaySound(SoundEffect.World_Coin_Collect);
             if (e.ItemSpawned) {

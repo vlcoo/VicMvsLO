@@ -11,7 +11,7 @@ namespace Quantum {
         public override void Update(Frame f) {
             var stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
 
-            if (!f.Exists(f.Global->MainBigStar) && QuantumUtils.Decrement(ref f.Global->BigStarSpawnTimer)) {
+            if (f.Global->Rules.StarsToWin > 0 && !f.Exists(f.Global->MainBigStar) && QuantumUtils.Decrement(ref f.Global->BigStarSpawnTimer)) {
                 HandleSpawningNewStar(f, stage);
             }
 
