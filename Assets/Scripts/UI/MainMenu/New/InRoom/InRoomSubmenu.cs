@@ -180,29 +180,30 @@ namespace NSMB.UI.MainMenu.Submenus {
                     startGameButtonText.text = tm.GetTranslation(ready ? "ui.inroom.buttons.unready" : "ui.inroom.buttons.readyup");
                 }
 
-                if (fadeMusicCoroutine != null) {
-                    StopCoroutine(fadeMusicCoroutine);
-                    fadeMusicCoroutine = null;
-                    musicSource.volume = 1;
-                }
+                // if (fadeMusicCoroutine != null) {
+                //     StopCoroutine(fadeMusicCoroutine);
+                //     fadeMusicCoroutine = null;
+                //     musicSource.volume = 1;
+                // }
             } else {
                 // Starting
                 startGameButton.interactable = isHost;
                 startGameButtonText.text = tm.GetTranslationWithReplacements("ui.inroom.buttons.starting", "countdown", seconds.ToString());
 
-                if (seconds == 1) {
-                    // Start fade
-                    fadeMusicCoroutine = StartCoroutine(FadeMusic());
-                }
+                // if (seconds == 1) {
+                //     // Start fade
+                //     fadeMusicCoroutine = StartCoroutine(FadeMusic());
+                // }
             }
         }
 
         private IEnumerator FadeMusic() {
-            while (musicSource.volume > 0) {
-                musicSource.volume -= Time.deltaTime;
-                yield return null;
-            }
-            fadeMusicCoroutine = null;
+            // while (musicSource.volume > 0) {
+            //     musicSource.volume -= Time.deltaTime;
+            //     yield return null;
+            // }
+            // fadeMusicCoroutine = null;
+            return null;
         }
 
         //---Buttons
@@ -266,11 +267,11 @@ namespace NSMB.UI.MainMenu.Submenus {
         }
 
         private void OnGameDestroyed(CallbackGameDestroyed e) {
-            if (fadeMusicCoroutine != null) {
-                StopCoroutine(fadeMusicCoroutine);
-                fadeMusicCoroutine = null;
-            }
-            musicSource.volume = 1;
+            // if (fadeMusicCoroutine != null) {
+            //     StopCoroutine(fadeMusicCoroutine);
+            //     fadeMusicCoroutine = null;
+            // }
+            // musicSource.volume = 1;
             Canvas.CloseSubmenuAndChildren(this);
         }
 
@@ -281,11 +282,11 @@ namespace NSMB.UI.MainMenu.Submenus {
         private void OnGameStateChanged(EventGameStateChanged e) {
             UpdateStartButton(e.Game, e.Frame);
 
-            if (fadeMusicCoroutine != null) {
-                StopCoroutine(fadeMusicCoroutine);
-                fadeMusicCoroutine = null;
-            }
-            musicSource.volume = 1;
+            // if (fadeMusicCoroutine != null) {
+            //     StopCoroutine(fadeMusicCoroutine);
+            //     fadeMusicCoroutine = null;
+            // }
+            // musicSource.volume = 1;
         }
 
         private void OnHostChanged(EventHostChanged e) {

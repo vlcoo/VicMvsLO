@@ -5,6 +5,7 @@ using NSMB.UI.Pause.Options;
 using Quantum;
 using System;
 using System.Collections;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.Audio;
 using UnityEngine.InputSystem;
@@ -49,6 +50,9 @@ public class GlobalController : Singleton<GlobalController> {
 
     public void OnValidate() {
         this.SetIfNull(ref discordController);
+        #if UNITY_EDITOR
+            PlayerSettings.SetAdditionalIl2CppArgs("--compiler-flags=\"-fbracket-depth=512\"");
+        #endif
     }
 
     public void Awake() {

@@ -34,6 +34,7 @@ public class Songinator : MonoBehaviour
     [NonSerialized] public MIDISong CurrentSong;
     [NonSerialized] private MidiFileSequencer Sequencer;
     [NonSerialized] private AudioSource Source;
+    [NonSerialized] private ToneAudioDriver Driver;
     private Coroutine switchToSongCoroutine;
 
     [NonSerialized] private Synthesizer Synth;
@@ -47,6 +48,10 @@ public class Songinator : MonoBehaviour
     private void OnEnable() 
     {
         CalculateCurrentSong();
+    }
+
+    private void OnDisable() {
+        Driver.BufferingStopped = true;
     }
 
     private void CalculateCurrentSong(bool discardInitializedSynth = false)
@@ -82,16 +87,16 @@ public class Songinator : MonoBehaviour
     {
         // Load in the soundfont and create the synth and sequencer objects.
         var sf = new SoundFont(new MemoryStream(CurrentSong.soundfont.Bytes));
-        var settings = new SynthesizerSettings(AudioSettings.outputSampleRate);
-        settings.EnableReverbAndChorus = false;
-        settings.BlockSize = 64;
-        Synth = new Synthesizer(sf, settings);
+        Synth = new Synthesizer(sf,
+            new SynthesizerSettings(AudioSettings.outputSampleRate) {
+                EnableReverbAndChorus = false, BlockSize = 64, MaximumPolyphony = 128
+            });
         Sequencer = new MidiFileSequencer(Synth);
 
-        var driver = gameObject.GetComponent<ToneAudioDriver>();
-        if (!driver) driver = gameObject.AddComponent<ToneAudioDriver>();
-        driver.SetRenderer(Sequencer);
-        Source = GetComponent<AudioSource>();
+        Driver ??= gameObject.GetComponent<ToneAudioDriver>();
+        Driver ??= gameObject.AddComponent<ToneAudioDriver>();
+        Driver.SetRenderer(Sequencer);
+        Source ??= GetComponent<AudioSource>();
 
         _currentMidiFile = new MidiFile(new MemoryStream(CurrentSong.song.Bytes));
 
@@ -121,7 +126,7 @@ public class Songinator : MonoBehaviour
             // This is a recursive function, so the "SetPlaybackState" calls in this if block
             // must not have a fade so we don't fall into an infinite loop.
             if ((int) newState > 0) {
-                Source.volume = 0.0f;
+                Driver.SetVolume(0.0f);
                 SetPlaybackState(newState);
             }
 
@@ -130,7 +135,7 @@ public class Songinator : MonoBehaviour
             });
         }
 
-        Source.volume = 1.0f;
+        Driver.SetVolume(1.0f);
 
         state = newState;
         switch (state)
@@ -139,11 +144,13 @@ public class Songinator : MonoBehaviour
                 timeAtPause = TimeSpan.Zero;
                 Sequencer.Stop();
                 Source.enabled = false;
+                Driver.BufferingStopped = true;
                 break;
             case PlaybackState.PAUSED:
                 timeAtPause = Sequencer.Pos();
                 Sequencer.Stop();
                 Source.enabled = false;
+                Driver.BufferingStopped = true;
                 break;
             case PlaybackState.PLAYING:
                 Sequencer.Play(_currentMidiFile, true);
@@ -151,6 +158,7 @@ public class Songinator : MonoBehaviour
                 if (timeAtPause != TimeSpan.Zero) Sequencer.Seek(timeAtPause);
                 else if (CurrentSong.startTicks > 0) Sequencer.Seek(CurrentSong.startTicks);
                 Source.enabled = true;
+                Driver.BufferingStopped = false;
                 break;
             default:
                 throw new ArgumentOutOfRangeException();
@@ -162,8 +170,8 @@ public class Songinator : MonoBehaviour
     public YieldInstruction FadeVolume(int direction, float secondsDuration, OnFadingComplete onComplete = null)
     {
         var t = DOTween.To(
-            () => Source.volume,
-            v => Source.volume = v,
+            () => Driver.GetVolume(),
+            v => Driver.SetVolume(v),
             direction > 0 ? 1.0f : 0.0f,
             secondsDuration
         ).SetEase(Ease.Linear);

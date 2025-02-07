@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using UnityEngine;
 using UnityEngine.UI;
+using DeviceType = Enums.DeviceType;
 
 namespace NSMB.Utils {
     public class Utils {
@@ -287,6 +288,17 @@ namespace NSMB.Utils {
         public static float Luminance(Color color) {
             // https://stackoverflow.com/a/596243/19635374
             return 0.2126f * color.r + 0.7152f * color.g + 0.0722f * color.b;
+        }
+        
+        public static DeviceType GetDeviceType() {
+            if (Application.isEditor) return DeviceType.EDITOR;
+            return Application.platform switch {
+                RuntimePlatform.WebGLPlayer => Application.isMobilePlatform ? DeviceType.MOBILE : DeviceType.BROWSER,
+                RuntimePlatform.Android or RuntimePlatform.IPhonePlayer => DeviceType.MOBILE,
+                RuntimePlatform.LinuxPlayer or RuntimePlatform.WindowsPlayer or RuntimePlatform.OSXPlayer => DeviceType
+                    .DESKTOP,
+                _ => DeviceType.OTHER
+            };
         }
     }
 }

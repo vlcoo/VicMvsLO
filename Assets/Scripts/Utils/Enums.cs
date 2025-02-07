@@ -48,6 +48,16 @@ public static class Enums {
         public const string StageGuid = "S";
     }
     #endregion
+    #region CLIENT
+    public enum DeviceType
+    {
+        DESKTOP,
+        BROWSER,
+        MOBILE,
+        EDITOR,
+        OTHER
+    }
+    #endregion
 }
 
 
