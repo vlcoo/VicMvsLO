@@ -350,6 +350,7 @@ namespace Quantum.Prototypes {
     public QBoolean TeamsEnabled;
     public QBoolean CustomPowerupsEnabled;
     public QBoolean DrawOnTimeUp;
+    public QBoolean TestRule;
     partial void MaterializeUser(Frame frame, ref Quantum.GameRules result, in PrototypeMaterializationContext context);
     public void Materialize(Frame frame, ref Quantum.GameRules result, in PrototypeMaterializationContext context = default) {
         result.Stage = this.Stage;
@@ -360,6 +361,7 @@ namespace Quantum.Prototypes {
         result.TeamsEnabled = this.TeamsEnabled;
         result.CustomPowerupsEnabled = this.CustomPowerupsEnabled;
         result.DrawOnTimeUp = this.DrawOnTimeUp;
+        result.TestRule = this.TestRule;
         MaterializeUser(frame, ref result, in context);
     }
   }

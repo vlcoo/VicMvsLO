@@ -93,8 +93,6 @@ namespace NSMB.UI.Game {
         }
 
         public void Start() {
-            PlayerTrackIcon.HideAllPlayerIcons = stage.HidePlayersOnMinimap;
-            boos.SetActive(stage.HidePlayersOnMinimap);
             StartCoroutine(UpdatePingTextCoroutine());
 
             QuantumCallback.Subscribe<CallbackUpdateView>(this, OnUpdateView);
@@ -238,6 +236,7 @@ namespace NSMB.UI.Game {
             bool teamsEnabled = rules.TeamsEnabled;
             bool livesEnabled = rules.IsLivesEnabled;
             bool timerEnabled = rules.TimerSeconds > 0;
+            bool testEnabled = rules.TestRule;
 
             if (rules.TeamsEnabled) {
                 byte teamIndex = mario->GetTeam(f);
@@ -286,6 +285,9 @@ namespace NSMB.UI.Game {
             } else {
                 timerParent.SetActive(false);
             }
+            
+            PlayerTrackIcon.HideAllPlayerIcons = testEnabled;
+            boos.SetActive(testEnabled);
         }
 
         public TrackIcon CreateTrackIcon(Frame f, EntityRef entity, Transform target) {

@@ -94,7 +94,6 @@ public class Songinator : MonoBehaviour
         Sequencer = new MidiFileSequencer(Synth);
 
         Driver ??= gameObject.GetComponent<ToneAudioDriver>();
-        Driver ??= gameObject.AddComponent<ToneAudioDriver>();
         Driver.SetRenderer(Sequencer);
         Source ??= GetComponent<AudioSource>();
 

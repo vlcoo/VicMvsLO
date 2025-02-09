@@ -14,17 +14,17 @@ namespace HGS.Tone {
         private float Volume = 1.0f;
 
         private void Awake() {
-            _buffer = new float[CHUNK_SIZE];
             _sampleRate = AudioSettings.outputSampleRate;
             
-            #if UNITY_WEBGL && !UNITY_EDITOR
+            #if UNITY_WEBGL
+                _buffer = new float[CHUNK_SIZE];
                 JsAudioLib.Init(_sampleRate, _initDelay);
             #else
-                if (!gameObject.TryGetComponent(out AudioSource source)) {
-                    var audioSource = gameObject.AddComponent<AudioSource>();
-                    audioSource.playOnAwake = true;
-                    audioSource.spatialBlend = 0;
-                }
+                // if (!gameObject.TryGetComponent(out AudioSource source)) {
+                //     var audioSource = gameObject.AddComponent<AudioSource>();
+                //     audioSource.playOnAwake = true;
+                //     audioSource.spatialBlend = 0;
+                // }
             #endif
         }
 
@@ -35,7 +35,7 @@ namespace HGS.Tone {
         }
 
         public void SetVolume(float volume) {
-            #if UNITY_WEBGL && !UNITY_EDITOR
+            #if UNITY_WEBGL
                 JsAudioLib.SetVolume(volume);
             #else
                 if (TryGetComponent(out AudioSource source)) {
@@ -46,7 +46,7 @@ namespace HGS.Tone {
         }
 
         public float GetVolume() {
-            #if UNITY_WEBGL && !UNITY_EDITOR
+            #if UNITY_WEBGL
                 return Volume;
             #else
                 if (TryGetComponent(out AudioSource source)) {
@@ -58,7 +58,7 @@ namespace HGS.Tone {
 
         // WEBGL implementation & JsAudioLib by https://github.com/hecomi/UnityWebGLAudioStream
         private void Update() {
-            #if UNITY_WEBGL && !UNITY_EDITOR
+            #if UNITY_WEBGL
                 if (_audioRenderer == null || _buffer == null) return;
                 int samplesToGenerate = (int)(_sampleRate * Time.unscaledDeltaTime);
                 
@@ -97,12 +97,7 @@ namespace HGS.Tone {
     
     public static class JsAudioLib
     {
-#if UNITY_EDITOR
-        public static void Init(int sampleRate, float initDelay) { Debug.Log($"Init({sampleRate}, {initDelay})"); }
-        public static void Play(float[] array, int size) { Debug.Log($"Play({array}, {size})"); }
-        public static void SetVolume(float volume) { Debug.Log($"SetVolume({volume})"); }
-        public static void SetVolumeMultiplier(float volumeMultiplier) { Debug.Log($"SetVolumeMultiplier({volumeMultiplier})"); }
-#else
+#if UNITY_WEBGL
         [DllImport("__Internal")]
         public static extern void Init(int sampleRate, float initDelay);
         [DllImport("__Internal")]
@@ -111,6 +106,11 @@ namespace HGS.Tone {
         public static extern void SetVolume(float volume);
         [DllImport("__Internal")]
         public static extern void SetVolumeMultiplier(float volumeMultiplier);
+#else
+        public static void Init(int sampleRate, float initDelay) { Debug.Log($"Init({sampleRate}, {initDelay})"); }
+        public static void Play(float[] array, int size) { Debug.Log($"Play({array}, {size})"); }
+        public static void SetVolume(float volume) { Debug.Log($"SetVolume({volume})"); }
+        public static void SetVolumeMultiplier(float volumeMultiplier) { Debug.Log($"SetVolumeMultiplier({volumeMultiplier})"); }
 #endif
     }
 }

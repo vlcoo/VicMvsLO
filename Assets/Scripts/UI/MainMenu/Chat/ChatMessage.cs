@@ -6,7 +6,6 @@ using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using WebSocketSharp;
 using static ChatManager;
 
 public class ChatMessage : MonoBehaviour {
@@ -37,7 +36,7 @@ public class ChatMessage : MonoBehaviour {
         } else {
             // chatText.richText = false;
             var text = "";
-            if (!data.userName.IsNullOrEmpty()) text += $"<size=12><i>{data.userName}</i></size>\n";
+            if (!string.IsNullOrEmpty(data.userName)) text += $"<size=12><i>{data.userName}</i></size>\n";
             text += $"<noparse>{data.message}</noparse>";
             chatText.text = text;
         }

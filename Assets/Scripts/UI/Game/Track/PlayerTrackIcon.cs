@@ -27,6 +27,8 @@ namespace NSMB.UI.Game.Track {
             if (f.Global->Rules.TeamsEnabled) {
                 teamIcon.sprite = f.SimulationConfig.Teams[mario->GetTeam(f)].spriteColorblind;
             }
+
+            stage.HidePlayersOnMinimap = f.Global->Rules.TestRule;
         }
 
         public override void OnDeactivate() {

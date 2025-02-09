@@ -667,6 +667,8 @@ namespace Quantum {
     public QBoolean CustomPowerupsEnabled;
     [FieldOffset(20)]
     public QBoolean DrawOnTimeUp;
+    [FieldOffset(28)]
+    public QBoolean TestRule;
     public override Int32 GetHashCode() {
       unchecked { 
         var hash = 443;
@@ -678,6 +680,7 @@ namespace Quantum {
         hash = hash * 31 + TeamsEnabled.GetHashCode();
         hash = hash * 31 + CustomPowerupsEnabled.GetHashCode();
         hash = hash * 31 + DrawOnTimeUp.GetHashCode();
+        hash = hash * 31 + TestRule.GetHashCode();
         return hash;
       }
     }
@@ -690,6 +693,7 @@ namespace Quantum {
         QBoolean.Serialize(&p->CustomPowerupsEnabled, serializer);
         QBoolean.Serialize(&p->DrawOnTimeUp, serializer);
         QBoolean.Serialize(&p->TeamsEnabled, serializer);
+        QBoolean.Serialize(&p->TestRule, serializer);
         AssetRef.Serialize(&p->Stage, serializer);
     }
   }

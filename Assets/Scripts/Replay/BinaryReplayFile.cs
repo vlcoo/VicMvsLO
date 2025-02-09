@@ -11,7 +11,7 @@ using UnityEngine;
 public class BinaryReplayFile {
 
     //---Helpers
-    public static readonly string[] Versions = { "Invalid", "v1.8.0.0" };
+    public static readonly string[] Versions = { "Invalid", "v18.0.1" };
     public const int CurrentVersion = 1;
     private static int MagicHeaderLength => Encoding.ASCII.GetByteCount(MagicHeader);
     private static readonly byte[] HeaderBuffer = new byte[MagicHeaderLength];
@@ -20,7 +20,7 @@ public class BinaryReplayFile {
     public long FileSize { get; private set; }
 
     // Header
-    private const string MagicHeader = "MvLO-RP";
+    private const string MagicHeader = "vcmi-RP";
     public byte Version;
     public long UnixTimestamp;
     public int InitialFrameNumber;
