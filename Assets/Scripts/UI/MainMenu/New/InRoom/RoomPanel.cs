@@ -15,8 +15,8 @@ namespace NSMB.UI.MainMenu.Submenus {
         public override bool IsInSubmenu => rules.Any(r => r.Editing);
 
         //---Serialized Variables
-        [SerializeField] private Image stagePreviewImage;
-        [SerializeField] private TMP_Text stageNameText, rulesText;
+        // [SerializeField] private Image stagePreviewImage;
+        [SerializeField] private TMP_Text stageNameText;
         [SerializeField] private StagePreviewManager stagePreviewManager;
         [SerializeField] private MainMenuChat chat;
 
@@ -70,12 +70,12 @@ namespace NSMB.UI.MainMenu.Submenus {
             builder.Append("<sprite name=room_powerups>").AppendLine(tm.GetTranslation(rules.CustomPowerupsEnabled ? "ui.generic.on" : "ui.generic.off"));
             builder.Append("<sprite name=room_teams>").Append(tm.GetTranslation(rules.TeamsEnabled ? "ui.generic.on" : "ui.generic.off"));
 
-            rulesText.text = builder.ToString();
+            // rulesText.text = builder.ToString();
         }
 
         private void ChangeStage(VersusStageData newStage) {
             stageNameText.text = GlobalController.Instance.translationManager.GetTranslation(newStage.TranslationKey);
-            stagePreviewImage.sprite = newStage.Icon;
+            // stagePreviewImage.sprite = newStage.Icon;
             currentStage = newStage;
         }
 

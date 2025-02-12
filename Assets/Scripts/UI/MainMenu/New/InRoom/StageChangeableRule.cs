@@ -1,5 +1,6 @@
 using Quantum;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.UI;
 
 public class StageChangeableRule : ChangeableRule {
@@ -7,24 +8,34 @@ public class StageChangeableRule : ChangeableRule {
     //---Properties
     public override bool CanIncreaseValue {
         get {
-            QuantumGame game = NetworkHandler.Game;
-            var allStages = game.Configurations.Simulation.AllStages;
-            int currentIndex = allStages.IndexOf(map => map == (AssetRef<Map>) value);
-            return currentIndex < allStages.Length - 1;
+            // QuantumGame game = NetworkHandler.Game;
+            // var allStages = game.Configurations.Simulation.AllStages;
+            // int currentIndex = allStages.IndexOf(map => map == (AssetRef<Map>) value);
+            // return currentIndex < allStages.Length - 1;
+            return false;
         }
     }
     public override bool CanDecreaseValue {
         get {
-            QuantumGame game = NetworkHandler.Game;
-            var allStages = game.Configurations.Simulation.AllStages;
-            int currentIndex = allStages.IndexOf(map => map == (AssetRef<Map>) value);
-            return currentIndex > 0;
+            // QuantumGame game = NetworkHandler.Game;
+            // var allStages = game.Configurations.Simulation.AllStages;
+            // int currentIndex = allStages.IndexOf(map => map == (AssetRef<Map>) value);
+            // return currentIndex > 0;
+            return false;
+        }
+    }
+    public override bool Editing {
+        set {
+            base.Editing = false;
+            if (!value) return;
+            OnStartEditing?.Invoke();
         }
     }
 
     //---Serialized Variables
-    [SerializeField] private Image stagePreview;
-    [SerializeField] private Sprite unknownMapSprite;
+    // [SerializeField] private Image stagePreview;
+    // [SerializeField] private Sprite unknownMapSprite;
+    [SerializeField] private UnityEvent OnStartEditing;
 
     protected override void IncreaseValueInternal() {
         QuantumGame game = NetworkHandler.Game;
@@ -78,9 +89,9 @@ public class StageChangeableRule : ChangeableRule {
             sprite = stage.Icon;
         } else {
             stageName = "???";
-            sprite = unknownMapSprite;
+            // sprite = unknownMapSprite;
         }
         label.text = labelPrefix + stageName;
-        stagePreview.sprite = sprite;
+        // stagePreview.sprite = sprite;
     }
 }

@@ -107,10 +107,10 @@ namespace HGS.Tone {
         [DllImport("__Internal")]
         public static extern void SetVolumeMultiplier(float volumeMultiplier);
 #else
-        public static void Init(int sampleRate, float initDelay) { Debug.Log($"Init({sampleRate}, {initDelay})"); }
-        public static void Play(float[] array, int size) { Debug.Log($"Play({array}, {size})"); }
-        public static void SetVolume(float volume) { Debug.Log($"SetVolume({volume})"); }
-        public static void SetVolumeMultiplier(float volumeMultiplier) { Debug.Log($"SetVolumeMultiplier({volumeMultiplier})"); }
+        public static void Init(int sampleRate, float initDelay) { /*Debug.Log($"Init({sampleRate}, {initDelay})");*/ }
+        public static void Play(float[] array, int size) { /*Debug.Log($"Play({array}, {size})");*/ }
+        public static void SetVolume(float volume) { /*Debug.Log($"SetVolume({volume})");*/ }
+        public static void SetVolumeMultiplier(float volumeMultiplier) { /*Debug.Log($"SetVolumeMultiplier({volumeMultiplier})");*/ }
 #endif
     }
 }

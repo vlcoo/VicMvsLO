@@ -9,7 +9,7 @@ using UnityEngine.UI;
 public class ChangeableRule : Selectable, ISubmitHandler, IPointerClickHandler, IScrollHandler {
 
     //---Properties
-    public bool Editing {
+    public virtual bool Editing {
         get => _editing;
         set {
             label.color = value ? editingColor : inactiveColor;
