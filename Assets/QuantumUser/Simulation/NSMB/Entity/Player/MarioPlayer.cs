@@ -229,6 +229,7 @@ namespace Quantum {
                 SpawnStars(f, entity, 1);
                 break;
             }
+            case PowerupState.HammerSuit:
             case PowerupState.FireFlower:
             case PowerupState.IceFlower:
             case PowerupState.PropellerMushroom:
@@ -416,10 +417,10 @@ namespace Quantum {
 
             physicsObject->Velocity = new FPVector2(
                 (fromRight ? -1 : 1) *
-                    (starsToDrop + 1) *
+                    ((starsToDrop + 2) / (FP) 3) *
                     FP._1_50 *
                     (CurrentPowerupState == PowerupState.MegaMushroom ? 3 : 1) *
-                    (CurrentPowerupState == PowerupState.MiniMushroom ? Constants._2_50 : 1) *
+                    (CurrentPowerupState == PowerupState.MiniMushroom ? FP._1_50 : 1) *
                     (weak ? FP._0_50 : 1),
 
                 // Don't go upwards if we got hit by a fireball

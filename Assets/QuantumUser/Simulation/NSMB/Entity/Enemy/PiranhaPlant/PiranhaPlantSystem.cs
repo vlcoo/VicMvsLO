@@ -73,7 +73,8 @@ namespace Quantum {
             var piranhaPlant = f.Unsafe.GetPointer<PiranhaPlant>(piranhaPlantEntity);
 
             switch (projectileAsset.Effect) {
-            case ProjectileEffectType.Knockback: {
+            case ProjectileEffectType.KillEnemiesAndSoftKnockbackPlayers:
+            case ProjectileEffectType.Fire: {
                 piranhaPlant->Kill(f, piranhaPlantEntity, projectileEntity, true);
                 break;
             }
@@ -85,9 +86,7 @@ namespace Quantum {
             }
             }
 
-            if (projectileAsset.DestroyOnHit) {
-                ProjectileSystem.Destroy(f, projectileEntity, projectileAsset.DestroyParticleEffect);
-            }
+            f.Signals.OnProjectileHitEntity(f, projectileEntity, piranhaPlantEntity);
         }
 
         public void OnPiranhaPlantMarioInteraction(Frame f, EntityRef piranhaPlantEntity, EntityRef marioEntity) {

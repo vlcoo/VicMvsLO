@@ -6,7 +6,8 @@ namespace NSMB.UI.Game {
 
         //---Serialized Variables
         [SerializeField] private PlayerElements playerElements;
-        [SerializeField] private GameObject ndsCanvas;
+        [SerializeField] private Canvas rootCanvas;
+        [SerializeField] private GameObject ndsBackground;
         [SerializeField] private RawImage ndsImage;
         [SerializeField] private AspectRatioFitter fitter;
 
@@ -27,6 +28,14 @@ namespace NSMB.UI.Game {
         public void Update() {
             if (!Settings.Instance.GraphicsNdsEnabled) {
                 ReleaseRenderTexture();
+                if (fitter.enabled) {
+                    fitter.enabled = false;
+                    RectTransform fitterTransform = (RectTransform) fitter.transform;
+                    fitterTransform.anchorMin = Vector2.zero;
+                    fitterTransform.anchorMax = Vector2.one;
+                    fitterTransform.sizeDelta = Vector2.zero;
+                    pixelPerfect = false;
+                }
                 return;
             }
 
@@ -37,18 +46,19 @@ namespace NSMB.UI.Game {
             bool resolutionChanged;
             if (Settings.Instance.GraphicsNdsForceAspect) {
                 resolutionChanged = CreateRenderTexture(298, 224);
+                RectTransform fitterTransform = (RectTransform) fitter.transform;
 
                 if (Settings.Instance.GraphicsNdsPixelPerfect && (!pixelPerfect || resolutionChanged || previousResolution != (width, height))) {
                     // Enable pixel-perfect
-                    RectTransform fitterTransform = fitter.GetComponent<RectTransform>();
                     fitter.enabled = false;
                     fitterTransform.anchorMax = fitterTransform.anchorMin = new Vector2(0.5f, 0.5f);
-                    float scaling = Mathf.Min(width / texture.width, height / texture.height);
+                    float scaling = Mathf.Min((float) width / texture.width, (float) height / texture.height);
                     if (scaling >= 1) {
                         scaling = Mathf.Floor(scaling);
                     } else {
-                        scaling = 1 / Mathf.Floor(1 / scaling);
+                        scaling = 1 / Mathf.Ceil(1 / scaling);
                     }
+                    scaling /= rootCanvas.scaleFactor;
                     fitterTransform.sizeDelta = new Vector2(texture.width * scaling, texture.height * scaling);
                     pixelPerfect = true;
                     previousResolution = (width, height);
@@ -56,7 +66,6 @@ namespace NSMB.UI.Game {
                 } else if (!Settings.Instance.GraphicsNdsPixelPerfect && (pixelPerfect || resolutionChanged)) {
                     // Disable pixel-perfect.
                     fitter.enabled = true;
-                    RectTransform fitterTransform = fitter.GetComponent<RectTransform>();
                     fitterTransform.anchorMin = Vector2.zero;
                     fitterTransform.anchorMax = Vector2.one;
                     fitterTransform.sizeDelta = Vector2.zero;
@@ -73,14 +82,12 @@ namespace NSMB.UI.Game {
                 }
                 resolutionChanged = CreateRenderTexture(width, height);
 
-                if (fitter.enabled) {
-                    fitter.enabled = false;
-                    RectTransform fitterTransform = fitter.GetComponent<RectTransform>();
-                    fitterTransform.anchorMin = Vector2.zero;
-                    fitterTransform.anchorMax = Vector2.one;
-                    fitterTransform.sizeDelta = Vector2.zero;
-                    pixelPerfect = false;
-                }
+                fitter.enabled = false;
+                RectTransform fitterTransform = (RectTransform) fitter.transform;
+                fitterTransform.anchorMin = Vector2.zero;
+                fitterTransform.anchorMax = Vector2.one;
+                fitterTransform.sizeDelta = Vector2.zero;
+                pixelPerfect = false;
             }
 
             if (resolutionChanged) {
@@ -103,7 +110,8 @@ namespace NSMB.UI.Game {
                 playerElements.ScrollCamera.targetTexture = texture;
             }
 
-            ndsCanvas.SetActive(true);
+            ndsBackground.SetActive(true);
+            ndsImage.enabled = true;
             return true;
         }
 
@@ -119,7 +127,8 @@ namespace NSMB.UI.Game {
             if (playerElements.ScrollCamera) {
                 playerElements.ScrollCamera.targetTexture = null;
             }
-            ndsCanvas.SetActive(false);
+            ndsBackground.SetActive(false);
+            ndsImage.enabled = false;
         }
 
         private void OnNdsResolutionSettingChanged() {

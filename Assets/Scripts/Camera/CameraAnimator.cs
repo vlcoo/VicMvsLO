@@ -41,12 +41,19 @@ public unsafe class CameraAnimator : ResizingCamera {
         OnScreenshake -= OnScreenshakeCallback;
     }
 
+    public override void Update() {
+        // Do nothing.
+    }
+
     public void OnUpdateView(CallbackUpdateView e) {
         QuantumGame game = e.Game;
         Frame f = game.Frames.Predicted;
         Frame fp = game.Frames.PredictedPrevious;
 
         if (!Target.IsValid || !f.Exists(Target) || !fp.Exists(Target)) {
+            if (BackgroundLoop.Instance) {
+                BackgroundLoop.Instance.Reposition(ourCamera);
+            }
             return;
         }
 
@@ -92,8 +99,8 @@ public unsafe class CameraAnimator : ResizingCamera {
         }
 
         // Clamp
-        float cameraMinX = stage.CameraMinPosition.X.AsFloat - (ourCamera.orthographicSize * ourCamera.aspect);
-        float cameraMaxX = stage.CameraMaxPosition.X.AsFloat + (ourCamera.orthographicSize * ourCamera.aspect);
+        float cameraMinX = stage.CameraMinPosition.X.AsFloat + (ourCamera.orthographicSize * ourCamera.aspect);
+        float cameraMaxX = stage.CameraMaxPosition.X.AsFloat - (ourCamera.orthographicSize * ourCamera.aspect);
         newPosition.x = Mathf.Clamp(newPosition.x, cameraMinX, cameraMaxX);
 
         float cameraMinY = stage.CameraMinPosition.Y.AsFloat + ourCamera.orthographicSize;
@@ -117,8 +124,8 @@ public unsafe class CameraAnimator : ResizingCamera {
     private void OnScreenshakeCallback(float screenshake) {
         Frame f = QuantumRunner.DefaultGame.Frames.Predicted;
 
-        if (f.Unsafe.TryGetPointer(Target, out PhysicsObject* physicsObject)
-            && physicsObject->IsTouchingGround) {
+        if (!f.Unsafe.TryGetPointer(Target, out PhysicsObject* physicsObject)
+            || physicsObject->IsTouchingGround) {
 
             screenshakeTimer += screenshake;
         }

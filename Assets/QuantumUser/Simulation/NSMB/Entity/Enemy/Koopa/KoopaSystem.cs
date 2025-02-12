@@ -371,7 +371,8 @@ namespace Quantum {
             var projectileAsset = f.FindAsset(f.Unsafe.GetPointer<Projectile>(projectileEntity)->Asset);
 
             switch (projectileAsset.Effect) {
-            case ProjectileEffectType.Knockback: {
+            case ProjectileEffectType.KillEnemiesAndSoftKnockbackPlayers:
+            case ProjectileEffectType.Fire: {
                 f.Unsafe.GetPointer<Koopa>(koopaEntity)->Kill(f, koopaEntity, projectileEntity, true);
                 break;
             }
@@ -381,9 +382,7 @@ namespace Quantum {
             }
             }
 
-            if (projectileAsset.DestroyOnHit) {
-                ProjectileSystem.Destroy(f, projectileEntity, projectileAsset.DestroyParticleEffect);
-            }
+            f.Signals.OnProjectileHitEntity(f, projectileEntity, koopaEntity);
         }
 
         public static void OnKoopaBooInteraction(Frame f, EntityRef koopaEntity, EntityRef booEntity) {

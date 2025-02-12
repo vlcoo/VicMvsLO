@@ -258,6 +258,21 @@ namespace Quantum.Prototypes {
     }
   }
   [System.SerializableAttribute()]
+  [Quantum.Prototypes.Prototype(typeof(Quantum.ComboKeeper))]
+  public unsafe partial class ComboKeeperPrototype : ComponentPrototype<Quantum.ComboKeeper> {
+    public Byte Combo;
+    partial void MaterializeUser(Frame frame, ref Quantum.ComboKeeper result, in PrototypeMaterializationContext context);
+    public override Boolean AddToEntity(FrameBase f, EntityRef entity, in PrototypeMaterializationContext context) {
+        Quantum.ComboKeeper component = default;
+        Materialize((Frame)f, ref component, in context);
+        return f.Set(entity, component) == SetResult.ComponentAdded;
+    }
+    public void Materialize(Frame frame, ref Quantum.ComboKeeper result, in PrototypeMaterializationContext context = default) {
+        result.Combo = this.Combo;
+        MaterializeUser(frame, ref result, in context);
+    }
+  }
+  [System.SerializableAttribute()]
   [Quantum.Prototypes.Prototype(typeof(Quantum.Cullable))]
   public unsafe partial class CullablePrototype : ComponentPrototype<Quantum.Cullable> {
     public FPVector2 Offset;
@@ -789,6 +804,18 @@ namespace Quantum.Prototypes {
         result.Tile = this.Tile;
         result.Rotation = this.Rotation;
         result.Scale = this.Scale;
+        MaterializeUser(frame, ref result, in context);
+    }
+  }
+  [System.SerializableAttribute()]
+  [Quantum.Prototypes.Prototype(typeof(Quantum.Vector2Int))]
+  public unsafe partial class Vector2IntPrototype : StructPrototype {
+    public Int32 x;
+    public Int32 y;
+    partial void MaterializeUser(Frame frame, ref Quantum.Vector2Int result, in PrototypeMaterializationContext context);
+    public void Materialize(Frame frame, ref Quantum.Vector2Int result, in PrototypeMaterializationContext context = default) {
+        result.x = this.x;
+        result.y = this.y;
         MaterializeUser(frame, ref result, in context);
     }
   }

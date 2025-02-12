@@ -86,7 +86,7 @@ namespace NSMB.Entities.Player {
         [SerializeField] private Animator animator;
         [SerializeField] private Avatar smallAvatar, largeAvatar;
         [SerializeField] private ParticleSystem dust, sparkles, drillParticle, giantParticle, fireParticle, bubblesParticle, iceSkiddingParticle, waterRunningParticle, waterSkiddingParticle;
-        [SerializeField] private GameObject smallModel, largeModel, largeShellExclude, blueShell, propellerHelmet, propeller;
+        [SerializeField] private GameObject smallModel, largeModel, largeShellExclude, blueShell, propellerHelmet, propeller, HammerHelm, HammerShell, HammerTuck;
         [SerializeField] private AudioClip normalDrill, propellerDrill;
         [SerializeField] private LoopingSoundPlayer dustPlayer, drillPlayer;
         [SerializeField] private LoopingSoundData wallSlideData, shellSlideData, spinnerDrillData, propellerDrillData;
@@ -520,6 +520,7 @@ namespace NSMB.Entities.Player {
                 PowerupState.FireFlower => 1,
                 PowerupState.PropellerMushroom => 2,
                 PowerupState.IceFlower => 3,
+                PowerupState.HammerSuit => 4,
                 _ => 0
             };
             materialBlock.SetFloat(ParamPowerupState, ps);
@@ -550,6 +551,9 @@ namespace NSMB.Entities.Player {
             smallModel.SetActive(!large);
             blueShell.SetActive(mario->CurrentPowerupState == PowerupState.BlueShell);
             propellerHelmet.SetActive(mario->CurrentPowerupState == PowerupState.PropellerMushroom);
+            HammerHelm.SetActive(mario->CurrentPowerupState == PowerupState.HammerSuit && !mario->IsCrouching);
+            HammerShell.SetActive(mario->CurrentPowerupState == PowerupState.HammerSuit && !mario->IsCrouching);
+            HammerTuck.SetActive(mario->CurrentPowerupState == PowerupState.HammerSuit && mario->IsCrouching);
 
             Avatar targetAvatar = large ? largeAvatar : smallAvatar;
             bool changedAvatar = animator.avatar != targetAvatar;
@@ -732,6 +736,7 @@ namespace NSMB.Entities.Player {
             SpawnParticle(Enums.PrefabParticle.Player_Groundpound.GetGameObject(), marioTransform->Position.ToUnityVector2() + new Vector2(mario->FacingRight ? 0.5f : -0.5f, 0));
             PlaySound(SoundEffect.Powerup_MegaMushroom_Walk, variant: (byte) (footstepVariant ? 1 : 2));
             GlobalController.Instance.rumbleManager.RumbleForSeconds(0.5f, 0f, 0.1f, RumbleManager.RumbleSetting.High);
+            CameraAnimator.TriggerScreenshake(0.15f);
             footstepVariant = !footstepVariant;
         }
 

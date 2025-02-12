@@ -1,7 +1,7 @@
 using Photon.Deterministic;
 
 namespace Quantum {
-    public unsafe class ProjectileSystem : SystemMainThreadFilterStage<ProjectileSystem.Filter> {
+    public unsafe class ProjectileSystem : SystemMainThreadFilterStage<ProjectileSystem.Filter>, ISignalOnProjectileHitEntity {
         public struct Filter {
             public EntityRef Entity;
             public Transform2D* Transform;
@@ -23,6 +23,7 @@ namespace Quantum {
             var physicsObject = filter.PhysicsObject;
             var asset = f.FindAsset(projectile->Asset);
 
+            // Check to instant-despawn if spawned inside a wall
             if (!physicsObject->DisableCollision && !projectile->CheckedCollision) {
                 if (PhysicsObjectSystem.BoxInGround((FrameThreadSafe) f, transform->Position, collider->Shape)) {
                     Destroy(f, filter.Entity, asset.DestroyParticleEffect);
@@ -45,11 +46,11 @@ namespace Quantum {
             var physicsObject = filter.PhysicsObject;
 
             // Despawn
-            if (physicsObject->IsTouchingLeftWall
+            if ((physicsObject->IsTouchingLeftWall
                 || physicsObject->IsTouchingRightWall
                 || physicsObject->IsTouchingCeiling
                 || (physicsObject->IsTouchingGround && (!asset.Bounce || (projectile->HasBounced && asset.DestroyOnSecondBounce)))
-                || PhysicsObjectSystem.BoxInGround((FrameThreadSafe) f, filter.Transform->Position, filter.PhysicsCollider->Shape)) {
+                || PhysicsObjectSystem.BoxInGround((FrameThreadSafe) f, filter.Transform->Position, filter.PhysicsCollider->Shape)) && !physicsObject->DisableCollision) {
 
                 Destroy(f, filter.Entity, asset.DestroyParticleEffect);
                 return;
@@ -72,6 +73,23 @@ namespace Quantum {
             var transform = f.Unsafe.GetPointer<Transform2D>(entity);
             f.Events.ProjectileDestroyed(f, entity, particle, transform->Position);
             f.Destroy(entity);
+        }
+
+        public void OnProjectileHitEntity(Frame f, Frame frame, EntityRef projectileEntity, EntityRef hitEntity) {
+            var projectile = f.Unsafe.GetPointer<Projectile>(projectileEntity);
+            var projectileAsset = f.FindAsset(projectile->Asset);
+
+            if (projectileAsset.DestroyOnHit) {
+                Destroy(f, projectileEntity, projectileAsset.DestroyParticleEffect);
+            } else if (projectileAsset.Bounce) {
+                var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(projectileEntity);
+                projectile->Speed *= Constants._0_66;
+                physicsObject->Velocity.Y = projectileAsset.BounceStrength;
+
+                if (projectile->Speed < 1) {
+                    Destroy(f, projectileEntity, projectileAsset.DestroyParticleEffect);
+                }
+            }
         }
     }
 }
