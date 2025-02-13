@@ -15346,6 +15346,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerElements: {fileID: 2058053739306675502}
+  toggler: {fileID: 0}
   playerTrackTemplate: {fileID: 1664770316685335005}
   starTrackTemplate: {fileID: 5220781289269746384}
   storedItemNull: {fileID: -4773353537684922170, guid: a87d3b028baa82640b06b88398a8c4f0,
@@ -15699,7 +15700,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 79.35
+  m_fontSize: 79.3
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -16494,7 +16495,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerElements: {fileID: 2058053739306675502}
-  ndsCanvas: {fileID: 3755032757265375133}
+  rootCanvas: {fileID: 7101364636489074872}
+  ndsBackground: {fileID: 2837950145417754647}
   ndsImage: {fileID: 1314064538110789042}
   fitter: {fileID: 6423212726571963257}
 --- !u!1 &6312823119962025977
@@ -21470,7 +21472,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: -224.49994, y: 0}
+  m_SizeDelta: {x: -236.83331, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &6423212726571963257
 MonoBehaviour:
@@ -22089,7 +22091,7 @@ MonoBehaviour:
   nametag: {fileID: 5499876797012526657}
   text: {fileID: 7190874099432899339}
   arrow: {fileID: 7171030738423974364}
-  parentTransform: {fileID: 1581435005356319649}
+  parentCanvas: {fileID: 0}
   temp: {x: 1, y: 1}
 --- !u!1 &8527382053634266106
 GameObject:

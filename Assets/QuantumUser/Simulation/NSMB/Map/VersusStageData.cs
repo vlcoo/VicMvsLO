@@ -14,6 +14,7 @@ public unsafe class VersusStageData : AssetObject {
     public string StageAuthor;
     public string MusicComposer;
     public string TranslationKey;
+    public string LegalEnglishName;
     public string DiscordStageImage;
 #if QUANTUM_UNITY
     public Sprite Icon;
