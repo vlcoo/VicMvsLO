@@ -365,7 +365,11 @@ namespace Quantum.Prototypes {
     public QBoolean TeamsEnabled;
     public QBoolean CustomPowerupsEnabled;
     public QBoolean DrawOnTimeUp;
-    public QBoolean TestRule;
+    public Int32 Laps;
+    [DynamicCollectionAttribute()]
+    public Quantum.Prototypes.MatchConditionerTriggerPrototype[] Triggers = {};
+    [DynamicCollectionAttribute()]
+    public Int32[] Poggies = {};
     partial void MaterializeUser(Frame frame, ref Quantum.GameRules result, in PrototypeMaterializationContext context);
     public void Materialize(Frame frame, ref Quantum.GameRules result, in PrototypeMaterializationContext context = default) {
         result.Stage = this.Stage;
@@ -376,7 +380,27 @@ namespace Quantum.Prototypes {
         result.TeamsEnabled = this.TeamsEnabled;
         result.CustomPowerupsEnabled = this.CustomPowerupsEnabled;
         result.DrawOnTimeUp = this.DrawOnTimeUp;
-        result.TestRule = this.TestRule;
+        result.Laps = this.Laps;
+        if (this.Triggers.Length == 0) {
+          result.Triggers = default;
+        } else {
+          var list = frame.AllocateList(out result.Triggers, this.Triggers.Length);
+          for (int i = 0; i < this.Triggers.Length; ++i) {
+            Quantum.MatchConditionerTrigger tmp = default;
+            this.Triggers[i].Materialize(frame, ref tmp, in context);
+            list.Add(tmp);
+          }
+        }
+        if (this.Poggies.Length == 0) {
+          result.Poggies = default;
+        } else {
+          var list = frame.AllocateList(out result.Poggies, this.Poggies.Length);
+          for (int i = 0; i < this.Poggies.Length; ++i) {
+            Int32 tmp = default;
+            tmp = this.Poggies[i];
+            list.Add(tmp);
+          }
+        }
         MaterializeUser(frame, ref result, in context);
     }
   }
@@ -575,6 +599,28 @@ namespace Quantum.Prototypes {
     public void Materialize(Frame frame, ref Quantum.MarioPlayer result, in PrototypeMaterializationContext context = default) {
         result.PhysicsAsset = this.PhysicsAsset;
         result.CharacterAsset = this.CharacterAsset;
+        MaterializeUser(frame, ref result, in context);
+    }
+  }
+  [System.SerializableAttribute()]
+  [Quantum.Prototypes.Prototype(typeof(Quantum.MatchConditionerTrigger))]
+  public unsafe partial class MatchConditionerTriggerPrototype : StructPrototype {
+    public Quantum.QEnum32<TriggerCondition> Condition;
+    public Quantum.QEnum32<TriggerTarget> ConditionTarget;
+    public Quantum.QEnum32<TriggerAction> Action;
+    public Quantum.QEnum32<TriggerTarget> ActionTarget;
+    public Quantum.QEnum32<TriggerConstraint> Constraint;
+    public QBoolean ConstraintNegated;
+    public Quantum.QEnum32<TriggerTarget> ConstraintTarget;
+    partial void MaterializeUser(Frame frame, ref Quantum.MatchConditionerTrigger result, in PrototypeMaterializationContext context);
+    public void Materialize(Frame frame, ref Quantum.MatchConditionerTrigger result, in PrototypeMaterializationContext context = default) {
+        result.Condition = this.Condition;
+        result.ConditionTarget = this.ConditionTarget;
+        result.Action = this.Action;
+        result.ActionTarget = this.ActionTarget;
+        result.Constraint = this.Constraint;
+        result.ConstraintNegated = this.ConstraintNegated;
+        result.ConstraintTarget = this.ConstraintTarget;
         MaterializeUser(frame, ref result, in context);
     }
   }

@@ -37,7 +37,9 @@ struct GameRules {
 	bool TeamsEnabled;
 	bool CustomPowerupsEnabled;
 	bool DrawOnTimeUp;
-	bool TestRule;
+	int Laps;
+	list<MatchConditionerTrigger> Triggers;
+	list<int> Poggies;
 }
 
 enum GameState : Byte {
@@ -46,6 +48,46 @@ enum GameState : Byte {
     Starting,
     Playing,
     Ended
+}
+
+struct MatchConditionerTrigger {
+    TriggerCondition Condition;
+    TriggerTarget ConditionTarget;
+    TriggerAction Action;
+    TriggerTarget ActionTarget;
+    TriggerConstraint Constraint;
+    bool ConstraintNegated;
+    TriggerTarget ConstraintTarget;
+}
+
+enum TriggerCondition {
+    GotStar,
+    GotCoin,
+    // ...
+}
+
+enum TriggerAction {
+    GiveStar,
+    GiveCoin,
+    Kill,
+    // ...
+}
+
+enum TriggerConstraint {
+    Always,
+    IsMoving,
+    IsAirborne,
+    // ...
+}
+
+enum TriggerTarget {
+    All,
+    Random,
+    Self,
+    Host,
+    Winning,
+    Losing,
+    // ...
 }
 
 signal OnLoadingComplete();

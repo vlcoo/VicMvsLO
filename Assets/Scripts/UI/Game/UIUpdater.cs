@@ -236,7 +236,7 @@ namespace NSMB.UI.Game {
             bool teamsEnabled = rules.TeamsEnabled;
             bool livesEnabled = rules.IsLivesEnabled;
             bool timerEnabled = rules.TimerSeconds > 0;
-            bool testEnabled = rules.TestRule;
+            bool testEnabled = false;
 
             if (rules.TeamsEnabled) {
                 byte teamIndex = mario->GetTeam(f);

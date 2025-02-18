@@ -13,7 +13,7 @@ namespace Quantum {
         public bool TeamsEnabled;
         public bool CustomPowerupsEnabled;
         public bool DrawOnTimeUp;
-        public bool TestRule;
+        public int Laps;
 
         public override void Serialize(BitStream stream) {
             ushort changes = (ushort) EnabledChanges;
@@ -28,7 +28,7 @@ namespace Quantum {
             stream.Serialize(ref TeamsEnabled);
             stream.Serialize(ref CustomPowerupsEnabled);
             stream.Serialize(ref DrawOnTimeUp);
-            stream.Serialize(ref TestRule);
+            stream.Serialize(ref Laps);
         }
 
         public unsafe void Execute(Frame f, PlayerRef sender, PlayerData* playerData) {
@@ -66,8 +66,8 @@ namespace Quantum {
             if (rulesChanges.HasFlag(Rules.DrawOnTimeUp)) {
                 rules.DrawOnTimeUp = DrawOnTimeUp;
             }
-            if (rulesChanges.HasFlag(Rules.TestRule)) {
-                rules.TestRule = TestRule;
+            if (rulesChanges.HasFlag(Rules.Laps)) {
+                rules.Laps = Laps;
             }
 
             f.Global->Rules = rules;
@@ -87,7 +87,7 @@ namespace Quantum {
             TeamsEnabled = 1 << 5,
             CustomPowerupsEnabled = 1 << 6,
             DrawOnTimeUp = 1 << 7,
-            TestRule = 1 << 8
+            Laps = 1 << 8
         }
     }
 }

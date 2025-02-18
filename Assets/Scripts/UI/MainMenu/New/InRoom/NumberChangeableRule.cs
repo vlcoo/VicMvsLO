@@ -41,6 +41,9 @@ public class NumberChangeableRule : ChangeableRule {
         case CommandChangeRules.Rules.StarsToWin:
             cmd.StarsToWin = (int) value;
             break;
+        case CommandChangeRules.Rules.Laps:
+            cmd.Laps = (int) value;
+            break;
         case CommandChangeRules.Rules.CoinsForPowerup:
             cmd.CoinsForPowerup = (int) value;
             break;

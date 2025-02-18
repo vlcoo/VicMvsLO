@@ -35,9 +35,6 @@ public class ToggleChangeableRule : ChangeableRule {
         case CommandChangeRules.Rules.TeamsEnabled:
             cmd.TeamsEnabled = (bool) value;
             break;
-        case CommandChangeRules.Rules.TestRule:
-            cmd.TestRule = (bool) value;
-            break;
         }
 
         QuantumGame game = NetworkHandler.Game;

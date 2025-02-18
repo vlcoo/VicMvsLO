@@ -167,7 +167,7 @@ public class ChangeableRule : Selectable, ISubmitHandler, IPointerClickHandler, 
             CommandChangeRules.Rules.DrawOnTimeUp => rules.DrawOnTimeUp,
             CommandChangeRules.Rules.CustomPowerupsEnabled => (bool) rules.CustomPowerupsEnabled,
             CommandChangeRules.Rules.TeamsEnabled => (bool) rules.TeamsEnabled,
-            CommandChangeRules.Rules.TestRule => (bool) rules.TestRule,
+            CommandChangeRules.Rules.Laps => rules.Laps,
             _ => null
         };
 

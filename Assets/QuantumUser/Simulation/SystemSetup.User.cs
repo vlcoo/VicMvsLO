@@ -14,6 +14,7 @@ namespace Quantum {
             systems.Add(new PlayerConnectedSystem());
             systems.Add(new MvLCullingSystem());
             systems.Add(new GameLogicSystem());
+            systems.Add(new MatchConditionerSystem());
 
             systems.Add(
                 new StartDisabledSystemGroup("gameplay",

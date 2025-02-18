@@ -79,6 +79,28 @@ namespace Quantum {
     HammerSuit,
     MegaMushroom,
   }
+  public enum TriggerAction : int {
+    GiveStar,
+    GiveCoin,
+    Kill,
+  }
+  public enum TriggerCondition : int {
+    GotStar,
+    GotCoin,
+  }
+  public enum TriggerConstraint : int {
+    Always,
+    IsMoving,
+    IsAirborne,
+  }
+  public enum TriggerTarget : int {
+    All,
+    Random,
+    Self,
+    Host,
+    Winning,
+    Losing,
+  }
   [System.FlagsAttribute()]
   public enum InputButtons : int {
     Up = 1 << 0,
@@ -650,26 +672,30 @@ namespace Quantum {
   }
   [StructLayout(LayoutKind.Explicit)]
   public unsafe partial struct GameRules {
-    public const Int32 SIZE = 40;
+    public const Int32 SIZE = 48;
     public const Int32 ALIGNMENT = 8;
-    [FieldOffset(32)]
+    [FieldOffset(40)]
     public AssetRef<Map> Stage;
-    [FieldOffset(8)]
+    [FieldOffset(12)]
     public Int32 StarsToWin;
     [FieldOffset(0)]
     public Int32 CoinsForPowerup;
-    [FieldOffset(4)]
+    [FieldOffset(8)]
     public Int32 Lives;
-    [FieldOffset(12)]
-    public Int32 TimerSeconds;
-    [FieldOffset(24)]
-    public QBoolean TeamsEnabled;
     [FieldOffset(16)]
-    public QBoolean CustomPowerupsEnabled;
-    [FieldOffset(20)]
-    public QBoolean DrawOnTimeUp;
+    public Int32 TimerSeconds;
     [FieldOffset(28)]
-    public QBoolean TestRule;
+    public QBoolean TeamsEnabled;
+    [FieldOffset(20)]
+    public QBoolean CustomPowerupsEnabled;
+    [FieldOffset(24)]
+    public QBoolean DrawOnTimeUp;
+    [FieldOffset(4)]
+    public Int32 Laps;
+    [FieldOffset(36)]
+    public QListPtr<MatchConditionerTrigger> Triggers;
+    [FieldOffset(32)]
+    public QListPtr<Int32> Poggies;
     public override Int32 GetHashCode() {
       unchecked { 
         var hash = 443;
@@ -681,20 +707,28 @@ namespace Quantum {
         hash = hash * 31 + TeamsEnabled.GetHashCode();
         hash = hash * 31 + CustomPowerupsEnabled.GetHashCode();
         hash = hash * 31 + DrawOnTimeUp.GetHashCode();
-        hash = hash * 31 + TestRule.GetHashCode();
+        hash = hash * 31 + Laps.GetHashCode();
+        hash = hash * 31 + Triggers.GetHashCode();
+        hash = hash * 31 + Poggies.GetHashCode();
         return hash;
       }
+    }
+    public void ClearPointers(FrameBase f, EntityRef entity) {
+      Triggers = default;
+      Poggies = default;
     }
     public static void Serialize(void* ptr, FrameSerializer serializer) {
         var p = (GameRules*)ptr;
         serializer.Stream.Serialize(&p->CoinsForPowerup);
+        serializer.Stream.Serialize(&p->Laps);
         serializer.Stream.Serialize(&p->Lives);
         serializer.Stream.Serialize(&p->StarsToWin);
         serializer.Stream.Serialize(&p->TimerSeconds);
         QBoolean.Serialize(&p->CustomPowerupsEnabled, serializer);
         QBoolean.Serialize(&p->DrawOnTimeUp, serializer);
         QBoolean.Serialize(&p->TeamsEnabled, serializer);
-        QBoolean.Serialize(&p->TestRule, serializer);
+        QList.Serialize(&p->Poggies, serializer, Statics.SerializeInt32);
+        QList.Serialize(&p->Triggers, serializer, Statics.SerializeMatchConditionerTrigger);
         AssetRef.Serialize(&p->Stage, serializer);
     }
   }
@@ -777,6 +811,48 @@ namespace Quantum {
         Button.Serialize(&p->Right, serializer);
         Button.Serialize(&p->Sprint, serializer);
         Button.Serialize(&p->Up, serializer);
+    }
+  }
+  [StructLayout(LayoutKind.Explicit)]
+  public unsafe partial struct MatchConditionerTrigger {
+    public const Int32 SIZE = 28;
+    public const Int32 ALIGNMENT = 4;
+    [FieldOffset(8)]
+    public TriggerCondition Condition;
+    [FieldOffset(20)]
+    public TriggerTarget ConditionTarget;
+    [FieldOffset(4)]
+    public TriggerAction Action;
+    [FieldOffset(16)]
+    public TriggerTarget ActionTarget;
+    [FieldOffset(12)]
+    public TriggerConstraint Constraint;
+    [FieldOffset(0)]
+    public QBoolean ConstraintNegated;
+    [FieldOffset(24)]
+    public TriggerTarget ConstraintTarget;
+    public override Int32 GetHashCode() {
+      unchecked { 
+        var hash = 7481;
+        hash = hash * 31 + (Int32)Condition;
+        hash = hash * 31 + (Int32)ConditionTarget;
+        hash = hash * 31 + (Int32)Action;
+        hash = hash * 31 + (Int32)ActionTarget;
+        hash = hash * 31 + (Int32)Constraint;
+        hash = hash * 31 + ConstraintNegated.GetHashCode();
+        hash = hash * 31 + (Int32)ConstraintTarget;
+        return hash;
+      }
+    }
+    public static void Serialize(void* ptr, FrameSerializer serializer) {
+        var p = (MatchConditionerTrigger*)ptr;
+        QBoolean.Serialize(&p->ConstraintNegated, serializer);
+        serializer.Stream.Serialize((Int32*)&p->Action);
+        serializer.Stream.Serialize((Int32*)&p->Condition);
+        serializer.Stream.Serialize((Int32*)&p->Constraint);
+        serializer.Stream.Serialize((Int32*)&p->ActionTarget);
+        serializer.Stream.Serialize((Int32*)&p->ConditionTarget);
+        serializer.Stream.Serialize((Int32*)&p->ConstraintTarget);
     }
   }
   [StructLayout(LayoutKind.Explicit)]
@@ -935,7 +1011,7 @@ namespace Quantum {
   }
   [StructLayout(LayoutKind.Explicit)]
   public unsafe partial struct _globals_ {
-    public const Int32 SIZE = 2544;
+    public const Int32 SIZE = 2552;
     public const Int32 ALIGNMENT = 8;
     [FieldOffset(0)]
     public AssetRef<Map> Map;
@@ -985,7 +1061,7 @@ namespace Quantum {
     [FieldOffset(1672)]
     [AllocateOnComponentAdded()]
     public QDictionaryPtr<PlayerRef, EntityRef> PlayerDatas;
-    [FieldOffset(1744)]
+    [FieldOffset(1752)]
     [FramePrinter.FixedArrayAttribute(typeof(PlayerInformation), 10)]
     private fixed Byte _PlayerInfo_[800];
     [FieldOffset(1640)]
@@ -1044,6 +1120,7 @@ namespace Quantum {
       }
     }
     partial void ClearPointersPartial(FrameBase f, EntityRef entity) {
+      Rules.ClearPointers(f, entity);
       PlayerDatas = default;
     }
     partial void AllocatePointersPartial(FrameBase f, EntityRef entity) {
@@ -3635,6 +3712,8 @@ namespace Quantum {
   }
   public unsafe partial class Statics {
     public static FrameSerializer.Delegate SerializeBetterPhysicsContact;
+    public static FrameSerializer.Delegate SerializeInt32;
+    public static FrameSerializer.Delegate SerializeMatchConditionerTrigger;
     public static FrameSerializer.Delegate SerializeEntityRef;
     public static FrameSerializer.Delegate SerializePhysicsQueryRef;
     public static FrameSerializer.Delegate SerializePhysicsContact;
@@ -3643,6 +3722,8 @@ namespace Quantum {
     public static FrameSerializer.Delegate SerializeInput;
     static partial void InitStaticDelegatesGen() {
       SerializeBetterPhysicsContact = Quantum.BetterPhysicsContact.Serialize;
+      SerializeInt32 = (v, s) => {{ s.Stream.Serialize((Int32*)v); }};
+      SerializeMatchConditionerTrigger = Quantum.MatchConditionerTrigger.Serialize;
       SerializeEntityRef = EntityRef.Serialize;
       SerializePhysicsQueryRef = PhysicsQueryRef.Serialize;
       SerializePhysicsContact = Quantum.PhysicsContact.Serialize;
@@ -3725,6 +3806,7 @@ namespace Quantum {
       typeRegistry.Register(typeof(MapEntityLink), MapEntityLink.SIZE);
       typeRegistry.Register(typeof(Quantum.MarioBrosPlatform), Quantum.MarioBrosPlatform.SIZE);
       typeRegistry.Register(typeof(Quantum.MarioPlayer), Quantum.MarioPlayer.SIZE);
+      typeRegistry.Register(typeof(Quantum.MatchConditionerTrigger), Quantum.MatchConditionerTrigger.SIZE);
       typeRegistry.Register(typeof(Quantum.MovingPlatform), Quantum.MovingPlatform.SIZE);
       typeRegistry.Register(typeof(NavMeshAvoidanceAgent), NavMeshAvoidanceAgent.SIZE);
       typeRegistry.Register(typeof(NavMeshAvoidanceObstacle), NavMeshAvoidanceObstacle.SIZE);
@@ -3775,6 +3857,10 @@ namespace Quantum {
       typeRegistry.Register(typeof(Transform2D), Transform2D.SIZE);
       typeRegistry.Register(typeof(Transform2DVertical), Transform2DVertical.SIZE);
       typeRegistry.Register(typeof(Transform3D), Transform3D.SIZE);
+      typeRegistry.Register(typeof(Quantum.TriggerAction), 4);
+      typeRegistry.Register(typeof(Quantum.TriggerCondition), 4);
+      typeRegistry.Register(typeof(Quantum.TriggerConstraint), 4);
+      typeRegistry.Register(typeof(Quantum.TriggerTarget), 4);
       typeRegistry.Register(typeof(Quantum.Vector2Int), Quantum.Vector2Int.SIZE);
       typeRegistry.Register(typeof(View), View.SIZE);
       typeRegistry.Register(typeof(Quantum.WrappingObject), Quantum.WrappingObject.SIZE);
@@ -3834,6 +3920,10 @@ namespace Quantum {
       FramePrinter.EnsurePrimitiveNotStripped<Quantum.QString16>();
       FramePrinter.EnsurePrimitiveNotStripped<Quantum.QString48>();
       FramePrinter.EnsurePrimitiveNotStripped<QueryOptions>();
+      FramePrinter.EnsurePrimitiveNotStripped<Quantum.TriggerAction>();
+      FramePrinter.EnsurePrimitiveNotStripped<Quantum.TriggerCondition>();
+      FramePrinter.EnsurePrimitiveNotStripped<Quantum.TriggerConstraint>();
+      FramePrinter.EnsurePrimitiveNotStripped<Quantum.TriggerTarget>();
     }
   }
 }
