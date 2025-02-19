@@ -181,7 +181,7 @@ namespace Quantum {
             f.Events.MarioPlayerCollectedPowerup(f, marioEntity, result, newScriptable);
         }
 
-        public static PowerupReserveResult CollectPowerup(Frame f, EntityRef marioEntity, MarioPlayer* mario, PhysicsObject* marioPhysicsObject, PowerupAsset newPowerup) {
+        public static PowerupReserveResult CollectPowerup(Frame f, EntityRef marioEntity, MarioPlayer* mario, PhysicsObject* marioPhysicsObject, PowerupAsset newPowerup, bool ignoreReserve = false) {
 
             if (newPowerup.Type == PowerupType.Starman) {
                 mario->InvincibilityFrames = 600;
@@ -196,8 +196,10 @@ namespace Quantum {
 
             // Reserve if it's the same item
             if (mario->CurrentPowerupState == newState) {
-                mario->SetReserveItem(f, newPowerup);
-                return PowerupReserveResult.ReserveNewPowerup;
+                if (!ignoreReserve) {
+                    mario->SetReserveItem(f, newPowerup);
+                    return PowerupReserveResult.ReserveNewPowerup;
+                } else return PowerupReserveResult.None;
             }
 
             /*
@@ -219,8 +221,10 @@ namespace Quantum {
 
             // Reserve if we have a higher priority item
             if (currentPowerupStatePriority > newPowerupItemPriority) {
-                mario->SetReserveItem(f, newPowerup);
-                return PowerupReserveResult.ReserveNewPowerup;
+                if (!ignoreReserve) {
+                    mario->SetReserveItem(f, newPowerup);
+                    return PowerupReserveResult.ReserveNewPowerup;
+                } else return PowerupReserveResult.NoneButPlaySound;
             }
 
             if (newState == PowerupState.MegaMushroom) {
@@ -257,9 +261,9 @@ namespace Quantum {
             }
 
             if (mario->CurrentPowerupState != PowerupState.NoPowerup) {
-                mario->SetReserveItem(f, currentPowerup);
+                if (!ignoreReserve) mario->SetReserveItem(f, currentPowerup);
             }
-            return PowerupReserveResult.ReserveOldPowerup;
+            return ignoreReserve ? PowerupReserveResult.NoneButPlaySound : PowerupReserveResult.ReserveOldPowerup;
         }
 
         public void OnEntityBumped(Frame f, EntityRef entity, FPVector2 position, EntityRef bumpOwner) {

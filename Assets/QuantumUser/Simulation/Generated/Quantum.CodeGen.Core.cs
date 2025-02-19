@@ -83,23 +83,133 @@ namespace Quantum {
     GiveStar,
     GiveCoin,
     Kill,
+    RemoveStar,
+    RemoveCoin,
+    GiveXPowerup,
+    GiveLife,
+    Win,
+    DrawMatch,
+    Disqualify,
+    Stun,
+    Dive,
+    Launch,
+    Freeze,
+    Harm,
+    SpawnXPowerup,
+    SpawnXEnemy,
+    RespawnLevel,
+    ExplodeLevel,
+    RandomTeleport,
+    RemoveReserve,
+    GiveXReserve,
+    GiveIFrames,
+    SpawnLooseCoin,
+    SpawnLooseStar,
+    ZeroCoins,
+    ZeroStars,
+    MaxCoins,
+    SpawnStar,
+    BecomeXTeam,
   }
   public enum TriggerCondition : int {
     GotStar,
     GotCoin,
+    Spawned,
+    MatchStarted,
+    GotCheckpoint,
+    GotPowerup,
+    LostPowerup,
+    HitBlock,
+    Stunned,
+    Frozen,
+    StunnedSomeone,
+    SteppedOnEnemy,
+    TriggeredPowerup,
+    Died,
+    Jumped,
+    LookedRight,
+    LookedLeft,
+    LookedUp,
+    LookedDown,
+    Ran,
+    ReachedCoinLimit,
+    Disqualified,
+    SixtySecondRemaining,
+    TenSecondRemaining,
+    EveryOneSecond,
+    EveryFiveSecond,
+    EveryTenSecond,
+    EveryFifteenSecond,
+    EveryThirtySecond,
+    EverySixtySecond,
+    SongBahd,
+    ReachedZeroCoins,
+    ReachedZeroStars,
+    GotStarcoin,
+    EnteredPipe,
+    GrabbedSomething,
+    FinishedLap,
+    TouchedGround,
+    StoppedMoving,
+    KilledSomeone,
+    HarmedSomeone,
   }
   public enum TriggerConstraint : int {
     Always,
     IsMoving,
+    IsStationary,
     IsAirborne,
+    IsGrounded,
+    IsXPowerup,
+    IsNotXPowerup,
+    HasNCoins,
+    HasNStars,
+    HasNLives,
+    HasLessThanNCoins,
+    HasLessThanNStars,
+    HasLessThanNLives,
+    HasMoreThanNCoins,
+    HasMoreThanNStars,
+    HasMoreThanNLives,
+    TimerIsLessThanN,
+    TimerIsMoreThanN,
+    StarsExist,
+    StarsNotExist,
+    EnemiesExist,
+    EnemiesNotExist,
+    CoinsExist,
+    CoinsNotExist,
+    NPlayersRemaining,
+    LessThanNPlayersRemaining,
+    MoreThanNPlayersRemaining,
   }
   public enum TriggerTarget : int {
     All,
     Random,
-    Self,
+    Conditioner,
+    ConditionerTeam,
+    NonConditioner,
+    NonConditionerTeam,
+    Actioner,
+    ActionerTeam,
+    NonActioner,
+    NonActionerTeam,
     Host,
-    Winning,
-    Losing,
+    NonHost,
+    FirstPlace,
+    NonFirstPlace,
+    LastPlace,
+    NonLastPlace,
+    TeamA,
+    NonTeamA,
+    TeamB,
+    NonTeamB,
+    TeamC,
+    NonTeamC,
+    TeamD,
+    NonTeamD,
+    TeamE,
+    NonTeamE,
   }
   [System.FlagsAttribute()]
   public enum InputButtons : int {
@@ -649,6 +759,72 @@ namespace Quantum {
     }
   }
   [StructLayout(LayoutKind.Explicit)]
+  [System.SerializableAttribute()]
+  public unsafe partial struct QString64 : IQString, System.IEquatable<QString64> {
+    public const Int32 SIZE = 64;
+    public const Int32 ALIGNMENT = 4;
+    [FieldOffset(0)]
+    public UInt16 ByteCount;
+    [FieldOffset(2)]
+    [FixedBufferDynamicLength("ByteCount")]
+    public fixed Byte Bytes[62];
+    public const int MaxByteCount = 62;
+    public QString64(String str) {
+      QString.ConstructFrom(str, MaxByteCount, out this);
+    }
+    public int Length {
+      get {
+        return QString.GetLength(ref this);
+      }
+    }
+    public override System.String ToString() {
+      return QString.GetString(ref this);
+    }
+    public static Boolean CanHold(String str) {
+      return QString.CanHold(str, MaxByteCount);
+    }
+    Int32 IQString.CompareOrdinal(byte* bytes, UInt16 byteCount) {
+      return QString.CompareOrdinal(ref this, bytes, byteCount);
+    }
+    public Int32 CompareOrdinal(String str) {
+      return QString.CompareOrdinal(ref this, str);
+    }
+    public static implicit operator QString64(String str) {
+      return new QString64(str);
+    }
+    public static implicit operator String(QString64 str) {
+      return str.ToString();
+    }
+    public override Boolean Equals(Object obj) {
+      return QString.AreEqual(ref this, obj);
+    }
+    public Boolean Equals(QString64 str) {
+      return QString.CompareOrdinal(ref this, str.Bytes, str.ByteCount) == 0;
+    }
+    public Boolean Equals<T>(ref T str)
+      where T : unmanaged, IQString {
+      return QString.CompareOrdinal(ref this, ref str) == 0;
+    }
+    public Int32 CompareOrdinal<T>(ref T str)
+      where T : unmanaged, IQString {
+      return QString.CompareOrdinal(ref this, ref str);
+    }
+    public override Int32 GetHashCode() {
+      unchecked { 
+        var hash = 13649;
+        hash = hash * 31 + ByteCount.GetHashCode();
+        fixed (Byte* p = Bytes) hash = hash * 31 + HashCodeUtils.GetArrayHashCode(p, this.ByteCount);
+        return hash;
+      }
+    }
+    public static void Serialize(void* ptr, FrameSerializer serializer) {
+        var p = (QString64*)ptr;
+        serializer.Stream.Serialize(&p->ByteCount);
+        Assert.Always(p->ByteCount <= 62, p->ByteCount);
+        serializer.Stream.SerializeBuffer(&p->Bytes[0], p->ByteCount);
+    }
+  }
+  [StructLayout(LayoutKind.Explicit)]
   public unsafe partial struct BetterPhysicsContact {
     public const Int32 SIZE = 80;
     public const Int32 ALIGNMENT = 8;
@@ -815,44 +991,52 @@ namespace Quantum {
   }
   [StructLayout(LayoutKind.Explicit)]
   public unsafe partial struct MatchConditionerTrigger {
-    public const Int32 SIZE = 28;
+    public const Int32 SIZE = 216;
     public const Int32 ALIGNMENT = 4;
-    [FieldOffset(8)]
-    public TriggerCondition Condition;
-    [FieldOffset(20)]
-    public TriggerTarget ConditionTarget;
     [FieldOffset(4)]
-    public TriggerAction Action;
+    public TriggerCondition Condition;
+    [FieldOffset(88)]
+    public QString64 ConditionParameter;
     [FieldOffset(16)]
-    public TriggerTarget ActionTarget;
-    [FieldOffset(12)]
-    public TriggerConstraint Constraint;
+    public TriggerTarget ConditionTarget;
     [FieldOffset(0)]
-    public QBoolean ConstraintNegated;
+    public TriggerAction Action;
     [FieldOffset(24)]
+    public QString64 ActionParameter;
+    [FieldOffset(12)]
+    public TriggerTarget ActionTarget;
+    [FieldOffset(8)]
+    public TriggerConstraint Constraint;
+    [FieldOffset(152)]
+    public QString64 ConstraintParameter;
+    [FieldOffset(20)]
     public TriggerTarget ConstraintTarget;
     public override Int32 GetHashCode() {
       unchecked { 
         var hash = 7481;
         hash = hash * 31 + (Int32)Condition;
+        hash = hash * 31 + ConditionParameter.GetHashCode();
         hash = hash * 31 + (Int32)ConditionTarget;
         hash = hash * 31 + (Int32)Action;
+        hash = hash * 31 + ActionParameter.GetHashCode();
         hash = hash * 31 + (Int32)ActionTarget;
         hash = hash * 31 + (Int32)Constraint;
-        hash = hash * 31 + ConstraintNegated.GetHashCode();
+        hash = hash * 31 + ConstraintParameter.GetHashCode();
         hash = hash * 31 + (Int32)ConstraintTarget;
         return hash;
       }
     }
     public static void Serialize(void* ptr, FrameSerializer serializer) {
         var p = (MatchConditionerTrigger*)ptr;
-        QBoolean.Serialize(&p->ConstraintNegated, serializer);
         serializer.Stream.Serialize((Int32*)&p->Action);
         serializer.Stream.Serialize((Int32*)&p->Condition);
         serializer.Stream.Serialize((Int32*)&p->Constraint);
         serializer.Stream.Serialize((Int32*)&p->ActionTarget);
         serializer.Stream.Serialize((Int32*)&p->ConditionTarget);
         serializer.Stream.Serialize((Int32*)&p->ConstraintTarget);
+        Quantum.QString64.Serialize(&p->ActionParameter, serializer);
+        Quantum.QString64.Serialize(&p->ConditionParameter, serializer);
+        Quantum.QString64.Serialize(&p->ConstraintParameter, serializer);
     }
   }
   [StructLayout(LayoutKind.Explicit)]
@@ -3845,6 +4029,7 @@ namespace Quantum {
       typeRegistry.Register(typeof(QBoolean), QBoolean.SIZE);
       typeRegistry.Register(typeof(Quantum.QString16), Quantum.QString16.SIZE);
       typeRegistry.Register(typeof(Quantum.QString48), Quantum.QString48.SIZE);
+      typeRegistry.Register(typeof(Quantum.QString64), Quantum.QString64.SIZE);
       typeRegistry.Register(typeof(Quantum.Ptr), Quantum.Ptr.SIZE);
       typeRegistry.Register(typeof(QueryOptions), 2);
       typeRegistry.Register(typeof(RNGSession), RNGSession.SIZE);
@@ -3919,6 +4104,7 @@ namespace Quantum {
       FramePrinter.EnsurePrimitiveNotStripped<Quantum.PowerupState>();
       FramePrinter.EnsurePrimitiveNotStripped<Quantum.QString16>();
       FramePrinter.EnsurePrimitiveNotStripped<Quantum.QString48>();
+      FramePrinter.EnsurePrimitiveNotStripped<Quantum.QString64>();
       FramePrinter.EnsurePrimitiveNotStripped<QueryOptions>();
       FramePrinter.EnsurePrimitiveNotStripped<Quantum.TriggerAction>();
       FramePrinter.EnsurePrimitiveNotStripped<Quantum.TriggerCondition>();

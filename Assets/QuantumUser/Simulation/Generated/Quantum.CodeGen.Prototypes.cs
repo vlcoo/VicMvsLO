@@ -606,20 +606,27 @@ namespace Quantum.Prototypes {
   [Quantum.Prototypes.Prototype(typeof(Quantum.MatchConditionerTrigger))]
   public unsafe partial class MatchConditionerTriggerPrototype : StructPrototype {
     public Quantum.QEnum32<TriggerCondition> Condition;
+    [MaxStringByteCount(62, "Unicode")]
+    public string ConditionParameter;
     public Quantum.QEnum32<TriggerTarget> ConditionTarget;
     public Quantum.QEnum32<TriggerAction> Action;
+    [MaxStringByteCount(62, "Unicode")]
+    public string ActionParameter;
     public Quantum.QEnum32<TriggerTarget> ActionTarget;
     public Quantum.QEnum32<TriggerConstraint> Constraint;
-    public QBoolean ConstraintNegated;
+    [MaxStringByteCount(62, "Unicode")]
+    public string ConstraintParameter;
     public Quantum.QEnum32<TriggerTarget> ConstraintTarget;
     partial void MaterializeUser(Frame frame, ref Quantum.MatchConditionerTrigger result, in PrototypeMaterializationContext context);
     public void Materialize(Frame frame, ref Quantum.MatchConditionerTrigger result, in PrototypeMaterializationContext context = default) {
         result.Condition = this.Condition;
+        PrototypeValidator.AssignQString(this.ConditionParameter, 64, in context, out result.ConditionParameter);
         result.ConditionTarget = this.ConditionTarget;
         result.Action = this.Action;
+        PrototypeValidator.AssignQString(this.ActionParameter, 64, in context, out result.ActionParameter);
         result.ActionTarget = this.ActionTarget;
         result.Constraint = this.Constraint;
-        result.ConstraintNegated = this.ConstraintNegated;
+        PrototypeValidator.AssignQString(this.ConstraintParameter, 64, in context, out result.ConstraintParameter);
         result.ConstraintTarget = this.ConstraintTarget;
         MaterializeUser(frame, ref result, in context);
     }
