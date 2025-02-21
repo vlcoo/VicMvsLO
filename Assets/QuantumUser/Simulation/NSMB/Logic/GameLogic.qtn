@@ -39,7 +39,6 @@ struct GameRules {
 	bool DrawOnTimeUp;
 	int Laps;
 	list<MatchConditionerTrigger> Triggers;
-	list<int> Poggies;
 }
 
 enum GameState : Byte {
@@ -71,28 +70,19 @@ enum TriggerCondition {
     GotPowerup,
     LostPowerup,
     HitBlock,
-    Stunned,    // bump, knockback, hardknockback
+    Stunned,
     Frozen,
-    StunnedSomeone,    // bump, knockback, hardknockback
+    StunnedSomeone,
     SteppedOnEnemy,
     TriggeredPowerup,
     Died,
     Jumped,
-    LookedRight,
-    LookedLeft,
-    LookedUp,
-    LookedDown,
+    LookedXDirection,   // any, up, right, down, left
     Ran,
     ReachedCoinLimit,
     Disqualified,
-    SixtySecondRemaining,
-    TenSecondRemaining,
-    EveryOneSecond,
-    EveryFiveSecond,
-    EveryTenSecond,
-    EveryFifteenSecond,
-    EveryThirtySecond,
-    EverySixtySecond,
+    XSecondRemaining,   // 60, 10
+    EveryXSecond, // 1, 5, 10, 15, 30, 60
     SongBahd,
     ReachedZeroCoins,
     ReachedZeroStars,
@@ -198,10 +188,43 @@ enum TriggerTarget {
     NonTeamE,
 }
 
+enum TriggerParameter {
+    Random,
+    Mushroom,
+    Fire,
+    Ice,
+    Propeller,
+    Shell,
+    Hammer,
+    Starman,
+    Mega,
+    Mini,
+    Goomba,
+    GreenKoopa,
+    RedKoopa,
+    BlueKoopa,
+    BulletBill,
+    Boo,
+    Spiny,
+    Bobomb,
+    Buzzy,
+    A,
+    B,
+    C,
+    D,
+    E,
+    Bump,
+    Knockback,
+    HardKnockback,
+    Force,
+}
+
 signal OnLoadingComplete();
 signal OnGameStarting();
 signal OnGameEnding(int winningTeam, bool hasWinner);
 signal OnReturnToRoom();
+signal OnTimerSecondsRemaining(int secondsRemaining);
+
 
 synced event GameStateChanged {
 	Frame Frame;

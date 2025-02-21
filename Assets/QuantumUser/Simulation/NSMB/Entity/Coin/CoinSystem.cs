@@ -104,6 +104,7 @@ namespace Quantum {
             if (item) {
                 mario->Coins = 0;
                 MarioPlayerSystem.SpawnItem(f, marioEntity, mario, default);
+                f.Signals.OnMarioPlayerReachedCoinLimit(marioEntity, mario);
             } else {
                 mario->Coins = newCoins;
             }

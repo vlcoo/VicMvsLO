@@ -368,8 +368,6 @@ namespace Quantum.Prototypes {
     public Int32 Laps;
     [DynamicCollectionAttribute()]
     public Quantum.Prototypes.MatchConditionerTriggerPrototype[] Triggers = {};
-    [DynamicCollectionAttribute()]
-    public Int32[] Poggies = {};
     partial void MaterializeUser(Frame frame, ref Quantum.GameRules result, in PrototypeMaterializationContext context);
     public void Materialize(Frame frame, ref Quantum.GameRules result, in PrototypeMaterializationContext context = default) {
         result.Stage = this.Stage;
@@ -388,16 +386,6 @@ namespace Quantum.Prototypes {
           for (int i = 0; i < this.Triggers.Length; ++i) {
             Quantum.MatchConditionerTrigger tmp = default;
             this.Triggers[i].Materialize(frame, ref tmp, in context);
-            list.Add(tmp);
-          }
-        }
-        if (this.Poggies.Length == 0) {
-          result.Poggies = default;
-        } else {
-          var list = frame.AllocateList(out result.Poggies, this.Poggies.Length);
-          for (int i = 0; i < this.Poggies.Length; ++i) {
-            Int32 tmp = default;
-            tmp = this.Poggies[i];
             list.Add(tmp);
           }
         }

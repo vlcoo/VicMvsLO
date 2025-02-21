@@ -2,10 +2,11 @@ using Photon.Deterministic;
 using Quantum.Collections;
 using System.Linq;
 using UnityEngine;
+using Int32 = System.Int32;
 
 namespace Quantum
 {
-    public class MatchConditionerSystem : SystemSignalsOnly, ISignalOnMarioPlayerCollectedStar, ISignalOnMarioPlayerCollectedCoin {
+    public class MatchConditionerSystem : SystemSignalsOnly, ISignalOnMarioPlayerCollectedStar, ISignalOnMarioPlayerCollectedCoin, ISignalOnMarioPlayerDied, ISignalOnEntityFreeze, ISignalOnGameStarting, ISignalOnMarioPlayerDisqualified, ISignalOnMarioPlayerJumped, ISignalOnMarioPlayerRespawned, ISignalOnMarioPlayerReceivedKnockback, ISignalOnMarioPlayerCollectedPowerup, ISignalOnMarioPlayerTookDamage, ISignalOnMarioPlayerReachedCoinLimit, ISignalOnMarioPlayerZeroedStars, ISignalOnMarioPlayerZeroedCoins {
         // TODO: initialize the trigger list in the correct place somewhere else!!
         public override unsafe void OnInit(Frame f) {
             // MOCK TRIGGER LIST for testing purposes...
@@ -16,7 +17,7 @@ namespace Quantum
                 Condition = TriggerCondition.GotStar,
                 ConditionParameter = "",
                 ConditionTarget = TriggerTarget.All,
-                Action = TriggerAction.ZeroCoins,
+                Action = TriggerAction.Disqualify,
                 ActionParameter = "",
                 ActionTarget = TriggerTarget.Conditioner,
                 Constraint = TriggerConstraint.Always,
@@ -25,7 +26,7 @@ namespace Quantum
             });
         }
 
-        private unsafe void ConditionActioned(TriggerCondition condition, Frame f, EntityRef entity) {
+        private unsafe void ConditionActioned(TriggerCondition condition, Frame f, EntityRef entity, string parameter = "") {
             foreach (var trigger in f.ResolveList(f.Global->Rules.Triggers).Where(trigger => trigger.Condition == condition))
             {
                 GetType().GetMethod($"Act{trigger.Action.ToString()}")?.Invoke(this, new object[] { f, entity, trigger.ActionParameter.ToString() });
@@ -44,6 +45,80 @@ namespace Quantum
         public unsafe void OnMarioPlayerCollectedCoin(Frame f, EntityRef marioEntity, MarioPlayer* mario, FPVector2 worldLocation,
             QBoolean fromBlock, QBoolean downwards) {
             ConditionActioned(TriggerCondition.GotCoin, f, marioEntity);
+        }
+
+        public void a() {
+            // ConditionActioned(TriggerCondition.GotCheckpoint, f, entity);
+            // ConditionActioned(TriggerCondition.HitBlock, f, entity);
+            // ConditionActioned(TriggerCondition.StunnedSomeone, f, entity);
+            // ConditionActioned(TriggerCondition.SteppedOnEnemy, f, entity);
+            // ConditionActioned(TriggerCondition.TriggeredPowerup, f, entity);
+            // ConditionActioned(TriggerCondition.LookedXDirection, f, entity);
+            // ConditionActioned(TriggerCondition.Ran, f, entity);
+            // ConditionActioned(TriggerCondition.XSecondRemaining, f, entity);
+            // ConditionActioned(TriggerCondition.SongBahd, f, entity);
+            // ConditionActioned(TriggerCondition.GotStarcoin, f, entity);
+            // ConditionActioned(TriggerCondition.EnteredPipe, f, entity);
+            // ConditionActioned(TriggerCondition.GrabbedSomething, f, entity);
+            // ConditionActioned(TriggerCondition.FinishedLap, f, entity);
+            // ConditionActioned(TriggerCondition.TouchedGround, f, entity);
+            // ConditionActioned(TriggerCondition.StoppedMoving, f, entity);
+            // ConditionActioned(TriggerCondition.KilledSomeone, f, entity);
+            // ConditionActioned(TriggerCondition.HarmedSomeone, f, entity);
+        }
+        
+        public void OnMarioPlayerDied(Frame f, EntityRef entity) {
+            ConditionActioned(TriggerCondition.Died, f, entity);
+        }
+
+        public void OnEntityFreeze(Frame f, EntityRef entity, EntityRef iceBlock) {
+            if (!f.Has<MarioPlayer>(entity)) return;
+            ConditionActioned(TriggerCondition.Frozen, f, entity);
+        }
+
+        public void OnGameStarting(Frame f) {
+            ConditionActioned(TriggerCondition.MatchStarted, f, default);
+        }
+        
+        public void OnMarioPlayerDisqualified(Frame f, EntityRef entity) {
+            ConditionActioned(TriggerCondition.Disqualified, f, entity);
+            Debug.Log("goodbye!!!");
+        }
+
+        public void OnMarioPlayerJumped(Frame f, EntityRef entity) {
+            ConditionActioned(TriggerCondition.Jumped, f, entity);
+        }
+
+        public void OnMarioPlayerRespawned(Frame f, EntityRef entity) {
+            ConditionActioned(TriggerCondition.Spawned, f, entity);
+        }
+
+        public void OnMarioPlayerReceivedKnockback(Frame f, EntityRef entity, EntityRef attacker, Int32 strength) {
+            switch (strength) {
+                case 0: ConditionActioned(TriggerCondition.Stunned, f, entity, "Bump"); break;
+                case 1: ConditionActioned(TriggerCondition.Stunned, f, entity, "Knockback"); break;
+                case 2: ConditionActioned(TriggerCondition.Stunned, f, entity, "HardKnockback"); break;
+            }
+        }
+
+        public unsafe void OnMarioPlayerCollectedPowerup(Frame f, EntityRef marioEntity, MarioPlayer* mario) {
+            ConditionActioned(TriggerCondition.GotPowerup, f, marioEntity);
+        }
+
+        public void OnMarioPlayerTookDamage(Frame f, EntityRef entity) {
+            ConditionActioned(TriggerCondition.LostPowerup, f, entity);
+        }
+        
+        public unsafe void OnMarioPlayerReachedCoinLimit(Frame f, EntityRef marioEntity, MarioPlayer* mario) {
+            ConditionActioned(TriggerCondition.ReachedCoinLimit, f, marioEntity);
+        }
+
+        public void OnMarioPlayerZeroedStars(Frame f, EntityRef entity) {
+            ConditionActioned(TriggerCondition.ReachedZeroStars, f, entity);
+        }
+
+        public unsafe void OnMarioPlayerZeroedCoins(Frame f, EntityRef marioEntity, MarioPlayer* mario) {
+            ConditionActioned(TriggerCondition.ReachedZeroCoins, f, marioEntity);
         }
         #endregion
 
@@ -68,12 +143,14 @@ namespace Quantum
             var mario = f.Unsafe.GetPointer<MarioPlayer>(entity);
             if (mario->Stars == 0) return;
             mario->Stars--;
+            if (mario->Stars == 0) f.Signals.OnMarioPlayerZeroedStars(entity);
         }
 
         public unsafe void ActRemoveCoin(Frame f, EntityRef entity, string parameter) {
             var mario = f.Unsafe.GetPointer<MarioPlayer>(entity);
             if (mario->Coins == 0) return;
             mario->Coins--;
+            if (mario->Coins == 0) f.Signals.OnMarioPlayerZeroedCoins(entity, mario);
         }
 
         public unsafe void ActGiveXPowerup(Frame f, EntityRef entity, string parameter) {
@@ -101,6 +178,7 @@ namespace Quantum
 
         public unsafe void ActDisqualify(Frame f, EntityRef entity, string parameter) {
             f.Destroy(entity);
+            f.Signals.OnMarioPlayerDisqualified(entity);
         }
 
         public unsafe void ActStun(Frame f, EntityRef entity, string parameter) {

@@ -141,6 +141,11 @@ component MarioPlayer {
 
 signal OnMarioPlayerDied(EntityRef entity);
 signal OnMarioPlayerBecameInvincible(EntityRef entity);
+signal OnMarioPlayerRespawned(EntityRef entity);
+signal OnMarioPlayerTookDamage(EntityRef entity);
+signal OnMarioPlayerReceivedKnockback(EntityRef entity, EntityRef attacker, int strength);  // 0 = bump, 1 = kback, 2 = hard kback
+signal OnMarioPlayerJumped(EntityRef entity);
+signal OnMarioPlayerDisqualified(EntityRef entity);
 
 event MarioPlayerJumped {
 	nothashed Frame Frame;

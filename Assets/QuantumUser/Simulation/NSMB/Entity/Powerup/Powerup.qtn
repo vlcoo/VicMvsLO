@@ -36,6 +36,8 @@ enum PowerupReserveResult : Byte {
     ReserveNewPowerup,
 }
 
+signal OnMarioPlayerCollectedPowerup(EntityRef marioEntity, MarioPlayer* mario);
+
 event PowerupBecameActive {
 	nothashed Frame Frame;
 	entity_ref Entity;
