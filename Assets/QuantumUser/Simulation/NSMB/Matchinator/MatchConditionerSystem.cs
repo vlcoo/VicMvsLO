@@ -14,10 +14,10 @@ namespace Quantum
             var triggerMap = f.ResolveList(f.Global->Rules.Triggers);
             
             triggerMap.Add(new MatchConditionerTrigger {
-                Condition = TriggerCondition.GotStar,
+                Condition = TriggerCondition.GotCoin,
                 ConditionParameter = "",
                 ConditionTarget = TriggerTarget.All,
-                Action = TriggerAction.Disqualify,
+                Action = TriggerAction.RemoveStar,
                 ActionParameter = "",
                 ActionTarget = TriggerTarget.Conditioner,
                 Constraint = TriggerConstraint.Always,
@@ -27,9 +27,11 @@ namespace Quantum
         }
 
         private unsafe void ConditionActioned(TriggerCondition condition, Frame f, EntityRef entity, string parameter = "") {
-            foreach (var trigger in f.ResolveList(f.Global->Rules.Triggers).Where(trigger => trigger.Condition == condition))
-            {
-                GetType().GetMethod($"Act{trigger.Action.ToString()}")?.Invoke(this, new object[] { f, entity, trigger.ActionParameter.ToString() });
+            foreach (var trigger in f.ResolveList(f.Global->Rules.Triggers).Where(trigger => trigger.Condition == condition)) {
+                Debug.Log(
+                    $"[MatchConditioner] <b>{condition}</b> succeeded... <b>{trigger.Action}</b>{(trigger.ActionParameter != "" ? (" (" + trigger.ActionParameter + ")") : "")} begin!!");
+                GetType().GetMethod($"Act{trigger.Action.ToString()}")?.Invoke(this,
+                    new object[] { f, entity, trigger.ActionParameter.ToString() });
             }
         }
         
@@ -82,7 +84,6 @@ namespace Quantum
         
         public void OnMarioPlayerDisqualified(Frame f, EntityRef entity) {
             ConditionActioned(TriggerCondition.Disqualified, f, entity);
-            Debug.Log("goodbye!!!");
         }
 
         public void OnMarioPlayerJumped(Frame f, EntityRef entity) {
@@ -177,8 +178,9 @@ namespace Quantum
         }
 
         public unsafe void ActDisqualify(Frame f, EntityRef entity, string parameter) {
-            f.Destroy(entity);
             f.Signals.OnMarioPlayerDisqualified(entity);
+            f.Destroy(entity);
+            GameLogicSystem.CheckForGameEnd(f);
         }
 
         public unsafe void ActStun(Frame f, EntityRef entity, string parameter) {
