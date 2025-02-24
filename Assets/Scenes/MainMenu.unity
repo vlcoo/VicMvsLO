@@ -4986,7 +4986,6 @@ GameObject:
   - component: {fileID: 98428434}
   - component: {fileID: 98428433}
   - component: {fileID: 98428432}
-  - component: {fileID: 98428431}
   m_Layer: 5
   m_Name: BtnDuplicate
   m_TagString: Untagged
@@ -5014,20 +5013,6 @@ RectTransform:
   m_AnchoredPosition: {x: 1034, y: -18}
   m_SizeDelta: {x: 40, y: 36}
   m_Pivot: {x: 1, y: 0.5}
---- !u!114 &98428431
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 98428429}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3bb27da77a7eaf647afaa5ac845ec6d7, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  roomMenu: {fileID: 252585805}
-  panelToSelect: {fileID: 950123092}
 --- !u!114 &98428432
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5075,7 +5060,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1214545170}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: NSMB.UI.MainMenu.Submenus.Prompts.StageChoosePromptSubmenu,
           Assembly-CSharp
         m_MethodName: StageSelected
@@ -28107,7 +28092,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: -20, y: 0}
-  m_SizeDelta: {x: -40, y: 112}
+  m_SizeDelta: {x: -40, y: 76}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!114 &503747077
 MonoBehaviour:
@@ -28881,7 +28866,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &527906728
 RectTransform:
   m_ObjectHideFlags: 0
@@ -28952,6 +28937,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1a89bcdd376be894186d19a55318ebad, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Index: 0
+  Parent: {fileID: 1214545173}
   txtCondition: {fileID: 1839866544}
   txtConditionParameter: {fileID: 1906307202}
   txtConditionTarget: {fileID: 1717739203}
@@ -46966,7 +46953,7 @@ MonoBehaviour:
         m_MethodName: OpenMenu
         m_Mode: 2
         m_Arguments:
-          m_ObjectArgument: {fileID: 1214545170}
+          m_ObjectArgument: {fileID: 1214545173}
           m_ObjectArgumentAssemblyTypeName: NSMB.UI.MainMenu.MainMenuSubmenu, Assembly-CSharp
           m_IntArgument: 0
           m_FloatArgument: 0
@@ -56188,7 +56175,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 791989380}
   m_Direction: 2
   m_Value: 0
-  m_Size: 0.8068466
+  m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -59222,7 +59209,7 @@ GameObject:
   - component: {fileID: 1214545169}
   - component: {fileID: 1214545172}
   - component: {fileID: 1214545171}
-  - component: {fileID: 1214545170}
+  - component: {fileID: 1214545173}
   m_Layer: 16
   m_Name: PromptTriggers
   m_TagString: Untagged
@@ -59250,29 +59237,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &1214545170
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1214545168}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 416e9a8c42af49af969ea9a3f77cbd57, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  canvas: {fileID: 2030938839}
-  ShowHeader: 1
-  IsOverlay: 0
-  RequiresMainPanel: 1
-  header: 
-  backHoldTime: 0
-  defaultSelection: {fileID: 989866155}
-  useHeaderColor: 0
-  headerColor: {r: 0, g: 0, b: 0, a: 0}
-  backButton: {fileID: 989866155}
-  success: 1
 --- !u!114 &1214545171
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -59311,6 +59275,33 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1214545168}
   m_CullTransparentMesh: 1
+--- !u!114 &1214545173
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1214545168}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e1a79cec289c07046876972c78f65921, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  canvas: {fileID: 2030938839}
+  ShowHeader: 1
+  IsOverlay: 0
+  RequiresMainPanel: 1
+  header: 
+  backHoldTime: 0
+  defaultSelection: {fileID: 0}
+  useHeaderColor: 0
+  headerColor: {r: 0, g: 0, b: 0, a: 0}
+  backButton: {fileID: 989866155}
+  triggerTemplate: {fileID: 527906727}
+  triggersParent: {fileID: 503747075}
+  counterTip: {fileID: 1229127586}
+  success: 1
+  triggers: []
 --- !u!1 &1214967828
 GameObject:
   m_ObjectHideFlags: 0
@@ -67150,7 +67141,6 @@ GameObject:
   - component: {fileID: 1427012359}
   - component: {fileID: 1427012358}
   - component: {fileID: 1427012357}
-  - component: {fileID: 1427012356}
   m_Layer: 5
   m_Name: BtnAdd
   m_TagString: Untagged
@@ -67178,20 +67168,6 @@ RectTransform:
   m_AnchoredPosition: {x: 1076.99, y: -22}
   m_SizeDelta: {x: 1074.99, y: 36}
   m_Pivot: {x: 1, y: 0.5}
---- !u!114 &1427012356
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1427012354}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3bb27da77a7eaf647afaa5ac845ec6d7, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  roomMenu: {fileID: 252585805}
-  panelToSelect: {fileID: 950123092}
 --- !u!114 &1427012357
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -67239,15 +67215,14 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1214545170}
-        m_TargetAssemblyTypeName: NSMB.UI.MainMenu.Submenus.Prompts.StageChoosePromptSubmenu,
+      - m_Target: {fileID: 1214545173}
+        m_TargetAssemblyTypeName: NSMB.UI.MainMenu.Submenus.Prompts.TriggerPromptSubmenu,
           Assembly-CSharp
-        m_MethodName: StageSelected
-        m_Mode: 2
+        m_MethodName: TriggerAdded
+        m_Mode: 1
         m_Arguments:
-          m_ObjectArgument: {fileID: 11400000, guid: d2dda38051a030947927f7fe9bce6e56,
-            type: 2}
-          m_ObjectArgumentAssemblyTypeName: VersusStageData, Quantum.Simulation
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -99150,7 +99125,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: -479.40808, y: 0}
+  m_SizeDelta: {x: -480.38452, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1644367863
 MonoBehaviour:
@@ -123222,7 +123197,6 @@ GameObject:
   - component: {fileID: 2111345299}
   - component: {fileID: 2111345298}
   - component: {fileID: 2111345297}
-  - component: {fileID: 2111345296}
   m_Layer: 5
   m_Name: BtnDelete
   m_TagString: Untagged
@@ -123250,20 +123224,6 @@ RectTransform:
   m_AnchoredPosition: {x: 1074, y: -18}
   m_SizeDelta: {x: 40, y: 36}
   m_Pivot: {x: 1, y: 0.5}
---- !u!114 &2111345296
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2111345294}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3bb27da77a7eaf647afaa5ac845ec6d7, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  roomMenu: {fileID: 252585805}
-  panelToSelect: {fileID: 950123092}
 --- !u!114 &2111345297
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -123311,15 +123271,14 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1214545170}
-        m_TargetAssemblyTypeName: NSMB.UI.MainMenu.Submenus.Prompts.StageChoosePromptSubmenu,
+      - m_Target: {fileID: 1214545173}
+        m_TargetAssemblyTypeName: NSMB.UI.MainMenu.Submenus.Prompts.TriggerPromptSubmenu,
           Assembly-CSharp
-        m_MethodName: StageSelected
+        m_MethodName: TriggerRemoved
         m_Mode: 2
         m_Arguments:
-          m_ObjectArgument: {fileID: 11400000, guid: d2dda38051a030947927f7fe9bce6e56,
-            type: 2}
-          m_ObjectArgumentAssemblyTypeName: VersusStageData, Quantum.Simulation
+          m_ObjectArgument: {fileID: 527906730}
+          m_ObjectArgumentAssemblyTypeName: TriggerListEntry, Assembly-CSharp
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 

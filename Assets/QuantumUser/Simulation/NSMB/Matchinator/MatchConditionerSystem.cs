@@ -1,5 +1,6 @@
 using Photon.Deterministic;
 using Quantum.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using Int32 = System.Int32;
@@ -10,28 +11,135 @@ namespace Quantum
         // TODO: initialize the trigger list in the correct place somewhere else!!
         public override unsafe void OnInit(Frame f) {
             // MOCK TRIGGER LIST for testing purposes...
-            f.Global->Rules.Triggers = f.AllocateList<MatchConditionerTrigger>(10);
+            f.Global->Rules.Triggers = f.AllocateList<MatchConditionerTrigger>(20);
             var triggerMap = f.ResolveList(f.Global->Rules.Triggers);
             
-            triggerMap.Add(new MatchConditionerTrigger {
-                Condition = TriggerCondition.GotCoin,
-                ConditionParameter = "",
-                ConditionTarget = TriggerTarget.All,
-                Action = TriggerAction.RemoveStar,
-                ActionParameter = "",
-                ActionTarget = TriggerTarget.Conditioner,
-                Constraint = TriggerConstraint.Always,
-                ConstraintParameter = "",
-                ConstraintTarget = TriggerTarget.All,
-            });
+            // triggerMap.Add(new MatchConditionerTrigger {
+            //     Condition = TriggerCondition.GotCoin,
+            //     ConditionParameter = "",
+            //     ConditionTarget = TriggerTarget.All,
+            //     Action = TriggerAction.RemoveStar,
+            //     ActionParameter = "",
+            //     ActionTarget = TriggerTarget.Conditioner,
+            //     Constraint = TriggerConstraint.Always,
+            //     ConstraintParameter = "",
+            //     ConstraintTarget = TriggerTarget.All,
+            // });
         }
 
-        private unsafe void ConditionActioned(TriggerCondition condition, Frame f, EntityRef entity, string parameter = "") {
+        private unsafe void ConditionActioned(TriggerCondition condition, Frame f, EntityRef conditionerEntity, string parameter = "") {
+            var conditionerIsPerson = f.Unsafe.TryGetPointer(conditionerEntity, out MarioPlayer* mario);
+            var playerData = conditionerIsPerson ? QuantumUtils.GetPlayerData(f, mario->PlayerRef) : null;
             foreach (var trigger in f.ResolveList(f.Global->Rules.Triggers).Where(trigger => trigger.Condition == condition)) {
+                // need to check for condition target... ok so if it's a match based condition (like the timer
+                // being a certain value, or the match starting) then the player ref entity will be null. the trigger
+                // gets executed if this is the case. if the player indeed exists, we check if it matches the target.
+                var conditionTargetMatches = !conditionerIsPerson;
+                
+                if (conditionerIsPerson) conditionTargetMatches = trigger.ConditionTarget switch {
+                    TriggerTarget.Any => true,
+                    TriggerTarget.Host => playerData->IsRoomHost,
+                    TriggerTarget.NonHost => !playerData->IsRoomHost,
+                    TriggerTarget.TeamA => f.Global->Rules.TeamsEnabled && mario->GetTeam(f) == 0,
+                    TriggerTarget.TeamB => f.Global->Rules.TeamsEnabled && mario->GetTeam(f) == 1,
+                    TriggerTarget.TeamC => f.Global->Rules.TeamsEnabled && mario->GetTeam(f) == 2,
+                    TriggerTarget.TeamD => f.Global->Rules.TeamsEnabled && mario->GetTeam(f) == 3,
+                    TriggerTarget.TeamE => f.Global->Rules.TeamsEnabled && mario->GetTeam(f) == 4,
+                    TriggerTarget.NonTeamA => f.Global->Rules.TeamsEnabled && mario->GetTeam(f) != 0,
+                    TriggerTarget.NonTeamB => f.Global->Rules.TeamsEnabled && mario->GetTeam(f) != 1,
+                    TriggerTarget.NonTeamC => f.Global->Rules.TeamsEnabled && mario->GetTeam(f) != 2,
+                    TriggerTarget.NonTeamD => f.Global->Rules.TeamsEnabled && mario->GetTeam(f) != 3,
+                    TriggerTarget.NonTeamE => f.Global->Rules.TeamsEnabled && mario->GetTeam(f) != 4,
+                    _ => false
+                };
+
+                if (!conditionTargetMatches) continue;
                 Debug.Log(
                     $"[MatchConditioner] <b>{condition}</b> succeeded... <b>{trigger.Action}</b>{(trigger.ActionParameter != "" ? (" (" + trigger.ActionParameter + ")") : "")} begin!!");
-                GetType().GetMethod($"Act{trigger.Action.ToString()}")?.Invoke(this,
-                    new object[] { f, entity, trigger.ActionParameter.ToString() });
+                
+                var actionerEntities = new List<EntityRef>();
+                var marioFilter = f.Filter<MarioPlayer>();
+
+                switch (trigger.ActionTarget) {
+                    case TriggerTarget.Everyone:
+                        while (marioFilter.NextUnsafe(out EntityRef e, out MarioPlayer* _)) {
+                            actionerEntities.Add(e);
+                        }
+                        break;
+                    case TriggerTarget.Conditioner:
+                        actionerEntities.Add(conditionerEntity);
+                        break;
+                    case TriggerTarget.NonConditioner:
+                        while (marioFilter.NextUnsafe(out EntityRef e, out MarioPlayer* _)) {
+                            if (e != conditionerEntity) actionerEntities.Add(e);
+                        }
+                        break;
+                    case TriggerTarget.ConditionerTeam:
+                        while (marioFilter.NextUnsafe(out EntityRef e, out MarioPlayer* m)) {
+                            if (m->GetTeam(f) == mario->GetTeam(f)) actionerEntities.Add(e);
+                        }
+                        break;
+                    case TriggerTarget.NonConditionerTeam:
+                        while (marioFilter.NextUnsafe(out EntityRef e, out MarioPlayer* m)) {
+                            if (m->GetTeam(f) != mario->GetTeam(f)) actionerEntities.Add(e);
+                        }
+                        break;
+                    case TriggerTarget.TeamA:
+                        while (marioFilter.NextUnsafe(out EntityRef e, out MarioPlayer* m)) {
+                            if (m->GetTeam(f) == 0) actionerEntities.Add(e);
+                        }
+                        break;
+                    case TriggerTarget.TeamB:
+                        while (marioFilter.NextUnsafe(out EntityRef e, out MarioPlayer* m)) {
+                            if (m->GetTeam(f) == 1) actionerEntities.Add(e);
+                        }
+                        break;
+                    case TriggerTarget.TeamC:
+                        while (marioFilter.NextUnsafe(out EntityRef e, out MarioPlayer* m)) {
+                            if (m->GetTeam(f) == 2) actionerEntities.Add(e);
+                        }
+                        break;
+                    case TriggerTarget.TeamD:
+                        while (marioFilter.NextUnsafe(out EntityRef e, out MarioPlayer* m)) {
+                            if (m->GetTeam(f) == 3) actionerEntities.Add(e);
+                        }
+                        break;
+                    case TriggerTarget.TeamE:
+                        while (marioFilter.NextUnsafe(out EntityRef e, out MarioPlayer* m)) {
+                            if (m->GetTeam(f) == 4) actionerEntities.Add(e);
+                        }
+                        break;
+                    case TriggerTarget.NonTeamA:
+                        while (marioFilter.NextUnsafe(out EntityRef e, out MarioPlayer* m)) {
+                            if (m->GetTeam(f) != 0) actionerEntities.Add(e);
+                        }
+                        break;
+                    case TriggerTarget.NonTeamB:
+                        while (marioFilter.NextUnsafe(out EntityRef e, out MarioPlayer* m)) {
+                            if (m->GetTeam(f) != 1) actionerEntities.Add(e);
+                        }
+                        break;
+                    case TriggerTarget.NonTeamC:
+                        while (marioFilter.NextUnsafe(out EntityRef e, out MarioPlayer* m)) {
+                            if (m->GetTeam(f) != 2) actionerEntities.Add(e);
+                        }
+                        break;
+                    case TriggerTarget.NonTeamD:
+                        while (marioFilter.NextUnsafe(out EntityRef e, out MarioPlayer* m)) {
+                            if (m->GetTeam(f) != 3) actionerEntities.Add(e);
+                        }
+                        break;
+                    case TriggerTarget.NonTeamE:
+                        while (marioFilter.NextUnsafe(out EntityRef e, out MarioPlayer* m)) {
+                            if (m->GetTeam(f) != 4) actionerEntities.Add(e);
+                        }
+                        break;
+                }
+
+                foreach (var actionerEntity in actionerEntities) {
+                    GetType().GetMethod($"Act{trigger.Action.ToString()}")?.Invoke(this,
+                        new object[] { f, actionerEntity, trigger.ActionParameter.ToString() });
+                }
             }
         }
         

@@ -95,9 +95,7 @@ namespace MeltySynth
                 {
                     activeVoiceCount--;
 
-                    var tmp = voices[i];
-                    voices[i] = voices[activeVoiceCount];
-                    voices[activeVoiceCount] = tmp;
+                    (voices[i], voices[activeVoiceCount]) = (voices[activeVoiceCount], voices[i]);
                 }
             }
         }

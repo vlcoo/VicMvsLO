@@ -66,34 +66,35 @@ enum TriggerCondition {
     GotCoin,
     Spawned,
     MatchStarted,
-    GotCheckpoint,
+//    GotCheckpoint,
     GotPowerup,
     LostPowerup,
-    HitBlock,
+//    HitBlock,
     Stunned,
     Frozen,
-    StunnedSomeone,
-    SteppedOnEnemy,
-    TriggeredPowerup,
+//    Thawed,
+//    StunnedSomeone,
+//    SteppedOnEnemy,
+//    TriggeredPowerup,
     Died,
     Jumped,
-    LookedXDirection,   // any, up, right, down, left
-    Ran,
+//    LookedXDirection,   // any, up, right, down, left
+//    Ran,
     ReachedCoinLimit,
     Disqualified,
-    XSecondRemaining,   // 60, 10
-    EveryXSecond, // 1, 5, 10, 15, 30, 60
-    SongBahd,
+//    XSecondRemaining,   // 60, 10
+//    EveryXSecond, // 1, 5, 10, 15, 30, 60
+//    SongBahd,
     ReachedZeroCoins,
     ReachedZeroStars,
-    GotStarcoin,
-    EnteredPipe,
-    GrabbedSomething,
-    FinishedLap,
-    TouchedGround,
-    StoppedMoving,
-    KilledSomeone,
-    HarmedSomeone,
+//    GotStarcoin,
+//    EnteredPipe,
+//    GrabbedSomething,
+//    FinishedLap,
+//    TouchedGround,
+//    StoppedMoving,
+//    KilledSomeone,
+//    HarmedSomeone,
 }
 
 enum TriggerAction {
@@ -103,20 +104,20 @@ enum TriggerAction {
     RemoveStar,
     RemoveCoin,
     GiveXPowerup,   // random, mushroom, fire, ice, propeller, shell, hammer, starman, mega, mini
-    GiveLife,
+//    GiveLife,
     Win,
     DrawMatch,
     Disqualify,
     Stun,    // bump, knockback, hardknockback
-    Dive,
-    Launch,
+//    Dive,
+//    Launch,
     Freeze,
     Harm,
     SpawnXPowerup,   // random, mushroom, fire, ice, propeller, shell, hammer, starman, mega, mini
-    SpawnXEnemy,    // random, goomba, Gkoopa, Rkoopa, Bkoopa, bulletbill, boo, spiny, bobomb
+//    SpawnXEnemy,    // random, goomba, Gkoopa, Rkoopa, Bkoopa, bulletbill, boo, spiny, bobomb
     RespawnLevel,
-    ExplodeLevel,
-    RandomTeleport,
+//    ExplodeLevel,
+//    RandomTeleport,
     RemoveReserve,
     GiveXReserve,   // random, mushroom, fire, ice, propeller, shell, hammer, starman, mega, mini
     GiveIFrames,
@@ -125,8 +126,8 @@ enum TriggerAction {
     ZeroCoins,
     ZeroStars,
     MaxCoins,
-    SpawnStar,
-    BecomeXTeam,    // random, A, B, C, D, E
+//    SpawnStar,
+//    BecomeXTeam,    // random, A, B, C, D, E
 }
 
 enum TriggerConstraint {
@@ -160,7 +161,7 @@ enum TriggerConstraint {
 }
 
 enum TriggerTarget {
-    All,
+    Everyone,
     Any,
     Random,
     Conditioner,
@@ -173,10 +174,10 @@ enum TriggerTarget {
     NonActionerTeam,
     Host,
     NonHost,
-    FirstPlace,
-    NonFirstPlace,
-    LastPlace,
-    NonLastPlace,
+//    FirstPlace,
+//    NonFirstPlace,
+//    LastPlace,
+//    NonLastPlace,
     TeamA,
     NonTeamA,
     TeamB,
@@ -265,6 +266,10 @@ synced event HostChanged {
 synced event RulesChanged {
 	Frame Frame;
 	bool LevelChanged;
+}
+
+synced event TriggersChanged {
+    Frame Frame;
 }
 
 synced event PlayerLoaded {
