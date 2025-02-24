@@ -20,8 +20,8 @@ public class ResultsHandler : MonoBehaviour {
     private Coroutine endingCoroutine, moveUiCoroutine, moveHeaderCoroutine, fadeCoroutine;
 
     public unsafe void Start() {
-        QuantumEvent.Subscribe<EventGameEnded>(this, OnGameEnded);
-        QuantumCallback.Subscribe<CallbackGameResynced>(this, OnGameResynced);
+        // QuantumEvent.Subscribe<EventGameEnded>(this, OnGameEnded);
+        // QuantumCallback.Subscribe<CallbackGameResynced>(this, OnGameResynced);
         parent.SetActive(false);
 
         if (NetworkHandler.Game != null) {

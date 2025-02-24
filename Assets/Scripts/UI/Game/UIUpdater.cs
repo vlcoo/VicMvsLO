@@ -332,8 +332,7 @@ namespace NSMB.UI.Game {
         }
 
         private IEnumerator EndGameSequence(SoundEffect resultMusic, string resultAnimationTrigger) {
-            // Wait one second before playing the music 
-            yield return new WaitForSecondsRealtime(1);
+            yield return new WaitForSecondsRealtime(0.25f);
 
             GlobalController.Instance.sfx.PlayOneShot(resultMusic);
             winTextAnimator.SetTrigger(resultAnimationTrigger);

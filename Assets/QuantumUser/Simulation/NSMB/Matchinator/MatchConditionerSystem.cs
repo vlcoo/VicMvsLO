@@ -1,5 +1,6 @@
 using Photon.Deterministic;
 using Quantum.Collections;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -64,6 +65,32 @@ namespace Quantum
                     case TriggerTarget.Everyone:
                         while (marioFilter.NextUnsafe(out EntityRef e, out MarioPlayer* _)) {
                             actionerEntities.Add(e);
+                        }
+                        break;
+                    case TriggerTarget.Randoms:
+                        while (marioFilter.NextUnsafe(out EntityRef e, out MarioPlayer* _)) {
+                            if (f.RNG->Next(0, 2) == 0) actionerEntities.Add(e);
+                        }
+                        break;
+                    case TriggerTarget.OneRandom:
+                        var i = 0;
+                        var randomIndex = f.RNG->Next(0, f.PlayerCount);
+                        while (marioFilter.NextUnsafe(out EntityRef e, out MarioPlayer* _)) {
+                            if (i == randomIndex) {
+                                actionerEntities.Add(e);
+                                break;
+                            }
+                            i++;
+                        }
+                        break;
+                    case TriggerTarget.Host:
+                        while (marioFilter.NextUnsafe(out EntityRef e, out MarioPlayer* m)) {
+                            if (QuantumUtils.GetPlayerData(f, m->PlayerRef)->IsRoomHost) actionerEntities.Add(e);
+                        }
+                        break;
+                    case TriggerTarget.NonHost:
+                        while (marioFilter.NextUnsafe(out EntityRef e, out MarioPlayer* m)) {
+                            if (!QuantumUtils.GetPlayerData(f, m->PlayerRef)->IsRoomHost) actionerEntities.Add(e);
                         }
                         break;
                     case TriggerTarget.Conditioner:
@@ -134,6 +161,13 @@ namespace Quantum
                             if (m->GetTeam(f) != 4) actionerEntities.Add(e);
                         }
                         break;
+                    case TriggerTarget.Any:
+                    case TriggerTarget.Actioner:
+                    case TriggerTarget.ActionerTeam:
+                    case TriggerTarget.NonActioner:
+                    case TriggerTarget.NonActionerTeam:
+                    default:
+                        Err("invalid action target!!"); break;
                 }
 
                 foreach (var actionerEntity in actionerEntities) {
@@ -143,7 +177,7 @@ namespace Quantum
             }
         }
         
-        private void Err(string message) {
+        private static void Err(string message) {
             Debug.LogError($"[MatchConditioner] {message}");
         }
 

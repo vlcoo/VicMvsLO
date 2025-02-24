@@ -229,7 +229,7 @@ namespace Quantum {
 
             f.Global->GameState = GameState.Ended;
             f.Events.GameStateChanged(f, GameState.Ended);
-            f.Global->GameStartFrames = (ushort) (21 * f.UpdateRate);
+            f.Global->GameStartFrames = (ushort) (5 * f.UpdateRate);
             f.SystemDisable<StartDisabledSystemGroup>();
         }
 

@@ -22494,7 +22494,7 @@ MonoBehaviour:
     m_PressedTrigger: Pressed
     m_SelectedTrigger: Selected
     m_DisabledTrigger: Disabled
-  m_Interactable: 1
+  m_Interactable: 0
   m_TargetGraphic: {fileID: 484517367}
   m_Template: {fileID: 402410597}
   m_CaptionText: {fileID: 484517367}
@@ -28092,7 +28092,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: -20, y: 0}
-  m_SizeDelta: {x: -40, y: 76}
+  m_SizeDelta: {x: -40, y: 112}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!114 &503747077
 MonoBehaviour:
@@ -32617,7 +32617,7 @@ MonoBehaviour:
     m_PressedTrigger: Pressed
     m_SelectedTrigger: Selected
     m_DisabledTrigger: Disabled
-  m_Interactable: 1
+  m_Interactable: 0
   m_TargetGraphic: {fileID: 630495239}
   m_Template: {fileID: 660467918}
   m_CaptionText: {fileID: 630495239}
@@ -56175,7 +56175,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 791989380}
   m_Direction: 2
   m_Value: 0
-  m_Size: 1
+  m_Size: 0.8068466
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -108281,7 +108281,7 @@ MonoBehaviour:
     m_PressedTrigger: Pressed
     m_SelectedTrigger: Selected
     m_DisabledTrigger: Disabled
-  m_Interactable: 1
+  m_Interactable: 0
   m_TargetGraphic: {fileID: 1820855923}
   m_Template: {fileID: 1107840734}
   m_CaptionText: {fileID: 1820855923}
@@ -109691,12 +109691,12 @@ PrefabInstance:
     - target: {fileID: 1504615058768193469, guid: fbf7edbed684f91a5af262ab11b7b0cf,
         type: 3}
       propertyPath: songs.Array.size
-      value: 2
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 1504615058768193469, guid: fbf7edbed684f91a5af262ab11b7b0cf,
         type: 3}
       propertyPath: chances.Array.size
-      value: 2
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 1504615058768193469, guid: fbf7edbed684f91a5af262ab11b7b0cf,
         type: 3}
@@ -109712,13 +109712,24 @@ PrefabInstance:
         type: 2}
     - target: {fileID: 1504615058768193469, guid: fbf7edbed684f91a5af262ab11b7b0cf,
         type: 3}
+      propertyPath: songs.Array.data[2]
+      value: 
+      objectReference: {fileID: 11400000, guid: 9414004b821b5de44b7a5145dd797232,
+        type: 2}
+    - target: {fileID: 1504615058768193469, guid: fbf7edbed684f91a5af262ab11b7b0cf,
+        type: 3}
       propertyPath: chances.Array.data[0]
-      value: 65
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 1504615058768193469, guid: fbf7edbed684f91a5af262ab11b7b0cf,
         type: 3}
       propertyPath: chances.Array.data[1]
-      value: 35
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 1504615058768193469, guid: fbf7edbed684f91a5af262ab11b7b0cf,
+        type: 3}
+      propertyPath: chances.Array.data[2]
+      value: 80
       objectReference: {fileID: 0}
     - target: {fileID: 3361589158912516817, guid: fbf7edbed684f91a5af262ab11b7b0cf,
         type: 3}

@@ -2,6 +2,7 @@ using NSMB.UI.MainMenu.Submenus.Prompts;
 using Quantum;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 
@@ -65,7 +66,8 @@ public class TriggerListEntry : MonoBehaviour {
     // some targets are exclusive to either the conditions, the actions or the constraints.
     private readonly List<TriggerTarget> _incompatibleConditionTargets = new() {
         TriggerTarget.Everyone,
-        TriggerTarget.Random,
+        TriggerTarget.OneRandom,
+        TriggerTarget.Randoms,
         TriggerTarget.Conditioner, 
         TriggerTarget.ConditionerTeam, 
         TriggerTarget.NonConditioner,
@@ -83,7 +85,8 @@ public class TriggerListEntry : MonoBehaviour {
         TriggerTarget.NonActionerTeam,
     };
     private readonly List<TriggerTarget> _incompatibleConstraintTargets = new() {
-        TriggerTarget.Random
+        TriggerTarget.OneRandom,
+        TriggerTarget.Randoms
     };
     
     // also, we have to map the parameters to each condition, action or constraint.
@@ -275,6 +278,9 @@ public class TriggerListEntry : MonoBehaviour {
             if (_incompatibleActionTargets.Contains((TriggerTarget) target)) {
                 continue;
             }
+            // if (_nonPeopleConditions.Contains(Trigger.Condition) && new [] {TriggerTarget.Conditioner, TriggerTarget.NonConditioner, TriggerTarget.ConditionerTeam, TriggerTarget.NonConditionerTeam}.Contains((TriggerTarget) target)) {
+            //     continue;
+            // }
             ddActionTarget.options.Add(new DropdownTriggerOption(i++, target.ToString(), (int) target));
         }
         

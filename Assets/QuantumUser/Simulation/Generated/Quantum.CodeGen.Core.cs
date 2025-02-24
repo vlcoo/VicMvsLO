@@ -121,6 +121,7 @@ namespace Quantum {
   }
   public enum TriggerConstraint : int {
     Always,
+    Randomly,
     IsMoving,
     IsStationary,
     IsAirborne,
@@ -181,7 +182,8 @@ namespace Quantum {
   public enum TriggerTarget : int {
     Everyone,
     Any,
-    Random,
+    OneRandom,
+    Randoms,
     Conditioner,
     ConditionerTeam,
     NonConditioner,

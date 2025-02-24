@@ -132,6 +132,7 @@ enum TriggerAction {
 
 enum TriggerConstraint {
     Always,
+    Randomly,
     IsMoving,
     IsStationary,
     IsAirborne,
@@ -163,7 +164,8 @@ enum TriggerConstraint {
 enum TriggerTarget {
     Everyone,
     Any,
-    Random,
+    OneRandom,
+    Randoms,
     Conditioner,
     ConditionerTeam,
     NonConditioner,

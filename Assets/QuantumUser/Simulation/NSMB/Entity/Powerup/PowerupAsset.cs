@@ -30,7 +30,9 @@ public class PowerupAsset : AssetObject {
 
     public FP GetModifiedChance(int starsToWin, int leaderStars, int ourStars) {
         int starDifference = leaderStars - ourStars;
-        FP bonus = LosingSpawnBonus * FPMath.Log(starDifference + 1, FP.E) * (FP._1 - ((FP) (starsToWin - leaderStars) / starsToWin));
+        if (starsToWin == 0) return SpawnChance;
+        FP bonus = LosingSpawnBonus * FPMath.Log(starDifference + 1, FP.E) *
+                   (FP._1 - ((FP) (starsToWin - leaderStars) / starsToWin));
         return FPMath.Max(0, SpawnChance + bonus);
     }
 }
