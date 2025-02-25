@@ -842,9 +842,9 @@ namespace Quantum {
   }
   [StructLayout(LayoutKind.Explicit)]
   public unsafe partial struct GameRules {
-    public const Int32 SIZE = 48;
+    public const Int32 SIZE = 112;
     public const Int32 ALIGNMENT = 8;
-    [FieldOffset(40)]
+    [FieldOffset(104)]
     public AssetRef<Map> Stage;
     [FieldOffset(12)]
     public Int32 StarsToWin;
@@ -854,7 +854,7 @@ namespace Quantum {
     public Int32 Lives;
     [FieldOffset(16)]
     public Int32 TimerSeconds;
-    [FieldOffset(28)]
+    [FieldOffset(92)]
     public QBoolean TeamsEnabled;
     [FieldOffset(20)]
     public QBoolean CustomPowerupsEnabled;
@@ -862,8 +862,40 @@ namespace Quantum {
     public QBoolean DrawOnTimeUp;
     [FieldOffset(4)]
     public Int32 Laps;
-    [FieldOffset(32)]
+    [FieldOffset(96)]
     public QListPtr<MatchConditionerTrigger> Triggers;
+    [FieldOffset(80)]
+    public QBoolean SNoReserve;
+    [FieldOffset(56)]
+    public QBoolean SNoDroppedStars;
+    [FieldOffset(36)]
+    public QBoolean SInstantDeath;
+    [FieldOffset(52)]
+    public QBoolean SNoDefrost;
+    [FieldOffset(48)]
+    public QBoolean SNoCollisions;
+    [FieldOffset(64)]
+    public QBoolean SNoIframes;
+    [FieldOffset(32)]
+    public QBoolean SHideSeek;
+    [FieldOffset(60)]
+    public QBoolean SNoEnemies;
+    [FieldOffset(40)]
+    public QBoolean SNoBahs;
+    [FieldOffset(84)]
+    public QBoolean SPitWrap;
+    [FieldOffset(28)]
+    public QBoolean SAllBricks;
+    [FieldOffset(68)]
+    public QBoolean SNoLooping;
+    [FieldOffset(44)]
+    public QBoolean SNoCoins;
+    [FieldOffset(76)]
+    public QBoolean SNoPowerups;
+    [FieldOffset(72)]
+    public QBoolean SNoMinimap;
+    [FieldOffset(88)]
+    public QBoolean SShowCoinCount;
     public override Int32 GetHashCode() {
       unchecked { 
         var hash = 443;
@@ -877,6 +909,22 @@ namespace Quantum {
         hash = hash * 31 + DrawOnTimeUp.GetHashCode();
         hash = hash * 31 + Laps.GetHashCode();
         hash = hash * 31 + Triggers.GetHashCode();
+        hash = hash * 31 + SNoReserve.GetHashCode();
+        hash = hash * 31 + SNoDroppedStars.GetHashCode();
+        hash = hash * 31 + SInstantDeath.GetHashCode();
+        hash = hash * 31 + SNoDefrost.GetHashCode();
+        hash = hash * 31 + SNoCollisions.GetHashCode();
+        hash = hash * 31 + SNoIframes.GetHashCode();
+        hash = hash * 31 + SHideSeek.GetHashCode();
+        hash = hash * 31 + SNoEnemies.GetHashCode();
+        hash = hash * 31 + SNoBahs.GetHashCode();
+        hash = hash * 31 + SPitWrap.GetHashCode();
+        hash = hash * 31 + SAllBricks.GetHashCode();
+        hash = hash * 31 + SNoLooping.GetHashCode();
+        hash = hash * 31 + SNoCoins.GetHashCode();
+        hash = hash * 31 + SNoPowerups.GetHashCode();
+        hash = hash * 31 + SNoMinimap.GetHashCode();
+        hash = hash * 31 + SShowCoinCount.GetHashCode();
         return hash;
       }
     }
@@ -892,6 +940,22 @@ namespace Quantum {
         serializer.Stream.Serialize(&p->TimerSeconds);
         QBoolean.Serialize(&p->CustomPowerupsEnabled, serializer);
         QBoolean.Serialize(&p->DrawOnTimeUp, serializer);
+        QBoolean.Serialize(&p->SAllBricks, serializer);
+        QBoolean.Serialize(&p->SHideSeek, serializer);
+        QBoolean.Serialize(&p->SInstantDeath, serializer);
+        QBoolean.Serialize(&p->SNoBahs, serializer);
+        QBoolean.Serialize(&p->SNoCoins, serializer);
+        QBoolean.Serialize(&p->SNoCollisions, serializer);
+        QBoolean.Serialize(&p->SNoDefrost, serializer);
+        QBoolean.Serialize(&p->SNoDroppedStars, serializer);
+        QBoolean.Serialize(&p->SNoEnemies, serializer);
+        QBoolean.Serialize(&p->SNoIframes, serializer);
+        QBoolean.Serialize(&p->SNoLooping, serializer);
+        QBoolean.Serialize(&p->SNoMinimap, serializer);
+        QBoolean.Serialize(&p->SNoPowerups, serializer);
+        QBoolean.Serialize(&p->SNoReserve, serializer);
+        QBoolean.Serialize(&p->SPitWrap, serializer);
+        QBoolean.Serialize(&p->SShowCoinCount, serializer);
         QBoolean.Serialize(&p->TeamsEnabled, serializer);
         QList.Serialize(&p->Triggers, serializer, Statics.SerializeMatchConditionerTrigger);
         AssetRef.Serialize(&p->Stage, serializer);
@@ -1184,7 +1248,7 @@ namespace Quantum {
   }
   [StructLayout(LayoutKind.Explicit)]
   public unsafe partial struct _globals_ {
-    public const Int32 SIZE = 2552;
+    public const Int32 SIZE = 2616;
     public const Int32 ALIGNMENT = 8;
     [FieldOffset(0)]
     public AssetRef<Map> Map;
@@ -1219,7 +1283,7 @@ namespace Quantum {
     public BitSet64 UsedStarSpawns;
     [FieldOffset(1660)]
     public Int32 UsedStarSpawnCount;
-    [FieldOffset(1704)]
+    [FieldOffset(2504)]
     public GameRules Rules;
     [FieldOffset(1642)]
     public GameState GameState;
@@ -1234,7 +1298,7 @@ namespace Quantum {
     [FieldOffset(1672)]
     [AllocateOnComponentAdded()]
     public QDictionaryPtr<PlayerRef, EntityRef> PlayerDatas;
-    [FieldOffset(1752)]
+    [FieldOffset(1704)]
     [FramePrinter.FixedArrayAttribute(typeof(PlayerInformation), 10)]
     private fixed Byte _PlayerInfo_[800];
     [FieldOffset(1640)]
@@ -1328,8 +1392,8 @@ namespace Quantum {
         Quantum.BitSet64.Serialize(&p->UsedStarSpawns, serializer);
         EntityRef.Serialize(&p->MainBigStar, serializer);
         FP.Serialize(&p->Timer, serializer);
-        Quantum.GameRules.Serialize(&p->Rules, serializer);
         FixedArray.Serialize(p->PlayerInfo, serializer, Statics.SerializePlayerInformation);
+        Quantum.GameRules.Serialize(&p->Rules, serializer);
     }
   }
   [StructLayout(LayoutKind.Explicit)]

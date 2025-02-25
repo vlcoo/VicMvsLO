@@ -39,6 +39,23 @@ struct GameRules {
 	bool DrawOnTimeUp;
 	int Laps;
 	list<MatchConditionerTrigger> Triggers;
+	
+	bool SNoReserve;
+	bool SNoDroppedStars;
+	bool SInstantDeath;
+	bool SNoDefrost;
+	bool SNoCollisions;
+	bool SNoIframes;
+	bool SHideSeek;
+	bool SNoEnemies;
+	bool SNoBahs;
+	bool SPitWrap;
+	bool SAllBricks;
+	bool SNoLooping;
+	bool SNoCoins;
+	bool SNoPowerups;
+	bool SNoMinimap;
+	bool SShowCoinCount;
 }
 
 enum GameState : Byte {

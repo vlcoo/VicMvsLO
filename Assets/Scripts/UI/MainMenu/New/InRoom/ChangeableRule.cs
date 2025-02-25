@@ -19,6 +19,7 @@ public class ChangeableRule : Selectable, ISubmitHandler, IPointerClickHandler, 
     }
     public virtual bool CanIncreaseValue => true;
     public virtual bool CanDecreaseValue => true;
+    public object Value => value; 
 
     //---Serialized Variables
     [SerializeField] protected MainMenuCanvas canvas;
@@ -46,7 +47,7 @@ public class ChangeableRule : Selectable, ISubmitHandler, IPointerClickHandler, 
         TranslationManager.OnLanguageChanged -= OnLanguageChanged;
     }
 
-    public unsafe void OnSubmit(BaseEventData eventData) {
+    public virtual unsafe void OnSubmit(BaseEventData eventData) {
         if (Editing) {
             Editing = false;
             canvas.PlaySound(SoundEffect.UI_Back);
@@ -85,7 +86,7 @@ public class ChangeableRule : Selectable, ISubmitHandler, IPointerClickHandler, 
         }
     }
 
-    public unsafe void OnPointerClick(PointerEventData eventData) {
+    public virtual unsafe void OnPointerClick(PointerEventData eventData) {
         QuantumGame game = NetworkHandler.Game;
         PlayerRef host = QuantumUtils.GetHostPlayer(game.Frames.Predicted, out _);
         if (!game.PlayerIsLocal(host)) {
@@ -168,6 +169,22 @@ public class ChangeableRule : Selectable, ISubmitHandler, IPointerClickHandler, 
             CommandChangeRules.Rules.CustomPowerupsEnabled => (bool) rules.CustomPowerupsEnabled,
             CommandChangeRules.Rules.TeamsEnabled => (bool) rules.TeamsEnabled,
             CommandChangeRules.Rules.Laps => rules.Laps,
+            CommandChangeRules.Rules.SNoReserve => (bool) rules.SNoReserve,
+            CommandChangeRules.Rules.SNoDroppedStars => (bool) rules.SNoDroppedStars,
+            CommandChangeRules.Rules.SInstantDeath => (bool) rules.SInstantDeath,
+            CommandChangeRules.Rules.SNoDefrost => (bool) rules.SNoDefrost,
+            CommandChangeRules.Rules.SNoCollisions => (bool) rules.SNoCollisions,
+            CommandChangeRules.Rules.SNoIframes => (bool) rules.SNoIframes,
+            CommandChangeRules.Rules.SHideSeek => (bool) rules.SHideSeek,
+            CommandChangeRules.Rules.SNoEnemies => (bool) rules.SNoEnemies,
+            CommandChangeRules.Rules.SNoBahs => (bool) rules.SNoBahs,
+            CommandChangeRules.Rules.SPitWrap => (bool) rules.SPitWrap,
+            CommandChangeRules.Rules.SAllBricks => (bool) rules.SAllBricks,
+            CommandChangeRules.Rules.SNoLooping => (bool) rules.SNoLooping,
+            CommandChangeRules.Rules.SNoCoins => (bool) rules.SNoCoins,
+            CommandChangeRules.Rules.SNoPowerups => (bool) rules.SNoPowerups,
+            CommandChangeRules.Rules.SNoMinimap => (bool) rules.SNoMinimap,
+            CommandChangeRules.Rules.SShowCoinCount => (bool) rules.SShowCoinCount,
             _ => null
         };
 

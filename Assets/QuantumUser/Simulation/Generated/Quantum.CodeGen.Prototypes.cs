@@ -368,6 +368,22 @@ namespace Quantum.Prototypes {
     public Int32 Laps;
     [DynamicCollectionAttribute()]
     public Quantum.Prototypes.MatchConditionerTriggerPrototype[] Triggers = {};
+    public QBoolean SNoReserve;
+    public QBoolean SNoDroppedStars;
+    public QBoolean SInstantDeath;
+    public QBoolean SNoDefrost;
+    public QBoolean SNoCollisions;
+    public QBoolean SNoIframes;
+    public QBoolean SHideSeek;
+    public QBoolean SNoEnemies;
+    public QBoolean SNoBahs;
+    public QBoolean SPitWrap;
+    public QBoolean SAllBricks;
+    public QBoolean SNoLooping;
+    public QBoolean SNoCoins;
+    public QBoolean SNoPowerups;
+    public QBoolean SNoMinimap;
+    public QBoolean SShowCoinCount;
     partial void MaterializeUser(Frame frame, ref Quantum.GameRules result, in PrototypeMaterializationContext context);
     public void Materialize(Frame frame, ref Quantum.GameRules result, in PrototypeMaterializationContext context = default) {
         result.Stage = this.Stage;
@@ -389,6 +405,22 @@ namespace Quantum.Prototypes {
             list.Add(tmp);
           }
         }
+        result.SNoReserve = this.SNoReserve;
+        result.SNoDroppedStars = this.SNoDroppedStars;
+        result.SInstantDeath = this.SInstantDeath;
+        result.SNoDefrost = this.SNoDefrost;
+        result.SNoCollisions = this.SNoCollisions;
+        result.SNoIframes = this.SNoIframes;
+        result.SHideSeek = this.SHideSeek;
+        result.SNoEnemies = this.SNoEnemies;
+        result.SNoBahs = this.SNoBahs;
+        result.SPitWrap = this.SPitWrap;
+        result.SAllBricks = this.SAllBricks;
+        result.SNoLooping = this.SNoLooping;
+        result.SNoCoins = this.SNoCoins;
+        result.SNoPowerups = this.SNoPowerups;
+        result.SNoMinimap = this.SNoMinimap;
+        result.SShowCoinCount = this.SShowCoinCount;
         MaterializeUser(frame, ref result, in context);
     }
   }
