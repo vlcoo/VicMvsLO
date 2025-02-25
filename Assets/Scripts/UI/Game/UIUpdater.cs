@@ -236,7 +236,7 @@ namespace NSMB.UI.Game {
             bool teamsEnabled = rules.TeamsEnabled;
             bool livesEnabled = rules.IsLivesEnabled;
             bool timerEnabled = rules.TimerSeconds > 0;
-            bool testEnabled = false;
+            bool minimapBoosEnabled = rules.SNoMinimap;
 
             if (rules.TeamsEnabled) {
                 byte teamIndex = mario->GetTeam(f);
@@ -286,8 +286,8 @@ namespace NSMB.UI.Game {
                 timerParent.SetActive(false);
             }
             
-            PlayerTrackIcon.HideAllPlayerIcons = testEnabled;
-            boos.SetActive(testEnabled);
+            PlayerTrackIcon.HideAllPlayerIcons = minimapBoosEnabled;
+            boos.SetActive(minimapBoosEnabled);
         }
 
         public TrackIcon CreateTrackIcon(Frame f, EntityRef entity, Transform target) {

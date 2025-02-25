@@ -1,6 +1,6 @@
 namespace Quantum {
-
-    public unsafe class EnemySystem : SystemMainThreadFilterStage<EnemySystem.Filter>, ISignalOnStageReset, ISignalOnTryLiquidSplash, ISignalOnBeforeInteraction,
+    public unsafe class EnemySystem : SystemMainThreadFilterStage<EnemySystem.Filter>, ISignalOnStageReset,
+        ISignalOnTryLiquidSplash, ISignalOnBeforeInteraction,
         ISignalOnEnemyDespawned, ISignalOnEnemyRespawned {
         public struct Filter {
             public EntityRef Entity;
@@ -21,12 +21,15 @@ namespace Quantum {
             var physicsObject = filter.PhysicsObject;
             var collider = filter.Collider;
 
+            // if (f.Global->Rules.SNoEnemies) enemy->IsActive = false;
+
             if (!enemy->IsActive) {
                 return;
             }
 
             // Despawn off bottom of stage
-            if (transform->Position.Y + collider->Shape.Box.Extents.Y + collider->Shape.Centroid.Y < stage.StageWorldMin.Y) {
+            if (transform->Position.Y + collider->Shape.Box.Extents.Y + collider->Shape.Centroid.Y <
+                stage.StageWorldMin.Y) {
                 enemy->IsActive = false;
                 enemy->IsDead = true;
                 physicsObject->IsFrozen = true;
@@ -50,11 +53,13 @@ namespace Quantum {
             var transformA = f.Unsafe.GetPointer<Transform2D>(entityA);
             var transformB = f.Unsafe.GetPointer<Transform2D>(entityB);
 
-            QuantumUtils.UnwrapWorldLocations(f, transformA->Position, transformB->Position, out var ourPos, out var theirPos);
+            QuantumUtils.UnwrapWorldLocations(f, transformA->Position, transformB->Position, out var ourPos,
+                out var theirPos);
             bool right = ourPos.X > theirPos.X;
             if (ourPos.X == theirPos.X) {
                 right = ourPos.Y < theirPos.Y;
             }
+
             enemyA->ChangeFacingRight(f, entityA, right);
             if (turnBoth) {
                 enemyB->ChangeFacingRight(f, entityB, !right);
@@ -62,6 +67,14 @@ namespace Quantum {
         }
 
         public void OnStageReset(Frame f, QBoolean full) {
+            if (f.Global->Rules.SNoEnemies) {
+                var enemyFilter = f.Filter<Enemy>();
+                while (enemyFilter.NextUnsafe(out EntityRef entity, out Enemy* _)) {
+                    f.Destroy(entity);
+                }
+                return;
+            }
+            
             var filter = f.Filter<Enemy, Transform2D>();
 
             while (filter.NextUnsafe(out EntityRef entity, out Enemy* enemy, out Transform2D* transform)) {
@@ -71,11 +84,13 @@ namespace Quantum {
                         || physicsObject->DisableCollision) {
                         continue;
                     }
+
                     if (!f.Unsafe.TryGetPointer(entity, out PhysicsCollider2D* collider)) {
                         continue;
                     }
 
-                    if (PhysicsObjectSystem.BoxInGround((FrameThreadSafe) f, transform->Position, collider->Shape, entity: entity)) {
+                    if (PhysicsObjectSystem.BoxInGround((FrameThreadSafe) f, transform->Position, collider->Shape,
+                            entity: entity)) {
                         f.Signals.OnEnemyKilledByStageReset(entity);
                     }
                 } else {
@@ -85,7 +100,8 @@ namespace Quantum {
                     }
 
                     if (!enemy->IgnorePlayerWhenRespawning) {
-                        Physics2D.HitCollection playerHits = f.Physics2D.OverlapShape(enemy->Spawnpoint, 0, f.Context.CircleRadiusTwo, f.Context.PlayerOnlyMask);
+                        Physics2D.HitCollection playerHits = f.Physics2D.OverlapShape(enemy->Spawnpoint, 0,
+                            f.Context.CircleRadiusTwo, f.Context.PlayerOnlyMask);
                         if (playerHits.Count > 0) {
                             continue;
                         }
@@ -118,7 +134,6 @@ namespace Quantum {
         public void OnEnemyRespawned(Frame f, EntityRef entity) {
             if (f.Has<Enemy>(entity) && f.Unsafe.TryGetPointer(entity, out PhysicsCollider2D* collider)) {
                 collider->Enabled = true;
-
             }
         }
     }

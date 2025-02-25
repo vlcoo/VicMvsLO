@@ -182,6 +182,8 @@ namespace NSMB.Entities.Player {
             AllMarioPlayers.RemoveWhere(ma => ma == null);
             AllMarioPlayers.Add(this);
             MarioPlayerInitialized?.Invoke(Game, f, this);
+            
+            if (f.Global->Rules.SHideSeek) models.transform.position = new Vector3(models.transform.position.x, models.transform.position.y, 6f);
 
             forceUpdate = true;
             OnUpdateView();

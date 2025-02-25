@@ -52,7 +52,7 @@ namespace Quantum {
                     continue;
                 }
 
-                if (QuantumUtils.Decrement(ref launcher->TimeToShootFrames)) {
+                if (!f.Global->Rules.SNoEnemies && QuantumUtils.Decrement(ref launcher->TimeToShootFrames)) {
                     // Attempt a shot
                     bool right = smallestDistance < 0;
 

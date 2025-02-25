@@ -1914,6 +1914,8 @@ namespace Quantum {
         }
 
         public static void OnMarioMarioInteraction(Frame f, EntityRef marioAEntity, EntityRef marioBEntity) {
+            if (f.Global->Rules.SNoCollisions) return;
+            
             var marioA = f.Unsafe.GetPointer<MarioPlayer>(marioAEntity);
             var marioB = f.Unsafe.GetPointer<MarioPlayer>(marioBEntity);
 
