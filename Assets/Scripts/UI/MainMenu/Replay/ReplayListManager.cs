@@ -325,7 +325,7 @@ public class ReplayListManager : Selectable {
                 if (QuantumUnityDB.TryGetGlobalAsset(replay.ReplayFile.Rules.Stage, out Map map)
                     && QuantumUnityDB.TryGetGlobalAsset(map.UserAsset, out VersusStageData stage)) {
 
-                    if (tm.GetTranslation(stage.TranslationKey).Contains(searchField.text, StringComparison.InvariantCultureIgnoreCase)) {
+                    if (stage.LegalEnglishName.Contains(searchField.text, StringComparison.InvariantCultureIgnoreCase)) {
                         continue;
                     }
                 }

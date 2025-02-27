@@ -85,7 +85,7 @@ public class StageChangeableRule : ChangeableRule {
         if (value is AssetRef<Map> mapAsset
             && QuantumUnityDB.TryGetGlobalAsset(mapAsset, out Map map)
             && QuantumUnityDB.TryGetGlobalAsset(map.UserAsset, out VersusStageData stage)) {
-            stageName = GlobalController.Instance.translationManager.GetTranslation(stage.TranslationKey);
+            stageName = stage.LegalEnglishName;
             sprite = stage.Icon;
         } else {
             stageName = "???";

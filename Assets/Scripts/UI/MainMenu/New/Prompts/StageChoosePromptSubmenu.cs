@@ -26,7 +26,7 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
             QuantumGame game = NetworkHandler.Game;
             var allStages = game.Configurations.Simulation.AllStages;
             var selectedStage = allStages.FirstOrDefault(map => 
-                ((VersusStageData)QuantumUnityDB.GetGlobalAsset(map.UserAsset)).TranslationKey == stage.TranslationKey);
+                ((VersusStageData)QuantumUnityDB.GetGlobalAsset(map.UserAsset)).LegalEnglishName == stage.LegalEnglishName);
             
             if (selectedStage == null) {
                 Debug.LogError("Stage not found in allStages");

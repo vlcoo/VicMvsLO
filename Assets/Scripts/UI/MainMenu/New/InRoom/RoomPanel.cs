@@ -74,7 +74,7 @@ namespace NSMB.UI.MainMenu.Submenus {
         }
 
         private void ChangeStage(VersusStageData newStage) {
-            stageNameText.text = GlobalController.Instance.translationManager.GetTranslation(newStage.TranslationKey);
+            stageNameText.text = newStage.LegalEnglishName;
             // stagePreviewImage.sprite = newStage.Icon;
             currentStage = newStage;
         }
@@ -101,7 +101,7 @@ namespace NSMB.UI.MainMenu.Submenus {
                 return;
             }
 
-            stageNameText.text = tm.GetTranslation(currentStage.TranslationKey);
+            stageNameText.text = currentStage.LegalEnglishName;
         }
     }
 }

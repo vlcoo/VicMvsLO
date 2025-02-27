@@ -78,7 +78,7 @@ namespace NSMB.UI.MainMenu {
                 && QuantumUnityDB.TryGetGlobalAsset(new AssetRef<Map>(guid), out Map map)
                 && QuantumUnityDB.TryGetGlobalAsset(map.UserAsset, out VersusStageData stage)) {
 
-                stageName = tm.GetTranslation(stage.TranslationKey);
+                stageName = stage.LegalEnglishName;
             } else {
                 stageName = "???";
             }
