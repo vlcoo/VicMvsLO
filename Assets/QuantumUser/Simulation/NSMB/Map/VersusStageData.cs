@@ -45,12 +45,6 @@ public unsafe class VersusStageData : AssetObject {
     public bool SpawnBigPowerups = true;
     public bool SpawnVerticalPowerups = true;
 
-    [Header("-- Music")]
-    public LoopingMusicData[] MainMusic;
-    public LoopingMusicData InvincibleMusic;
-    public LoopingMusicData MegaMushroomMusic;
-
-
     [HideInInspector] public StageTileInstance[] TileData;
     [HideInInspector] public FPVector2[] BigStarSpawnpoints;
 

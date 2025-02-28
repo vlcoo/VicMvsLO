@@ -5,6 +5,6 @@ using TMPro;
 public class SetDevBuildDate : MonoBehaviour {
     private void Start() {
         TMP_Text text = GetComponent<TMP_Text>();
-        text.text = $"vcmi {Application.version} (dev-1) based on vanilla from {BuildInfo.SOURCE_BUILD_TIME}";
+        text.text = $"vcmi {Application.version} (dev-2) based on vanilla from {BuildInfo.SOURCE_BUILD_TIME}";
     }
 }
