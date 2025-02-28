@@ -4,7 +4,6 @@ using NSMB.UI.MainMenu;
 using NSMB.UI.MainMenu.Submenus.Prompts;
 using NSMB.Utils;
 using Quantum;
-using SFB;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -250,17 +249,16 @@ public class ReplayListManager : Selectable {
     }
 
     public void OnImportClicked() {
-        TranslationManager tm = GlobalController.Instance.translationManager;
-        string[] selected = StandaloneFileBrowser.OpenFilePanel(tm.GetTranslation("ui.extras.replays.actions.import"), "", "mvlreplay", false);
+        var paths = DialogModule.OpenFilesBrowser("vcmi Replay files|*.mvlreplay").Split("\n");
 
-        foreach (var filepath in selected) {
+        foreach (var filepath in paths) {
             try {
                 using FileStream stream = new FileStream(filepath, FileMode.Open);
                 if (BinaryReplayFile.TryLoadFromFile(stream, out BinaryReplayFile parsedReplay)) {
                     // Move into the replays folder
                     string newPath = Path.Combine(ReplayDirectory, "saved", parsedReplay.UnixTimestamp + ".mvlreplay");
                     File.Copy(filepath, newPath, false);
-
+        
                     Replay newReplay = new Replay {
                         FilePath = filepath,
                         ReplayFile = parsedReplay,

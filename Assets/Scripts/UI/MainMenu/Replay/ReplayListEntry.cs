@@ -1,7 +1,6 @@
 using NSMB.Translation;
 using NSMB.UI.MainMenu;
 using NSMB.Utils;
-using SFB;
 using System;
 using System.Collections;
 using System.IO;
@@ -139,15 +138,13 @@ public class ReplayListEntry : MonoBehaviour {
     }
 
     public void OnExportClick() {
-        TranslationManager tm = GlobalController.Instance.translationManager;
-        StandaloneFileBrowser.SaveFilePanelAsync(tm.GetTranslation("ui.extras.replays.actions.export.prompt"), null, Replay.ReplayFile.GetDisplayName(), "mvlreplay", (file) => {
-            if (string.IsNullOrWhiteSpace(file)) {
-                return;
-            }
+        var path = DialogModule.SaveFileBrowser("vcmi Replay files|*.mvlreplay", "vcmiReplay.mvlreplay");
+        if (string.IsNullOrWhiteSpace(path)) {
+            return;
+        }
 
-            using FileStream stream = new(file, FileMode.OpenOrCreate);
-            Replay.ReplayFile.WriteToStream(stream);
-        });
+        using FileStream stream = new(path, FileMode.OpenOrCreate);
+        Replay.ReplayFile.WriteToStream(stream);
     }
 
     public void OnDeleteClick() {
