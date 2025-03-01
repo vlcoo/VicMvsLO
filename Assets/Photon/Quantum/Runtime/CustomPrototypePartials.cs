@@ -21,6 +21,23 @@ namespace Quantum {
     }
   }
 
+  public partial class QPrototypeIndividualSquishy {
+    public void OnValidate() {
+      ValidationUtility.SafeOnValidate(() => {
+        if (!this) {
+          return;
+        }
+        SpriteRenderer sRenderer = GetComponentInChildren<SpriteRenderer>();
+        sRenderer.size = new Vector2(Prototype.OriginalWidth.AsFloat, Prototype.OriginalHeight.AsFloat);
+      });
+
+      QuantumEntityPrototype entityPrototype = GetComponent<QuantumEntityPrototype>();
+      Shape2DConfig shape = entityPrototype.PhysicsCollider.Shape2D;
+      shape.PositionOffset = new FPVector2(Prototype.OriginalWidth / 4, Prototype.OriginalHeight / 4) - new FPVector2(Prototype.OriginalWidth / 4, Prototype.OriginalHeight / 4);
+      shape.BoxExtents = new FPVector2(Prototype.OriginalWidth / 4, Prototype.OriginalHeight / 4);
+    }
+  }
+
   public static class ValidationUtility {
     public static void SafeOnValidate(Action onValidateAction) {
 #if UNITY_EDITOR

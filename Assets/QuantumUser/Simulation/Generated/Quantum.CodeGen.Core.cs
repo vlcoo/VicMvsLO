@@ -2111,6 +2111,28 @@ namespace Quantum {
     }
   }
   [StructLayout(LayoutKind.Explicit)]
+  public unsafe partial struct IndividualSquishy : Quantum.IComponent {
+    public const Int32 SIZE = 16;
+    public const Int32 ALIGNMENT = 8;
+    [FieldOffset(0)]
+    public FP OriginalHeight;
+    [FieldOffset(8)]
+    public FP OriginalWidth;
+    public override Int32 GetHashCode() {
+      unchecked { 
+        var hash = 12917;
+        hash = hash * 31 + OriginalHeight.GetHashCode();
+        hash = hash * 31 + OriginalWidth.GetHashCode();
+        return hash;
+      }
+    }
+    public static void Serialize(void* ptr, FrameSerializer serializer) {
+        var p = (IndividualSquishy*)ptr;
+        FP.Serialize(&p->OriginalHeight, serializer);
+        FP.Serialize(&p->OriginalWidth, serializer);
+    }
+  }
+  [StructLayout(LayoutKind.Explicit)]
   public unsafe partial struct Interactable : Quantum.IComponent {
     public const Int32 SIZE = 24;
     public const Int32 ALIGNMENT = 8;
@@ -3662,6 +3684,8 @@ namespace Quantum {
       BuildSignalsArrayOnComponentRemoved<Quantum.Holdable>();
       BuildSignalsArrayOnComponentAdded<Quantum.IceBlock>();
       BuildSignalsArrayOnComponentRemoved<Quantum.IceBlock>();
+      BuildSignalsArrayOnComponentAdded<Quantum.IndividualSquishy>();
+      BuildSignalsArrayOnComponentRemoved<Quantum.IndividualSquishy>();
       BuildSignalsArrayOnComponentAdded<Quantum.Interactable>();
       BuildSignalsArrayOnComponentRemoved<Quantum.Interactable>();
       BuildSignalsArrayOnComponentAdded<Quantum.InvisibleBlock>();
@@ -4166,6 +4190,7 @@ namespace Quantum {
       typeRegistry.Register(typeof(Quantum.Holdable), Quantum.Holdable.SIZE);
       typeRegistry.Register(typeof(Quantum.IceBlock), Quantum.IceBlock.SIZE);
       typeRegistry.Register(typeof(IceBlockBreakReason), 1);
+      typeRegistry.Register(typeof(Quantum.IndividualSquishy), Quantum.IndividualSquishy.SIZE);
       typeRegistry.Register(typeof(Quantum.Input), Quantum.Input.SIZE);
       typeRegistry.Register(typeof(Quantum.InputButtons), 4);
       typeRegistry.Register(typeof(Quantum.Interactable), Quantum.Interactable.SIZE);
@@ -4244,7 +4269,7 @@ namespace Quantum {
       typeRegistry.Register(typeof(Quantum._globals_), Quantum._globals_.SIZE);
     }
     static partial void InitComponentTypeIdGen() {
-      ComponentTypeId.Reset(ComponentTypeId.BuiltInComponentCount + 33)
+      ComponentTypeId.Reset(ComponentTypeId.BuiltInComponentCount + 34)
         .AddBuiltInComponents()
         .Add<Quantum.BetterPhysicsObject>(Quantum.BetterPhysicsObject.Serialize, Quantum.BetterPhysicsObject.OnAdded, Quantum.BetterPhysicsObject.OnRemoved, ComponentFlags.None)
         .Add<Quantum.BigStar>(Quantum.BigStar.Serialize, null, null, ComponentFlags.None)
@@ -4265,6 +4290,7 @@ namespace Quantum {
         .Add<Quantum.Goomba>(Quantum.Goomba.Serialize, null, null, ComponentFlags.None)
         .Add<Quantum.Holdable>(Quantum.Holdable.Serialize, null, null, ComponentFlags.None)
         .Add<Quantum.IceBlock>(Quantum.IceBlock.Serialize, null, null, ComponentFlags.None)
+        .Add<Quantum.IndividualSquishy>(Quantum.IndividualSquishy.Serialize, null, null, ComponentFlags.None)
         .Add<Quantum.Interactable>(Quantum.Interactable.Serialize, null, null, ComponentFlags.None)
         .Add<Quantum.InvisibleBlock>(Quantum.InvisibleBlock.Serialize, null, null, ComponentFlags.None)
         .Add<Quantum.Koopa>(Quantum.Koopa.Serialize, null, null, ComponentFlags.None)
