@@ -427,7 +427,9 @@ namespace Quantum.Prototypes {
   [System.SerializableAttribute()]
   [Quantum.Prototypes.Prototype(typeof(Quantum.GenericMover))]
   public unsafe partial class GenericMoverPrototype : ComponentPrototype<Quantum.GenericMover> {
-    public AssetRef<GenericMoverAsset> MoverAsset;
+    [DynamicCollectionAttribute()]
+    public Quantum.Prototypes.PathNodePrototype[] Path = {};
+    public Quantum.QEnum32<LoopingMode> LoopingMode;
     public FP StartOffset;
     partial void MaterializeUser(Frame frame, ref Quantum.GenericMover result, in PrototypeMaterializationContext context);
     public override Boolean AddToEntity(FrameBase f, EntityRef entity, in PrototypeMaterializationContext context) {
@@ -436,7 +438,17 @@ namespace Quantum.Prototypes {
         return f.Set(entity, component) == SetResult.ComponentAdded;
     }
     public void Materialize(Frame frame, ref Quantum.GenericMover result, in PrototypeMaterializationContext context = default) {
-        result.MoverAsset = this.MoverAsset;
+        if (this.Path.Length == 0) {
+          result.Path = default;
+        } else {
+          var list = frame.AllocateList(out result.Path, this.Path.Length);
+          for (int i = 0; i < this.Path.Length; ++i) {
+            Quantum.PathNode tmp = default;
+            this.Path[i].Materialize(frame, ref tmp, in context);
+            list.Add(tmp);
+          }
+        }
+        result.LoopingMode = this.LoopingMode;
         result.StartOffset = this.StartOffset;
         MaterializeUser(frame, ref result, in context);
     }
@@ -682,6 +694,22 @@ namespace Quantum.Prototypes {
     public void Materialize(Frame frame, ref Quantum.MovingPlatform result, in PrototypeMaterializationContext context = default) {
         result.Velocity = this.Velocity;
         result.IgnoreMovement = this.IgnoreMovement;
+        MaterializeUser(frame, ref result, in context);
+    }
+  }
+  [System.SerializableAttribute()]
+  [Quantum.Prototypes.Prototype(typeof(Quantum.PathNode))]
+  public unsafe partial class PathNodePrototype : StructPrototype {
+    public FPVector2 Position;
+    public FP TravelDuration;
+    public QBoolean EaseIn;
+    public QBoolean EaseOut;
+    partial void MaterializeUser(Frame frame, ref Quantum.PathNode result, in PrototypeMaterializationContext context);
+    public void Materialize(Frame frame, ref Quantum.PathNode result, in PrototypeMaterializationContext context = default) {
+        result.Position = this.Position;
+        result.TravelDuration = this.TravelDuration;
+        result.EaseIn = this.EaseIn;
+        result.EaseOut = this.EaseOut;
         MaterializeUser(frame, ref result, in context);
     }
   }

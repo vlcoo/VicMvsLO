@@ -1,7 +1,8 @@
 using Photon.Deterministic;
+using Quantum.Collections;
 
 namespace Quantum {
-    public unsafe class GenericMoverSystem : SystemMainThreadFilter<GenericMoverSystem.Filter> {
+    public unsafe class GenericMoverSystem : SystemMainThreadFilter<GenericMoverSystem.Filter>, ISignalOnComponentAdded<GenericMover>, ISignalOnComponentRemoved<GenericMover> {
         public struct Filter {
             public EntityRef Entity;
             public Transform2D* Transform;
@@ -17,13 +18,14 @@ namespace Quantum {
             var platform = filter.Platform;
             var genericMover = filter.GenericMover;
             var transform = filter.Transform;
-            var asset = f.FindAsset(genericMover->MoverAsset);
+            // var asset = f.FindAsset(genericMover->MoverAsset);
+            var moverPathList = f.ResolveList(genericMover->Path);
 
             FP currentTime = ((f.Number - f.Global->StartFrame) * f.DeltaTime) + genericMover->StartOffset;
             FP nextTime = ((f.Number - f.Global->StartFrame + 1) * f.DeltaTime) + genericMover->StartOffset;
 
-            FPVector2 currentPos = SamplePosition(asset.ObjectPath, currentTime, asset.LoopMode);
-            FPVector2 nextPos = SamplePosition(asset.ObjectPath, nextTime, asset.LoopMode);
+            FPVector2 currentPos = SamplePosition(moverPathList, currentTime, genericMover->LoopingMode);
+            FPVector2 nextPos = SamplePosition(moverPathList, nextTime, genericMover->LoopingMode);
             FPVector2 velocity = nextPos - currentPos;
 
             // This doesnt work.
@@ -35,26 +37,33 @@ namespace Quantum {
             platform->Velocity = velocity * f.UpdateRate;
         }
 
-        private static FPVector2 SamplePosition(GenericMoverAsset.PathNode[] positions, FP sample, GenericMoverAsset.LoopingMode loopMode) {
+        private static FPVector2 SamplePosition(QList<PathNode> positions, FP sample, LoopingMode loopMode) {
             FP totalDuration = 0;
-            for (int i = 0; i < positions.Length; i++) {
+            for (int i = 0; i < positions.Count; i++) {
                 totalDuration += positions[i].TravelDuration;
             }
 
-            if (loopMode == GenericMoverAsset.LoopingMode.Loop) {
+            switch (loopMode)
+            {
+            case LoopingMode.Loop:
                 sample %= totalDuration;
-            } else if (loopMode == GenericMoverAsset.LoopingMode.Clamp) {
+                break;
+            case LoopingMode.Clamp:
                 sample = FPMath.Clamp(sample, 0, totalDuration);
-            } else if (loopMode == GenericMoverAsset.LoopingMode.PingPong) {
+                break;
+            case LoopingMode.PingPong:
+            {
                 sample %= (totalDuration * 2); 
                 if (sample > totalDuration) {
                     sample = (totalDuration * 2) - sample;
                 }
+                break;
+            }
             }
 
-            for (int i = 0; i < positions.Length; i++) {
-                GenericMoverAsset.PathNode current = positions[i];
-                GenericMoverAsset.PathNode next = positions[(i + 1) % positions.Length];
+            for (int i = 0; i < positions.Count; i++) {
+                PathNode current = positions[i];
+                PathNode next = positions[(i + 1) % positions.Count];
 
                 if (sample > current.TravelDuration) {
                     sample -= current.TravelDuration;
@@ -74,5 +83,13 @@ namespace Quantum {
             return default;
         }
 
+        public void OnAdded(Frame f, EntityRef entity, GenericMover* component) {
+            // component->Path = f.AllocateList<PathNode>(10);
+        }
+        
+        public void OnRemoved(Frame f, EntityRef entity, GenericMover* component) {
+            // f.FreeList(component->Path);
+            // component->Path = default;
+        }
     }
 }

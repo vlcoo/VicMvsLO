@@ -62,6 +62,11 @@ namespace Quantum {
     DoubleJump,
     TripleJump,
   }
+  public enum LoopingMode : int {
+    Clamp,
+    Loop,
+    PingPong,
+  }
   public enum PowerupReserveResult : byte {
     None,
     NoneButPlaySound,
@@ -1093,6 +1098,36 @@ namespace Quantum {
     }
   }
   [StructLayout(LayoutKind.Explicit)]
+  public unsafe partial struct PathNode {
+    public const Int32 SIZE = 32;
+    public const Int32 ALIGNMENT = 8;
+    [FieldOffset(16)]
+    public FPVector2 Position;
+    [FieldOffset(8)]
+    public FP TravelDuration;
+    [FieldOffset(0)]
+    public QBoolean EaseIn;
+    [FieldOffset(4)]
+    public QBoolean EaseOut;
+    public override Int32 GetHashCode() {
+      unchecked { 
+        var hash = 9257;
+        hash = hash * 31 + Position.GetHashCode();
+        hash = hash * 31 + TravelDuration.GetHashCode();
+        hash = hash * 31 + EaseIn.GetHashCode();
+        hash = hash * 31 + EaseOut.GetHashCode();
+        return hash;
+      }
+    }
+    public static void Serialize(void* ptr, FrameSerializer serializer) {
+        var p = (PathNode*)ptr;
+        QBoolean.Serialize(&p->EaseIn, serializer);
+        QBoolean.Serialize(&p->EaseOut, serializer);
+        FP.Serialize(&p->TravelDuration, serializer);
+        FPVector2.Serialize(&p->Position, serializer);
+    }
+  }
+  [StructLayout(LayoutKind.Explicit)]
   public unsafe partial struct PhysicsContact {
     public const Int32 SIZE = 64;
     public const Int32 ALIGNMENT = 8;
@@ -1978,21 +2013,32 @@ namespace Quantum {
   public unsafe partial struct GenericMover : Quantum.IComponent {
     public const Int32 SIZE = 16;
     public const Int32 ALIGNMENT = 8;
+    [FieldOffset(4)]
+    public QListPtr<PathNode> Path;
     [FieldOffset(0)]
-    public AssetRef<GenericMoverAsset> MoverAsset;
+    public LoopingMode LoopingMode;
     [FieldOffset(8)]
     public FP StartOffset;
     public override Int32 GetHashCode() {
       unchecked { 
         var hash = 1901;
-        hash = hash * 31 + MoverAsset.GetHashCode();
+        hash = hash * 31 + Path.GetHashCode();
+        hash = hash * 31 + (Int32)LoopingMode;
         hash = hash * 31 + StartOffset.GetHashCode();
         return hash;
       }
     }
+    public void ClearPointers(FrameBase f, EntityRef entity) {
+      Path = default;
+    }
+    public static void OnRemoved(FrameBase frame, EntityRef entity, void* ptr) {
+      var p = (Quantum.GenericMover*)ptr;
+      p->ClearPointers((Frame)frame, entity);
+    }
     public static void Serialize(void* ptr, FrameSerializer serializer) {
         var p = (GenericMover*)ptr;
-        AssetRef.Serialize(&p->MoverAsset, serializer);
+        serializer.Stream.Serialize((Int32*)&p->LoopingMode);
+        QList.Serialize(&p->Path, serializer, Statics.SerializePathNode);
         FP.Serialize(&p->StartOffset, serializer);
     }
   }
@@ -4114,6 +4160,7 @@ namespace Quantum {
   public unsafe partial class Statics {
     public static FrameSerializer.Delegate SerializeBetterPhysicsContact;
     public static FrameSerializer.Delegate SerializeMatchConditionerTrigger;
+    public static FrameSerializer.Delegate SerializePathNode;
     public static FrameSerializer.Delegate SerializeEntityRef;
     public static FrameSerializer.Delegate SerializePhysicsQueryRef;
     public static FrameSerializer.Delegate SerializePhysicsContact;
@@ -4123,6 +4170,7 @@ namespace Quantum {
     static partial void InitStaticDelegatesGen() {
       SerializeBetterPhysicsContact = Quantum.BetterPhysicsContact.Serialize;
       SerializeMatchConditionerTrigger = Quantum.MatchConditionerTrigger.Serialize;
+      SerializePathNode = Quantum.PathNode.Serialize;
       SerializeEntityRef = EntityRef.Serialize;
       SerializePhysicsQueryRef = PhysicsQueryRef.Serialize;
       SerializePhysicsContact = Quantum.PhysicsContact.Serialize;
@@ -4202,6 +4250,7 @@ namespace Quantum {
       typeRegistry.Register(typeof(LayerMask), LayerMask.SIZE);
       typeRegistry.Register(typeof(Quantum.Liquid), Quantum.Liquid.SIZE);
       typeRegistry.Register(typeof(LiquidType), 1);
+      typeRegistry.Register(typeof(Quantum.LoopingMode), 4);
       typeRegistry.Register(typeof(MapEntityId), MapEntityId.SIZE);
       typeRegistry.Register(typeof(MapEntityLink), MapEntityLink.SIZE);
       typeRegistry.Register(typeof(Quantum.MarioBrosPlatform), Quantum.MarioBrosPlatform.SIZE);
@@ -4218,6 +4267,7 @@ namespace Quantum {
       typeRegistry.Register(typeof(NullableFPVector3), NullableFPVector3.SIZE);
       typeRegistry.Register(typeof(NullableNonNegativeFP), NullableNonNegativeFP.SIZE);
       typeRegistry.Register(typeof(ParticleEffect), 1);
+      typeRegistry.Register(typeof(Quantum.PathNode), Quantum.PathNode.SIZE);
       typeRegistry.Register(typeof(PhysicsBody2D), PhysicsBody2D.SIZE);
       typeRegistry.Register(typeof(PhysicsBody3D), PhysicsBody3D.SIZE);
       typeRegistry.Register(typeof(PhysicsCallbacks2D), PhysicsCallbacks2D.SIZE);
@@ -4286,7 +4336,7 @@ namespace Quantum {
         .Add<Quantum.Enemy>(Quantum.Enemy.Serialize, null, null, ComponentFlags.None)
         .Add<Quantum.EnterablePipe>(Quantum.EnterablePipe.Serialize, null, null, ComponentFlags.None)
         .Add<Quantum.Freezable>(Quantum.Freezable.Serialize, null, null, ComponentFlags.None)
-        .Add<Quantum.GenericMover>(Quantum.GenericMover.Serialize, null, null, ComponentFlags.None)
+        .Add<Quantum.GenericMover>(Quantum.GenericMover.Serialize, null, Quantum.GenericMover.OnRemoved, ComponentFlags.None)
         .Add<Quantum.Goomba>(Quantum.Goomba.Serialize, null, null, ComponentFlags.None)
         .Add<Quantum.Holdable>(Quantum.Holdable.Serialize, null, null, ComponentFlags.None)
         .Add<Quantum.IceBlock>(Quantum.IceBlock.Serialize, null, null, ComponentFlags.None)
@@ -4316,6 +4366,7 @@ namespace Quantum {
       FramePrinter.EnsurePrimitiveNotStripped<Quantum.InputButtons>();
       FramePrinter.EnsurePrimitiveNotStripped<Quantum.JumpState>();
       FramePrinter.EnsurePrimitiveNotStripped<LiquidType>();
+      FramePrinter.EnsurePrimitiveNotStripped<Quantum.LoopingMode>();
       FramePrinter.EnsurePrimitiveNotStripped<ParticleEffect>();
       FramePrinter.EnsurePrimitiveNotStripped<PhysicsFlags>();
       FramePrinter.EnsurePrimitiveNotStripped<Quantum.PowerupReserveResult>();
