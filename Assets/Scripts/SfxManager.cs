@@ -1,4 +1,5 @@
 using NSMB.Extensions;
+using NSMB.Loading;
 using Photon.Deterministic;
 using Quantum;
 using UnityEngine;
@@ -6,9 +7,10 @@ using UnityEngine;
 public class SfxManager : QuantumSceneViewComponent {
 
     //---Serialized Variables
-    [SerializeField] private AudioSource sfx;
+    [SerializeField] public AudioSource sfx;
 
     //---Private Variables
+    private VersusStageData stage;
     private bool playedHurryUp;
     private int previousTimer;
 
@@ -19,6 +21,10 @@ public class SfxManager : QuantumSceneViewComponent {
     public void Start() {
         QuantumCallback.Subscribe<CallbackGameResynced>(this, OnGameResynced);
         QuantumEvent.Subscribe<EventTimerExpired>(this, OnTimerExpired, NetworkHandler.FilterOutReplayFastForward);
+        QuantumEvent.Subscribe<EventGameStarted>(this, OnGameStarted);
+        QuantumEvent.Subscribe<EventGameEnded>(this, OnGameEnded);
+        
+        stage = (VersusStageData) QuantumUnityDB.GetGlobalAsset(FindObjectOfType<QuantumMapData>().Asset.UserAsset);
     }
 
     public override unsafe void OnUpdateView() {
@@ -46,6 +52,14 @@ public class SfxManager : QuantumSceneViewComponent {
                 previousTimer = timerHalfSeconds;
             }
         }
+    }
+    
+    private void OnGameStarted(EventGameStarted e) {
+        if (stage.ReverbSfx) sfx.outputAudioMixerGroup.audioMixer.SetFloat("SFXReverb", 0.4f);
+    }
+    
+    private void OnGameEnded(EventGameEnded e) {
+        sfx.outputAudioMixerGroup.audioMixer.SetFloat("SFXReverb", 0.0f);
     }
 
     private unsafe void OnGameResynced(CallbackGameResynced e) {

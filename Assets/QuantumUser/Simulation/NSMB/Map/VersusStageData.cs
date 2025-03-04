@@ -41,9 +41,11 @@ public unsafe class VersusStageData : AssetObject {
     public ColorRGBA UIColor = new(24, 178, 170);
     public bool HidePlayersOnMinimap;
 
-    [Header("-- Powerups")]
+    [Header("-- Modifiers")]
     public bool SpawnBigPowerups = true;
     public bool SpawnVerticalPowerups = true;
+    public bool ReverbSfx = false;
+    public bool VerticalMap = false;
 
     [HideInInspector] public StageTileInstance[] TileData;
     [HideInInspector] public FPVector2[] BigStarSpawnpoints;
