@@ -49,7 +49,14 @@ public class VersusStageBaker : MapDataBakerCallback {
             // Adjust so we don't see the absolute bottom of the stage.
             stage.CameraMinPosition += FPVector2.Up * FP._1_50;
             LogInfo($"Automatically found camera bounds: min={stage.CameraMinPosition} max={stage.CameraMaxPosition}");
+            if (stage.ForceOneScreenCameraHeight) stage.CameraMaxPosition.Y = stage.CameraMinPosition.Y;
+            if (!stage.IsWrappingLevel && !stage.VerticalMap) {
+                // add a one-tile margin to the left and right bounds.
+                stage.CameraMinPosition.X += FP._0_50;
+                stage.CameraMaxPosition.X -= FP._0_50;
+            }
         }
+        else if (stage.ForceOneScreenCameraHeight) Debug.LogWarning("ForceOneScreenCameraHeight will have no effect because the camera bounds are being manually set (OverrideAutomaticCameraSettings is true).");
 
         // --- Bake Tilemap
         HashSet<AssetRef<StageTile>> uniqueTiles = new();
