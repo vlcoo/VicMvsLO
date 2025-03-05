@@ -60,9 +60,9 @@ namespace Quantum {
             FPVector2 rotatedOffset = (Mathf.Rad2Deg * transform->Rotation.AsFloat) switch {
                 // up, left, down, right
                 <= 315 and <= 45 => offset * FPVector2.Up,
-                >= 45 and <= 135 => -offset * FPVector2.Right,
+                >= 45 and <= 135 => offset * FPVector2.Left,
                 >= 135 and <= 225 => offset * FPVector2.Down,
-                >= 225 and <= 315 => -offset * FPVector2.Left,
+                >= 225 and <= 315 => offset * FPVector2.Right,
                 _ => default
             };
 
