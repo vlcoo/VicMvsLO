@@ -1,328 +1,185 @@
-using UnityEngine;
 #if UNITY_EDITOR
 using System.Collections;
-using System.Linq;
 using System.Collections.Generic;
-using UnityEngine.UIElements;
-using UnityEditor.UIElements;
-using System.Reflection;
-using System.Reflection.Emit;
+using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEditor;
+using UnityEditor.ShortcutManagement;
+using System.Reflection;
+using System.Linq;
+using UnityEngine.UIElements;
+using UnityEngine.SceneManagement;
+using UnityEditor.SceneManagement;
 using Type = System.Type;
+using static VInspector.VInspectorState;
 using static VInspector.Libs.VUtils;
 using static VInspector.Libs.VGUI;
-
-#endif
 
 
 
 namespace VInspector
 {
-    public class VInspectorData : ScriptableObject
+    public class VInspectorData : ScriptableObject, ISerializationCallbackReceiver
     {
-#if UNITY_EDITOR
 
-        public void Setup(Object target)
-        {
-            void buttons()
-            {
-                var membersWithButtonAttributes = new List<MemberInfo>();
-
-
-                void findMembersWithButtonAttributes(Type type)
-                {
-                    membersWithButtonAttributes.AddRange(type.GetMembers(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance)
-                                                             .Where(r => r.GetCustomAttribute<ButtonAttribute>() is ButtonAttribute _)
-                                                             .OrderBy(r => r is MethodInfo));
-
-                    if (type == typeof(MonoBehaviour)) return;
-                    if (type == typeof(ScriptableObject)) return;
-                    if (type == null) return;
-                    if (type.BaseType == null) return;
-
-                    findMembersWithButtonAttributes(type.BaseType);
-
-                }
-                void createButton(MemberInfo member, ButtonAttribute buttonAttribute)
-                {
-                    var button = new Button();
-
-
-                    if (member.GetCustomAttribute<ButtonSizeAttribute>() is ButtonSizeAttribute sizeAttribute)
-                        button.size = sizeAttribute.size;
-
-                    if (member.GetCustomAttribute<ButtonSpaceAttribute>() is ButtonSpaceAttribute spaceAttribute)
-                        button.space = spaceAttribute.space;
-
-                    if (member.GetCustomAttribute<TabAttribute>() is TabAttribute tabAttribute)
-                        button.tab = tabAttribute.name;
-
-                    if (member.GetCustomAttribute<IfAttribute>() is IfAttribute ifAttribute)
-                        button.ifAttribute = ifAttribute;
-
-
-                    if (member is FieldInfo field && field.FieldType == typeof(bool))
-                    {
-                        var o = field.IsStatic ? null : target;
-
-                        button.isPressed = () => (bool)field.GetValue(o);
-                        button.action = (o) => field.SetValue(o, !(bool)field.GetValue(o));
-                        button.name = buttonAttribute.name != "" ? buttonAttribute.name : field.Name.PrettifyVarName(false);
-
-                    }
-
-                    if (member is MethodInfo method && !method.GetParameters().Any())
-                    {
-                        var o = method.IsStatic ? null : target;
-
-                        button.isPressed = () => false;
-                        button.action = (o) => method.Invoke(o, null);
-                        button.name = buttonAttribute.name != "" ? buttonAttribute.name : method.Name.PrettifyVarName(false);
-
-                    }
-
-
-                    if (button.action != null)
-                        this.buttons.Add(button);
-
-                }
-
-
-                this.buttons = new List<Button>();
-
-                findMembersWithButtonAttributes(target.GetType());
-
-                foreach (var r in membersWithButtonAttributes.ToList())
-                    if (membersWithButtonAttributes.Where(rr => rr.Name == r.Name).Count() > 1)
-                        membersWithButtonAttributes.Remove(r);
-
-                foreach (var member in membersWithButtonAttributes)
-                    createButton(member, member.GetCustomAttribute<ButtonAttribute>());
-
-            }
-            void tabs()
-            {
-                var tabAttributes = new List<TabAttribute>();
-
-                void createRootTab()
-                {
-                    if (rootTab != null) return;
-
-                    rootTab = new Tab("");
-
-                }
-                void findTabAttributes(Type type)
-                {
-                    tabAttributes.AddRange(type.GetFields(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance)
-                                               .Select(r => r.GetCustomAttribute<TabAttribute>())
-                                               .OfType<TabAttribute>());
-
-                    if (type == typeof(MonoBehaviour)) return;
-                    if (type == typeof(ScriptableObject)) return;
-                    if (type == null) return;
-                    if (type.BaseType == null) return;
-
-                    findTabAttributes(type.BaseType);
-
-                }
-                void setupTab(Tab tab, IEnumerable<string> allSubtabPaths)
-                {
-                    void repair()
-                    {
-                        if (tab.subtabs == null)
-                            tab.subtabs = new List<Tab>();
-
-                        tab.subtabs.RemoveAll(r => r == null);
-
-                    }
-                    void refreshSubtabs()
-                    {
-                        var names = allSubtabPaths.Select(r => r.Split('/').First()).ToList();
-
-                        foreach (var name in names)
-                            if (tab.subtabs.None(r => r.name == name))
-                                tab.subtabs.Add(new Tab(name));
-
-                        foreach (var subtab in tab.subtabs.ToList())
-                            if (names.None(r => r == subtab.name))
-                                tab.subtabs.Remove(subtab);
-
-                        tab.subtabs.SortBy(r => names.IndexOf(r.name));
-
-                    }
-                    void setupSubtabs()
-                    {
-                        foreach (var subtab in tab.subtabs)
-                            setupTab(subtab, allSubtabPaths.Where(r => r.StartsWith(subtab.name + "/")).Select(r => r.Remove(subtab.name + "/")).ToList());
-                    }
-
-                    repair();
-                    refreshSubtabs();
-                    setupSubtabs();
-
-                }
-
-                createRootTab();
-                findTabAttributes(target.GetType());
-                setupTab(rootTab, tabAttributes.Select(r => r.name));
-
-            }
-            void foldouts()
-            {
-                var foldoutAttributes = new List<FoldoutAttribute>();
-
-                void createRootFoldout()
-                {
-                    if (rootFoldout != null) return;
-
-                    rootFoldout = new Foldout(true);
-
-                }
-                void findTabAttributes(Type type)
-                {
-                    foldoutAttributes.AddRange(type.GetFields(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance)
-                                                   .Select(r => r.GetCustomAttribute<FoldoutAttribute>())
-                                                   .OfType<FoldoutAttribute>());
-
-                    if (type == typeof(MonoBehaviour)) return;
-                    if (type == typeof(ScriptableObject)) return;
-                    if (type == null) return;
-                    if (type.BaseType == null) return;
-
-                    findTabAttributes(type.BaseType);
-
-                }
-                void setupFoldout(Foldout foldout, IEnumerable<string> allSubfoldoutPaths)
-                {
-                    void repair()
-                    {
-                        if (foldout.subfoldouts == null)
-                            foldout.subfoldouts = new List<Foldout>();
-
-                        foldout.subfoldouts.RemoveAll(r => r == null);
-
-                    }
-                    void refreshSubfoldouts()
-                    {
-                        var names = allSubfoldoutPaths.Select(r => r.Split('/').First()).ToList();
-
-                        foreach (var name in names)
-                            if (foldout.subfoldouts.Find(r => r.name == name) == null)
-                                foldout.subfoldouts.Add(new Foldout(name));
-
-                        foreach (var subtab in foldout.subfoldouts.ToList())
-                            if (names.Find(r => r == subtab.name) == null)
-                                foldout.subfoldouts.Remove(subtab);
-
-                        foldout.subfoldouts.SortBy(r => names.IndexOf(r.name));
-
-                    }
-                    void setupSubfoldouts()
-                    {
-                        foreach (var subtab in foldout.subfoldouts)
-                            setupFoldout(subtab, allSubfoldoutPaths.Where(r => r.StartsWith(subtab.name + "/")).Select(r => r.Remove(subtab.name + "/")).ToList());
-                    }
-
-                    repair();
-                    refreshSubfoldouts();
-                    setupSubfoldouts();
-
-                }
-
-                createRootFoldout();
-                findTabAttributes(target.GetType());
-                setupFoldout(rootFoldout, foldoutAttributes.Select(r => r.name));
-
-            }
-
-            buttons();
-            tabs();
-            foldouts();
-
-        }
-
-        public List<Button> buttons = new List<Button>();
-        public Tab rootTab = new Tab("");
-        public Foldout rootFoldout = new Foldout(true);
-
-        public bool isIntact => buttons != null && rootTab?.subtabs != null && rootFoldout?.subfoldouts != null;
-
-
-
+        public List<Item> items = new();
 
         [System.Serializable]
-        public class Button
+        public class Item
         {
-            public string name;
-            public string tab = "";
-            public float size = 30;
-            public float space = 0;
-            public IfAttribute ifAttribute;
-            public System.Action<Object> action;
-            public System.Func<bool> isPressed;
+            public GlobalID globalId;
 
-        }
 
-        [System.Serializable]
-        public class Tab
-        {
-            public string name;
-            public int selectedSubtabIndex;
+            public Type type => Type.GetType(_typeString) ?? typeof(DefaultAsset);
+            public string _typeString;
 
-            [SerializeReference]
-            public List<Tab> subtabs = new List<Tab>();
-
-            public bool subtabsDrawn;
-            public Tab selectedSubtab { get => selectedSubtabIndex.IsInRange(0, subtabs.Count - 1) ? subtabs[selectedSubtabIndex] : null; set => selectedSubtabIndex = subtabs.IndexOf(value); }
-
-            public void ResetSubtabsDrawn()
+            public Object obj
             {
-                subtabsDrawn = false;
+                get
+                {
+                    if (_obj == null && !isSceneGameObject)
+                        _obj = globalId.GetObject();
 
-                foreach (var r in subtabs)
-                    r.ResetSubtabsDrawn();
+                    return _obj;
+
+                    // updating scene objects here using globalId.GetObject() could cause performance issues on large scenes
+                    // so instead they are batch updated in VInspector.UpdateBookmarkedObjectsForScene()
+
+                }
+            }
+            public Object _obj;
+
+
+            public bool isSceneGameObject;
+            public bool isAsset;
+
+
+            public bool isLoadable => obj != null;
+
+            public bool isDeleted
+            {
+                get
+                {
+                    if (!isSceneGameObject)
+                        return !isLoadable;
+
+                    if (isLoadable)
+                        return false;
+
+                    if (!AssetDatabase.LoadAssetAtPath<SceneAsset>(globalId.guid.ToPath()))
+                        return true;
+
+                    for (int i = 0; i < EditorSceneManager.sceneCount; i++)
+                        if (EditorSceneManager.GetSceneAt(i).path == globalId.guid.ToPath())
+                            return true;
+
+                    return false;
+
+                }
+            }
+
+            public string assetPath => globalId.guid.ToPath();
+
+
+            public Item(Object o)
+            {
+                globalId = o.GetGlobalID();
+
+                id = Random.value.GetHashCode();
+
+                isSceneGameObject = o is GameObject go && go.scene.rootCount != 0;
+                isAsset = !isSceneGameObject;
+
+                _typeString = o.GetType().AssemblyQualifiedName;
+
+                _name = o.name;
+
+                _obj = o;
 
             }
 
-            public Tab(string name) => this.name = name;
+
+
+            public float width => VInspectorNavbar.expandedItemWidth;
+
+
+
+
+            public string name
+            {
+                get
+                {
+                    if (!isLoadable) return _name;
+
+                    if (assetPath.GetExtension() == ".cs")
+                        _name = obj.name.Decamelcase();
+                    else
+                        _name = obj.name;
+
+                    return _name;
+
+                }
+            }
+            public string _name { get => state._name; set => state._name = value; }
+
+            public string sceneGameObjectIconName { get => state.sceneGameObjectIconName; set => state.sceneGameObjectIconName = value; }
+
+
+
+            public ItemState state
+            {
+                get
+                {
+                    if (!VInspectorState.instance.itemStates_byItemId.ContainsKey(id))
+                        VInspectorState.instance.itemStates_byItemId[id] = new ItemState();
+
+                    return VInspectorState.instance.itemStates_byItemId[id];
+
+                }
+            }
+
+            public int id;
 
         }
 
-        [System.Serializable]
-        public class Foldout
+
+
+        public void OnAfterDeserialize() => VInspectorNavbar.repaintNeededAfterUndoRedo = true;
+        public void OnBeforeSerialize() { }
+
+
+
+
+
+
+
+
+
+        [CustomEditor(typeof(VInspectorData))]
+        class Editor : UnityEditor.Editor
         {
-            public string name;
-            public bool expanded;
-
-            [SerializeReference]
-            public List<Foldout> subfoldouts = new List<Foldout>();
-
-            public Foldout GetSubfoldout(string path)
+            public override void OnInspectorGUI()
             {
-                if (path == "")
-                    return this;
-                else if (!path.Contains('/'))
-                    return subfoldouts.Find(r => r.name == path);
-                else
-                    return subfoldouts.Find(r => r.name == path.Split('/').First()).GetSubfoldout(path.Substring(path.IndexOf('/') + 1));
+                var style = EditorStyles.label;
+                style.wordWrap = true;
+
+
+                SetGUIEnabled(false);
+                BeginIndent(0);
+
+                Space(10);
+                EditorGUILayout.LabelField("This file stores bookmarks from vInspector's navigation bar", style);
+
+                EndIndent(10);
+                ResetGUIEnabled();
+
+                // Space(15);
+                // base.OnInspectorGUI();
 
             }
-            public bool IsSubfoldoutContentVisible(string path)
-            {
-                if (path == "")
-                    return expanded;
-                else if (!path.Contains('/'))
-                    return expanded && subfoldouts.Find(r => r.name == path).expanded;
-                else
-                    return expanded && subfoldouts.Find(r => r.name == path.Split('/').First()).IsSubfoldoutContentVisible(path.Substring(path.IndexOf('/') + 1));
-
-            }
-
-            public Foldout(string name) => this.name = name;
-            public Foldout(bool expanded) => this.expanded = expanded;
-
         }
 
-#endif
+
     }
 }
+#endif
