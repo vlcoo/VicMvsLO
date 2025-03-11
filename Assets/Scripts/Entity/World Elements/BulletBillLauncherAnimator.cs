@@ -25,7 +25,7 @@ public class BulletBillLauncherAnimator : BreakableObjectAnimator {
 
         var breakable = f.Unsafe.GetPointer<BreakableObject>(EntityRef);
         headRenderer.enabled = breakable->CurrentHeight > 0;
-        headOrigin.transform.localPosition = Vector3.up * (breakable->CurrentHeight.AsFloat * 0.5f);
+        headOrigin.transform.localPosition = Vector3.up * (breakable->CurrentHeight.AsFloat - 1.0f);
     }
 
     protected override void OnBreakableObjectBroken(EventBreakableObjectBroken e) {

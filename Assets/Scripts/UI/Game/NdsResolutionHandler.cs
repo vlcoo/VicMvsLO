@@ -1,3 +1,4 @@
+using Quantum;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -15,8 +16,10 @@ namespace NSMB.UI.Game {
         private RenderTexture texture;
         private bool pixelPerfect;
         private (int, int) previousResolution;
+        private bool stageForced4by3 = false;
 
         public void Start() {
+            QuantumEvent.Subscribe<EventGameStateChanged>(this, OnGameStateChanged);
             Settings.OnNdsResolutionSettingChanged += OnNdsResolutionSettingChanged;
         }
 
@@ -44,7 +47,7 @@ namespace NSMB.UI.Game {
             int height = Screen.height;
             float aspect = (float) width / height;
             bool resolutionChanged;
-            if (Settings.Instance.GraphicsNdsForceAspect) {
+            if (Settings.Instance.GraphicsNdsForceAspect || stageForced4by3) {
                 resolutionChanged = CreateRenderTexture(298, 224);
                 RectTransform fitterTransform = (RectTransform) fitter.transform;
 
@@ -133,6 +136,13 @@ namespace NSMB.UI.Game {
 
         private void OnNdsResolutionSettingChanged() {
             Update();
+        }
+        
+        private void OnGameStateChanged(EventGameStateChanged e) {
+            // if (e.NewState == GameState.Starting) {
+            //     var stage = (VersusStageData) QuantumUnityDB.GetGlobalAsset(e.Frame.Map.UserAsset);
+            //     stageForced4by3 = stage.Force4By3;
+            // }
         }
     }
 }
