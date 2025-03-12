@@ -163,6 +163,11 @@ public static unsafe class QuantumUtils {
     }
 
     public static FPVector2 WrapWorld(VersusStageData stage, FPVector2 worldPos, out WrapDirection wrapDirection) {
+        if (!stage.IsWrappingLevel) {
+            wrapDirection = WrapDirection.NoWrap;
+            return worldPos;
+        }
+        
         if (worldPos.X < stage.StageWorldMin.X) {
             worldPos.X += stage.TileDimensions.x / 2;
             wrapDirection = WrapDirection.Left;

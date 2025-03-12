@@ -7,7 +7,7 @@ using static IInteractableTile;
 namespace Quantum {
     public unsafe class MarioPlayerSystem : SystemMainThreadFilterStage<MarioPlayerSystem.Filter>, ISignalOnComponentRemoved<Projectile>, 
         ISignalOnGameStarting, ISignalOnBobombExplodeEntity, ISignalOnTryLiquidSplash, ISignalOnEntityBumped, ISignalOnBeforeInteraction,
-        ISignalOnPlayerDisconnected, ISignalOnIceBlockBroken, ISignalOnStageReset, ISignalOnEntityChangeUnderwaterState, ISignalOnEntityFreeze {
+        ISignalOnPlayerDisconnected, ISignalOnIceBlockBroken, ISignalOnStageReset, ISignalOnEntityChangeUnderwaterState, ISignalOnEntityFreeze, ISignalOnEntityCrushed {
 
         private static readonly FPVector2 DeathUpForce = new FPVector2(0, FP.FromString("6.5"));
         private static readonly FPVector2 DeathUpGravity = new FPVector2(0, FP.FromString("-12.75"));
@@ -61,10 +61,11 @@ namespace Quantum {
             }
 
             if (HandleStuckInBlock(f, ref filter, stage)) {
-                HandleCrouching(f, ref filter, physics);
-                HandleFacingDirection(f, ref filter, physics);
-                HandleHitbox(f, ref filter, physics);
-                return;
+                // HandleCrouching(f, ref filter, physics);
+                // HandleFacingDirection(f, ref filter, physics);
+                // HandleHitbox(f, ref filter, physics);
+                // return;
+                mario->Death(f, filter.Entity, false);
             }
             HandleKnockback(f, ref filter);
 
@@ -1637,13 +1638,13 @@ namespace Quantum {
                     mario->IsStuckInBlock = false;
                 } 
 
-                if (physicsObject->IsBeingCrushed) {
-                    // In a ceiling crusher
-                    if (mario->CrushDamageInvincibilityFrames == 0) {
-                        mario->CrushDamageInvincibilityFrames = 30;
-                        mario->Powerdown(f, filter.Entity, true);
-                    }
-                }
+                // if (physicsObject->IsBeingCrushed) {
+                //     // In a ceiling crusher
+                //     if (mario->CrushDamageInvincibilityFrames == 0) {
+                //         mario->CrushDamageInvincibilityFrames = 30;
+                //         mario->Powerdown(f, filter.Entity, true);
+                //     }
+                // }
                 return false;
             }
 
@@ -2260,6 +2261,17 @@ namespace Quantum {
                 bool onRight = ourPos.X > theirPos.X;
 
                 mario->DoKnockback(f, entity, !onRight, 1, false, bumper);
+            }
+        }
+        
+        public void OnEntityCrushed(Frame f, EntityRef entity) {
+            if (!f.Unsafe.TryGetPointer(entity, out MarioPlayer* mario)) {
+                return;
+            }
+
+            if (mario->CrushDamageInvincibilityFrames == 0) {
+                mario->CrushDamageInvincibilityFrames = 30;
+                mario->Powerdown(f, entity, true);
             }
         }
 

@@ -20,9 +20,10 @@ namespace Quantum {
 
 #if MULTITHREADED
         public override void Update(FrameThreadSafe f, ref Filter filter) {
-            UpdateCameraSize(f, ref filter);
+            var stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
+            UpdateCameraSize(f, ref filter, stage);
             if (!filter.Mario->IsDead) {
-                filter.Camera->CurrentPosition = CalculateNewPosition(f, ref filter, f.FindAsset<VersusStageData>(f.Map.UserAsset));
+                filter.Camera->CurrentPosition = CalculateNewPosition(f, ref filter, stage);
             }
         }
 #else
@@ -34,12 +35,12 @@ namespace Quantum {
         }
 #endif
 
-        private void UpdateCameraSize(FrameThreadSafe f, ref Filter filter) {
+        private void UpdateCameraSize(FrameThreadSafe f, ref Filter filter, VersusStageData stage) {
             var mario = filter.Mario;
             var camera = filter.Camera;
 
             FP targetSize;
-            if (mario->IsPropellerFlying || mario->IsSpinnerFlying) {
+            if (!stage.NoHorizontalCameraMovement && (mario->IsPropellerFlying || mario->IsSpinnerFlying)) {
                 targetSize = 8;
             } else {
                 targetSize = 7;
@@ -114,7 +115,7 @@ namespace Quantum {
                 right = newCameraPosition.X > camera->LastPlayerPosition.X;
             }
 
-            if (xDifference > FP._0_25) {
+            if (xDifference > FP._0_25 && !stage.NoHorizontalCameraMovement) {
                 newCameraPosition.X += (FP._0_25 - xDifference - FP._0_01) * (right ? 1 : -1);
             }
 

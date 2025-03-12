@@ -49,6 +49,12 @@ namespace Quantum {
   using RuntimeInitializeOnLoadMethodAttribute = UnityEngine.RuntimeInitializeOnLoadMethodAttribute;
   #endif //;
   
+  public enum FlagpoleState : int {
+    Vacant,
+    SomeoneTouching,
+    Sliding,
+    FinishedSliding,
+  }
   public enum GameState : byte {
     PreGameRoom,
     WaitingForPlayers,
@@ -2043,6 +2049,40 @@ namespace Quantum {
     }
   }
   [StructLayout(LayoutKind.Explicit)]
+  public unsafe partial struct GoalFlagpole : Quantum.IComponent {
+    public const Int32 SIZE = 24;
+    public const Int32 ALIGNMENT = 8;
+    [FieldOffset(8)]
+    [ExcludeFromPrototype()]
+    public QBoolean AcceptsPlayers;
+    [FieldOffset(4)]
+    [ExcludeFromPrototype()]
+    public FlagpoleState State;
+    [FieldOffset(0)]
+    [ExcludeFromPrototype()]
+    public UInt16 AnimationTimerFrames;
+    [FieldOffset(16)]
+    [ExcludeFromPrototype()]
+    public EntityRef MarioTouching;
+    public override Int32 GetHashCode() {
+      unchecked { 
+        var hash = 1181;
+        hash = hash * 31 + AcceptsPlayers.GetHashCode();
+        hash = hash * 31 + (Int32)State;
+        hash = hash * 31 + AnimationTimerFrames.GetHashCode();
+        hash = hash * 31 + MarioTouching.GetHashCode();
+        return hash;
+      }
+    }
+    public static void Serialize(void* ptr, FrameSerializer serializer) {
+        var p = (GoalFlagpole*)ptr;
+        serializer.Stream.Serialize(&p->AnimationTimerFrames);
+        serializer.Stream.Serialize((Int32*)&p->State);
+        QBoolean.Serialize(&p->AcceptsPlayers, serializer);
+        EntityRef.Serialize(&p->MarioTouching, serializer);
+    }
+  }
+  [StructLayout(LayoutKind.Explicit)]
   public unsafe partial struct Goomba : Quantum.IComponent {
     public const Int32 SIZE = 16;
     public const Int32 ALIGNMENT = 8;
@@ -3311,6 +3351,15 @@ namespace Quantum {
   public unsafe partial interface ISignalOnTimerSecondsRemaining : ISignal {
     void OnTimerSecondsRemaining(Frame f, Int32 secondsRemaining);
   }
+  public unsafe partial interface ISignalOnMarioTouchedGoal : ISignal {
+    void OnMarioTouchedGoal(Frame f, EntityRef entity);
+  }
+  public unsafe partial interface ISignalOnMarioGoalFinishedSliding : ISignal {
+    void OnMarioGoalFinishedSliding(Frame f, EntityRef entity);
+  }
+  public unsafe partial interface ISignalOnFlagpoleStateChanged : ISignal {
+    void OnFlagpoleStateChanged(Frame f, FlagpoleState newState);
+  }
   public unsafe partial interface ISignalOnThrowHoldable : ISignal {
     void OnThrowHoldable(Frame f, EntityRef entity, EntityRef mario, QBoolean crouching, QBoolean dropped);
   }
@@ -3620,6 +3669,9 @@ namespace Quantum {
     private ISignalOnGameEnding[] _ISignalOnGameEndingSystems;
     private ISignalOnReturnToRoom[] _ISignalOnReturnToRoomSystems;
     private ISignalOnTimerSecondsRemaining[] _ISignalOnTimerSecondsRemainingSystems;
+    private ISignalOnMarioTouchedGoal[] _ISignalOnMarioTouchedGoalSystems;
+    private ISignalOnMarioGoalFinishedSliding[] _ISignalOnMarioGoalFinishedSlidingSystems;
+    private ISignalOnFlagpoleStateChanged[] _ISignalOnFlagpoleStateChangedSystems;
     private ISignalOnThrowHoldable[] _ISignalOnThrowHoldableSystems;
     private ISignalOnIceBlockBroken[] _ISignalOnIceBlockBrokenSystems;
     private ISignalOnBeforeInteraction[] _ISignalOnBeforeInteractionSystems;
@@ -3668,6 +3720,9 @@ namespace Quantum {
       _ISignalOnGameEndingSystems = BuildSignalsArray<ISignalOnGameEnding>();
       _ISignalOnReturnToRoomSystems = BuildSignalsArray<ISignalOnReturnToRoom>();
       _ISignalOnTimerSecondsRemainingSystems = BuildSignalsArray<ISignalOnTimerSecondsRemaining>();
+      _ISignalOnMarioTouchedGoalSystems = BuildSignalsArray<ISignalOnMarioTouchedGoal>();
+      _ISignalOnMarioGoalFinishedSlidingSystems = BuildSignalsArray<ISignalOnMarioGoalFinishedSliding>();
+      _ISignalOnFlagpoleStateChangedSystems = BuildSignalsArray<ISignalOnFlagpoleStateChanged>();
       _ISignalOnThrowHoldableSystems = BuildSignalsArray<ISignalOnThrowHoldable>();
       _ISignalOnIceBlockBrokenSystems = BuildSignalsArray<ISignalOnIceBlockBroken>();
       _ISignalOnBeforeInteractionSystems = BuildSignalsArray<ISignalOnBeforeInteraction>();
@@ -3724,6 +3779,8 @@ namespace Quantum {
       BuildSignalsArrayOnComponentRemoved<Quantum.Freezable>();
       BuildSignalsArrayOnComponentAdded<Quantum.GenericMover>();
       BuildSignalsArrayOnComponentRemoved<Quantum.GenericMover>();
+      BuildSignalsArrayOnComponentAdded<Quantum.GoalFlagpole>();
+      BuildSignalsArrayOnComponentRemoved<Quantum.GoalFlagpole>();
       BuildSignalsArrayOnComponentAdded<Quantum.Goomba>();
       BuildSignalsArrayOnComponentRemoved<Quantum.Goomba>();
       BuildSignalsArrayOnComponentAdded<Quantum.Holdable>();
@@ -3993,6 +4050,33 @@ namespace Quantum {
           }
         }
       }
+      public void OnMarioTouchedGoal(EntityRef entity) {
+        var array = _f._ISignalOnMarioTouchedGoalSystems;
+        for (Int32 i = 0; i < array.Length; ++i) {
+          var s = array[i];
+          if (_f.SystemIsEnabledInHierarchy((SystemBase)s)) {
+            s.OnMarioTouchedGoal(_f, entity);
+          }
+        }
+      }
+      public void OnMarioGoalFinishedSliding(EntityRef entity) {
+        var array = _f._ISignalOnMarioGoalFinishedSlidingSystems;
+        for (Int32 i = 0; i < array.Length; ++i) {
+          var s = array[i];
+          if (_f.SystemIsEnabledInHierarchy((SystemBase)s)) {
+            s.OnMarioGoalFinishedSliding(_f, entity);
+          }
+        }
+      }
+      public void OnFlagpoleStateChanged(FlagpoleState newState) {
+        var array = _f._ISignalOnFlagpoleStateChangedSystems;
+        for (Int32 i = 0; i < array.Length; ++i) {
+          var s = array[i];
+          if (_f.SystemIsEnabledInHierarchy((SystemBase)s)) {
+            s.OnFlagpoleStateChanged(_f, newState);
+          }
+        }
+      }
       public void OnThrowHoldable(EntityRef entity, EntityRef mario, QBoolean crouching, QBoolean dropped) {
         var array = _f._ISignalOnThrowHoldableSystems;
         for (Int32 i = 0; i < array.Length; ++i) {
@@ -4224,12 +4308,14 @@ namespace Quantum {
       typeRegistry.Register(typeof(FPQuaternion), FPQuaternion.SIZE);
       typeRegistry.Register(typeof(FPVector2), FPVector2.SIZE);
       typeRegistry.Register(typeof(FPVector3), FPVector3.SIZE);
+      typeRegistry.Register(typeof(Quantum.FlagpoleState), 4);
       typeRegistry.Register(typeof(FrameMetaData), FrameMetaData.SIZE);
       typeRegistry.Register(typeof(FrameTimer), FrameTimer.SIZE);
       typeRegistry.Register(typeof(Quantum.Freezable), Quantum.Freezable.SIZE);
       typeRegistry.Register(typeof(Quantum.GameRules), Quantum.GameRules.SIZE);
       typeRegistry.Register(typeof(Quantum.GameState), 1);
       typeRegistry.Register(typeof(Quantum.GenericMover), Quantum.GenericMover.SIZE);
+      typeRegistry.Register(typeof(Quantum.GoalFlagpole), Quantum.GoalFlagpole.SIZE);
       typeRegistry.Register(typeof(Quantum.Goomba), Quantum.Goomba.SIZE);
       typeRegistry.Register(typeof(HingeJoint), HingeJoint.SIZE);
       typeRegistry.Register(typeof(HingeJoint3D), HingeJoint3D.SIZE);
@@ -4319,7 +4405,7 @@ namespace Quantum {
       typeRegistry.Register(typeof(Quantum._globals_), Quantum._globals_.SIZE);
     }
     static partial void InitComponentTypeIdGen() {
-      ComponentTypeId.Reset(ComponentTypeId.BuiltInComponentCount + 34)
+      ComponentTypeId.Reset(ComponentTypeId.BuiltInComponentCount + 35)
         .AddBuiltInComponents()
         .Add<Quantum.BetterPhysicsObject>(Quantum.BetterPhysicsObject.Serialize, Quantum.BetterPhysicsObject.OnAdded, Quantum.BetterPhysicsObject.OnRemoved, ComponentFlags.None)
         .Add<Quantum.BigStar>(Quantum.BigStar.Serialize, null, null, ComponentFlags.None)
@@ -4337,6 +4423,7 @@ namespace Quantum {
         .Add<Quantum.EnterablePipe>(Quantum.EnterablePipe.Serialize, null, null, ComponentFlags.None)
         .Add<Quantum.Freezable>(Quantum.Freezable.Serialize, null, null, ComponentFlags.None)
         .Add<Quantum.GenericMover>(Quantum.GenericMover.Serialize, null, Quantum.GenericMover.OnRemoved, ComponentFlags.None)
+        .Add<Quantum.GoalFlagpole>(Quantum.GoalFlagpole.Serialize, null, null, ComponentFlags.None)
         .Add<Quantum.Goomba>(Quantum.Goomba.Serialize, null, null, ComponentFlags.None)
         .Add<Quantum.Holdable>(Quantum.Holdable.Serialize, null, null, ComponentFlags.None)
         .Add<Quantum.IceBlock>(Quantum.IceBlock.Serialize, null, null, ComponentFlags.None)
@@ -4361,6 +4448,7 @@ namespace Quantum {
     public static void EnsureNotStrippedGen() {
       FramePrinter.EnsureNotStripped();
       FramePrinter.EnsurePrimitiveNotStripped<CallbackFlags>();
+      FramePrinter.EnsurePrimitiveNotStripped<Quantum.FlagpoleState>();
       FramePrinter.EnsurePrimitiveNotStripped<Quantum.GameState>();
       FramePrinter.EnsurePrimitiveNotStripped<IceBlockBreakReason>();
       FramePrinter.EnsurePrimitiveNotStripped<Quantum.InputButtons>();

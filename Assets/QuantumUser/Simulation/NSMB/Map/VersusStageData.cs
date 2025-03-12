@@ -35,7 +35,7 @@ public unsafe class VersusStageData : AssetObject {
     [Header("-- Camera")]
     public bool OverrideAutomaticCameraSettings;
     public bool ForceOneScreenCameraHeight;
-    public bool Force4By3;
+    public bool NoHorizontalCameraMovement;
     public FPVector2 CameraMinPosition;
     public FPVector2 CameraMaxPosition;
 

@@ -312,21 +312,25 @@ namespace Quantum {
                 var physicsHits = f.Physics2D.ShapeCastAll(raycastOrigin, 0, &shape, raycastTranslation, mask, QueryOptions.HitAll | QueryOptions.ComputeDetailedInfo);
                 
                 FP center = transform->Position.X + shape.Centroid.X;
-                if (center < (stage.StageWorldMin.X + stage.StageWorldMax.X) / 2) {
-                    // Left edge
-                    FPVector2 wrappedRaycastOrigin = raycastOrigin;
-                    wrappedRaycastOrigin.X += stage.TileDimensions.x * FP._0_50;
-                    var wrappedHits = f.Physics2D.ShapeCastAll(wrappedRaycastOrigin, 0, &shape, raycastTranslation, mask, QueryOptions.HitAll | QueryOptions.ComputeDetailedInfo);
-                    for (int i = 0; i < wrappedHits.Count; i++) {
-                        physicsHits.Add(wrappedHits[i], f.Context);
-                    }
-                } else {
-                    // Right edge
-                    FPVector2 wrappedRaycastOrigin = raycastOrigin;
-                    wrappedRaycastOrigin.X -= stage.TileDimensions.x * FP._0_50;
-                    var wrappedHits = f.Physics2D.ShapeCastAll(wrappedRaycastOrigin, 0, &shape, raycastTranslation, mask, QueryOptions.HitAll | QueryOptions.ComputeDetailedInfo);
-                    for (int i = 0; i < wrappedHits.Count; i++) {
-                        physicsHits.Add(wrappedHits[i], f.Context);
+                if (stage.IsWrappingLevel) {
+                    if (center < (stage.StageWorldMin.X + stage.StageWorldMax.X) / 2) {
+                        // Left edge
+                        FPVector2 wrappedRaycastOrigin = raycastOrigin;
+                        wrappedRaycastOrigin.X += stage.TileDimensions.x * FP._0_50;
+                        var wrappedHits = f.Physics2D.ShapeCastAll(wrappedRaycastOrigin, 0, &shape, raycastTranslation,
+                            mask, QueryOptions.HitAll | QueryOptions.ComputeDetailedInfo);
+                        for (int i = 0; i < wrappedHits.Count; i++) {
+                            physicsHits.Add(wrappedHits[i], f.Context);
+                        }
+                    } else {
+                        // Right edge
+                        FPVector2 wrappedRaycastOrigin = raycastOrigin;
+                        wrappedRaycastOrigin.X -= stage.TileDimensions.x * FP._0_50;
+                        var wrappedHits = f.Physics2D.ShapeCastAll(wrappedRaycastOrigin, 0, &shape, raycastTranslation,
+                            mask, QueryOptions.HitAll | QueryOptions.ComputeDetailedInfo);
+                        for (int i = 0; i < wrappedHits.Count; i++) {
+                            physicsHits.Add(wrappedHits[i], f.Context);
+                        }
                     }
                 }
 

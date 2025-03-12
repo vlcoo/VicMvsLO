@@ -1,0 +1,34 @@
+﻿component GoalFlagpole {
+    [ExcludeFromPrototype] bool AcceptsPlayers;
+    [ExcludeFromPrototype] FlagpoleState State;
+    [ExcludeFromPrototype] ushort AnimationTimerFrames;
+    [ExcludeFromPrototype] EntityRef MarioTouching;
+}
+
+enum FlagpoleState {
+    Vacant,
+    SomeoneTouching,
+    Sliding,
+    FinishedSliding
+}
+
+signal OnMarioTouchedGoal(EntityRef entity);
+signal OnMarioGoalFinishedSliding(EntityRef entity);
+signal OnFlagpoleStateChanged(FlagpoleState newState);
+
+synced event MarioTouchedGoal {
+	Frame Frame;
+	entity_ref Entity;
+	MarioPlayer Mario;
+}
+
+synced event MarioGoalFinishedSliding {
+    Frame Frame;
+    entity_ref Entity;
+    MarioPlayer Mario;
+}
+
+synced event FlagpoleStateChanged {
+    Frame Frame;
+    FlagpoleState NewState;
+}
