@@ -431,6 +431,7 @@ namespace Quantum.Prototypes {
     public Quantum.Prototypes.PathNodePrototype[] Path = {};
     public Quantum.QEnum32<LoopingMode> LoopingMode;
     public FP StartOffset;
+    public QBoolean DurationIsSpeedInstead;
     partial void MaterializeUser(Frame frame, ref Quantum.GenericMover result, in PrototypeMaterializationContext context);
     public override Boolean AddToEntity(FrameBase f, EntityRef entity, in PrototypeMaterializationContext context) {
         Quantum.GenericMover component = default;
@@ -450,6 +451,7 @@ namespace Quantum.Prototypes {
         }
         result.LoopingMode = this.LoopingMode;
         result.StartOffset = this.StartOffset;
+        result.DurationIsSpeedInstead = this.DurationIsSpeedInstead;
         MaterializeUser(frame, ref result, in context);
     }
   }

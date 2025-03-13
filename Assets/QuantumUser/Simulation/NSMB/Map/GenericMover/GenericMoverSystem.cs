@@ -24,8 +24,8 @@ namespace Quantum {
             FP currentTime = ((f.Number - f.Global->StartFrame) * f.DeltaTime) + genericMover->StartOffset;
             FP nextTime = ((f.Number - f.Global->StartFrame + 1) * f.DeltaTime) + genericMover->StartOffset;
 
-            FPVector2 currentPos = SamplePosition(moverPathList, currentTime, genericMover->LoopingMode);
-            FPVector2 nextPos = SamplePosition(moverPathList, nextTime, genericMover->LoopingMode);
+            FPVector2 currentPos = SamplePosition(moverPathList, currentTime, genericMover->LoopingMode, genericMover->DurationIsSpeedInstead);
+            FPVector2 nextPos = SamplePosition(moverPathList, nextTime, genericMover->LoopingMode, genericMover->DurationIsSpeedInstead);
             FPVector2 velocity = nextPos - currentPos;
 
             // This doesnt work.
@@ -37,10 +37,14 @@ namespace Quantum {
             platform->Velocity = velocity * f.UpdateRate;
         }
 
-        private static FPVector2 SamplePosition(QList<PathNode> positions, FP sample, LoopingMode loopMode) {
+        private static FPVector2 SamplePosition(QList<PathNode> positions, FP sample, LoopingMode loopMode, bool durationIsSpeed = false) {
             FP totalDuration = 0;
             for (int i = 0; i < positions.Count; i++) {
-                totalDuration += positions[i].TravelDuration;
+                if (durationIsSpeed) {
+                    totalDuration += FPVector2.Distance(positions[i].Position, positions[(i + 1) % positions.Count].Position) / positions[i].TravelDuration;
+                } else {
+                    totalDuration += positions[i].TravelDuration;
+                }
             }
 
             switch (loopMode)
@@ -64,11 +68,16 @@ namespace Quantum {
             for (int i = 0; i < positions.Count; i++) {
                 PathNode current = positions[i];
                 PathNode next = positions[(i + 1) % positions.Count];
+                FP currentDuration = current.TravelDuration;
+                // "durationIsSpeed" means that the duration is actually the speed of the object, not the time it takes to reach the next node. that way there's a constant travel speed and the duration is automatically calculated.
+                if (durationIsSpeed) {
+                    currentDuration = FPVector2.Distance(current.Position, next.Position) / currentDuration;
+                }
 
-                if (sample > current.TravelDuration) {
-                    sample -= current.TravelDuration;
+                if (sample > currentDuration) {
+                    sample -= currentDuration;
                 } else {
-                    FP alpha = sample / current.TravelDuration;
+                    FP alpha = sample / currentDuration;
                     if (next.EaseIn && next.EaseOut) {
                         alpha = QuantumUtils.EaseInOut(alpha);
                     } else if (next.EaseIn) {

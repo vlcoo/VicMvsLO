@@ -451,6 +451,8 @@ MonoBehaviour:
           Value: 1
         StartOffset:
           RawValue: 0
+        DurationIsSpeedInstead:
+          Value: 1
     - rid: 196403629618364420
       type: {class: MovingPlatformPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
@@ -550,7 +552,7 @@ MonoBehaviour:
             Y:
               RawValue: 0
           TravelDuration:
-            RawValue: 131072
+            RawValue: 65536
           EaseIn:
             Value: 0
           EaseOut:
@@ -561,7 +563,7 @@ MonoBehaviour:
             Y:
               RawValue: 0
           TravelDuration:
-            RawValue: 131072
+            RawValue: 65536
           EaseIn:
             Value: 0
           EaseOut:
@@ -572,7 +574,7 @@ MonoBehaviour:
             Y:
               RawValue: 32768
           TravelDuration:
-            RawValue: 131072
+            RawValue: 65536
           EaseIn:
             Value: 0
           EaseOut:
@@ -583,7 +585,7 @@ MonoBehaviour:
             Y:
               RawValue: 32768
           TravelDuration:
-            RawValue: 131072
+            RawValue: 65536
           EaseIn:
             Value: 0
           EaseOut:
@@ -594,7 +596,18 @@ MonoBehaviour:
             Y:
               RawValue: 32768
           TravelDuration:
-            RawValue: 131072
+            RawValue: 65536
+          EaseIn:
+            Value: 0
+          EaseOut:
+            Value: 0
+        - Position:
+            X:
+              RawValue: 65536
+            Y:
+              RawValue: 0
+          TravelDuration:
+            RawValue: 65536
           EaseIn:
             Value: 0
           EaseOut:
@@ -603,6 +616,8 @@ MonoBehaviour:
           Value: 1
         StartOffset:
           RawValue: 0
+        DurationIsSpeedInstead:
+          Value: 1
     - rid: 215339139699048452
       type: {class: MovingPlatformPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
@@ -702,7 +717,7 @@ MonoBehaviour:
             Y:
               RawValue: 0
           TravelDuration:
-            RawValue: 131072
+            RawValue: 65536
           EaseIn:
             Value: 0
           EaseOut:
@@ -713,7 +728,7 @@ MonoBehaviour:
             Y:
               RawValue: 0
           TravelDuration:
-            RawValue: 131072
+            RawValue: 65536
           EaseIn:
             Value: 0
           EaseOut:
@@ -722,6 +737,8 @@ MonoBehaviour:
           Value: 1
         StartOffset:
           RawValue: 0
+        DurationIsSpeedInstead:
+          Value: 1
     - rid: 276464880180002820
       type: {class: MovingPlatformPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
@@ -821,7 +838,7 @@ MonoBehaviour:
             Y:
               RawValue: 0
           TravelDuration:
-            RawValue: 131072
+            RawValue: 65536
           EaseIn:
             Value: 0
           EaseOut:
@@ -832,7 +849,7 @@ MonoBehaviour:
             Y:
               RawValue: 0
           TravelDuration:
-            RawValue: 131072
+            RawValue: 65536
           EaseIn:
             Value: 0
           EaseOut:
@@ -841,6 +858,8 @@ MonoBehaviour:
           Value: 1
         StartOffset:
           RawValue: 0
+        DurationIsSpeedInstead:
+          Value: 1
     - rid: 791596203178459140
       type: {class: MovingPlatformPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
@@ -960,6 +979,8 @@ MonoBehaviour:
           Value: 1
         StartOffset:
           RawValue: 0
+        DurationIsSpeedInstead:
+          Value: 1
     - rid: 1031736047412707332
       type: {class: MovingPlatformPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
@@ -1059,18 +1080,18 @@ MonoBehaviour:
             Y:
               RawValue: 0
           TravelDuration:
-            RawValue: 131072
+            RawValue: 65536
           EaseIn:
             Value: 0
           EaseOut:
             Value: 0
         - Position:
             X:
-              RawValue: 131072
+              RawValue: 65536
             Y:
-              RawValue: 131072
+              RawValue: 0
           TravelDuration:
-            RawValue: 131072
+            RawValue: 65536
           EaseIn:
             Value: 0
           EaseOut:
@@ -1081,7 +1102,7 @@ MonoBehaviour:
             Y:
               RawValue: 131072
           TravelDuration:
-            RawValue: 131072
+            RawValue: 65536
           EaseIn:
             Value: 0
           EaseOut:
@@ -1092,7 +1113,29 @@ MonoBehaviour:
             Y:
               RawValue: 0
           TravelDuration:
-            RawValue: 131072
+            RawValue: 65536
+          EaseIn:
+            Value: 0
+          EaseOut:
+            Value: 0
+        - Position:
+            X:
+              RawValue: 196608
+            Y:
+              RawValue: 131072
+          TravelDuration:
+            RawValue: 65536
+          EaseIn:
+            Value: 0
+          EaseOut:
+            Value: 0
+        - Position:
+            X:
+              RawValue: 65536
+            Y:
+              RawValue: 0
+          TravelDuration:
+            RawValue: 65536
           EaseIn:
             Value: 0
           EaseOut:
@@ -1101,6 +1144,8 @@ MonoBehaviour:
           Value: 1
         StartOffset:
           RawValue: 0
+        DurationIsSpeedInstead:
+          Value: 1
     - rid: 1520744685679673348
       type: {class: MovingPlatformPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
@@ -1238,10 +1283,34 @@ MonoBehaviour:
             Value: 0
           EaseOut:
             Value: 0
+        - Position:
+            X:
+              RawValue: 262144
+            Y:
+              RawValue: -65536
+          TravelDuration:
+            RawValue: 131072
+          EaseIn:
+            Value: 0
+          EaseOut:
+            Value: 0
+        - Position:
+            X:
+              RawValue: 196608
+            Y:
+              RawValue: 0
+          TravelDuration:
+            RawValue: 131072
+          EaseIn:
+            Value: 0
+          EaseOut:
+            Value: 0
         LoopingMode:
           Value: 1
         StartOffset:
           RawValue: 0
+        DurationIsSpeedInstead:
+          Value: 1
     - rid: 1553022217460121604
       type: {class: MovingPlatformPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
@@ -1493,7 +1562,7 @@ MonoBehaviour:
             Y:
               RawValue: 0
           TravelDuration:
-            RawValue: 131072
+            RawValue: 65536
           EaseIn:
             Value: 0
           EaseOut:
@@ -1504,7 +1573,7 @@ MonoBehaviour:
             Y:
               RawValue: 0
           TravelDuration:
-            RawValue: 131072
+            RawValue: 65536
           EaseIn:
             Value: 0
           EaseOut:
@@ -1513,6 +1582,8 @@ MonoBehaviour:
           Value: 1
         StartOffset:
           RawValue: 0
+        DurationIsSpeedInstead:
+          Value: 1
     - rid: 2173991284207779844
       type: {class: MovingPlatformPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
@@ -1865,7 +1936,18 @@ MonoBehaviour:
             X:
               RawValue: 196608
             Y:
-              RawValue: 65536
+              RawValue: -65536
+          TravelDuration:
+            RawValue: 131072
+          EaseIn:
+            Value: 0
+          EaseOut:
+            Value: 0
+        - Position:
+            X:
+              RawValue: 131072
+            Y:
+              RawValue: 0
           TravelDuration:
             RawValue: 131072
           EaseIn:
@@ -1876,6 +1958,8 @@ MonoBehaviour:
           Value: 1
         StartOffset:
           RawValue: 0
+        DurationIsSpeedInstead:
+          Value: 1
     - rid: 2915483030271295492
       type: {class: MovingPlatformPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
@@ -2051,7 +2135,7 @@ MonoBehaviour:
             Y:
               RawValue: 0
           TravelDuration:
-            RawValue: 131072
+            RawValue: 65536
           EaseIn:
             Value: 0
           EaseOut:
@@ -2062,7 +2146,7 @@ MonoBehaviour:
             Y:
               RawValue: 0
           TravelDuration:
-            RawValue: 131072
+            RawValue: 65536
           EaseIn:
             Value: 0
           EaseOut:
@@ -2071,6 +2155,8 @@ MonoBehaviour:
           Value: 1
         StartOffset:
           RawValue: 0
+        DurationIsSpeedInstead:
+          Value: 1
     - rid: 3469968831512838148
       type: {class: MovingPlatformPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
@@ -2785,7 +2871,7 @@ MonoBehaviour:
           TravelDuration:
             RawValue: 131072
           EaseIn:
-            Value: 0
+            Value: 1
           EaseOut:
             Value: 0
         - Position:
@@ -2796,13 +2882,15 @@ MonoBehaviour:
           TravelDuration:
             RawValue: 131072
           EaseIn:
-            Value: 1
+            Value: 0
           EaseOut:
             Value: 1
         LoopingMode:
           Value: 1
         StartOffset:
           RawValue: 0
+        DurationIsSpeedInstead:
+          Value: 1
     - rid: 5419156414289412100
       type: {class: MovingPlatformPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
@@ -2902,7 +2990,7 @@ MonoBehaviour:
             Y:
               RawValue: 0
           TravelDuration:
-            RawValue: 131072
+            RawValue: 65536
           EaseIn:
             Value: 0
           EaseOut:
@@ -2913,7 +3001,7 @@ MonoBehaviour:
             Y:
               RawValue: 0
           TravelDuration:
-            RawValue: 131072
+            RawValue: 65536
           EaseIn:
             Value: 0
           EaseOut:
@@ -2924,7 +3012,18 @@ MonoBehaviour:
             Y:
               RawValue: -65536
           TravelDuration:
-            RawValue: 131072
+            RawValue: 65536
+          EaseIn:
+            Value: 0
+          EaseOut:
+            Value: 0
+        - Position:
+            X:
+              RawValue: 262144
+            Y:
+              RawValue: -65536
+          TravelDuration:
+            RawValue: 65536
           EaseIn:
             Value: 0
           EaseOut:
@@ -2935,7 +3034,18 @@ MonoBehaviour:
             Y:
               RawValue: -65536
           TravelDuration:
-            RawValue: 131072
+            RawValue: 65536
+          EaseIn:
+            Value: 0
+          EaseOut:
+            Value: 0
+        - Position:
+            X:
+              RawValue: 65536
+            Y:
+              RawValue: 0
+          TravelDuration:
+            RawValue: 65536
           EaseIn:
             Value: 0
           EaseOut:
@@ -2944,6 +3054,8 @@ MonoBehaviour:
           Value: 1
         StartOffset:
           RawValue: 0
+        DurationIsSpeedInstead:
+          Value: 1
     - rid: 5545245259551735812
       type: {class: MovingPlatformPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
@@ -4495,7 +4607,7 @@ MonoBehaviour:
           TravelDuration:
             RawValue: 131072
           EaseIn:
-            Value: 1
+            Value: 0
           EaseOut:
             Value: 1
         - Position:
@@ -4506,13 +4618,15 @@ MonoBehaviour:
           TravelDuration:
             RawValue: 131072
           EaseIn:
-            Value: 0
+            Value: 1
           EaseOut:
             Value: 0
         LoopingMode:
           Value: 1
         StartOffset:
           RawValue: 0
+        DurationIsSpeedInstead:
+          Value: 1
     - rid: 8010276945214308356
       type: {class: MovingPlatformPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
@@ -4840,7 +4954,7 @@ MonoBehaviour:
             Y:
               RawValue: 0
           TravelDuration:
-            RawValue: 131072
+            RawValue: 65536
           EaseIn:
             Value: 0
           EaseOut:
@@ -4851,7 +4965,7 @@ MonoBehaviour:
             Y:
               RawValue: 0
           TravelDuration:
-            RawValue: 131072
+            RawValue: 65536
           EaseIn:
             Value: 0
           EaseOut:
@@ -4860,6 +4974,8 @@ MonoBehaviour:
           Value: 1
         StartOffset:
           RawValue: 0
+        DurationIsSpeedInstead:
+          Value: 1
     - rid: 8506298644452868100
       type: {class: MovingPlatformPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
@@ -4959,7 +5075,7 @@ MonoBehaviour:
             Y:
               RawValue: 0
           TravelDuration:
-            RawValue: 131072
+            RawValue: 65536
           EaseIn:
             Value: 0
           EaseOut:
@@ -4970,7 +5086,7 @@ MonoBehaviour:
             Y:
               RawValue: 0
           TravelDuration:
-            RawValue: 131072
+            RawValue: 65536
           EaseIn:
             Value: 0
           EaseOut:
@@ -4979,6 +5095,8 @@ MonoBehaviour:
           Value: 1
         StartOffset:
           RawValue: 0
+        DurationIsSpeedInstead:
+          Value: 1
     - rid: 8601953338570833924
       type: {class: MovingPlatformPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:

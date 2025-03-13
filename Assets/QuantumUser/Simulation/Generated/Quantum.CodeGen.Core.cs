@@ -2017,20 +2017,23 @@ namespace Quantum {
   }
   [StructLayout(LayoutKind.Explicit)]
   public unsafe partial struct GenericMover : Quantum.IComponent {
-    public const Int32 SIZE = 16;
+    public const Int32 SIZE = 24;
     public const Int32 ALIGNMENT = 8;
-    [FieldOffset(4)]
+    [FieldOffset(8)]
     public QListPtr<PathNode> Path;
     [FieldOffset(0)]
     public LoopingMode LoopingMode;
-    [FieldOffset(8)]
+    [FieldOffset(16)]
     public FP StartOffset;
+    [FieldOffset(4)]
+    public QBoolean DurationIsSpeedInstead;
     public override Int32 GetHashCode() {
       unchecked { 
         var hash = 1901;
         hash = hash * 31 + Path.GetHashCode();
         hash = hash * 31 + (Int32)LoopingMode;
         hash = hash * 31 + StartOffset.GetHashCode();
+        hash = hash * 31 + DurationIsSpeedInstead.GetHashCode();
         return hash;
       }
     }
@@ -2044,6 +2047,7 @@ namespace Quantum {
     public static void Serialize(void* ptr, FrameSerializer serializer) {
         var p = (GenericMover*)ptr;
         serializer.Stream.Serialize((Int32*)&p->LoopingMode);
+        QBoolean.Serialize(&p->DurationIsSpeedInstead, serializer);
         QList.Serialize(&p->Path, serializer, Statics.SerializePathNode);
         FP.Serialize(&p->StartOffset, serializer);
     }

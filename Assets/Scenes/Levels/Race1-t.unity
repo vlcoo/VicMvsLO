@@ -213,6 +213,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2857987242245735359, guid: b91fa28117ef9924783b776ac9fdc5c4,
         type: 3}
+      propertyPath: PhysicsCollider.Layer
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 2857987242245735359, guid: b91fa28117ef9924783b776ac9fdc5c4,
+        type: 3}
       propertyPath: PhysicsCollider.Shape2D.BoxExtents.X.RawValue
       value: 32768
       objectReference: {fileID: 0}
@@ -461,7 +466,7 @@ PrefabInstance:
     - target: {fileID: 1448426384698846915, guid: b91fa28117ef9924783b776ac9fdc5c4,
         type: 3}
       propertyPath: Prototype.Path.Array.size
-      value: 2
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 1448426384698846915, guid: b91fa28117ef9924783b776ac9fdc5c4,
         type: 3}
@@ -471,6 +476,11 @@ PrefabInstance:
     - target: {fileID: 1448426384698846915, guid: b91fa28117ef9924783b776ac9fdc5c4,
         type: 3}
       propertyPath: Prototype.StartOffset.RawValue
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1448426384698846915, guid: b91fa28117ef9924783b776ac9fdc5c4,
+        type: 3}
+      propertyPath: Prototype.DurationIsSpeedInstead.Value
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1448426384698846915, guid: b91fa28117ef9924783b776ac9fdc5c4,
@@ -485,12 +495,52 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1448426384698846915, guid: b91fa28117ef9924783b776ac9fdc5c4,
         type: 3}
+      propertyPath: Prototype.Path.Array.data[2].EaseIn.Value
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1448426384698846915, guid: b91fa28117ef9924783b776ac9fdc5c4,
+        type: 3}
+      propertyPath: Prototype.Path.Array.data[3].EaseIn.Value
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1448426384698846915, guid: b91fa28117ef9924783b776ac9fdc5c4,
+        type: 3}
+      propertyPath: Prototype.Path.Array.data[4].EaseIn.Value
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1448426384698846915, guid: b91fa28117ef9924783b776ac9fdc5c4,
+        type: 3}
+      propertyPath: Prototype.Path.Array.data[5].EaseIn.Value
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1448426384698846915, guid: b91fa28117ef9924783b776ac9fdc5c4,
+        type: 3}
       propertyPath: Prototype.Path.Array.data[0].EaseOut.Value
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1448426384698846915, guid: b91fa28117ef9924783b776ac9fdc5c4,
         type: 3}
       propertyPath: Prototype.Path.Array.data[1].EaseOut.Value
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1448426384698846915, guid: b91fa28117ef9924783b776ac9fdc5c4,
+        type: 3}
+      propertyPath: Prototype.Path.Array.data[2].EaseOut.Value
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1448426384698846915, guid: b91fa28117ef9924783b776ac9fdc5c4,
+        type: 3}
+      propertyPath: Prototype.Path.Array.data[3].EaseOut.Value
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1448426384698846915, guid: b91fa28117ef9924783b776ac9fdc5c4,
+        type: 3}
+      propertyPath: Prototype.Path.Array.data[4].EaseOut.Value
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1448426384698846915, guid: b91fa28117ef9924783b776ac9fdc5c4,
+        type: 3}
+      propertyPath: Prototype.Path.Array.data[5].EaseOut.Value
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1448426384698846915, guid: b91fa28117ef9924783b776ac9fdc5c4,
@@ -505,12 +555,52 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1448426384698846915, guid: b91fa28117ef9924783b776ac9fdc5c4,
         type: 3}
+      propertyPath: Prototype.Path.Array.data[2].Position.X.RawValue
+      value: -229376
+      objectReference: {fileID: 0}
+    - target: {fileID: 1448426384698846915, guid: b91fa28117ef9924783b776ac9fdc5c4,
+        type: 3}
+      propertyPath: Prototype.Path.Array.data[3].Position.X.RawValue
+      value: -229376
+      objectReference: {fileID: 0}
+    - target: {fileID: 1448426384698846915, guid: b91fa28117ef9924783b776ac9fdc5c4,
+        type: 3}
+      propertyPath: Prototype.Path.Array.data[4].Position.X.RawValue
+      value: -229376
+      objectReference: {fileID: 0}
+    - target: {fileID: 1448426384698846915, guid: b91fa28117ef9924783b776ac9fdc5c4,
+        type: 3}
+      propertyPath: Prototype.Path.Array.data[5].Position.X.RawValue
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1448426384698846915, guid: b91fa28117ef9924783b776ac9fdc5c4,
+        type: 3}
       propertyPath: Prototype.Path.Array.data[0].TravelDuration.RawValue
       value: 131072
       objectReference: {fileID: 0}
     - target: {fileID: 1448426384698846915, guid: b91fa28117ef9924783b776ac9fdc5c4,
         type: 3}
       propertyPath: Prototype.Path.Array.data[1].TravelDuration.RawValue
+      value: 131072
+      objectReference: {fileID: 0}
+    - target: {fileID: 1448426384698846915, guid: b91fa28117ef9924783b776ac9fdc5c4,
+        type: 3}
+      propertyPath: Prototype.Path.Array.data[2].TravelDuration.RawValue
+      value: 131072
+      objectReference: {fileID: 0}
+    - target: {fileID: 1448426384698846915, guid: b91fa28117ef9924783b776ac9fdc5c4,
+        type: 3}
+      propertyPath: Prototype.Path.Array.data[3].TravelDuration.RawValue
+      value: 131072
+      objectReference: {fileID: 0}
+    - target: {fileID: 1448426384698846915, guid: b91fa28117ef9924783b776ac9fdc5c4,
+        type: 3}
+      propertyPath: Prototype.Path.Array.data[4].TravelDuration.RawValue
+      value: 131072
+      objectReference: {fileID: 0}
+    - target: {fileID: 1448426384698846915, guid: b91fa28117ef9924783b776ac9fdc5c4,
+        type: 3}
+      propertyPath: Prototype.Path.Array.data[5].TravelDuration.RawValue
       value: 131072
       objectReference: {fileID: 0}
     - target: {fileID: 1450510929900931296, guid: b91fa28117ef9924783b776ac9fdc5c4,
@@ -545,8 +635,13 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2857987242245735359, guid: b91fa28117ef9924783b776ac9fdc5c4,
         type: 3}
+      propertyPath: PhysicsCollider.Layer
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 2857987242245735359, guid: b91fa28117ef9924783b776ac9fdc5c4,
+        type: 3}
       propertyPath: PhysicsCollider.Shape2D.BoxExtents.X.RawValue
-      value: 196608
+      value: 294912
       objectReference: {fileID: 0}
     - target: {fileID: 2857987242245735359, guid: b91fa28117ef9924783b776ac9fdc5c4,
         type: 3}
@@ -893,8 +988,13 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2857987242245735359, guid: b91fa28117ef9924783b776ac9fdc5c4,
         type: 3}
+      propertyPath: PhysicsCollider.Layer
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 2857987242245735359, guid: b91fa28117ef9924783b776ac9fdc5c4,
+        type: 3}
       propertyPath: PhysicsCollider.Shape2D.BoxExtents.X.RawValue
-      value: 32768
+      value: 65536
       objectReference: {fileID: 0}
     - target: {fileID: 2857987242245735359, guid: b91fa28117ef9924783b776ac9fdc5c4,
         type: 3}
@@ -1502,8 +1602,13 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2857987242245735359, guid: b91fa28117ef9924783b776ac9fdc5c4,
         type: 3}
+      propertyPath: PhysicsCollider.Layer
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 2857987242245735359, guid: b91fa28117ef9924783b776ac9fdc5c4,
+        type: 3}
       propertyPath: PhysicsCollider.Shape2D.BoxExtents.X.RawValue
-      value: 32768
+      value: 65536
       objectReference: {fileID: 0}
     - target: {fileID: 2857987242245735359, guid: b91fa28117ef9924783b776ac9fdc5c4,
         type: 3}
@@ -13332,8 +13437,13 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2857987242245735359, guid: b91fa28117ef9924783b776ac9fdc5c4,
         type: 3}
+      propertyPath: PhysicsCollider.Layer
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 2857987242245735359, guid: b91fa28117ef9924783b776ac9fdc5c4,
+        type: 3}
       propertyPath: PhysicsCollider.Shape2D.BoxExtents.X.RawValue
-      value: 131072
+      value: 245760
       objectReference: {fileID: 0}
     - target: {fileID: 2857987242245735359, guid: b91fa28117ef9924783b776ac9fdc5c4,
         type: 3}
@@ -13504,6 +13614,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_TagString
       value: Squishy
+      objectReference: {fileID: 0}
+    - target: {fileID: 2857987242245735359, guid: b91fa28117ef9924783b776ac9fdc5c4,
+        type: 3}
+      propertyPath: PhysicsCollider.Layer
+      value: 8
       objectReference: {fileID: 0}
     - target: {fileID: 2857987242245735359, guid: b91fa28117ef9924783b776ac9fdc5c4,
         type: 3}
@@ -13804,8 +13919,13 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2857987242245735359, guid: b91fa28117ef9924783b776ac9fdc5c4,
         type: 3}
+      propertyPath: PhysicsCollider.Layer
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 2857987242245735359, guid: b91fa28117ef9924783b776ac9fdc5c4,
+        type: 3}
       propertyPath: PhysicsCollider.Shape2D.BoxExtents.X.RawValue
-      value: 131072
+      value: 163840
       objectReference: {fileID: 0}
     - target: {fileID: 2857987242245735359, guid: b91fa28117ef9924783b776ac9fdc5c4,
         type: 3}
@@ -14022,7 +14142,7 @@ PrefabInstance:
     - target: {fileID: 1448426384698846915, guid: b91fa28117ef9924783b776ac9fdc5c4,
         type: 3}
       propertyPath: Prototype.Path.Array.size
-      value: 2
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 1448426384698846915, guid: b91fa28117ef9924783b776ac9fdc5c4,
         type: 3}
@@ -14032,6 +14152,11 @@ PrefabInstance:
     - target: {fileID: 1448426384698846915, guid: b91fa28117ef9924783b776ac9fdc5c4,
         type: 3}
       propertyPath: Prototype.StartOffset.RawValue
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1448426384698846915, guid: b91fa28117ef9924783b776ac9fdc5c4,
+        type: 3}
+      propertyPath: Prototype.DurationIsSpeedInstead.Value
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1448426384698846915, guid: b91fa28117ef9924783b776ac9fdc5c4,
@@ -14046,6 +14171,21 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1448426384698846915, guid: b91fa28117ef9924783b776ac9fdc5c4,
         type: 3}
+      propertyPath: Prototype.Path.Array.data[2].EaseIn.Value
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1448426384698846915, guid: b91fa28117ef9924783b776ac9fdc5c4,
+        type: 3}
+      propertyPath: Prototype.Path.Array.data[3].EaseIn.Value
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1448426384698846915, guid: b91fa28117ef9924783b776ac9fdc5c4,
+        type: 3}
+      propertyPath: Prototype.Path.Array.data[4].EaseIn.Value
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1448426384698846915, guid: b91fa28117ef9924783b776ac9fdc5c4,
+        type: 3}
       propertyPath: Prototype.Path.Array.data[0].EaseOut.Value
       value: 1
       objectReference: {fileID: 0}
@@ -14056,8 +14196,23 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1448426384698846915, guid: b91fa28117ef9924783b776ac9fdc5c4,
         type: 3}
+      propertyPath: Prototype.Path.Array.data[2].EaseOut.Value
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1448426384698846915, guid: b91fa28117ef9924783b776ac9fdc5c4,
+        type: 3}
+      propertyPath: Prototype.Path.Array.data[3].EaseOut.Value
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1448426384698846915, guid: b91fa28117ef9924783b776ac9fdc5c4,
+        type: 3}
+      propertyPath: Prototype.Path.Array.data[4].EaseOut.Value
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1448426384698846915, guid: b91fa28117ef9924783b776ac9fdc5c4,
+        type: 3}
       propertyPath: Prototype.Path.Array.data[1].Position.X.RawValue
-      value: -163840
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1448426384698846915, guid: b91fa28117ef9924783b776ac9fdc5c4,
         type: 3}
@@ -14066,12 +14221,42 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1448426384698846915, guid: b91fa28117ef9924783b776ac9fdc5c4,
         type: 3}
+      propertyPath: Prototype.Path.Array.data[2].Position.X.RawValue
+      value: -163840
+      objectReference: {fileID: 0}
+    - target: {fileID: 1448426384698846915, guid: b91fa28117ef9924783b776ac9fdc5c4,
+        type: 3}
+      propertyPath: Prototype.Path.Array.data[3].Position.X.RawValue
+      value: -163840
+      objectReference: {fileID: 0}
+    - target: {fileID: 1448426384698846915, guid: b91fa28117ef9924783b776ac9fdc5c4,
+        type: 3}
+      propertyPath: Prototype.Path.Array.data[4].Position.X.RawValue
+      value: -163840
+      objectReference: {fileID: 0}
+    - target: {fileID: 1448426384698846915, guid: b91fa28117ef9924783b776ac9fdc5c4,
+        type: 3}
       propertyPath: Prototype.Path.Array.data[0].TravelDuration.RawValue
-      value: 131072
+      value: 65536
       objectReference: {fileID: 0}
     - target: {fileID: 1448426384698846915, guid: b91fa28117ef9924783b776ac9fdc5c4,
         type: 3}
       propertyPath: Prototype.Path.Array.data[1].TravelDuration.RawValue
+      value: 131072
+      objectReference: {fileID: 0}
+    - target: {fileID: 1448426384698846915, guid: b91fa28117ef9924783b776ac9fdc5c4,
+        type: 3}
+      propertyPath: Prototype.Path.Array.data[2].TravelDuration.RawValue
+      value: 131072
+      objectReference: {fileID: 0}
+    - target: {fileID: 1448426384698846915, guid: b91fa28117ef9924783b776ac9fdc5c4,
+        type: 3}
+      propertyPath: Prototype.Path.Array.data[3].TravelDuration.RawValue
+      value: 131072
+      objectReference: {fileID: 0}
+    - target: {fileID: 1448426384698846915, guid: b91fa28117ef9924783b776ac9fdc5c4,
+        type: 3}
+      propertyPath: Prototype.Path.Array.data[4].TravelDuration.RawValue
       value: 131072
       objectReference: {fileID: 0}
     - target: {fileID: 1450510929900931296, guid: b91fa28117ef9924783b776ac9fdc5c4,
@@ -14106,8 +14291,13 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2857987242245735359, guid: b91fa28117ef9924783b776ac9fdc5c4,
         type: 3}
+      propertyPath: PhysicsCollider.Layer
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 2857987242245735359, guid: b91fa28117ef9924783b776ac9fdc5c4,
+        type: 3}
       propertyPath: PhysicsCollider.Shape2D.BoxExtents.X.RawValue
-      value: 196608
+      value: 262144
       objectReference: {fileID: 0}
     - target: {fileID: 2857987242245735359, guid: b91fa28117ef9924783b776ac9fdc5c4,
         type: 3}
@@ -14293,8 +14483,13 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2857987242245735359, guid: b91fa28117ef9924783b776ac9fdc5c4,
         type: 3}
+      propertyPath: PhysicsCollider.Layer
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 2857987242245735359, guid: b91fa28117ef9924783b776ac9fdc5c4,
+        type: 3}
       propertyPath: PhysicsCollider.Shape2D.BoxExtents.X.RawValue
-      value: 131072
+      value: 180224
       objectReference: {fileID: 0}
     - target: {fileID: 2857987242245735359, guid: b91fa28117ef9924783b776ac9fdc5c4,
         type: 3}
@@ -14480,8 +14675,13 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2857987242245735359, guid: b91fa28117ef9924783b776ac9fdc5c4,
         type: 3}
+      propertyPath: PhysicsCollider.Layer
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 2857987242245735359, guid: b91fa28117ef9924783b776ac9fdc5c4,
+        type: 3}
       propertyPath: PhysicsCollider.Shape2D.BoxExtents.X.RawValue
-      value: 131072
+      value: 163840
       objectReference: {fileID: 0}
     - target: {fileID: 2857987242245735359, guid: b91fa28117ef9924783b776ac9fdc5c4,
         type: 3}
@@ -15637,6 +15837,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2857987242245735359, guid: b91fa28117ef9924783b776ac9fdc5c4,
         type: 3}
+      propertyPath: PhysicsCollider.Layer
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 2857987242245735359, guid: b91fa28117ef9924783b776ac9fdc5c4,
+        type: 3}
       propertyPath: PhysicsCollider.Shape2D.BoxExtents.X.RawValue
       value: 229376
       objectReference: {fileID: 0}
@@ -15812,8 +16017,13 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2857987242245735359, guid: b91fa28117ef9924783b776ac9fdc5c4,
         type: 3}
+      propertyPath: PhysicsCollider.Layer
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 2857987242245735359, guid: b91fa28117ef9924783b776ac9fdc5c4,
+        type: 3}
       propertyPath: PhysicsCollider.Shape2D.BoxExtents.X.RawValue
-      value: 163840
+      value: 196608
       objectReference: {fileID: 0}
     - target: {fileID: 2857987242245735359, guid: b91fa28117ef9924783b776ac9fdc5c4,
         type: 3}
@@ -15999,6 +16209,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2857987242245735359, guid: b91fa28117ef9924783b776ac9fdc5c4,
         type: 3}
+      propertyPath: PhysicsCollider.Layer
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 2857987242245735359, guid: b91fa28117ef9924783b776ac9fdc5c4,
+        type: 3}
       propertyPath: PhysicsCollider.Shape2D.BoxExtents.X.RawValue
       value: 32768
       objectReference: {fileID: 0}
@@ -16174,8 +16389,13 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2857987242245735359, guid: b91fa28117ef9924783b776ac9fdc5c4,
         type: 3}
+      propertyPath: PhysicsCollider.Layer
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 2857987242245735359, guid: b91fa28117ef9924783b776ac9fdc5c4,
+        type: 3}
       propertyPath: PhysicsCollider.Shape2D.BoxExtents.X.RawValue
-      value: 131072
+      value: 163840
       objectReference: {fileID: 0}
     - target: {fileID: 2857987242245735359, guid: b91fa28117ef9924783b776ac9fdc5c4,
         type: 3}
@@ -16349,8 +16569,13 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2857987242245735359, guid: b91fa28117ef9924783b776ac9fdc5c4,
         type: 3}
+      propertyPath: PhysicsCollider.Layer
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 2857987242245735359, guid: b91fa28117ef9924783b776ac9fdc5c4,
+        type: 3}
       propertyPath: PhysicsCollider.Shape2D.BoxExtents.X.RawValue
-      value: 163840
+      value: 212992
       objectReference: {fileID: 0}
     - target: {fileID: 2857987242245735359, guid: b91fa28117ef9924783b776ac9fdc5c4,
         type: 3}
@@ -16651,8 +16876,13 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2857987242245735359, guid: b91fa28117ef9924783b776ac9fdc5c4,
         type: 3}
+      propertyPath: PhysicsCollider.Layer
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 2857987242245735359, guid: b91fa28117ef9924783b776ac9fdc5c4,
+        type: 3}
       propertyPath: PhysicsCollider.Shape2D.BoxExtents.X.RawValue
-      value: 131072
+      value: 180224
       objectReference: {fileID: 0}
     - target: {fileID: 2857987242245735359, guid: b91fa28117ef9924783b776ac9fdc5c4,
         type: 3}
@@ -16818,6 +17048,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_TagString
       value: Squishy
+      objectReference: {fileID: 0}
+    - target: {fileID: 2857987242245735359, guid: b91fa28117ef9924783b776ac9fdc5c4,
+        type: 3}
+      propertyPath: PhysicsCollider.Layer
+      value: 8
       objectReference: {fileID: 0}
     - target: {fileID: 2857987242245735359, guid: b91fa28117ef9924783b776ac9fdc5c4,
         type: 3}
@@ -16996,8 +17231,13 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2857987242245735359, guid: b91fa28117ef9924783b776ac9fdc5c4,
         type: 3}
+      propertyPath: PhysicsCollider.Layer
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 2857987242245735359, guid: b91fa28117ef9924783b776ac9fdc5c4,
+        type: 3}
       propertyPath: PhysicsCollider.Shape2D.BoxExtents.X.RawValue
-      value: 131072
+      value: 212992
       objectReference: {fileID: 0}
     - target: {fileID: 2857987242245735359, guid: b91fa28117ef9924783b776ac9fdc5c4,
         type: 3}
@@ -17171,8 +17411,13 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2857987242245735359, guid: b91fa28117ef9924783b776ac9fdc5c4,
         type: 3}
+      propertyPath: PhysicsCollider.Layer
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 2857987242245735359, guid: b91fa28117ef9924783b776ac9fdc5c4,
+        type: 3}
       propertyPath: PhysicsCollider.Shape2D.BoxExtents.X.RawValue
-      value: 131072
+      value: 180224
       objectReference: {fileID: 0}
     - target: {fileID: 2857987242245735359, guid: b91fa28117ef9924783b776ac9fdc5c4,
         type: 3}
@@ -17352,7 +17597,7 @@ PrefabInstance:
     - target: {fileID: 2857987242245735359, guid: b91fa28117ef9924783b776ac9fdc5c4,
         type: 3}
       propertyPath: PhysicsCollider.Shape2D.BoxExtents.X.RawValue
-      value: 163840
+      value: 212992
       objectReference: {fileID: 0}
     - target: {fileID: 2857987242245735359, guid: b91fa28117ef9924783b776ac9fdc5c4,
         type: 3}
@@ -17922,8 +18167,13 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2857987242245735359, guid: b91fa28117ef9924783b776ac9fdc5c4,
         type: 3}
+      propertyPath: PhysicsCollider.Layer
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 2857987242245735359, guid: b91fa28117ef9924783b776ac9fdc5c4,
+        type: 3}
       propertyPath: PhysicsCollider.Shape2D.BoxExtents.X.RawValue
-      value: 131072
+      value: 163840
       objectReference: {fileID: 0}
     - target: {fileID: 2857987242245735359, guid: b91fa28117ef9924783b776ac9fdc5c4,
         type: 3}
@@ -18405,6 +18655,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2857987242245735359, guid: b91fa28117ef9924783b776ac9fdc5c4,
         type: 3}
+      propertyPath: PhysicsCollider.Layer
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 2857987242245735359, guid: b91fa28117ef9924783b776ac9fdc5c4,
+        type: 3}
       propertyPath: PhysicsCollider.Shape2D.BoxExtents.X.RawValue
       value: 131072
       objectReference: {fileID: 0}
@@ -18745,7 +19000,7 @@ PrefabInstance:
     - target: {fileID: 1448426384698846915, guid: b91fa28117ef9924783b776ac9fdc5c4,
         type: 3}
       propertyPath: Prototype.Path.Array.size
-      value: 2
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 1448426384698846915, guid: b91fa28117ef9924783b776ac9fdc5c4,
         type: 3}
@@ -18755,6 +19010,11 @@ PrefabInstance:
     - target: {fileID: 1448426384698846915, guid: b91fa28117ef9924783b776ac9fdc5c4,
         type: 3}
       propertyPath: Prototype.StartOffset.RawValue
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1448426384698846915, guid: b91fa28117ef9924783b776ac9fdc5c4,
+        type: 3}
+      propertyPath: Prototype.DurationIsSpeedInstead.Value
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1448426384698846915, guid: b91fa28117ef9924783b776ac9fdc5c4,
@@ -18769,6 +19029,26 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1448426384698846915, guid: b91fa28117ef9924783b776ac9fdc5c4,
         type: 3}
+      propertyPath: Prototype.Path.Array.data[2].EaseIn.Value
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1448426384698846915, guid: b91fa28117ef9924783b776ac9fdc5c4,
+        type: 3}
+      propertyPath: Prototype.Path.Array.data[3].EaseIn.Value
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1448426384698846915, guid: b91fa28117ef9924783b776ac9fdc5c4,
+        type: 3}
+      propertyPath: Prototype.Path.Array.data[4].EaseIn.Value
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1448426384698846915, guid: b91fa28117ef9924783b776ac9fdc5c4,
+        type: 3}
+      propertyPath: Prototype.Path.Array.data[5].EaseIn.Value
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1448426384698846915, guid: b91fa28117ef9924783b776ac9fdc5c4,
+        type: 3}
       propertyPath: Prototype.Path.Array.data[0].EaseOut.Value
       value: 1
       objectReference: {fileID: 0}
@@ -18779,8 +19059,28 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1448426384698846915, guid: b91fa28117ef9924783b776ac9fdc5c4,
         type: 3}
+      propertyPath: Prototype.Path.Array.data[2].EaseOut.Value
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1448426384698846915, guid: b91fa28117ef9924783b776ac9fdc5c4,
+        type: 3}
+      propertyPath: Prototype.Path.Array.data[3].EaseOut.Value
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1448426384698846915, guid: b91fa28117ef9924783b776ac9fdc5c4,
+        type: 3}
+      propertyPath: Prototype.Path.Array.data[4].EaseOut.Value
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1448426384698846915, guid: b91fa28117ef9924783b776ac9fdc5c4,
+        type: 3}
+      propertyPath: Prototype.Path.Array.data[5].EaseOut.Value
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1448426384698846915, guid: b91fa28117ef9924783b776ac9fdc5c4,
+        type: 3}
       propertyPath: Prototype.Path.Array.data[1].Position.X.RawValue
-      value: -98304
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1448426384698846915, guid: b91fa28117ef9924783b776ac9fdc5c4,
         type: 3}
@@ -18789,12 +19089,52 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1448426384698846915, guid: b91fa28117ef9924783b776ac9fdc5c4,
         type: 3}
+      propertyPath: Prototype.Path.Array.data[2].Position.X.RawValue
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1448426384698846915, guid: b91fa28117ef9924783b776ac9fdc5c4,
+        type: 3}
+      propertyPath: Prototype.Path.Array.data[3].Position.X.RawValue
+      value: -98304
+      objectReference: {fileID: 0}
+    - target: {fileID: 1448426384698846915, guid: b91fa28117ef9924783b776ac9fdc5c4,
+        type: 3}
+      propertyPath: Prototype.Path.Array.data[4].Position.X.RawValue
+      value: -98304
+      objectReference: {fileID: 0}
+    - target: {fileID: 1448426384698846915, guid: b91fa28117ef9924783b776ac9fdc5c4,
+        type: 3}
+      propertyPath: Prototype.Path.Array.data[5].Position.X.RawValue
+      value: -98304
+      objectReference: {fileID: 0}
+    - target: {fileID: 1448426384698846915, guid: b91fa28117ef9924783b776ac9fdc5c4,
+        type: 3}
       propertyPath: Prototype.Path.Array.data[0].TravelDuration.RawValue
-      value: 131072
+      value: 65536
       objectReference: {fileID: 0}
     - target: {fileID: 1448426384698846915, guid: b91fa28117ef9924783b776ac9fdc5c4,
         type: 3}
       propertyPath: Prototype.Path.Array.data[1].TravelDuration.RawValue
+      value: 65536
+      objectReference: {fileID: 0}
+    - target: {fileID: 1448426384698846915, guid: b91fa28117ef9924783b776ac9fdc5c4,
+        type: 3}
+      propertyPath: Prototype.Path.Array.data[2].TravelDuration.RawValue
+      value: 131072
+      objectReference: {fileID: 0}
+    - target: {fileID: 1448426384698846915, guid: b91fa28117ef9924783b776ac9fdc5c4,
+        type: 3}
+      propertyPath: Prototype.Path.Array.data[3].TravelDuration.RawValue
+      value: 131072
+      objectReference: {fileID: 0}
+    - target: {fileID: 1448426384698846915, guid: b91fa28117ef9924783b776ac9fdc5c4,
+        type: 3}
+      propertyPath: Prototype.Path.Array.data[4].TravelDuration.RawValue
+      value: 131072
+      objectReference: {fileID: 0}
+    - target: {fileID: 1448426384698846915, guid: b91fa28117ef9924783b776ac9fdc5c4,
+        type: 3}
+      propertyPath: Prototype.Path.Array.data[5].TravelDuration.RawValue
       value: 131072
       objectReference: {fileID: 0}
     - target: {fileID: 1450510929900931296, guid: b91fa28117ef9924783b776ac9fdc5c4,
@@ -18829,8 +19169,13 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2857987242245735359, guid: b91fa28117ef9924783b776ac9fdc5c4,
         type: 3}
+      propertyPath: PhysicsCollider.Layer
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 2857987242245735359, guid: b91fa28117ef9924783b776ac9fdc5c4,
+        type: 3}
       propertyPath: PhysicsCollider.Shape2D.BoxExtents.X.RawValue
-      value: 196608
+      value: 229376
       objectReference: {fileID: 0}
     - target: {fileID: 2857987242245735359, guid: b91fa28117ef9924783b776ac9fdc5c4,
         type: 3}
@@ -19004,8 +19349,13 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2857987242245735359, guid: b91fa28117ef9924783b776ac9fdc5c4,
         type: 3}
+      propertyPath: PhysicsCollider.Layer
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 2857987242245735359, guid: b91fa28117ef9924783b776ac9fdc5c4,
+        type: 3}
       propertyPath: PhysicsCollider.Shape2D.BoxExtents.X.RawValue
-      value: 131072
+      value: 163840
       objectReference: {fileID: 0}
     - target: {fileID: 2857987242245735359, guid: b91fa28117ef9924783b776ac9fdc5c4,
         type: 3}
@@ -19428,6 +19778,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2857987242245735359, guid: b91fa28117ef9924783b776ac9fdc5c4,
         type: 3}
+      propertyPath: PhysicsCollider.Layer
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 2857987242245735359, guid: b91fa28117ef9924783b776ac9fdc5c4,
+        type: 3}
       propertyPath: PhysicsCollider.Shape2D.BoxExtents.X.RawValue
       value: 49152
       objectReference: {fileID: 0}
@@ -19835,6 +20190,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_TagString
       value: Squishy
+      objectReference: {fileID: 0}
+    - target: {fileID: 2857987242245735359, guid: b91fa28117ef9924783b776ac9fdc5c4,
+        type: 3}
+      propertyPath: PhysicsCollider.Layer
+      value: 8
       objectReference: {fileID: 0}
     - target: {fileID: 2857987242245735359, guid: b91fa28117ef9924783b776ac9fdc5c4,
         type: 3}
@@ -20511,6 +20871,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2857987242245735359, guid: b91fa28117ef9924783b776ac9fdc5c4,
         type: 3}
+      propertyPath: PhysicsCollider.Layer
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 2857987242245735359, guid: b91fa28117ef9924783b776ac9fdc5c4,
+        type: 3}
       propertyPath: PhysicsCollider.Shape2D.BoxExtents.X.RawValue
       value: 278528
       objectReference: {fileID: 0}
@@ -20930,6 +21295,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2857987242245735359, guid: b91fa28117ef9924783b776ac9fdc5c4,
         type: 3}
+      propertyPath: PhysicsCollider.Layer
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 2857987242245735359, guid: b91fa28117ef9924783b776ac9fdc5c4,
+        type: 3}
       propertyPath: PhysicsCollider.Shape2D.BoxExtents.X.RawValue
       value: 49152
       objectReference: {fileID: 0}
@@ -21148,12 +21518,17 @@ PrefabInstance:
     - target: {fileID: 1448426384698846915, guid: b91fa28117ef9924783b776ac9fdc5c4,
         type: 3}
       propertyPath: Prototype.Path.Array.size
-      value: 2
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 1448426384698846915, guid: b91fa28117ef9924783b776ac9fdc5c4,
         type: 3}
       propertyPath: Prototype.LoopingMode.Value
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1448426384698846915, guid: b91fa28117ef9924783b776ac9fdc5c4,
+        type: 3}
+      propertyPath: Prototype.DurationIsSpeedInstead.Value
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1448426384698846915, guid: b91fa28117ef9924783b776ac9fdc5c4,
         type: 3}
@@ -21163,6 +21538,21 @@ PrefabInstance:
     - target: {fileID: 1448426384698846915, guid: b91fa28117ef9924783b776ac9fdc5c4,
         type: 3}
       propertyPath: Prototype.Path.Array.data[1].EaseIn.Value
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1448426384698846915, guid: b91fa28117ef9924783b776ac9fdc5c4,
+        type: 3}
+      propertyPath: Prototype.Path.Array.data[2].EaseIn.Value
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1448426384698846915, guid: b91fa28117ef9924783b776ac9fdc5c4,
+        type: 3}
+      propertyPath: Prototype.Path.Array.data[3].EaseIn.Value
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1448426384698846915, guid: b91fa28117ef9924783b776ac9fdc5c4,
+        type: 3}
+      propertyPath: Prototype.Path.Array.data[4].EaseIn.Value
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1448426384698846915, guid: b91fa28117ef9924783b776ac9fdc5c4,
@@ -21177,8 +21567,23 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1448426384698846915, guid: b91fa28117ef9924783b776ac9fdc5c4,
         type: 3}
+      propertyPath: Prototype.Path.Array.data[2].EaseOut.Value
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1448426384698846915, guid: b91fa28117ef9924783b776ac9fdc5c4,
+        type: 3}
+      propertyPath: Prototype.Path.Array.data[3].EaseOut.Value
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1448426384698846915, guid: b91fa28117ef9924783b776ac9fdc5c4,
+        type: 3}
+      propertyPath: Prototype.Path.Array.data[4].EaseOut.Value
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1448426384698846915, guid: b91fa28117ef9924783b776ac9fdc5c4,
+        type: 3}
       propertyPath: Prototype.Path.Array.data[1].Position.X.RawValue
-      value: -32768
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1448426384698846915, guid: b91fa28117ef9924783b776ac9fdc5c4,
         type: 3}
@@ -21187,12 +21592,42 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1448426384698846915, guid: b91fa28117ef9924783b776ac9fdc5c4,
         type: 3}
+      propertyPath: Prototype.Path.Array.data[2].Position.X.RawValue
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1448426384698846915, guid: b91fa28117ef9924783b776ac9fdc5c4,
+        type: 3}
+      propertyPath: Prototype.Path.Array.data[3].Position.X.RawValue
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1448426384698846915, guid: b91fa28117ef9924783b776ac9fdc5c4,
+        type: 3}
+      propertyPath: Prototype.Path.Array.data[4].Position.X.RawValue
+      value: -32768
+      objectReference: {fileID: 0}
+    - target: {fileID: 1448426384698846915, guid: b91fa28117ef9924783b776ac9fdc5c4,
+        type: 3}
       propertyPath: Prototype.Path.Array.data[0].TravelDuration.RawValue
-      value: 131072
+      value: 65536
       objectReference: {fileID: 0}
     - target: {fileID: 1448426384698846915, guid: b91fa28117ef9924783b776ac9fdc5c4,
         type: 3}
       propertyPath: Prototype.Path.Array.data[1].TravelDuration.RawValue
+      value: 65536
+      objectReference: {fileID: 0}
+    - target: {fileID: 1448426384698846915, guid: b91fa28117ef9924783b776ac9fdc5c4,
+        type: 3}
+      propertyPath: Prototype.Path.Array.data[2].TravelDuration.RawValue
+      value: 65536
+      objectReference: {fileID: 0}
+    - target: {fileID: 1448426384698846915, guid: b91fa28117ef9924783b776ac9fdc5c4,
+        type: 3}
+      propertyPath: Prototype.Path.Array.data[3].TravelDuration.RawValue
+      value: 131072
+      objectReference: {fileID: 0}
+    - target: {fileID: 1448426384698846915, guid: b91fa28117ef9924783b776ac9fdc5c4,
+        type: 3}
+      propertyPath: Prototype.Path.Array.data[4].TravelDuration.RawValue
       value: 131072
       objectReference: {fileID: 0}
     - target: {fileID: 1450510929900931296, guid: b91fa28117ef9924783b776ac9fdc5c4,
@@ -21224,6 +21659,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_TagString
       value: Squishy
+      objectReference: {fileID: 0}
+    - target: {fileID: 2857987242245735359, guid: b91fa28117ef9924783b776ac9fdc5c4,
+        type: 3}
+      propertyPath: PhysicsCollider.Layer
+      value: 8
       objectReference: {fileID: 0}
     - target: {fileID: 2857987242245735359, guid: b91fa28117ef9924783b776ac9fdc5c4,
         type: 3}
@@ -38203,6 +38643,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2857987242245735359, guid: b91fa28117ef9924783b776ac9fdc5c4,
         type: 3}
+      propertyPath: PhysicsCollider.Layer
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 2857987242245735359, guid: b91fa28117ef9924783b776ac9fdc5c4,
+        type: 3}
       propertyPath: PhysicsCollider.Shape2D.BoxExtents.X.RawValue
       value: 32768
       objectReference: {fileID: 0}
@@ -38770,6 +39215,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2857987242245735359, guid: b91fa28117ef9924783b776ac9fdc5c4,
         type: 3}
+      propertyPath: PhysicsCollider.Layer
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 2857987242245735359, guid: b91fa28117ef9924783b776ac9fdc5c4,
+        type: 3}
       propertyPath: PhysicsCollider.Shape2D.BoxExtents.X.RawValue
       value: 32768
       objectReference: {fileID: 0}
@@ -38945,8 +39395,13 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2857987242245735359, guid: b91fa28117ef9924783b776ac9fdc5c4,
         type: 3}
+      propertyPath: PhysicsCollider.Layer
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 2857987242245735359, guid: b91fa28117ef9924783b776ac9fdc5c4,
+        type: 3}
       propertyPath: PhysicsCollider.Shape2D.BoxExtents.X.RawValue
-      value: 131072
+      value: 212992
       objectReference: {fileID: 0}
     - target: {fileID: 2857987242245735359, guid: b91fa28117ef9924783b776ac9fdc5c4,
         type: 3}
@@ -39424,6 +39879,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2857987242245735359, guid: b91fa28117ef9924783b776ac9fdc5c4,
         type: 3}
+      propertyPath: PhysicsCollider.Layer
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 2857987242245735359, guid: b91fa28117ef9924783b776ac9fdc5c4,
+        type: 3}
       propertyPath: PhysicsCollider.Shape2D.BoxExtents.X.RawValue
       value: 163840
       objectReference: {fileID: 0}
@@ -39873,8 +40333,13 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2857987242245735359, guid: b91fa28117ef9924783b776ac9fdc5c4,
         type: 3}
+      propertyPath: PhysicsCollider.Layer
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 2857987242245735359, guid: b91fa28117ef9924783b776ac9fdc5c4,
+        type: 3}
       propertyPath: PhysicsCollider.Shape2D.BoxExtents.X.RawValue
-      value: 229376
+      value: 262144
       objectReference: {fileID: 0}
     - target: {fileID: 2857987242245735359, guid: b91fa28117ef9924783b776ac9fdc5c4,
         type: 3}
@@ -40479,8 +40944,13 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2857987242245735359, guid: b91fa28117ef9924783b776ac9fdc5c4,
         type: 3}
+      propertyPath: PhysicsCollider.Layer
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 2857987242245735359, guid: b91fa28117ef9924783b776ac9fdc5c4,
+        type: 3}
       propertyPath: PhysicsCollider.Shape2D.BoxExtents.X.RawValue
-      value: 131072
+      value: 163840
       objectReference: {fileID: 0}
     - target: {fileID: 2857987242245735359, guid: b91fa28117ef9924783b776ac9fdc5c4,
         type: 3}
@@ -40651,6 +41121,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_TagString
       value: Squishy
+      objectReference: {fileID: 0}
+    - target: {fileID: 2857987242245735359, guid: b91fa28117ef9924783b776ac9fdc5c4,
+        type: 3}
+      propertyPath: PhysicsCollider.Layer
+      value: 8
       objectReference: {fileID: 0}
     - target: {fileID: 2857987242245735359, guid: b91fa28117ef9924783b776ac9fdc5c4,
         type: 3}
@@ -40993,8 +41468,13 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2857987242245735359, guid: b91fa28117ef9924783b776ac9fdc5c4,
         type: 3}
+      propertyPath: PhysicsCollider.Layer
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 2857987242245735359, guid: b91fa28117ef9924783b776ac9fdc5c4,
+        type: 3}
       propertyPath: PhysicsCollider.Shape2D.BoxExtents.X.RawValue
-      value: 131072
+      value: 180224
       objectReference: {fileID: 0}
     - target: {fileID: 2857987242245735359, guid: b91fa28117ef9924783b776ac9fdc5c4,
         type: 3}
@@ -41168,8 +41648,13 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2857987242245735359, guid: b91fa28117ef9924783b776ac9fdc5c4,
         type: 3}
+      propertyPath: PhysicsCollider.Layer
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 2857987242245735359, guid: b91fa28117ef9924783b776ac9fdc5c4,
+        type: 3}
       propertyPath: PhysicsCollider.Shape2D.BoxExtents.X.RawValue
-      value: 131072
+      value: 163840
       objectReference: {fileID: 0}
     - target: {fileID: 2857987242245735359, guid: b91fa28117ef9924783b776ac9fdc5c4,
         type: 3}
@@ -41343,8 +41828,13 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2857987242245735359, guid: b91fa28117ef9924783b776ac9fdc5c4,
         type: 3}
+      propertyPath: PhysicsCollider.Layer
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 2857987242245735359, guid: b91fa28117ef9924783b776ac9fdc5c4,
+        type: 3}
       propertyPath: PhysicsCollider.Shape2D.BoxExtents.X.RawValue
-      value: 163840
+      value: 147456
       objectReference: {fileID: 0}
     - target: {fileID: 2857987242245735359, guid: b91fa28117ef9924783b776ac9fdc5c4,
         type: 3}
@@ -41515,6 +42005,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_TagString
       value: Squishy
+      objectReference: {fileID: 0}
+    - target: {fileID: 2857987242245735359, guid: b91fa28117ef9924783b776ac9fdc5c4,
+        type: 3}
+      propertyPath: PhysicsCollider.Layer
+      value: 8
       objectReference: {fileID: 0}
     - target: {fileID: 2857987242245735359, guid: b91fa28117ef9924783b776ac9fdc5c4,
         type: 3}
@@ -41996,6 +42491,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2857987242245735359, guid: b91fa28117ef9924783b776ac9fdc5c4,
         type: 3}
+      propertyPath: PhysicsCollider.Layer
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 2857987242245735359, guid: b91fa28117ef9924783b776ac9fdc5c4,
+        type: 3}
       propertyPath: PhysicsCollider.Shape2D.BoxExtents.X.RawValue
       value: 131072
       objectReference: {fileID: 0}
@@ -42171,8 +42671,13 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2857987242245735359, guid: b91fa28117ef9924783b776ac9fdc5c4,
         type: 3}
+      propertyPath: PhysicsCollider.Layer
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 2857987242245735359, guid: b91fa28117ef9924783b776ac9fdc5c4,
+        type: 3}
       propertyPath: PhysicsCollider.Shape2D.BoxExtents.X.RawValue
-      value: 131072
+      value: 180224
       objectReference: {fileID: 0}
     - target: {fileID: 2857987242245735359, guid: b91fa28117ef9924783b776ac9fdc5c4,
         type: 3}
@@ -42686,8 +43191,13 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2857987242245735359, guid: b91fa28117ef9924783b776ac9fdc5c4,
         type: 3}
+      propertyPath: PhysicsCollider.Layer
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 2857987242245735359, guid: b91fa28117ef9924783b776ac9fdc5c4,
+        type: 3}
       propertyPath: PhysicsCollider.Shape2D.BoxExtents.X.RawValue
-      value: 32768
+      value: 65536
       objectReference: {fileID: 0}
     - target: {fileID: 2857987242245735359, guid: b91fa28117ef9924783b776ac9fdc5c4,
         type: 3}
