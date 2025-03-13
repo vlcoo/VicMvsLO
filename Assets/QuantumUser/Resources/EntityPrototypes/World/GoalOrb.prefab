@@ -112,6 +112,7 @@ GameObject:
   - component: {fileID: 1553203041153522363}
   - component: {fileID: 4064725579428214608}
   - component: {fileID: 2333072886424663942}
+  - component: {fileID: 4598710244013304392}
   m_Layer: 0
   m_Name: GoalOrb
   m_TagString: Untagged
@@ -177,9 +178,9 @@ MonoBehaviour:
         RawValue: 0
       BoxExtents:
         X:
-          RawValue: -16384
+          RawValue: -32768
         Y:
-          RawValue: 16384
+          RawValue: 32768
       PositionOffset:
         X:
           RawValue: 0
@@ -335,3 +336,18 @@ MonoBehaviour:
   Prototype:
     ColliderDisabled:
       Value: 0
+--- !u!114 &4598710244013304392
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9177859486925039916}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f6cf45d85f733d24a96efe453b46f06e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Prototype:
+    IsOrb:
+      Value: 1

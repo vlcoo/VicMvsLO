@@ -456,17 +456,17 @@ namespace Quantum.Prototypes {
     }
   }
   [System.SerializableAttribute()]
-  [Quantum.Prototypes.Prototype(typeof(Quantum.GoalFlagpole))]
-  public unsafe partial class GoalFlagpolePrototype : ComponentPrototype<Quantum.GoalFlagpole> {
-    [HideInInspector()]
-    public Int32 _empty_prototype_dummy_field_;
-    partial void MaterializeUser(Frame frame, ref Quantum.GoalFlagpole result, in PrototypeMaterializationContext context);
+  [Quantum.Prototypes.Prototype(typeof(Quantum.Goal))]
+  public unsafe partial class GoalPrototype : ComponentPrototype<Quantum.Goal> {
+    public QBoolean IsOrb;
+    partial void MaterializeUser(Frame frame, ref Quantum.Goal result, in PrototypeMaterializationContext context);
     public override Boolean AddToEntity(FrameBase f, EntityRef entity, in PrototypeMaterializationContext context) {
-        Quantum.GoalFlagpole component = default;
+        Quantum.Goal component = default;
         Materialize((Frame)f, ref component, in context);
         return f.Set(entity, component) == SetResult.ComponentAdded;
     }
-    public void Materialize(Frame frame, ref Quantum.GoalFlagpole result, in PrototypeMaterializationContext context = default) {
+    public void Materialize(Frame frame, ref Quantum.Goal result, in PrototypeMaterializationContext context = default) {
+        result.IsOrb = this.IsOrb;
         MaterializeUser(frame, ref result, in context);
     }
   }

@@ -1,0 +1,13 @@
+﻿component Goal {
+    bool IsOrb;
+}
+
+signal OnMarioTouchedGoal(EntityRef marioEntity, EntityRef goalEntity, bool isLastLap);
+
+synced event MarioTouchedGoal {
+	Frame Frame;
+	entity_ref Entity;
+	MarioPlayer Mario;
+	bool LastLap;
+	FPVector2 Position;
+}

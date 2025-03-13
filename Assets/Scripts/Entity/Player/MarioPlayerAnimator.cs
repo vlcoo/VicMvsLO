@@ -82,7 +82,7 @@ namespace NSMB.Entities.Player {
         //---Serialized Variables
         [SerializeField] private CharacterAsset character;
         [SerializeField] private PlayerElements playerElementsPrefab;
-        [SerializeField] private GameObject coinNumberParticle, coinFromBlockParticle, respawnParticle, starCollectParticle;
+        [SerializeField] private GameObject coinNumberParticle, coinFromBlockParticle, respawnParticle, starCollectParticle, goalOrbParticle;
         [SerializeField] private Animator animator;
         [SerializeField] private Avatar smallAvatar, largeAvatar;
         [SerializeField] private ParticleSystem dust, sparkles, drillParticle, giantParticle, fireParticle, bubblesParticle, iceSkiddingParticle, waterRunningParticle, waterSkiddingParticle;
@@ -158,6 +158,7 @@ namespace NSMB.Entities.Player {
             QuantumEvent.Subscribe<EventMarioPlayerStompedByTeammate>(this, OnMarioPlayerStompedByTeammate, NetworkHandler.FilterOutReplayFastForward);
             QuantumEvent.Subscribe<EventPhysicsObjectLanded>(this, OnPhysicsObjectLanded, NetworkHandler.FilterOutReplayFastForward);
             QuantumEvent.Subscribe<EventMarioPlayerLandedWithAnimation>(this, OnMarioPlayerLandedWithAnimation);
+            QuantumEvent.Subscribe<EventMarioTouchedGoal>(this, OnMarioTouchedGoal, NetworkHandler.FilterOutReplayFastForward);
         }
 
         public override void OnActivate(Frame f) {
@@ -910,6 +911,15 @@ namespace NSMB.Entities.Player {
 
             PlaySoundEverywhere(Utils.Utils.IsMarioLocal(e.Entity) ? SoundEffect.World_Star_Collect : SoundEffect.World_Star_CollectOthers);
             Instantiate(starCollectParticle, e.Position.ToUnityVector3(), Quaternion.identity);
+        }
+        
+        private void OnMarioTouchedGoal(EventMarioTouchedGoal e) {
+            if (e.Entity != EntityRef) {
+                return;
+            }
+
+            PlaySound(e.LastLap ? SoundEffect.World_Goal_Last : SoundEffect.World_Goal_Non_Last);
+            if (e.LastLap) Instantiate(goalOrbParticle, e.Position.ToUnityVector3(), Quaternion.identity);
         }
 
         private void OnMarioPlayerPropellerSpin(EventMarioPlayerPropellerSpin e) {

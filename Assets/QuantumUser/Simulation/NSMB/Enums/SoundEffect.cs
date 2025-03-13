@@ -1,7 +1,7 @@
 using System;
 
 public enum SoundEffect : byte {
-    //CURRENT HIGHEST NUMBER: 106 (use 107 next)
+    //CURRENT HIGHEST NUMBER: 108
     //Enemy
     [SoundData("enemy/freeze")] Enemy_Generic_Freeze = 0,
     [SoundData("enemy/freeze_shatter")] Enemy_Generic_FreezeShatter = 1,
@@ -121,6 +121,8 @@ public enum SoundEffect : byte {
     [SoundData("world/star_nearby")] World_Star_Nearby = 75,
     [SoundData("world/star_spawn")] World_Star_Spawn = 76,
     [SoundData("world/water_splash")] World_Water_Splash = 77,
+    [SoundData("world/goal_touched_short")] World_Goal_Non_Last = 107,
+    [SoundData("world/goal_touched_long")] World_Goal_Last = 108,
 }
 
 public class SoundData : Attribute {

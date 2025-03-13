@@ -2,10 +2,11 @@ using Photon.Deterministic;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 
 namespace Quantum {
     public unsafe class GameLogicSystem : SystemMainThread, ISignalOnPlayerAdded, ISignalOnPlayerRemoved, ISignalOnMarioPlayerDied,
-        ISignalOnLoadingComplete, ISignalOnMarioPlayerCollectedStar, ISignalOnReturnToRoom, ISignalOnComponentRemoved<MarioPlayer> {
+        ISignalOnLoadingComplete, ISignalOnMarioPlayerCollectedStar, ISignalOnMarioTouchedGoal, ISignalOnReturnToRoom, ISignalOnComponentRemoved<MarioPlayer> {
 
         public override void OnInit(Frame f) {
             var config = f.RuntimeConfig;
@@ -188,6 +189,15 @@ namespace Quantum {
                 // <team> wins
                 EndGame(f, winningTeam.Value);
                 return;
+            }
+            
+            // End Condition: a player has enough laps
+            marioFilter = f.Filter<MarioPlayer>();
+            while (marioFilter.NextUnsafe(out _, out MarioPlayer* mario)) {
+                if (mario->Laps >= f.Global->Rules.Laps) {
+                    EndGame(f, mario->GetTeam(f));
+                    return;
+                }
             }
 
             // End Condition: timer expires
@@ -410,6 +420,10 @@ namespace Quantum {
         }
 
         public void OnMarioPlayerCollectedStar(Frame f, EntityRef entity) {
+            CheckForGameEnd(f);
+        }
+
+        public void OnMarioTouchedGoal(Frame f, EntityRef marioEntity, EntityRef goalEntity, QBoolean isLastLap) {
             CheckForGameEnd(f);
         }
 
