@@ -107,6 +107,11 @@ public class VersusStageBaker : MapDataBakerCallback {
         }
         LogInfo($"Baked {breakables.Length} breakable objects");
         */
+        
+        // --- Try finding a Goal object to determine if map is Campaign (race) or Versus.
+        QPrototypeGoal[] goals =
+            GameObject.FindObjectsByType<QPrototypeGoal>(FindObjectsInactive.Exclude, FindObjectsSortMode.None);
+        stage.IsCampaignMap = goals.Length > 0;
 
         EditorUtility.SetDirty(stage);
     }

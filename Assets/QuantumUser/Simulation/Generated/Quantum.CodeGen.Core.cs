@@ -123,6 +123,7 @@ namespace Quantum {
     Disqualified,
     ReachedZeroCoins,
     ReachedZeroStars,
+    FinishedLap,
   }
   public enum TriggerConstraint : int {
     Always,

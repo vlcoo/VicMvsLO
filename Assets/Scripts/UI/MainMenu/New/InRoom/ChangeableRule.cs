@@ -4,6 +4,7 @@ using Quantum;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 public class ChangeableRule : Selectable, ISubmitHandler, IPointerClickHandler, IScrollHandler {
@@ -19,7 +20,9 @@ public class ChangeableRule : Selectable, ISubmitHandler, IPointerClickHandler, 
     }
     public virtual bool CanIncreaseValue => true;
     public virtual bool CanDecreaseValue => true;
-    public object Value => value; 
+    public object Value => value;
+    public bool IsDisabled;
+
 
     //---Serialized Variables
     [SerializeField] protected MainMenuCanvas canvas;
@@ -89,7 +92,7 @@ public class ChangeableRule : Selectable, ISubmitHandler, IPointerClickHandler, 
     public virtual unsafe void OnPointerClick(PointerEventData eventData) {
         QuantumGame game = NetworkHandler.Game;
         PlayerRef host = QuantumUtils.GetHostPlayer(game.Frames.Predicted, out _);
-        if (!game.PlayerIsLocal(host)) {
+        if (!game.PlayerIsLocal(host) || IsDisabled) {
             canvas.PlaySound(SoundEffect.UI_Error);
             return;
         }
@@ -159,6 +162,15 @@ public class ChangeableRule : Selectable, ISubmitHandler, IPointerClickHandler, 
     }
 
     private void FindValue(in GameRules rules) {
+        switch (ruleType) {
+        case CommandChangeRules.Rules.Laps:
+            if (QuantumUnityDB.TryGetGlobalAsset(rules.Stage, out Map map)
+                && QuantumUnityDB.TryGetGlobalAsset(map.UserAsset, out VersusStageData stage)) {
+                IsDisabled = !stage.IsCampaignMap;
+            }
+            break;
+        }
+        
         value = ruleType switch {
             CommandChangeRules.Rules.Stage => rules.Stage,
             CommandChangeRules.Rules.StarsToWin => rules.StarsToWin,

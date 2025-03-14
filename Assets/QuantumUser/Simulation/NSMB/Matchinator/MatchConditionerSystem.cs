@@ -8,7 +8,7 @@ using Int32 = System.Int32;
 
 namespace Quantum
 {
-    public class MatchConditionerSystem : SystemSignalsOnly, ISignalOnMarioPlayerCollectedStar, ISignalOnMarioPlayerCollectedCoin, ISignalOnMarioPlayerDied, ISignalOnEntityFreeze, ISignalOnGameStarting, ISignalOnMarioPlayerDisqualified, ISignalOnMarioPlayerJumped, ISignalOnMarioPlayerRespawned, ISignalOnMarioPlayerReceivedKnockback, ISignalOnMarioPlayerCollectedPowerup, ISignalOnMarioPlayerTookDamage, ISignalOnMarioPlayerReachedCoinLimit, ISignalOnMarioPlayerZeroedStars, ISignalOnMarioPlayerZeroedCoins {
+    public class MatchConditionerSystem : SystemSignalsOnly, ISignalOnMarioPlayerCollectedStar, ISignalOnMarioPlayerCollectedCoin, ISignalOnMarioPlayerDied, ISignalOnEntityFreeze, ISignalOnGameStarting, ISignalOnMarioPlayerDisqualified, ISignalOnMarioPlayerJumped, ISignalOnMarioPlayerRespawned, ISignalOnMarioPlayerReceivedKnockback, ISignalOnMarioPlayerCollectedPowerup, ISignalOnMarioPlayerTookDamage, ISignalOnMarioPlayerReachedCoinLimit, ISignalOnMarioPlayerZeroedStars, ISignalOnMarioPlayerZeroedCoins, ISignalOnMarioTouchedGoal {
         // TODO: initialize the trigger list in the correct place somewhere else!!
         public override unsafe void OnInit(Frame f) {
             // MOCK TRIGGER LIST for testing purposes...
@@ -204,13 +204,16 @@ namespace Quantum
             // ConditionActioned(TriggerCondition.GotStarcoin, f, entity);
             // ConditionActioned(TriggerCondition.EnteredPipe, f, entity);
             // ConditionActioned(TriggerCondition.GrabbedSomething, f, entity);
-            // ConditionActioned(TriggerCondition.FinishedLap, f, entity);
             // ConditionActioned(TriggerCondition.TouchedGround, f, entity);
             // ConditionActioned(TriggerCondition.StoppedMoving, f, entity);
             // ConditionActioned(TriggerCondition.KilledSomeone, f, entity);
             // ConditionActioned(TriggerCondition.HarmedSomeone, f, entity);
         }
-        
+
+        public void OnMarioTouchedGoal(Frame f, EntityRef marioEntity, EntityRef goalEntity, QBoolean isLastLap) {
+            ConditionActioned(TriggerCondition.FinishedLap, f, marioEntity);
+        }
+
         public void OnMarioPlayerDied(Frame f, EntityRef entity) {
             ConditionActioned(TriggerCondition.Died, f, entity);
         }

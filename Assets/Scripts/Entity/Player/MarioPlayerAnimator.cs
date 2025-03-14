@@ -919,7 +919,7 @@ namespace NSMB.Entities.Player {
             }
 
             PlaySound(e.LastLap ? SoundEffect.World_Goal_Last : SoundEffect.World_Goal_Non_Last);
-            if (e.LastLap) Instantiate(goalOrbParticle, e.Position.ToUnityVector3(), Quaternion.identity);
+            if (e.LastLap && e.IsOrb) Instantiate(goalOrbParticle, e.Position.ToUnityVector3(), Quaternion.identity);
         }
 
         private void OnMarioPlayerPropellerSpin(EventMarioPlayerPropellerSpin e) {

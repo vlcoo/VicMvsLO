@@ -28,7 +28,7 @@ namespace NSMB.UI.Game {
         [SerializeField] private CanvasGroup toggler;
         [SerializeField] private TrackIcon playerTrackTemplate, starTrackTemplate;
         [SerializeField] private Sprite storedItemNull;
-        [SerializeField] private TMP_Text uiTeamStars, uiStars, uiCoins, uiDebug, uiLives, uiCountdown;
+        [SerializeField] private TMP_Text uiTeamStars, uiStars, uiCoins, uiDebug, uiLives, uiCountdown, uiLaps;
         [SerializeField] private Image itemReserve, itemColor, deathFade;
         [SerializeField] private GameObject boos;
         [SerializeField] private Animator reserveAnimator;
@@ -40,12 +40,12 @@ namespace NSMB.UI.Game {
         //---Private Variables
         private readonly Dictionary<MonoBehaviour, TrackIcon> entityTrackIcons = new();
         private readonly List<Image> backgrounds = new();
-        private GameObject teamsParent, starsParent, coinsParent, livesParent, timerParent;
+        private GameObject teamsParent, starsParent, coinsParent, livesParent, timerParent, lapsParent;
         private Material timerMaterial;
         private bool uiHidden;
 
         //private TeamManager teamManager;
-        private int cachedCoins = -1, cachedTeamStars = -1, cachedStars = -1, cachedLives = -1, cachedTimer = -1;
+        private int cachedCoins = -1, cachedTeamStars = -1, cachedStars = -1, cachedLives = -1, cachedTimer = -1, cachedLaps = -1;
         private PowerupAsset previousPowerup;
         private VersusStageData stage;
         private EntityRef previousTarget;
@@ -86,12 +86,14 @@ namespace NSMB.UI.Game {
             coinsParent = uiCoins.transform.parent.gameObject;
             livesParent = uiLives.transform.parent.gameObject;
             timerParent = uiCountdown.transform.parent.gameObject;
+            lapsParent = uiLaps.transform.parent.gameObject;
 
             backgrounds.Add(teamsParent.GetComponentInChildren<Image>());
             backgrounds.Add(starsParent.GetComponentInChildren<Image>());
             backgrounds.Add(coinsParent.GetComponentInChildren<Image>());
             backgrounds.Add(livesParent.GetComponentInChildren<Image>());
             backgrounds.Add(timerParent.GetComponentInChildren<Image>());
+            backgrounds.Add(lapsParent.GetComponentInChildren<Image>());
 
             stage = (VersusStageData) QuantumUnityDB.GetGlobalAsset(FindObjectOfType<QuantumMapData>().Asset.UserAsset);
         }
@@ -167,6 +169,7 @@ namespace NSMB.UI.Game {
             livesParent.SetActive(!hidden);
             coinsParent.SetActive(!hidden);
             timerParent.SetActive(!hidden);
+            lapsParent.SetActive(!hidden);
         }
 
         private void UpdateStoredItemUI(MarioPlayer* mario, bool playAnimation) {
@@ -237,6 +240,8 @@ namespace NSMB.UI.Game {
             bool livesEnabled = rules.IsLivesEnabled;
             bool timerEnabled = rules.TimerSeconds > 0;
             bool minimapBoosEnabled = rules.SNoMinimap;
+            int lapsRequirement = rules.Laps;
+            bool lapsEnabled = lapsRequirement > 1 && stage.IsCampaignMap; // don't show counter if only 1 lap or in versus stage.
 
             if (rules.TeamsEnabled) {
                 byte teamIndex = mario->GetTeam(f);
@@ -259,9 +264,19 @@ namespace NSMB.UI.Game {
 
                 uiStars.text = Utils.Utils.GetSymbolString(starString);
             }
+            
             if (mario->Coins != cachedCoins) {
                 cachedCoins = mario->Coins;
                 uiCoins.text = Utils.Utils.GetSymbolString("Cx" + cachedCoins + (coinsEnabled ? "/" + coinRequirement : ""));
+            }
+
+            if (lapsEnabled) {
+                if (mario->Laps != cachedLaps) {
+                    cachedLaps = mario->Laps;
+                    uiLaps.text = Utils.Utils.GetSymbolString("Lx" + cachedLaps + "/" + lapsRequirement);
+                }
+            } else {
+                lapsParent.SetActive(false);
             }
 
             if (livesEnabled) {

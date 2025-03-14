@@ -635,6 +635,12 @@ MonoBehaviour:
     - rid: 1274240107934646273
     - rid: 1274240107934646274
     - rid: 1274240107934646275
+  - Components:
+    - rid: 411939244743852032
+    - rid: 411939244743852033
+    - rid: 411939244743852034
+    - rid: 411939244743852035
+    - rid: 411939244743852036
   SerializedTriangleDataUncompressedSize: 8
   references:
     version: 2
@@ -1015,6 +1021,68 @@ MonoBehaviour:
         BroadRadius:
           RawValue: 26214
     - rid: 394228964278665221
+      type: {class: InteractablePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
+      data:
+        ColliderDisabled:
+          Value: 0
+    - rid: 411939244743852032
+      type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
+      data:
+        Position:
+          X:
+            RawValue: 4030464
+          Y:
+            RawValue: 65536
+        Rotation:
+          RawValue: 0
+    - rid: 411939244743852033
+      type: {class: PhysicsCollider2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
+      data:
+        ShapeConfig:
+          ShapeType: 4
+          PolygonCollider:
+            Id:
+              Value: 0
+          CircleRadius:
+            RawValue: 0
+          CapsuleSize:
+            X:
+              RawValue: 0
+            Y:
+              RawValue: 0
+          EdgeExtent:
+            RawValue: 0
+          BoxExtents:
+            X:
+              RawValue: 13107
+            Y:
+              RawValue: 137626
+          PositionOffset:
+            X:
+              RawValue: 0
+            Y:
+              RawValue: 167117
+          RotationOffset:
+            RawValue: 0
+          UserTag: 0
+          IsPersistent: 1
+          CompoundShapes: []
+        Layer: 9
+        IsTrigger: 1
+        PhysicsMaterial:
+          Id:
+            Value: 0
+    - rid: 411939244743852034
+      type: {class: PhysicsCallbacks2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
+      data:
+        CallbackFlags:
+          Value: 0
+    - rid: 411939244743852035
+      type: {class: GoalPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
+      data:
+        IsOrb:
+          Value: 0
+    - rid: 411939244743852036
       type: {class: InteractablePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         ColliderDisabled:

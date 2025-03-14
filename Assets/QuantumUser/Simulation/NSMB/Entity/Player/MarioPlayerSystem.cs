@@ -1870,7 +1870,7 @@ namespace Quantum {
             }
             
             f.Signals.OnMarioTouchedGoal(marioEntity, goalEntity, lastLap);
-            f.Events.MarioTouchedGoal(f, marioEntity, *mario, lastLap, f.Unsafe.GetPointer<Transform2D>(goalEntity)->Position);
+            f.Events.MarioTouchedGoal(f, marioEntity, *mario, lastLap, f.Unsafe.GetPointer<Transform2D>(goalEntity)->Position, goal->IsOrb);
             
             if (lastLap && goal->IsOrb) f.Destroy(goalEntity);
         }

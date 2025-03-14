@@ -80,6 +80,7 @@ namespace NSMB.Utils {
             ['C'] = "hudnumber_coin",
             ['S'] = "hudnumber_star",
             ['T'] = "hudnumber_timer",
+            ['L'] = "hudnumber_laps",
             ['/'] = "hudnumber_slash",
             [':'] = "hudnumber_colon",
         };

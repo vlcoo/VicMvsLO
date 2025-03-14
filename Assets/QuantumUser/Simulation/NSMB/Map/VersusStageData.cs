@@ -51,6 +51,7 @@ public unsafe class VersusStageData : AssetObject {
 
     [HideInInspector] public StageTileInstance[] TileData;
     [HideInInspector] public FPVector2[] BigStarSpawnpoints;
+    [HideInInspector] public bool IsCampaignMap = false;
 
     public FPVector2 GetWorldSpawnpointForPlayer(int playerIndex, int totalPlayers) {
         FP comp = ((FP) playerIndex / totalPlayers) * 2 * FP.Pi + FP.PiOver2 + (FP.Pi / (2 * totalPlayers));

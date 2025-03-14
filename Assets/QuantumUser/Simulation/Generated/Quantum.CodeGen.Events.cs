@@ -399,7 +399,7 @@ namespace Quantum {
         _f.AddEvent(ev);
         return ev;
       }
-      public EventMarioTouchedGoal MarioTouchedGoal(Frame Frame, EntityRef Entity, MarioPlayer Mario, QBoolean LastLap, FPVector2 Position) {
+      public EventMarioTouchedGoal MarioTouchedGoal(Frame Frame, EntityRef Entity, MarioPlayer Mario, QBoolean LastLap, FPVector2 Position, QBoolean IsOrb) {
         if (_f.IsPredicted) return null;
         var ev = _f.Context.AcquireEvent<EventMarioTouchedGoal>(EventMarioTouchedGoal.ID);
         ev.Frame = Frame;
@@ -407,6 +407,7 @@ namespace Quantum {
         ev.Mario = Mario;
         ev.LastLap = LastLap;
         ev.Position = Position;
+        ev.IsOrb = IsOrb;
         _f.AddEvent(ev);
         return ev;
       }
@@ -1629,6 +1630,7 @@ namespace Quantum {
     public MarioPlayer Mario;
     public QBoolean LastLap;
     public FPVector2 Position;
+    public QBoolean IsOrb;
     protected EventMarioTouchedGoal(Int32 id, EventFlags flags) : 
         base(id, flags) {
     }
@@ -1651,6 +1653,7 @@ namespace Quantum {
         hash = hash * 31 + Mario.GetHashCode();
         hash = hash * 31 + LastLap.GetHashCode();
         hash = hash * 31 + Position.GetHashCode();
+        hash = hash * 31 + IsOrb.GetHashCode();
         return hash;
       }
     }

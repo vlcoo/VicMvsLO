@@ -61,6 +61,11 @@ public class NumberChangeableRule : ChangeableRule {
     }
 
     protected override void UpdateLabel() {
+        if (IsDisabled) {
+            label.text = labelPrefix + "N/A";
+            return;
+        }
+        
         TranslationManager tm = GlobalController.Instance.translationManager;
         if (value is int intValue) {
             label.text = labelPrefix + ((minimumValueIsOff && intValue == minValue) ? tm.GetTranslation("ui.generic.off") : intValue);
