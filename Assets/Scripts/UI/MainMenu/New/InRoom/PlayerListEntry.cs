@@ -267,8 +267,15 @@ namespace NSMB.UI.MainMenu {
             canvas.EventSystem.SetSelectedGameObject(button.gameObject);
         }
 
-        public void BanPlayer() {
-            // TODO MainMenuManager.Instance.Ban(player);
+        public unsafe void BanPlayer() {
+            QuantumGame game = NetworkHandler.Game;
+            PlayerRef host = QuantumUtils.GetHostPlayer(game.Frames.Predicted, out _);
+            if (game.PlayerIsLocal(host)) {
+                int slot = game.GetLocalPlayerSlots()[game.GetLocalPlayers().IndexOf(host)];
+                game.SendCommand(slot, new CommandBanPlayer {
+                    Target = player
+                });
+            }
             HideDropdown(true);
         }
 
@@ -340,19 +347,22 @@ namespace NSMB.UI.MainMenu {
 
         private void OnGameStateChanged(EventGameStateChanged e) {
             if (e.NewState == GameState.PreGameRoom) {
-                UpdateText(e.Frame);
+                Frame f = e.Game.Frames.Verified;
+                UpdateText(f);
             }
         }
 
         private unsafe void OnPlayerDataChanged(EventPlayerDataChanged e) {
+            Frame f = e.Game.Frames.Predicted;
+            handler.GetPlayerEntry(player).UpdateText(f);
+
             if (e.Player != player) {
                 return;
             }
 
-            var playerData = QuantumUtils.GetPlayerData(e.Frame, e.Player);
+            var playerData = QuantumUtils.GetPlayerData(f, player);
             readyIcon.SetActive(playerData->IsReady);
             settingsIcon.SetActive(playerData->IsInSettings);
-            handler.GetPlayerEntry(e.Player).UpdateText(e.Frame);
         }
 
         public void OnSelect(BaseEventData eventData) {
@@ -372,12 +382,13 @@ namespace NSMB.UI.MainMenu {
         }
 
         private void OnPlayerRemoved(EventPlayerRemoved e) {
+            Frame f = e.Game.Frames.Verified;
             RuntimePlayer runtimePlayer;
-            if (!player.IsValid || (runtimePlayer = e.Frame.GetPlayerData(player)) == null) {
+            if (!player.IsValid || (runtimePlayer = f.GetPlayerData(player)) == null) {
                 return;
             }
 
-            cachedNickname = runtimePlayer.PlayerNickname.ToValidUsername(e.Frame, player);
+            cachedNickname = runtimePlayer.PlayerNickname.ToValidUsername(f, player);
         }
     }
 }

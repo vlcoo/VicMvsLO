@@ -15,11 +15,6 @@ using UnityEngine.UI;
 namespace NSMB.UI.Game {
     public unsafe class UIUpdater : MonoBehaviour {
 
-        //---Static Variables
-        private static readonly int ParamIn = Animator.StringToHash("in");
-        private static readonly int ParamOut = Animator.StringToHash("out");
-        private static readonly int ParamHasItem = Animator.StringToHash("has-item");
-
         //---Properties
         public EntityRef Target => playerElements.Entity;
 
@@ -31,7 +26,7 @@ namespace NSMB.UI.Game {
         [SerializeField] private TMP_Text uiTeamStars, uiStars, uiCoins, uiDebug, uiLives, uiCountdown, uiLaps;
         [SerializeField] private Image itemReserve, itemColor, deathFade;
         [SerializeField] private GameObject boos;
-        [SerializeField] private Animator reserveAnimator;
+        [SerializeField] private Animation reserveAnimation;
 
         [SerializeField] private TMP_Text winText;
         [SerializeField] private Animator winTextAnimator;
@@ -50,7 +45,7 @@ namespace NSMB.UI.Game {
         private VersusStageData stage;
         private EntityRef previousTarget;
 
-        private Coroutine endGameSequenceCoroutine;
+        private Coroutine endGameSequenceCoroutine, reserveSummonCoroutine;
 
         public void OnEnable() {
             MarioPlayerAnimator.MarioPlayerInitialized += OnMarioInitialized;
@@ -174,28 +169,35 @@ namespace NSMB.UI.Game {
 
         private void UpdateStoredItemUI(MarioPlayer* mario, bool playAnimation) {
             PowerupAsset powerup = QuantumUnityDB.GetGlobalAsset(mario->ReserveItem);
-            reserveAnimator.SetBool(ParamHasItem, powerup && powerup.ReserveSprite);
-
-            if (!powerup) {
-                if (playAnimation && previousPowerup != powerup) {
-                    reserveAnimator.SetTrigger(ParamOut);
-                    previousPowerup = powerup;
-                }
+            if (previousPowerup == powerup) {
                 return;
             }
 
-            itemReserve.sprite = powerup.ReserveSprite ? powerup.ReserveSprite : storedItemNull;
-            if (playAnimation && previousPowerup != powerup) {
-                reserveAnimator.SetTrigger(ParamIn);
-                previousPowerup = powerup;
+            // New powerup
+            if (reserveSummonCoroutine != null) {
+                StopCoroutine(reserveSummonCoroutine);
+                reserveSummonCoroutine = null;
             }
+            if (playAnimation) {
+                if (powerup) {
+                    reserveAnimation.Play("reserve-in");
+                    itemReserve.sprite = powerup.ReserveSprite;
+                } else {
+                    reserveAnimation.Play("reserve-out");
+                    reserveSummonCoroutine = StartCoroutine(ReserveSummonCoroutine());
+                }
+            } else {
+                itemReserve.sprite = (powerup && powerup.ReserveSprite) ? powerup.ReserveSprite : storedItemNull;
+                reserveAnimation.Play();
+            }
+            previousPowerup = powerup;
         }
 
-        // The "reserve-static" animation is just for the "No Item" sprite to not do the bopping idling movement.
-        // We gotta wait for the "reserve-summon" animation, which always auto-exits to the static one,
-        // to finish before swapping to the "No Item" sprite.
-        public void OnReserveItemStaticStarted() {
+        private IEnumerator ReserveSummonCoroutine() {
+            yield return new WaitForSeconds(reserveAnimation.GetClip("reserve-out").length);
             itemReserve.sprite = storedItemNull;
+            reserveAnimation.Play();
+            reserveSummonCoroutine = null;
         }
 
         private void OnStartCameraFadeOut(EventStartCameraFadeOut e) {
@@ -346,7 +348,8 @@ namespace NSMB.UI.Game {
             itemColor.color = color;
         }
 
-        private IEnumerator EndGameSequence(SoundEffect resultMusic, string resultAnimationTrigger) {
+        private IEnumerator EndGameSequence(SoundEffect resultMusic, string resultAnimationTrigger, float delay) {
+            // Wait before playing the music 
             yield return new WaitForSecondsRealtime(0.25f);
 
             GlobalController.Instance.sfx.PlayOneShot(resultMusic);
@@ -378,13 +381,13 @@ namespace NSMB.UI.Game {
         private void OnGameStateChanged(EventGameStateChanged e) {
             if (e.NewState == GameState.Starting) {
                 foreach (var mario in MarioPlayerAnimator.AllMarioPlayers) {
-                    entityTrackIcons[mario] = CreateTrackIcon(e.Frame, mario.EntityRef, mario.transform);
+                    entityTrackIcons[mario] = CreateTrackIcon(e.Game.Frames.Predicted, mario.EntityRef, mario.transform);
                 }
             }
         }
 
         private void OnGameEnded(EventGameEnded e) {
-            Frame f = e.Frame;
+            Frame f = e.Game.Frames.Verified;
             bool teamMode = f.Global->Rules.TeamsEnabled;
             bool hasWinner = e.HasWinner;
 
@@ -392,9 +395,12 @@ namespace NSMB.UI.Game {
             TeamAsset[] allTeams = f.SimulationConfig.Teams;
             string resultText;
             string winner = null;
-            bool local;
+            bool local = false;
 
-            if (hasWinner) {
+            if (e.EndedByHost) {
+                resultText = tm.GetTranslation("ui.result.nocontest");
+                ChatManager.Instance.AddSystemMessage("ui.inroom.chat.server.ended.nocontest", color: ChatManager.Red);
+            } else if (hasWinner) {
                 if (teamMode) {
                     // Winning team
                     winner = tm.GetTranslation(allTeams[e.WinningTeam].nameTranslationKey);
@@ -417,13 +423,15 @@ namespace NSMB.UI.Game {
             } else {
                 resultText = tm.GetTranslation("ui.result.draw");
                 ChatManager.Instance.AddSystemMessage("ui.inroom.chat.server.ended.draw", color: ChatManager.Red);
-                local = false;
             }
             winText.text = resultText;
 
             SoundEffect resultMusic;
             string resultAnimationTrigger;
-            if (!hasWinner) {
+            if (e.EndedByHost) {
+                resultMusic = SoundEffect.UI_Match_Cancel;
+                resultAnimationTrigger = "startNoContest";
+            } else if (!hasWinner) {
                 resultMusic = SoundEffect.UI_Match_Draw;
                 resultAnimationTrigger = "startNegative";
             } else if (hasWinner && local) {
@@ -434,7 +442,7 @@ namespace NSMB.UI.Game {
                 resultAnimationTrigger = "startNegative";
             }
 
-            endGameSequenceCoroutine = StartCoroutine(EndGameSequence(resultMusic, resultAnimationTrigger));
+            endGameSequenceCoroutine = StartCoroutine(EndGameSequence(resultMusic, resultAnimationTrigger, e.EndedByHost ? 0.5f : 1f));
         }
 
         private void OnLanguageChanged(TranslationManager tm) {

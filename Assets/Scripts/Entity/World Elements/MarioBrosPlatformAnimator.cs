@@ -97,9 +97,11 @@ public unsafe class MarioBrosPlatformAnimator : QuantumEntityViewComponent<Stage
             return;
         }
 
-        Frame f = e.Frame;
-        var qTransform = f.Unsafe.GetPointer<Transform2D>(e.Entity);
-        var qCollider = f.Unsafe.GetPointer<PhysicsCollider2D>(e.Entity);
+        Frame f = PredictedFrame;
+        if (!f.Unsafe.TryGetPointer(e.Entity, out Transform2D* qTransform)
+            || !f.Unsafe.TryGetPointer(e.Entity, out PhysicsCollider2D* qCollider)) {
+            return;
+        }
 
         FPVector2 localPos = qTransform->InverseTransformPoint(e.Position);
         localPos = QuantumUtils.WrapWorld(ViewContext.Stage, localPos, out _);

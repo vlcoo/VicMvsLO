@@ -39,6 +39,7 @@ public class ChatManager : MonoBehaviour {
         QuantumEvent.Subscribe<EventPlayerAdded>(this, OnPlayerAdded, NetworkHandler.FilterOutReplay);
         QuantumEvent.Subscribe<EventPlayerRemoved>(this, OnPlayerRemoved, NetworkHandler.FilterOutReplay);
         QuantumEvent.Subscribe<EventHostChanged>(this, OnHostChanged, NetworkHandler.FilterOutReplay);
+        QuantumEvent.Subscribe<EventPlayerKickedFromRoom>(this, OnPlayerKickedFromRoom, NetworkHandler.FilterOutReplay);
     }
 
     public void AddChatMessage(string message, PlayerRef player, Frame f, Color? color = null, bool filter = false) {
@@ -93,12 +94,9 @@ public class ChatManager : MonoBehaviour {
         string message = e.Message;
         message = message[..Mathf.Min(128, message.Length)];
         message = message.Replace("\n", " ").Trim();
+        message = message.SanitizeRichText().Filter();
 
-        // Add username
-        RuntimePlayer runtimeData = e.Frame.GetPlayerData(e.Player);
-        message = runtimeData.PlayerNickname.ToValidUsername(e.Frame, e.Player) + ": " + message.SanitizeRichText().Filter();
-
-        AddChatMessage(message, e.Player, e.Frame);
+        AddChatMessage(message, e.Player, f);
     }
 
     private void OnGameStateChanged(EventGameStateChanged e) {
@@ -108,13 +106,21 @@ public class ChatManager : MonoBehaviour {
     }
 
     private void OnPlayerAdded(EventPlayerAdded e) {
-        RuntimePlayer runtimeData = e.Frame.GetPlayerData(e.Player);
-        AddSystemMessage("ui.inroom.chat.player.joined", Blue, "playername", runtimeData.PlayerNickname.ToValidUsername(e.Frame, e.Player));
+        Frame f = e.Game.Frames.Predicted;
+        RuntimePlayer runtimeData = f.GetPlayerData(e.Player);
+        AddSystemMessage("ui.inroom.chat.player.joined", Blue, "playername", runtimeData.PlayerNickname.ToValidUsername(f, e.Player));
     }
 
     private void OnPlayerRemoved(EventPlayerRemoved e) {
-        RuntimePlayer runtimeData = e.Frame.GetPlayerData(e.Player);
-        AddSystemMessage("ui.inroom.chat.player.quit", Blue, "playername", runtimeData.PlayerNickname.ToValidUsername(e.Frame, e.Player));
+        Frame f = e.Game.Frames.Predicted;
+        RuntimePlayer runtimeData = f.GetPlayerData(e.Player);
+        AddSystemMessage("ui.inroom.chat.player.quit", Blue, "playername", runtimeData.PlayerNickname.ToValidUsername(f, e.Player));
+    }
+
+    private void OnPlayerKickedFromRoom(EventPlayerKickedFromRoom e) {
+        Frame f = e.Game.Frames.Predicted;
+        RuntimePlayer runtimeData = f.GetPlayerData(e.Player);
+        AddSystemMessage(e.Banned ? "ui.inroom.chat.player.banned" : "ui.inroom.chat.player.kicked", Blue, "playername", runtimeData.PlayerNickname.ToValidUsername(f, e.Player));
     }
 
     private void OnHostChanged(EventHostChanged e) {

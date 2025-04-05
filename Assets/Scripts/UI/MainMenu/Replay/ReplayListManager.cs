@@ -4,6 +4,7 @@ using NSMB.UI.MainMenu;
 using NSMB.UI.MainMenu.Submenus.Prompts;
 using NSMB.Utils;
 using Quantum;
+using SFB;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -13,6 +14,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using static BinaryReplayFile;
 
 public class ReplayListManager : Selectable {
 
@@ -120,13 +122,14 @@ public class ReplayListManager : Selectable {
         // Playerlist
         StringBuilder builder = new();
         BinaryReplayFile file = replay.ReplayFile;
-        for (int i = 0; i < file.Players; i++) {
+        for (int i = 0; i < file.PlayerInformation.Length; i++) {
+            ref ReplayPlayerInformation info = ref file.PlayerInformation[i];
+
             // Color and width
             builder.Append("<width=85%>");
-            int teamIndex = file.PlayerTeams[i];
             if (file.Rules.TeamsEnabled) {
                 var allTeams = GlobalController.Instance.config.Teams;
-                TeamAsset team = allTeams[teamIndex % allTeams.Length];
+                TeamAsset team = allTeams[info.Team % allTeams.Length];
                 builder.Append("<nobr>");
                 builder.Append("<color=#").Append(Utils.ColorToHex(team.color, false)).Append(">").Append(Settings.Instance.GraphicsColorblind ? team.textSpriteColorblind : team.textSpriteNormal);
             } else {
@@ -135,14 +138,14 @@ public class ReplayListManager : Selectable {
             }
 
             // Username
-            builder.Append(file.PlayerNames[i]);
+            builder.Append(info.Username);
             builder.Append("</nobr>");
 
             // Stars
             builder.Append("<width=100%><pos=90%><sprite name=room_stars>");
             builder.Append("<line-height=0><align=right><br>");
-            builder.Append(teamIndex == file.WinningTeam ? "<color=yellow>" : "<color=white>");
-            builder.Append(file.PlayerStars[i]);
+            builder.Append(info.Team == file.WinningTeam ? "<color=yellow>" : "<color=white>");
+            builder.Append(info.FinalStarCount);
 
             // Fix formatting
             builder.AppendLine("<align=left><line-height=100%>");
@@ -163,7 +166,7 @@ public class ReplayListManager : Selectable {
         builder.Append("<sprite name=room_teams>").AppendLine(file.Rules.TeamsEnabled ? on : off);
 
         // Add date
-        builder.Append("<color=#aaa>").Append(DateTime.UnixEpoch.AddSeconds(file.UnixTimestamp).ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss")).Append(" - ");
+        builder.Append("<color=#aaa>").Append(DateTime.UnixEpoch.AddSeconds(file.UnixTimestamp).ToLocalTime().ToString()).Append(" - ");
         builder.Append(Utils.SecondsToMinuteSeconds(file.ReplayLengthInFrames / 60)).Append(" - ").Append(Utils.BytesToString(file.FileSize));
 
         replayInformation.text = builder.ToString();
@@ -200,7 +203,7 @@ public class ReplayListManager : Selectable {
             }
 
             using FileStream inputStream = new FileStream(file, FileMode.Open);
-            if (BinaryReplayFile.TryLoadFromFile(inputStream, out BinaryReplayFile replayFile)) {
+            if (BinaryReplayFile.TryLoadFromFile(inputStream, out BinaryReplayFile replayFile) == ReplayParseResult.Success) {
                 Replay newReplay = new Replay {
                     FilePath = file,
                     ReplayFile = replayFile,
@@ -249,27 +252,28 @@ public class ReplayListManager : Selectable {
     }
 
     public void OnImportClicked() {
-        var paths = DialogModule.OpenFilesBrowser("vcmi Replay files|*.mvlreplay").Split("\n");
+        TranslationManager tm = GlobalController.Instance.translationManager;
+        string[] selected = StandaloneFileBrowser.OpenFilePanel(tm.GetTranslation("ui.extras.replays.actions.import"), "", "mvlreplay", false);
 
-        foreach (var filepath in paths) {
-            try {
-                using FileStream stream = new FileStream(filepath, FileMode.Open);
-                if (BinaryReplayFile.TryLoadFromFile(stream, out BinaryReplayFile parsedReplay)) {
-                    // Move into the replays folder
-                    string newPath = Path.Combine(ReplayDirectory, "saved", parsedReplay.UnixTimestamp + ".mvlreplay");
-                    File.Copy(filepath, newPath, false);
-        
-                    Replay newReplay = new Replay {
-                        FilePath = filepath,
-                        ReplayFile = parsedReplay,
-                        ListEntry = Instantiate(replayTemplate, replayTemplate.transform.parent)
-                    };
-                    newReplay.ListEntry.Initialize(this, newReplay);
-                    replays.Add(newReplay);
-                    newReplay.ListEntry.UpdateText();
-                }
-            } catch {
-                Debug.Log($"[Replay] Failed to import replay file at '{filepath}'");
+        foreach (var filepath in selected) {
+            using FileStream stream = new FileStream(filepath, FileMode.Open);
+            ReplayParseResult parseResult = BinaryReplayFile.TryLoadFromFile(stream, out BinaryReplayFile parsedReplay);
+
+            if (parseResult == ReplayParseResult.Success) {
+                // Move into the replays folder
+                string newPath = Path.Combine(ReplayDirectory, "saved", parsedReplay.UnixTimestamp + ".mvlreplay");
+                File.Copy(filepath, newPath, false);
+
+                Replay newReplay = new Replay {
+                    FilePath = filepath,
+                    ReplayFile = parsedReplay,
+                    ListEntry = Instantiate(replayTemplate, replayTemplate.transform.parent)
+                };
+                newReplay.ListEntry.Initialize(this, newReplay);
+                replays.Add(newReplay);
+                newReplay.ListEntry.UpdateText();
+            } else {
+                Debug.LogWarning($"[Replay] Failed to parse {filepath} as a replay: {parseResult}");
             }
         }
     }
@@ -323,7 +327,7 @@ public class ReplayListManager : Selectable {
                 if (QuantumUnityDB.TryGetGlobalAsset(replay.ReplayFile.Rules.Stage, out Map map)
                     && QuantumUnityDB.TryGetGlobalAsset(map.UserAsset, out VersusStageData stage)) {
 
-                    if (stage.LegalEnglishName.Contains(searchField.text, StringComparison.InvariantCultureIgnoreCase)) {
+                    if (tm.GetTranslation(stage.TranslationKey).Contains(searchField.text, StringComparison.InvariantCultureIgnoreCase)) {
                         continue;
                     }
                 }
@@ -400,7 +404,7 @@ public class ReplayListManager : Selectable {
     public int? GetReplaysUntilDeletion(Replay replay) {
         int max = Settings.Instance.generalMaxTempReplays;
         int index = temporaryReplays.IndexOf(r => r == replay);
-        if (max == 0 || !replay.IsTemporary || index == -1) {    
+        if (max <= 0 || !replay.IsTemporary || index == -1) {    
             return null;
         }
 
@@ -408,6 +412,10 @@ public class ReplayListManager : Selectable {
     }
 
     public List<Replay> GetTemporaryReplaysToDelete() {
+        if (Settings.Instance.generalMaxTempReplays <= 0) {
+            return null;
+        }
+
         List<Replay> replaysToDelete = new();
 
         foreach (var replay in temporaryReplays) {

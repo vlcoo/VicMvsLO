@@ -14,7 +14,6 @@ signal OnMarioPlayerReachedCoinLimit(EntityRef marioEntity, MarioPlayer* mario);
 signal OnMarioPlayerZeroedCoins(EntityRef marioEntity, MarioPlayer* mario);
 
 synced event MarioPlayerCollectedCoin {
-	Frame Frame;
 	entity_ref Entity;
 	MarioPlayer Mario;
 	byte Coins;
@@ -26,20 +25,17 @@ synced event MarioPlayerCollectedCoin {
 }
 
 event CoinChangedType {
-	nothashed Frame Frame;
 	entity_ref Entity;
 	nothashed Coin Coin;
 }
 
 event CoinChangeCollected {
-	nothashed Frame Frame;
 	entity_ref Entity;
 	nothashed Coin Coin;
 	bool Collected;
 }
 
 event CoinBounced {
-	nothashed Frame Frame;
 	entity_ref Entity;
 	nothashed Coin Coin;
 }

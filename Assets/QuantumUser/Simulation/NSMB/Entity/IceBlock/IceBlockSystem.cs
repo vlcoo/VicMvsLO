@@ -1,5 +1,4 @@
 using Photon.Deterministic;
-using UnityEngine;
 
 namespace Quantum {
 
@@ -208,7 +207,7 @@ namespace Quantum {
             holdable->IgnoreOwnerFrames = 15;
 
             if (!dropped) {
-                f.Events.MarioPlayerThrewObject(f, marioEntity, entity);
+                f.Events.MarioPlayerThrewObject(marioEntity, entity);
             }
         }
 

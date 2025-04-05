@@ -1,7 +1,10 @@
 using NSMB.Extensions;
+using NSMB.UI.MainMenu.Submenus;
 using NSMB.UI.MainMenu.Submenus.Prompts;
+using Quantum;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using TMPro;
 using UnityEngine;
@@ -25,7 +28,6 @@ namespace NSMB.UI.MainMenu {
         [SerializeField] private MainMenuSubmenu startingSubmenu;
         [SerializeField] private GameObject mainPanel;
         [SerializeField] private AudioSource sfx;
-        [SerializeField] private MainMenuSubmenu goToSubmenuOnError;
         [SerializeField] private ErrorPromptSubmenu errorSubmenu;
         [SerializeField] private Songinator musicPlayer;
 
@@ -60,6 +62,20 @@ namespace NSMB.UI.MainMenu {
             OpenMenu(startingSubmenu);
         }
 
+        public void OnDestroy() {
+            foreach (var menu in allSubmenus) {
+                menu.OnDestroy();
+            }
+            NetworkHandler.OnError -= OnError;
+        }
+
+        public void Update() {
+            // Fallback: select the default object if we somehow aren't selecting anything.
+            if (!eventSystem.currentSelectedGameObject && SubmenuStack.Count > 0) {
+                eventSystem.SetSelectedGameObject(SubmenuStack[^1].DefaultSelection);
+            }
+        }
+
         public void UpdateHeader() {
             StringBuilder builder = new();
 
@@ -88,24 +104,38 @@ namespace NSMB.UI.MainMenu {
             header.SetActive(showHeader);
         }
 
+        public bool IsSubmenuOpen(MainMenuSubmenu menu) {
+            return submenuStack.Contains(menu);
+        }
+
         public void OpenMenu(MainMenuSubmenu menu) {
+            OpenMenu(menu, menu.IsOverlay ? SoundEffect.UI_WindowOpen : SoundEffect.UI_Decide);
+        }
+
+        public void OpenMenu(MainMenuSubmenu menu, SoundEffect? sound) {
+            bool first = true;
             if (submenuStack.Contains(menu)) {
                 // Close menus on top of this menu
                 while (submenuStack[^1] != menu) {
                     GoBack(true);
                 }
+                first = false;
             }
 
             if (submenuStack.Count > 0) {
                 submenuStack[^1].Hide(menu.IsOverlay ? SubmenuHideReason.Overlayed : SubmenuHideReason.Background);
-                PlaySound(menu.IsOverlay ? SoundEffect.UI_WindowOpen : SoundEffect.UI_Decide);
+                if (sound.HasValue) {
+                    PlaySound(sound.Value);
+                }
             }
 
-            submenuStack.Add(menu);
-            menu.Show(true);
+            if (first) {
+                submenuStack.Add(menu);
+            }
+
+            menu.Show(first);
             UpdateHeader();
             ShowHideMainPanel();
-            
         }
 
         public void CloseSubmenuAndChildren(MainMenuSubmenu menu) {
@@ -188,7 +218,10 @@ namespace NSMB.UI.MainMenu {
             mainPanel.SetActive(showMainPanel);
         }
 
-        private void OnError(string message) {
+        private void OnError(string message, bool disconnect) {
+            if (disconnect) {
+                OpenMenu(allSubmenus.OfType<RoomListSubmenu>().First());
+            }
             errorSubmenu.OpenWithString(message);
         }
     }

@@ -42,7 +42,7 @@ namespace Quantum {
                 }
             } else if (dot > -PhysicsObjectSystem.GroundMaxAngle) {
                 // Hit the side of a pipe
-                f.Events.BreakableObjectBroken(f, breakableObjectEntity, marioEntity, -effectiveNormal, breakable->CurrentHeight - breakable->MinimumHeight);
+                f.Events.BreakableObjectBroken(breakableObjectEntity, marioEntity, -effectiveNormal, breakable->CurrentHeight - breakable->MinimumHeight);
                 ChangeHeight(f, breakableObjectEntity, breakable, breakableCollider, breakable->MinimumHeight, true);
                 breakable->IsDestroyed = true;
 
@@ -52,7 +52,7 @@ namespace Quantum {
                 if (contact.HasValue) {
                     FP before = f.Unsafe.GetPointer<Transform2D>(marioEntity)->Position.X;
                     FP leftoverVelocity = (FPMath.Abs(velocity.X) - (contact.Value.Distance * f.UpdateRate)) * (velocity.X > 0 ? 1 : -1);
-                    PhysicsObjectSystem.MoveHorizontally((FrameThreadSafe) f, new FPVector2(leftoverVelocity, 0), marioEntity, f.FindAsset<VersusStageData>(f.Map.UserAsset));
+                    PhysicsObjectSystem.MoveHorizontally((FrameThreadSafe) f, new FPVector2(leftoverVelocity, 0), marioEntity, f.FindAsset<VersusStageData>(f.Map.UserAsset), default, out _);
                     marioPhysicsObject->Velocity.X = velocity.X;
                 }
                 return true;

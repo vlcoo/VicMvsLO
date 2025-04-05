@@ -1,11 +1,12 @@
 component Powerup {
-	asset_ref<PowerupAsset> Scriptable;
+	AssetRef<PowerupAsset> Scriptable;
 	bool FacingRight;
 	int Lifetime;
 
 	FPVector2 AnimationCurveOrigin;
 	FP AnimationCurveTimer;
 
+	[ExcludeFromPrototype] PowerupSpawnReason SpawnReason;
 	[ExcludeFromPrototype] bool BlockSpawn;
 	[ExcludeFromPrototype] bool LaunchSpawn;
 	[ExcludeFromPrototype] FPVector2 BlockSpawnOrigin;
@@ -29,6 +30,13 @@ enum PowerupState : Byte {
     MegaMushroom
 }
 
+enum PowerupSpawnReason : Byte {
+	PowerupBlock,
+	Coins,
+	BlueKoopa,
+	Other
+}
+
 enum PowerupReserveResult : Byte {
     None,
     NoneButPlaySound,
@@ -39,6 +47,5 @@ enum PowerupReserveResult : Byte {
 signal OnMarioPlayerCollectedPowerup(EntityRef marioEntity, MarioPlayer* mario);
 
 event PowerupBecameActive {
-	nothashed Frame Frame;
-	entity_ref Entity;
+	EntityRef Entity;
 }

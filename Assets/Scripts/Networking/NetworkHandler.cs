@@ -12,12 +12,13 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 using System.Text.RegularExpressions;
+using static BinaryReplayFile;
 
 public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, IConnectionCallbacks {
 
     //---Events
     public static event Action<ClientState, ClientState> StateChanged;
-    public static event Action<string> OnError;
+    public static event Action<string, bool> OnError;
 
     //---Constants
     public static readonly string RoomIdValidChars = "BCDFGHJKLMNPRQSTVWXYZ";
@@ -59,6 +60,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
         };
         realtimeClient.AddCallbackTarget(this);
 
+        QuantumCallback.Subscribe<CallbackGameStarted>(this, OnGameStarted);
         QuantumCallback.Subscribe<CallbackSimulateFinished>(this, OnSimulateFinished);
         QuantumCallback.Subscribe<CallbackGameResynced>(this, OnGameResynced);
         QuantumCallback.Subscribe<CallbackGameDestroyed>(this, OnGameDestroyed);
@@ -131,6 +133,10 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
         Instance.lastRegion = region;
         Client.AuthValues = await AuthenticationHandler.Authenticate();
 
+        if (Client == null) {
+            return false;
+        }
+
         if (Client.AuthValues == null) {
             StateChanged?.Invoke(ClientState.ConnectingToMasterServer, ClientState.Disconnected);
             return false;
@@ -149,7 +155,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
         try {
             await Client.ConnectUsingSettingsAsync(new AppSettings {
                 AppIdQuantum = "6b4b72d0-57c3-4991-96c1-f3f36f9548e5",
-                AppVersion = Application.version[0..(Application.version.LastIndexOf('.') - 1)],
+                AppVersion = GameVersion.Parse(Application.version).ToStringIgnoreHotfix(),
                 EnableLobbyStatistics = true,
                 AuthMode = AuthModeOption.Auth,
                 FixedRegion = region,
@@ -239,10 +245,12 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
         var manager = ReplayListManager.Instance;
         if (manager) {
             var deletions = manager.GetTemporaryReplaysToDelete();
-            foreach (var replay in deletions) {
-                Debug.Log($"[Replay] Automatically deleting temporary replay '{replay.ReplayFile.GetDisplayName()}' ({replay.FilePath}) to make room.");
-                File.Delete(replay.FilePath);
-                manager.RemoveReplay(replay);
+            if (deletions != null) {
+                foreach (var replay in deletions) {
+                    Debug.Log($"[Replay] Automatically deleting temporary replay '{replay.ReplayFile.GetDisplayName()}' ({replay.FilePath}) to make room.");
+                    File.Delete(replay.FilePath);
+                    manager.RemoveReplay(replay);
+                }
             }
         }
 
@@ -257,18 +265,29 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
         string replayFolder = Path.Combine(ReplayListManager.ReplayDirectory, "temp");
         Directory.CreateDirectory(replayFolder);
 
-        byte[] stars = new byte[10];
+        // Find end-game data
         Frame f = game.Frames.Verified;
+
+        int players = f.Global->RealPlayers;
+        ReplayPlayerInformation[] playerInformation = new ReplayPlayerInformation[players];
+
         for (int i = 0; i < players; i++) {
+            ref PlayerInformation inGamePlayerInformation = ref f.Global->PlayerInfo[i];
+            playerInformation[i].Username = inGamePlayerInformation.Nickname;
+            playerInformation[i].Character = inGamePlayerInformation.Character;
+            playerInformation[i].Team = inGamePlayerInformation.Team;
+            playerInformation[i].PlayerRef = inGamePlayerInformation.PlayerRef;
+
             var filter = f.Filter<MarioPlayer>();
+            filter.UseCulling = false;
             while (filter.NextUnsafe(out _, out MarioPlayer* mario)) {
-                if (mario->PlayerRef != playerrefs[i]) {
+                if (mario->PlayerRef != playerInformation[i].PlayerRef) {
                     continue;
                 }
 
                 // Found him :)
                 if (mario->Lives > 0 || !f.Global->Rules.IsLivesEnabled) {
-                    stars[i] = mario->Stars;
+                    playerInformation[i].FinalStarCount = mario->Stars;
                 }
                 break;
             }
@@ -288,7 +307,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
             }
         } while (outputStream == null);
 
-        BinaryReplayFile binaryReplay = BinaryReplayFile.FromReplayData(jsonReplay, f.Global->Rules, players, playernames, playerteams, stars, winner);
+        BinaryReplayFile binaryReplay = BinaryReplayFile.FromReplayData(jsonReplay, f.Global->Rules, playerInformation, winner);
         long writtenBytes = binaryReplay.WriteToStream(outputStream);
         outputStream.Dispose();
 
@@ -305,9 +324,6 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
             Game.RecordInputStream.Dispose();
             Game.RecordInputStream = null;
         }
-        playernames = null;
-        playerteams = null;
-        playerrefs = null;
     }
 
     private unsafe void UpdateRealtimeProperties() {
@@ -373,20 +389,30 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
         };
 
         IsReplay = false;
-        Runner = await QuantumRunner.StartGameAsync(sessionRunnerArguments);
-        Runner.Game.AddPlayer(new RuntimePlayer {
-            PlayerNickname = Settings.Instance.generalNickname ?? "noname",
-            UserId = default(Guid).ToString(),
-            UseColoredNickname = Settings.Instance.generalUseNicknameColor,
-            Character = (byte) Settings.Instance.generalCharacter,
-            Palette = (byte) Settings.Instance.generalPalette,
-        });
+        try {
+            Runner = await QuantumRunner.StartGameAsync(sessionRunnerArguments);
+            Runner.Game.AddPlayer(new RuntimePlayer {
+                PlayerNickname = Settings.Instance.generalNickname ?? "noname",
+                UserId = Client.UserId,
+                UseColoredNickname = Settings.Instance.generalUseNicknameColor,
+                Character = (byte) Settings.Instance.generalCharacter,
+                Palette = (byte) Settings.Instance.generalPalette,
+            });
+        } catch { }
 
         ChatManager.Instance.mutedPlayers.Clear();
         GlobalController.Instance.connecting.SetActive(false);
     }
 
-    public void OnJoinRoomFailed(short returnCode, string message) { }
+    public void OnJoinRoomFailed(short returnCode, string message) {
+        Debug.Log($"[Network] Failed to join room: ({returnCode}) {message}");
+
+        if (!RealtimeErrorCodes.TryGetValue(returnCode, out string errorTranslationKey)) {
+            errorTranslationKey = $"{message} ({returnCode})";
+        }
+
+        OnError?.Invoke(errorTranslationKey, true);
+    }
 
     public void OnJoinRandomFailed(short returnCode, string message) { }
 
@@ -400,7 +426,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
     private void OnPluginDisconnect(CallbackPluginDisconnect e) {
         Debug.Log($"[Network] Disconnected via server plugin: {e.Reason}");
 
-        OnError?.Invoke(e.Reason);
+        OnError?.Invoke(e.Reason, true);
 
         if (Runner) {
             Runner.Shutdown(ShutdownCause.SimulationStopped);
@@ -420,12 +446,14 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
     }
 
     private void OnPlayerAdded(EventPlayerAdded e) {
-        RuntimePlayer runtimePlayer = e.Frame.GetPlayerData(e.Player);
+        Frame f = e.Game.Frames.Predicted;
+        RuntimePlayer runtimePlayer = f.GetPlayerData(e.Player);
         Debug.Log($"[Network] {runtimePlayer.PlayerNickname} ({runtimePlayer.UserId}) joined the game.");
     }
 
     private void OnPlayerRemoved(EventPlayerRemoved e) {
-        RuntimePlayer runtimePlayer = e.Frame.GetPlayerData(e.Player);
+        Frame f = e.Game.Frames.Predicted;
+        RuntimePlayer runtimePlayer = f.GetPlayerData(e.Player);
         Debug.Log($"[Network] {runtimePlayer.PlayerNickname} ({runtimePlayer.UserId}) left the game.");
     }
 
@@ -445,12 +473,9 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
 
     int initialFrame;
     byte[] initialFrameData;
-    byte players;
-    string[] playernames;
-    byte[] playerteams;
-    PlayerRef[] playerrefs;
+
     private void OnRecordingStarted(EventRecordingStarted e) {
-        RecordReplay(e.Game, e.Frame);
+        RecordReplay(e.Game, e.Game.Frames.Verified);
     }
 
     public unsafe void RecordReplay(QuantumGame game, Frame f) {
@@ -461,29 +486,6 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
         game.StartRecordingInput(f.Number);
         initialFrameData = f.Serialize(DeterministicFrameSerializeMode.Serialize);
         initialFrame = f.Number;
-
-        players = f.Global->RealPlayers;
-        playernames = new string[10];
-        playerrefs = new PlayerRef[10];
-        playerteams = new byte[10];
-
-        int count = 0;
-        for (PlayerRef player = 0; count < players && player < f.PlayerCount; player++) {
-            var playerData = QuantumUtils.GetPlayerData(f, player);
-            if (playerData == null || playerData->IsSpectator) {
-                continue;
-            }
-
-            RuntimePlayer runtimePlayer = f.GetPlayerData(player);
-            if (runtimePlayer == null) {
-                continue;
-            }
-
-            playernames[count] = runtimePlayer.PlayerNickname.ToValidUsername(f, player);
-            playerrefs[count] = player;
-            playerteams[count] = playerData->RealTeam;
-            count++;
-        }
 
         Debug.Log("[Replay] Started recording a new replay.");
     }
@@ -527,6 +529,14 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
         ReplayFrameCache.Clear();
         ReplayFrameCache.Add(arguments.FrameData);
         Runner = await QuantumRunner.StartGameAsync(arguments);
+    }
+
+    private unsafe void OnGameStarted(CallbackGameStarted e) {
+        Frame f = e.Game.Frames.Verified;
+        if (f.ResolveList(f.Global->BannedPlayerIds).Contains(Client.UserId)) {
+            QuantumRunner.Default.Shutdown(ShutdownCause.SessionError);
+            OnError?.Invoke("ui.error.join.banned", true);
+        }
     }
 
     private unsafe void OnGameResynced(CallbackGameResynced e) {

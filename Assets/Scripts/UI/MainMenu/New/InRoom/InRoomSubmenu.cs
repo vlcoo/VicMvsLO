@@ -102,6 +102,12 @@ namespace NSMB.UI.MainMenu.Submenus {
             Settings.Controls.UI.Previous.performed -= OnPreviousPerformed;
         }
 
+        public override void OnDestroy() {
+            foreach (var panel in allPanels) {
+                panel.OnDestroy();
+            }
+        }
+
         public override bool TryGoBack(out bool playSound) {
             bool allowGoBack = true;
             playSound = true;
@@ -281,7 +287,7 @@ namespace NSMB.UI.MainMenu.Submenus {
         }
 
         private void OnGameStateChanged(EventGameStateChanged e) {
-            UpdateStartButton(e.Game, e.Frame);
+            UpdateStartButton(e.Game, e.Game.Frames.Predicted);
 
             // if (fadeMusicCoroutine != null) {
             //     StopCoroutine(fadeMusicCoroutine);
@@ -292,11 +298,11 @@ namespace NSMB.UI.MainMenu.Submenus {
 
         private void OnHostChanged(EventHostChanged e) {
             Canvas.UpdateHeader();
-            UpdateStartButton(e.Game, e.Frame);
+            UpdateStartButton(e.Game, e.Game.Frames.Verified);
         }
 
         private unsafe void OnStartingCountdownChanged(EventStartingCountdownChanged e) {
-            Frame f = e.Frame;
+            Frame f = e.Game.Frames.Predicted;
             UpdateStartButton(e.Game, f, e.IsGameStarting ? 3 : -1);
 
             bool isHost = e.Game.PlayerIsLocal(QuantumUtils.GetHostPlayer(f, out _));
@@ -320,17 +326,18 @@ namespace NSMB.UI.MainMenu.Submenus {
         }
 
         private unsafe void OnPlayerDataChanged(EventPlayerDataChanged e) {
-            bool isHost = e.Game.PlayerIsLocal(QuantumUtils.GetHostPlayer(e.Frame, out _));
+            Frame f = e.Game.Frames.Predicted;
+            bool isHost = e.Game.PlayerIsLocal(QuantumUtils.GetHostPlayer(f, out _));
 
             if (isHost) {
-                startGameButton.interactable = QuantumUtils.IsGameStartable(e.Frame);
+                startGameButton.interactable = QuantumUtils.IsGameStartable(f);
             } else {
-                startGameButton.interactable = e.Frame.Global->GameStartFrames == 0;
+                startGameButton.interactable = f.Global->GameStartFrames == 0;
             }
         }
 
         private void OnCountdownTick(EventCountdownTick e) {
-            UpdateStartButton(e.Game, e.Frame);
+            UpdateStartButton(e.Game, e.Game.Frames.Predicted);
         }
     }
 }

@@ -45,8 +45,9 @@ namespace NSMB.UI.MainMenu.Submenus {
             TranslationManager.OnLanguageChanged += OnLanguageChanged;
         }
 
-        public void OnDestroy() {
+        public override void OnDestroy() {
             TranslationManager.OnLanguageChanged -= OnLanguageChanged;
+            chat.OnDestroy();
         }
 
         public override bool TryGoBack(out bool playSound) {
@@ -86,7 +87,7 @@ namespace NSMB.UI.MainMenu.Submenus {
         }
 
         private unsafe void OnRulesChanged(EventRulesChanged e) {
-            Frame f = e.Frame;
+            Frame f = e.Game.Frames.Verified;
             ref GameRules rules = ref f.Global->Rules;
 
             if (e.LevelChanged) {

@@ -109,7 +109,7 @@ namespace Quantum {
                 physicsObject->Velocity.X = bigStar->Speed * (bigStar->FacingRight ? 1 : -1);
             }
 
-            if (physicsObject->DisableCollision && QuantumUtils.Decrement(ref bigStar->UncollectableFrames)) {
+            if (physicsObject->DisableCollision && QuantumUtils.Decrement(ref bigStar->UncollectableFrames) && transform->Position.Y < stage.StageWorldMax.Y) {
                 var physicsCollider = f.Unsafe.GetPointer<PhysicsCollider2D>(entity);
                 if (!PhysicsObjectSystem.BoxInGround((FrameThreadSafe) f, transform->Position, physicsCollider->Shape, true, stage)) {
                     physicsObject->DisableCollision = false;
@@ -141,7 +141,7 @@ namespace Quantum {
             }
 
             f.Signals.OnMarioPlayerCollectedStar(marioEntity);
-            f.Events.MarioPlayerCollectedStar(f, marioEntity, *mario, f.Unsafe.GetPointer<Transform2D>(starEntity)->Position);
+            f.Events.MarioPlayerCollectedStar(marioEntity, *mario, f.Unsafe.GetPointer<Transform2D>(starEntity)->Position);
             f.Destroy(starEntity);
         }
 

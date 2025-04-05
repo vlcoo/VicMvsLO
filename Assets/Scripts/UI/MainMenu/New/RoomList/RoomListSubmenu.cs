@@ -1,3 +1,4 @@
+using NSMB.UI.MainMenu.Submenus.Prompts;
 using NSMB.Utils;
 using Photon.Realtime;
 using Quantum;
@@ -20,18 +21,22 @@ namespace NSMB.UI.MainMenu.Submenus {
         [SerializeField] private TMP_InputField usernameField;
         [SerializeField] private SpriteChangingToggle filterInProgressRooms, filterFullRooms;
         [SerializeField] private MainMenuSubmenu inRoomSubmenu;
+        [SerializeField] private ErrorPromptSubmenu errorSubmenu;
         [SerializeField] private RectTransform sideMenu;
         [SerializeField] private Color invalidUsernameColor;
 
         //---Private Variables
         private Color defaultUsernameColor;
         private bool overlayed;
-
+        private bool kickedFromPreviousGame, bannedFromPreviousGame;
+    
         public override void Initialize() {
             base.Initialize();
-            NetworkHandler.StateChanged += OnClientStateChanged;
-            QuantumCallback.Subscribe<CallbackLocalPlayerAddConfirmed>(this, OnLocalPlayerAddConfirmed);
             defaultUsernameColor = usernameField.targetGraphic.color;
+
+            NetworkHandler.StateChanged += OnClientStateChanged;
+            QuantumEvent.Subscribe<EventPlayerKickedFromRoom>(this, OnPlayerKickedFromRoom);
+            QuantumEvent.Subscribe<EventPlayerAdded>(this, OnPlayerAdded);
         }
 
         public void OnEnable() {
@@ -41,7 +46,7 @@ namespace NSMB.UI.MainMenu.Submenus {
             LayoutRebuilder.ForceRebuildLayoutImmediate(sideMenu);
         }
 
-        public void OnDestroy() {
+        public override void OnDestroy() {
             NetworkHandler.StateChanged -= OnClientStateChanged;
         }
 
@@ -61,6 +66,15 @@ namespace NSMB.UI.MainMenu.Submenus {
                 Settings.Instance.generalNickname = "Player" + UnityEngine.Random.Range(1000, 10000);
             }
             usernameField.text = Settings.Instance.generalNickname;
+
+            if (kickedFromPreviousGame) {
+                errorSubmenu.OpenWithString("ui.error.kicked");
+            } else if (bannedFromPreviousGame) {
+                errorSubmenu.OpenWithString("ui.error.banned");
+            }
+
+            kickedFromPreviousGame = false;
+            bannedFromPreviousGame = false;
         }
 
         public override void Hide(SubmenuHideReason hideReason) {
@@ -188,8 +202,17 @@ namespace NSMB.UI.MainMenu.Submenus {
             */
         }
 
-        private void OnLocalPlayerAddConfirmed(CallbackLocalPlayerAddConfirmed e) {
-            Canvas.OpenMenu(inRoomSubmenu);
+        private void OnPlayerAdded(EventPlayerAdded e) {
+            if (e.Game.PlayerIsLocal(e.Player) && !Canvas.IsSubmenuOpen(inRoomSubmenu)) {
+                Canvas.OpenMenu(inRoomSubmenu);
+            }
+        }
+
+        private void OnPlayerKickedFromRoom(EventPlayerKickedFromRoom e) {
+            if (e.Game.PlayerIsLocal(e.Player)) {
+                kickedFromPreviousGame = !e.Banned;
+                bannedFromPreviousGame = e.Banned;
+            }
         }
 
         private class RegionOption : TMP_Dropdown.OptionData, IComparable {

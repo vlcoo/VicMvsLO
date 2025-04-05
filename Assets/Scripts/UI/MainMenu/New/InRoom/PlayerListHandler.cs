@@ -31,7 +31,7 @@ namespace NSMB.UI.MainMenu {
                 playerListEntries.Add(Instantiate(template, template.transform.parent));
             }
 
-            QuantumCallback.Subscribe<CallbackLocalPlayerAddConfirmed>(this, OnLocalPlayerAddConfirmed);
+            QuantumCallback.Subscribe<CallbackGameStarted>(this, OnGameStarted);
             QuantumCallback.Subscribe<CallbackGameDestroyed>(this, OnGameDestroyed);
             QuantumEvent.Subscribe<EventPlayerAdded>(this, OnPlayerAdded, NetworkHandler.FilterOutReplay);
             QuantumEvent.Subscribe<EventPlayerRemoved>(this, OnPlayerRemoved, NetworkHandler.FilterOutReplay);
@@ -150,31 +150,35 @@ namespace NSMB.UI.MainMenu {
 
         //---Callbacks
         private void OnPlayerAdded(EventPlayerAdded e) {
-            AddPlayerEntry(e.Frame, e.Player);
+            Frame f = e.Game.Frames.Verified;
+            AddPlayerEntry(f, e.Player);
             GlobalController.Instance.sfx.PlayOneShot(SoundEffect.UI_PlayerConnect);
         }
 
         private void OnPlayerRemoved(EventPlayerRemoved e) {
-            RemovePlayerEntry(e.Frame, e.Player);
+            Frame f = e.Game.Frames.Verified;
+            RemovePlayerEntry(f, e.Player);
             GlobalController.Instance.sfx.PlayOneShot(SoundEffect.UI_PlayerDisconnect);
         }
 
         private void OnGameStateChanged(EventGameStateChanged e) {
+            Frame f = e.Game.Frames.Verified;
             if (e.NewState == GameState.PreGameRoom) {
-                UpdateAllPlayerEntries(e.Frame);
+                UpdateAllPlayerEntries(f);
             }
         }
 
         private void OnRulesChanged(EventRulesChanged e) {
-            UpdateAllPlayerEntries(e.Frame);
+            Frame f = e.Game.Frames.Verified;
+            UpdateAllPlayerEntries(f);
         }
 
         private void OnGameDestroyed(CallbackGameDestroyed e) {
             RemoveAllPlayerEntries();
         }
 
-        private void OnLocalPlayerAddConfirmed(CallbackLocalPlayerAddConfirmed e) {
-            PopulatePlayerEntries(e.Frame);
+        private void OnGameStarted(CallbackGameStarted e) {
+            PopulatePlayerEntries(e.Game.Frames.Predicted);
         }
     }
 }

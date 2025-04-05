@@ -1,4 +1,5 @@
-#pragma max_players 10
+#define MaxPlayers 10
+#pragma max_players MaxPlayers
 
 global {
 	GameRules Rules;	
@@ -8,8 +9,9 @@ global {
 	ushort GameStartFrames;
 	ushort PlayerLoadFrames;
 
+	[AllocateOnComponentAdded] list<QStringUtf8<40>> BannedPlayerIds;
 	[AllocateOnComponentAdded] dictionary<PlayerRef, EntityRef> PlayerDatas;
-	array<PlayerInformation>[10] PlayerInfo;
+	array<PlayerInformation>[MaxPlayers] PlayerInfo;
 	byte RealPlayers;
 	byte TotalMarios;
 
@@ -28,7 +30,7 @@ struct PlayerInformation {
 }
 
 struct GameRules {
-	asset_ref<Map> Stage;
+	AssetRef<Map> Stage;
 
 	int StarsToWin;
 	int CoinsForPowerup;
@@ -258,42 +260,34 @@ signal OnTimerSecondsRemaining(int secondsRemaining);
 
 
 synced event GameStateChanged {
-	Frame Frame;
 	GameState NewState;
 }
 
 synced event PlayerAdded {
-	Frame Frame;
 	PlayerRef Player;
 }
 
 synced event PlayerRemoved {
-	Frame Frame;
 	PlayerRef Player;
 }
 
 event PlayerDataChanged {
-	nothashed Frame Frame;
 	PlayerRef Player;
 }
 
 event StartingCountdownChanged {
-	nothashed Frame Frame;
 	bool IsGameStarting;
 }
 
 event CountdownTick {
-	nothashed Frame Frame;
 	int SecondsRemaining;
 }
 
 synced event HostChanged {
-	Frame Frame;
 	PlayerRef NewHost;
 }
 
 synced event RulesChanged {
-	Frame Frame;
 	bool LevelChanged;
 }
 
@@ -306,24 +300,23 @@ synced event PowerupChancesChanged {
 }
 
 synced event PlayerLoaded {
-	Frame Frame;
 	PlayerRef Player;
 }
 
 synced event RecordingStarted {
-	Frame Frame;
+
 }
 
 synced event GameStarted {
-	Frame Frame;
+
 }
 
 synced event GameEnded {
-	Frame Frame;
+	bool EndedByHost;
 	int WinningTeam;
 	bool HasWinner;
 }
 
 event StartGameEndFade {
-	nothashed Frame Frame;
+
 }

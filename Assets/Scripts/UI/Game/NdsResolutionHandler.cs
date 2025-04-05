@@ -63,6 +63,7 @@ namespace NSMB.UI.Game {
                     }
                     scaling /= rootCanvas.scaleFactor;
                     fitterTransform.sizeDelta = new Vector2(texture.width * scaling, texture.height * scaling);
+                    fitterTransform.hasChanged = true;
                     pixelPerfect = true;
                     previousResolution = (width, height);
 
@@ -72,6 +73,7 @@ namespace NSMB.UI.Game {
                     fitterTransform.anchorMin = Vector2.zero;
                     fitterTransform.anchorMax = Vector2.one;
                     fitterTransform.sizeDelta = Vector2.zero;
+                    fitterTransform.hasChanged = true;
                     pixelPerfect = false;
                 }
             } else {
@@ -85,8 +87,9 @@ namespace NSMB.UI.Game {
                 }
                 resolutionChanged = CreateRenderTexture(width, height);
 
-                fitter.enabled = false;
                 RectTransform fitterTransform = (RectTransform) fitter.transform;
+                fitter.enabled = false;
+                fitterTransform.hasChanged = resolutionChanged;
                 fitterTransform.anchorMin = Vector2.zero;
                 fitterTransform.anchorMax = Vector2.one;
                 fitterTransform.sizeDelta = Vector2.zero;

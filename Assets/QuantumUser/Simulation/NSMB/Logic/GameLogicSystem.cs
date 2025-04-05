@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace Quantum {
     public unsafe class GameLogicSystem : SystemMainThread, ISignalOnPlayerAdded, ISignalOnPlayerRemoved, ISignalOnMarioPlayerDied,
-        ISignalOnLoadingComplete, ISignalOnMarioPlayerCollectedStar, ISignalOnMarioTouchedGoal, ISignalOnReturnToRoom, ISignalOnComponentRemoved<MarioPlayer> {
+        ISignalOnLoadingComplete, ISignalOnMarioPlayerCollectedStar, ISignalOnReturnToRoom, ISignalOnComponentRemoved<MarioPlayer> {
 
         public override void OnInit(Frame f) {
             var config = f.RuntimeConfig;
@@ -17,11 +17,14 @@ namespace Quantum {
                 f.Global->GameState = GameState.WaitingForPlayers;
                 f.Global->PlayerLoadFrames = (ushort) (20 * f.UpdateRate);
             } else {
-                f.Events.GameStateChanged(f, f.Global->GameState);
+                f.Events.GameStateChanged(f.Global->GameState);
             }
         }
 
         public override void Update(Frame f) {
+            // Tick RNG
+            _ = f.RNG->Next();
+            
             // Parse lobby commands
             var playerDataDictionary = f.ResolveDictionary(f.Global->PlayerDatas);
             for (int i = 0; i < f.PlayerCount; i++) {
@@ -47,16 +50,18 @@ namespace Quantum {
                         f.Global->PlayerLoadFrames = (ushort) (20 * f.UpdateRate);
                         f.Global->GameState = GameState.WaitingForPlayers;
 
-                        f.Events.GameStateChanged(f, GameState.WaitingForPlayers);
+                        f.Events.GameStateChanged(GameState.WaitingForPlayers);
                     } else if (f.Global->GameStartFrames % 60 == 0) {
-                        f.Events.CountdownTick(f, f.Global->GameStartFrames / 60);
+                        f.Events.CountdownTick(f.Global->GameStartFrames / 60);
                     }
                 }
                 break;
             case GameState.WaitingForPlayers:
-                var playerDataFilter = f.Filter<PlayerData>();
                 int validPlayers = 0;
                 int loadedPlayers = 0;
+
+                var playerDataFilter = f.Filter<PlayerData>();
+                playerDataFilter.UseCulling = false;
                 while (playerDataFilter.NextUnsafe(out _, out PlayerData* data)) {
                     if (!f.RuntimeConfig.IsRealGame) {
                         data->IsLoaded = true;
@@ -65,9 +70,9 @@ namespace Quantum {
 
                     if (!data->IsSpectator) {
                         validPlayers++;
-                    }
-                    if (data->IsLoaded) {
-                        loadedPlayers++;
+                        if (data->IsLoaded) {
+                            loadedPlayers++;
+                        }
                     }
                 }
                 f.Global->RealPlayers = (byte) validPlayers;
@@ -80,28 +85,28 @@ namespace Quantum {
                     // Progress to next stage.
                     f.Global->RealPlayers = (byte) loadedPlayers;
                     f.Global->GameState = GameState.Starting;
-                    f.Global->GameStartFrames = 6 * 60;
-                    f.Global->Timer = f.Global->Rules.TimerSeconds * 60;
+                    f.Global->GameStartFrames = (ushort) (6 * f.UpdateRate);
+                    f.Global->Timer = f.Global->Rules.TimerSeconds * f.UpdateRate;
 
                     f.Signals.OnLoadingComplete();
-                    f.Events.GameStateChanged(f, GameState.Starting);
+                    f.Events.GameStateChanged(GameState.Starting);
                 }
                 break;
             case GameState.Starting:
                 if (QuantumUtils.Decrement(ref f.Global->GameStartFrames)) {
                     // Now playing
                     f.Global->GameState = GameState.Playing;
-                    f.Events.GameStateChanged(f, GameState.Playing);
+                    f.Events.GameStateChanged(GameState.Playing);
                     f.Global->StartFrame = f.Number;
 
                 } else if (f.Global->GameStartFrames == 79) {
-                    f.Events.RecordingStarted(f);
+                    f.Events.RecordingStarted();
 
                 } if (f.Global->GameStartFrames == 78) {
                     // Respawn all players and enable systems
                     f.SystemEnable<StartDisabledSystemGroup>();
                     f.Signals.OnGameStarting();
-                    f.Events.GameStarted(f);
+                    f.Events.GameStarted();
                 }
                 break;
 
@@ -116,14 +121,14 @@ namespace Quantum {
 
                 PlayerRef host = QuantumUtils.GetHostPlayer(f, out _);
                 if (f.GetPlayerCommand(host) is CommandHostEndGame) {
-                    EndGame(f, null);
+                    EndGame(f, true, null);
                 }
                 break;
 
             case GameState.Ended:
                 QuantumUtils.Decrement(ref f.Global->GameStartFrames);
                 if (f.Global->GameStartFrames == 30) {
-                    f.Events.StartGameEndFade(f);
+                    f.Events.StartGameEndFade();
                 }
 
                 if (f.Global->GameStartFrames == 0) {
@@ -136,7 +141,7 @@ namespace Quantum {
                     f.SystemEnable<StartDisabledSystemGroup>();
                     f.Signals.OnReturnToRoom();
                     f.Global->GameState = GameState.PreGameRoom;
-                    f.Events.GameStateChanged(f, GameState.PreGameRoom);
+                    f.Events.GameStateChanged(GameState.PreGameRoom);
                     f.SystemDisable<StartDisabledSystemGroup>();
                 }
                 break;
@@ -145,7 +150,7 @@ namespace Quantum {
 
         public static void StopCountdown(Frame f) {
             f.Global->GameStartFrames = 0;
-            f.Events.StartingCountdownChanged(f, false);
+            f.Events.StartingCountdownChanged(false);
         }
 
         public static void CheckForGameEnd(Frame f) {
@@ -172,12 +177,12 @@ namespace Quantum {
             if (oneOrNoTeamAlive) {
                 if (aliveTeam == -1) {
                     // It's a draw
-                    EndGame(f, null);
+                    EndGame(f, false, null);
                     return;
                 } else if (f.Global->RealPlayers > 1) {
                     // <team> wins, assuming more than 1 player
                     // so the player doesn't insta-win in a solo game.
-                    EndGame(f, aliveTeam);
+                    EndGame(f, false, aliveTeam);
                     return;
                 }
             }
@@ -185,39 +190,30 @@ namespace Quantum {
             int? winningTeam = QuantumUtils.GetWinningTeam(f, out int stars);
 
             // End Condition: team gets to enough stars
-            if (winningTeam != null && f.Global->Rules.StarsToWin > 0 && stars >= f.Global->Rules.StarsToWin) {
+            if (winningTeam != null && stars >= f.Global->Rules.StarsToWin) {
                 // <team> wins
-                EndGame(f, winningTeam.Value);
+                EndGame(f, false, winningTeam.Value);
                 return;
-            }
-            
-            // End Condition: a player has enough laps
-            marioFilter = f.Filter<MarioPlayer>();
-            while (marioFilter.NextUnsafe(out _, out MarioPlayer* mario)) {
-                if (mario->Laps >= f.Global->Rules.Laps) {
-                    EndGame(f, mario->GetTeam(f));
-                    return;
-                }
             }
 
             // End Condition: timer expires
             if (f.Global->Rules.IsTimerEnabled && f.Global->Timer <= 0) {
                 if (f.Global->Rules.DrawOnTimeUp) {
                     // It's a draw
-                    EndGame(f, null);
+                    EndGame(f, false, null);
                     return;
                 }
 
                 // Check if one team is winning
                 if (winningTeam != null) {
                     // <team> wins
-                    EndGame(f, winningTeam.Value);
+                    EndGame(f, false, winningTeam.Value);
                     return;
                 }
             }
         }
 
-        public static void EndGame(Frame f, int? winningTeam) {
+        public static void EndGame(Frame f, bool endedByHost, int? winningTeam) {
             if (f.Global->GameState != GameState.Playing) {
                 return;
             }
@@ -226,7 +222,7 @@ namespace Quantum {
             f.Global->HasWinner = winningTeam.HasValue;
 
             f.Signals.OnGameEnding(winningTeam.GetValueOrDefault(), winningTeam.HasValue);
-            f.Events.GameEnded(f, winningTeam.GetValueOrDefault(), winningTeam.HasValue);
+            f.Events.GameEnded(endedByHost, winningTeam.GetValueOrDefault(), winningTeam.HasValue);
 
             var playerDatas = f.Filter<PlayerData>();
             playerDatas.UseCulling = false;
@@ -236,10 +232,10 @@ namespace Quantum {
                 }
                 data->IsSpectator = data->ManualSpectator;
             }
-
+            
             f.Global->GameState = GameState.Ended;
-            f.Events.GameStateChanged(f, GameState.Ended);
-            f.Global->GameStartFrames = (ushort) (5 * f.UpdateRate);
+            f.Events.GameStateChanged(GameState.Ended);
+            f.Global->GameStartFrames = (ushort) ((endedByHost ? Constants._3_50 : 21) * f.UpdateRate);
             f.SystemDisable<StartDisabledSystemGroup>();
         }
 
@@ -249,6 +245,12 @@ namespace Quantum {
 
         public void OnPlayerAdded(Frame f, PlayerRef player, bool firstTime) {
             RuntimePlayer runtimePlayer = f.GetPlayerData(player);
+
+            if (f.ResolveList(f.Global->BannedPlayerIds).Contains(runtimePlayer.UserId)) {
+                // banned user- ignore them.
+                return;
+            }
+
             EntityRef newEntity = f.Create();
             f.Add(newEntity, out PlayerData* newData);
             newData->PlayerRef = player;
@@ -285,7 +287,7 @@ namespace Quantum {
             if (playerDatas.Count == 0) {
                 // First player is host
                 newData->IsRoomHost = true;
-                f.Events.HostChanged(f, player);
+                f.Events.HostChanged(player);
             }
 
             foreach ((_, EntityRef otherEntity) in playerDatas) {
@@ -296,8 +298,8 @@ namespace Quantum {
             }
 
             playerDatas[player] = newEntity;
-            f.Events.PlayerAdded(f, player);
-            f.Events.PlayerDataChanged(f, player);
+            f.Events.PlayerAdded(player);
+            f.Events.PlayerDataChanged(player);
         }
 
         public void OnPlayerRemoved(Frame f, PlayerRef player) {
@@ -330,7 +332,7 @@ namespace Quantum {
 
                     if (youngestPlayer != null) {
                         youngestPlayer->IsRoomHost = true;
-                        f.Events.HostChanged(f, youngestPlayer->PlayerRef);
+                        f.Events.HostChanged(youngestPlayer->PlayerRef);
                     }
 
                     hostChanged = true;
@@ -338,9 +340,9 @@ namespace Quantum {
 
                 f.Destroy(entity);
                 playerDatas.Remove(player);
-            }
 
-            f.Events.PlayerRemoved(f, player);
+                f.Events.PlayerRemoved(player);
+            }
 
             switch (f.Global->GameState) {
             case GameState.PreGameRoom:
@@ -389,6 +391,7 @@ namespace Quantum {
                 EntityRef newPlayer = f.Create(character.Prototype);
                 var mario = f.Unsafe.GetPointer<MarioPlayer>(newPlayer);
                 mario->PlayerRef = data->PlayerRef;
+                mario->Lives = (byte) f.Global->Rules.Lives;
                 data->RealTeam = (byte) (f.Global->Rules.TeamsEnabled ? data->RequestedTeam : teamCount++);
 
                 var newTransform = f.Unsafe.GetPointer<Transform2D>(newPlayer);
@@ -420,10 +423,6 @@ namespace Quantum {
         }
 
         public void OnMarioPlayerCollectedStar(Frame f, EntityRef entity) {
-            CheckForGameEnd(f);
-        }
-
-        public void OnMarioTouchedGoal(Frame f, EntityRef marioEntity, EntityRef goalEntity, QBoolean isLastLap) {
             CheckForGameEnd(f);
         }
 

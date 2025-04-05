@@ -107,7 +107,7 @@ namespace Quantum {
             if (rulesChanges.HasFlag(Rules.SShowCoinCount)) { rules.SShowCoinCount = SShowCoinCount; }
             
             f.Global->Rules = rules;
-            f.Events.RulesChanged(f, levelChanged);
+            f.Events.RulesChanged(levelChanged);
 
             if (f.Global->GameStartFrames > 0 && !QuantumUtils.IsGameStartable(f)) {
                 GameLogicSystem.StopCountdown(f);
