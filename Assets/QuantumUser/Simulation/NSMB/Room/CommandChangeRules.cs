@@ -124,6 +124,7 @@ namespace Quantum {
             CustomPowerupsEnabled = 1 << 6,
             DrawOnTimeUp = 1 << 7,
             Laps = 1 << 8,
+            PowerupChances = 1 << 9,
             // skipping to 12 in case we need to add more normal room rules
             SNoReserve = 1 << 12,
             SNoDroppedStars = 1 << 13,
@@ -141,6 +142,7 @@ namespace Quantum {
             SNoPowerups = 1 << 25,
             SNoMinimap = 1 << 26,
             SShowCoinCount = 1 << 27,
+            
         }
     }
 }

@@ -384,6 +384,15 @@ namespace Quantum.Prototypes {
     public QBoolean SNoPowerups;
     public QBoolean SNoMinimap;
     public QBoolean SShowCoinCount;
+    public Int32 ChanceMushroom;
+    public Int32 ChanceFireFlower;
+    public Int32 ChanceIceFlower;
+    public Int32 ChancePropellerMushroom;
+    public Int32 ChanceBlueShell;
+    public Int32 ChanceHammerSuit;
+    public Int32 ChanceMiniMushroom;
+    public Int32 ChanceMegaMushroom;
+    public Int32 ChanceStarman;
     partial void MaterializeUser(Frame frame, ref Quantum.GameRules result, in PrototypeMaterializationContext context);
     public void Materialize(Frame frame, ref Quantum.GameRules result, in PrototypeMaterializationContext context = default) {
         result.Stage = this.Stage;
@@ -421,6 +430,15 @@ namespace Quantum.Prototypes {
         result.SNoPowerups = this.SNoPowerups;
         result.SNoMinimap = this.SNoMinimap;
         result.SShowCoinCount = this.SShowCoinCount;
+        result.ChanceMushroom = this.ChanceMushroom;
+        result.ChanceFireFlower = this.ChanceFireFlower;
+        result.ChanceIceFlower = this.ChanceIceFlower;
+        result.ChancePropellerMushroom = this.ChancePropellerMushroom;
+        result.ChanceBlueShell = this.ChanceBlueShell;
+        result.ChanceHammerSuit = this.ChanceHammerSuit;
+        result.ChanceMiniMushroom = this.ChanceMiniMushroom;
+        result.ChanceMegaMushroom = this.ChanceMegaMushroom;
+        result.ChanceStarman = this.ChanceStarman;
         MaterializeUser(frame, ref result, in context);
     }
   }

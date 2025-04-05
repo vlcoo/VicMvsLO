@@ -56,6 +56,16 @@ struct GameRules {
 	bool SNoPowerups;
 	bool SNoMinimap;
 	bool SShowCoinCount;
+	
+	int ChanceMushroom;
+    int ChanceFireFlower;
+    int ChanceIceFlower;
+    int ChancePropellerMushroom;
+    int ChanceBlueShell;
+    int ChanceHammerSuit;
+    int ChanceMiniMushroom;
+    int ChanceMegaMushroom;
+    int ChanceStarman;
 }
 
 enum GameState : Byte {
@@ -288,6 +298,10 @@ synced event RulesChanged {
 }
 
 synced event TriggersChanged {
+    Frame Frame;
+}
+
+synced event PowerupChancesChanged {
     Frame Frame;
 }
 
