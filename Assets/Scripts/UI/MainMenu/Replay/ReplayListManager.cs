@@ -4,7 +4,6 @@ using NSMB.UI.MainMenu;
 using NSMB.UI.MainMenu.Submenus.Prompts;
 using NSMB.Utils;
 using Quantum;
-using SFB;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -252,8 +251,7 @@ public class ReplayListManager : Selectable {
     }
 
     public void OnImportClicked() {
-        TranslationManager tm = GlobalController.Instance.translationManager;
-        string[] selected = StandaloneFileBrowser.OpenFilePanel(tm.GetTranslation("ui.extras.replays.actions.import"), "", "mvlreplay", false);
+        var selected = DialogModule.OpenFilesBrowser("vcmi Replay files|*.mvlreplay").Split("\n");
 
         foreach (var filepath in selected) {
             using FileStream stream = new FileStream(filepath, FileMode.Open);

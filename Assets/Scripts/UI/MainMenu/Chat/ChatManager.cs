@@ -96,7 +96,7 @@ public class ChatManager : MonoBehaviour {
         message = message.Replace("\n", " ").Trim();
         message = message.SanitizeRichText().Filter();
 
-        AddChatMessage(message, e.Player, f);
+        AddChatMessage(message, e.Player, e.Game.Frames.Verified);
     }
 
     private void OnGameStateChanged(EventGameStateChanged e) {

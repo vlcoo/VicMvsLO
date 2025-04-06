@@ -429,7 +429,7 @@ namespace NSMB.UI.Game {
             SoundEffect resultMusic;
             string resultAnimationTrigger;
             if (e.EndedByHost) {
-                resultMusic = SoundEffect.UI_Match_Cancel;
+                resultMusic = SoundEffect.UI_Match_Draw;
                 resultAnimationTrigger = "startNoContest";
             } else if (!hasWinner) {
                 resultMusic = SoundEffect.UI_Match_Draw;

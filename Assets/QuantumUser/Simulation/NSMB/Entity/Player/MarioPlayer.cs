@@ -374,7 +374,7 @@ namespace Quantum {
             f.Events.MarioPlayerRespawned(entity);
         }
 
-        public void DoKnockback(Frame f, EntityRef entity, bool fromRight, int starsToDrop, bool weak, EntityRef attacker) {
+        public void DoKnockback(Frame f, EntityRef entity, bool fromRight, int starsToDrop, bool weak, EntityRef attacker, bool ignoreInvincible = false) {
             var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(entity);
             if (physicsObject->IsUnderwater) {
                 weak = false;
@@ -385,7 +385,7 @@ namespace Quantum {
             }
 
             var freezable = f.Unsafe.GetPointer<Freezable>(entity);
-            if (DamageInvincibilityFrames > 0 || f.Exists(CurrentPipe) || (freezable->IsFrozen(f) && freezable->FrozenCubeEntity != attacker) || IsDead || MegaMushroomStartFrames > 0 || MegaMushroomEndFrames > 0) {
+            if ((!ignoreInvincible && DamageInvincibilityFrames > 0) || f.Exists(CurrentPipe) || (freezable->IsFrozen(f) && freezable->FrozenCubeEntity != attacker) || IsDead || MegaMushroomStartFrames > 0 || MegaMushroomEndFrames > 0) {
                 return;
             }
 

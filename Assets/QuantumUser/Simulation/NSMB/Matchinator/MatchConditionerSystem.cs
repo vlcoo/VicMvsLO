@@ -277,7 +277,7 @@ namespace Quantum
             var mario = f.Unsafe.GetPointer<MarioPlayer>(entity);
             mario->Stars++;
             f.Signals.OnMarioPlayerCollectedStar(entity);
-            f.Events.MarioPlayerCollectedStar(f, entity, *mario, f.Unsafe.GetPointer<Transform2D>(entity)->Position);
+            f.Events.MarioPlayerCollectedStar(entity, *mario, f.Unsafe.GetPointer<Transform2D>(entity)->Position);
         }
 
         public unsafe void ActGiveCoin(Frame f, EntityRef entity, string parameter) {
@@ -305,7 +305,7 @@ namespace Quantum
                 : f.SimulationConfig.AllPowerups.FirstOrDefault(p => p.State.ToString() == parameter);
             if (newScriptable == null) { Err("powerup asset was null!!"); return; }
             PowerupReserveResult result = PowerupSystem.CollectPowerup(f, entity, f.Unsafe.GetPointer<MarioPlayer>(entity), f.Unsafe.GetPointer<PhysicsObject>(entity), newScriptable, true);
-            f.Events.MarioPlayerCollectedPowerup(f, entity, result, newScriptable);
+            f.Events.MarioPlayerCollectedPowerup(entity, result, newScriptable);
         }
 
         public unsafe void ActGiveLife(Frame f, EntityRef entity, string parameter) {
@@ -315,11 +315,11 @@ namespace Quantum
         }
 
         public unsafe void ActWin(Frame f, EntityRef entity, string parameter) {
-            GameLogicSystem.EndGame(f, f.Unsafe.GetPointer<MarioPlayer>(entity)->GetTeam(f));
+            GameLogicSystem.EndGame(f, false, f.Unsafe.GetPointer<MarioPlayer>(entity)->GetTeam(f));
         }
 
         public unsafe void ActDrawMatch(Frame f, EntityRef entity, string parameter) {
-            GameLogicSystem.EndGame(f, null);
+            GameLogicSystem.EndGame(f, false, null);
         }
 
         public unsafe void ActDisqualify(Frame f, EntityRef entity, string parameter) {
@@ -398,7 +398,7 @@ namespace Quantum
                 : f.SimulationConfig.AllPowerups.FirstOrDefault(p => p.State.ToString() == parameter);
             if (newScriptable == null) { Err("powerup asset was null!!"); return; }
             mario->ReserveItem = newScriptable;
-            f.Events.MarioPlayerCollectedPowerup(f, entity, PowerupReserveResult.ReserveNewPowerup, newScriptable);
+            f.Events.MarioPlayerCollectedPowerup(entity, PowerupReserveResult.ReserveNewPowerup, newScriptable);
         }
 
         public unsafe void ActGiveIFrames(Frame f, EntityRef entity, string parameter) {
