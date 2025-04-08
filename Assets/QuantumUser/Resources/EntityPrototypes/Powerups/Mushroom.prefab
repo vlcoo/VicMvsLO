@@ -35,7 +35,7 @@ Transform:
   m_GameObject: {fileID: 1017215213198693191}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: -0.5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -61,6 +61,7 @@ MonoBehaviour:
   scaleRate: 0.1333
   scaleSize: 0.3
   sfx: {fileID: 4207910641862185911}
+  koopaSpawnParticles: {fileID: 0}
 --- !u!114 &6673749068647908742
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -371,6 +372,8 @@ MonoBehaviour:
       Value: 1
     IsWaterSolid:
       Value: 0
+    BreakMegaObjects:
+      Value: 0
 --- !u!114 &1256801405142820976
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -441,8 +444,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Prototype:
-    DisableCulling:
-      Value: 0
     Offset:
       X:
         RawValue: 0
@@ -492,7 +493,7 @@ Transform:
   m_GameObject: {fileID: 8453737792750304721}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: -0.5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

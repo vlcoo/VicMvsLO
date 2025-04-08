@@ -33,6 +33,8 @@ public class TriggerListEntry : MonoBehaviour {
         ddConstraint,
         ddConstraintParameter,
         ddConstraintTarget;
+
+    public GameObject extrasDialog;
     
     // some conditions, actions and constraints are global (not referring to a player, but rather the stage or match itself)
     // they can't have a target.

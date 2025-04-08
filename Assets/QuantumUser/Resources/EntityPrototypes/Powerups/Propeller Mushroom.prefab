@@ -29,7 +29,7 @@ Transform:
   m_GameObject: {fileID: 3552150030264483580}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: -0.5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -140,6 +140,7 @@ MonoBehaviour:
   - {fileID: -404099666, guid: 752c51ce7499177419a33a6cddc8de5c, type: 3}
   - {fileID: 1339308990, guid: 752c51ce7499177419a33a6cddc8de5c, type: 3}
   - {fileID: 2093605636, guid: 752c51ce7499177419a33a6cddc8de5c, type: 3}
+  useUnscaledDelta: 0
   sRenderer: {fileID: 5475970293224446295}
   image: {fileID: 0}
 --- !u!1 &5334425534174023786
@@ -177,7 +178,7 @@ Transform:
   m_GameObject: {fileID: 5334425534174023786}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: -0.5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -203,6 +204,7 @@ MonoBehaviour:
   scaleRate: 0.1333
   scaleSize: 0.3
   sfx: {fileID: -6891361109405082350}
+  koopaSpawnParticles: {fileID: 0}
 --- !u!114 &3377063373533538626
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -570,6 +572,8 @@ MonoBehaviour:
       Value: 0
     IsWaterSolid:
       Value: 0
+    BreakMegaObjects:
+      Value: 0
 --- !u!114 &7282818765540506302
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -583,8 +587,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Prototype:
-    DisableCulling:
-      Value: 0
     Offset:
       X:
         RawValue: 0
