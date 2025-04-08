@@ -19,7 +19,7 @@ public unsafe class BinaryReplayFile {
     public long FileSize { get; private set; }
 
     // Header
-    private const string MagicHeader = "MvLO-RP";
+    private const string MagicHeader = "vcmi-RP";
     public GameVersion Version;
     public long UnixTimestamp;
     public int InitialFrameNumber;

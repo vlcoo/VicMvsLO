@@ -333,6 +333,20 @@ public static unsafe class QuantumUtils {
             if (powerup.State == PowerupState.MegaMushroom && !canSpawnMega) {
                 continue;
             }
+            
+            var ruleChanceMultiplier = (powerup.Type, powerup.State) switch {
+                (PowerupType.Basic, PowerupState.Mushroom) => f.Global->Rules.ChanceMushroom,
+                (PowerupType.Basic, PowerupState.MiniMushroom) => f.Global->Rules.ChanceMiniMushroom,
+                (PowerupType.Basic, PowerupState.FireFlower) => f.Global->Rules.ChanceFireFlower,
+                (PowerupType.Basic, PowerupState.IceFlower) => f.Global->Rules.ChanceIceFlower,
+                (PowerupType.Basic, PowerupState.PropellerMushroom) => f.Global->Rules.ChancePropellerMushroom,
+                (PowerupType.Basic, PowerupState.BlueShell) => f.Global->Rules.ChanceBlueShell,
+                (PowerupType.Basic, PowerupState.HammerSuit) => f.Global->Rules.ChanceHammerSuit,
+                (PowerupType.Basic, PowerupState.MegaMushroom) => f.Global->Rules.ChanceMegaMushroom,
+                (PowerupType.Starman, PowerupState.NoPowerup) => f.Global->Rules.ChanceStarman,
+                _ => 1
+            };
+            if (ruleChanceMultiplier == 0) continue;
 
             if ((powerup.BigPowerup && !big)
                 || (powerup.VerticalPowerup && !vertical)

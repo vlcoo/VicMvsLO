@@ -250,6 +250,7 @@ namespace Quantum {
             if (!IsDead) {
                 DamageInvincibilityFrames = 2 * 60;
                 f.Events.MarioPlayerTookDamage(entity);
+                f.Signals.OnMarioPlayerTookDamage(entity);
             }
             return true;
         }
@@ -313,6 +314,7 @@ namespace Quantum {
 
             if ((f.Global->Rules.IsLivesEnabled && Lives == 0) || Disconnected) {
                 f.Destroy(entity);
+                f.Signals.OnMarioPlayerDisqualified(entity);
                 return;
             }
 
@@ -372,6 +374,7 @@ namespace Quantum {
             physicsObject->DisableCollision = false;
 
             f.Events.MarioPlayerRespawned(entity);
+            f.Signals.OnMarioPlayerRespawned(entity);
         }
 
         public void DoKnockback(Frame f, EntityRef entity, bool fromRight, int starsToDrop, bool weak, EntityRef attacker, bool ignoreInvincible = false) {
@@ -446,6 +449,7 @@ namespace Quantum {
                 attackerPosition = attackerTransform->Position;
             }
             f.Events.MarioPlayerReceivedKnockback(entity, attacker, weak, attackerPosition);
+            f.Signals.OnMarioPlayerReceivedKnockback(entity, attacker, weak ? 0 : (starsToDrop > 1 ? 2 : 1));
         }
 
         public void ResetKnockback(Frame f, EntityRef entity) {
