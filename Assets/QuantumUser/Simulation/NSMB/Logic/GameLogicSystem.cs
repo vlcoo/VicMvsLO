@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace Quantum {
     public unsafe class GameLogicSystem : SystemMainThread, ISignalOnPlayerAdded, ISignalOnPlayerRemoved, ISignalOnMarioPlayerDied,
-        ISignalOnLoadingComplete, ISignalOnMarioPlayerCollectedStar, ISignalOnReturnToRoom, ISignalOnComponentRemoved<MarioPlayer> {
+        ISignalOnLoadingComplete, ISignalOnMarioPlayerCollectedStar, ISignalOnReturnToRoom, ISignalOnMarioTouchedGoal, ISignalOnComponentRemoved<MarioPlayer> {
 
         public override void OnInit(Frame f) {
             var config = f.RuntimeConfig;
@@ -195,6 +195,15 @@ namespace Quantum {
                 EndGame(f, false, winningTeam.Value);
                 return;
             }
+            
+            // End Condition: a player has enough laps
+            marioFilter = f.Filter<MarioPlayer>();
+            while (marioFilter.NextUnsafe(out _, out MarioPlayer* mario)) {
+                if (mario->Laps >= f.Global->Rules.Laps) {
+                    EndGame(f, false, mario->GetTeam(f));
+                    return;
+                }
+            }
 
             // End Condition: timer expires
             if (f.Global->Rules.IsTimerEnabled && f.Global->Timer <= 0) {
@@ -235,7 +244,7 @@ namespace Quantum {
             
             f.Global->GameState = GameState.Ended;
             f.Events.GameStateChanged(GameState.Ended);
-            f.Global->GameStartFrames = (ushort) ((endedByHost ? Constants._3_50 : 21) * f.UpdateRate);
+            f.Global->GameStartFrames = (ushort) ((endedByHost ? Constants._2_50 : 5) * f.UpdateRate);
             f.SystemDisable<StartDisabledSystemGroup>();
         }
 
@@ -423,6 +432,10 @@ namespace Quantum {
         }
 
         public void OnMarioPlayerCollectedStar(Frame f, EntityRef entity) {
+            CheckForGameEnd(f);
+        }
+        
+        public void OnMarioTouchedGoal(Frame f, EntityRef marioEntity, EntityRef goalEntity, QBoolean isLastLap) {
             CheckForGameEnd(f);
         }
 

@@ -34,7 +34,7 @@ public class SpecialToggleChangeableRule : ChangeableRule {
         else if (CanDecreaseValue) DecreaseValue();
     }
 
-    private unsafe void SendCommand() {
+    protected virtual unsafe void SendCommand() {
         CommandChangeRules cmd = new() {
             EnabledChanges = ruleType,
         };

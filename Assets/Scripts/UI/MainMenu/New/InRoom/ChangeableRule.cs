@@ -161,7 +161,7 @@ public class ChangeableRule : Selectable, ISubmitHandler, IPointerClickHandler, 
         label.text = labelPrefix + value.ToString();
     }
 
-    private void FindValue(in GameRules rules) {
+    protected virtual void FindValue(in GameRules rules) {
         switch (ruleType) {
         case CommandChangeRules.Rules.Laps:
             if (QuantumUnityDB.TryGetGlobalAsset(rules.Stage, out Map map)

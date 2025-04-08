@@ -350,7 +350,7 @@ namespace NSMB.UI.Game {
 
         private IEnumerator EndGameSequence(SoundEffect resultMusic, string resultAnimationTrigger, float delay) {
             // Wait before playing the music 
-            yield return new WaitForSecondsRealtime(0.25f);
+            yield return new WaitForSecondsRealtime(delay);
 
             GlobalController.Instance.sfx.PlayOneShot(resultMusic);
             winTextAnimator.SetTrigger(resultAnimationTrigger);
@@ -429,7 +429,7 @@ namespace NSMB.UI.Game {
             SoundEffect resultMusic;
             string resultAnimationTrigger;
             if (e.EndedByHost) {
-                resultMusic = SoundEffect.UI_Match_Draw;
+                resultMusic = SoundEffect.UI_Match_Cancelled;
                 resultAnimationTrigger = "startNoContest";
             } else if (!hasWinner) {
                 resultMusic = SoundEffect.UI_Match_Draw;
@@ -442,7 +442,7 @@ namespace NSMB.UI.Game {
                 resultAnimationTrigger = "startNegative";
             }
 
-            endGameSequenceCoroutine = StartCoroutine(EndGameSequence(resultMusic, resultAnimationTrigger, e.EndedByHost ? 0.5f : 1f));
+            endGameSequenceCoroutine = StartCoroutine(EndGameSequence(resultMusic, resultAnimationTrigger, e.EndedByHost ? 0.0f : 0.5f));
         }
 
         private void OnLanguageChanged(TranslationManager tm) {

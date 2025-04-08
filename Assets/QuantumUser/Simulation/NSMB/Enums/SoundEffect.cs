@@ -1,7 +1,7 @@
 using System;
 
 public enum SoundEffect : byte {
-    //CURRENT HIGHEST NUMBER: 108
+    //CURRENT HIGHEST NUMBER: 110
     //Enemy
     [SoundData("enemy/freeze")] Enemy_Generic_Freeze = 0,
     [SoundData("enemy/freeze_shatter")] Enemy_Generic_FreezeShatter = 1,
@@ -99,6 +99,8 @@ public enum SoundEffect : byte {
     [SoundData("ui/windowclosed")] UI_WindowClose = 85,
     [SoundData("ui/windowopen")] UI_WindowOpen = 86,
     [SoundData("ui/match_draw")] UI_Match_Draw = 87,
+    [SoundData("ui/match_cancelled")] UI_Match_Cancelled = 109,
+    [SoundData("ui/match_concluded")] UI_Match_Concluded = 110,
     [SoundData("ui/countdown0")] UI_Countdown_0 = 88,
     [SoundData("ui/countdown1")] UI_Countdown_1 = 89,
     [SoundData("ui/file_select")] UI_FileSelect = 98,

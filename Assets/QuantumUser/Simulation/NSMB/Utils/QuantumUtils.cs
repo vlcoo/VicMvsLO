@@ -3,6 +3,8 @@ using Quantum;
 using Quantum.Collections;
 using System;
 using System.Collections.Generic;
+using UnityEngine;
+using Vector2Int = Quantum.Vector2Int;
 
 public static unsafe class QuantumUtils {
 
@@ -363,7 +365,8 @@ public static unsafe class QuantumUtils {
 
             rand -= chance;
         }
-
+        
+        Debug.Log("No powerup - spawning fallback...");
         return f.SimulationConfig.FallbackPowerup;
     }
 
