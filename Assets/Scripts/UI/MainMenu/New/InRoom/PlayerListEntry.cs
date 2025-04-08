@@ -142,7 +142,7 @@ namespace NSMB.UI.MainMenu {
 
             // Ping text
             // pingImage.sprite = Utils.Utils.GetPingSprite(playerData->Ping);
-            pingText.text = $"{playerData->Ping}ms {Utils.Utils.GetPingSymbol(playerData->Ping)}";
+            pingText.text = $"{Utils.Utils.GetDeviceString((Enums.DeviceType)playerData->Device)} {playerData->Ping}ms {Utils.Utils.GetPingSymbol(playerData->Ping)}";
 
             // Name text
             RuntimePlayer runtimePlayer = f.GetPlayerData(player);

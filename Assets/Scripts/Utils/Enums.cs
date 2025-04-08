@@ -51,11 +51,11 @@ public static class Enums {
     #region CLIENT
     public enum DeviceType
     {
+        OTHER,
         DESKTOP,
         BROWSER,
         MOBILE,
         EDITOR,
-        OTHER
     }
     #endregion
 }

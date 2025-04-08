@@ -837,6 +837,7 @@ namespace Quantum.Prototypes {
     public QBoolean IsInSettings;
     public Int32 JoinTick;
     public Int32 Ping;
+    public Byte Device;
     partial void MaterializeUser(Frame frame, ref Quantum.PlayerData result, in PrototypeMaterializationContext context);
     public override Boolean AddToEntity(FrameBase f, EntityRef entity, in PrototypeMaterializationContext context) {
         Quantum.PlayerData component = default;
@@ -860,6 +861,7 @@ namespace Quantum.Prototypes {
         result.IsInSettings = this.IsInSettings;
         result.JoinTick = this.JoinTick;
         result.Ping = this.Ping;
+        result.Device = this.Device;
         MaterializeUser(frame, ref result, in context);
     }
   }

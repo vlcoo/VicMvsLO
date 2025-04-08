@@ -246,6 +246,16 @@ namespace NSMB.Utils {
             return GlobalController.Instance.pingIndicators[index];
         }
 
+        public static string GetDeviceString(DeviceType device) {
+            return device switch {
+                DeviceType.EDITOR => "<sprite name=dev_editor>",
+                DeviceType.DESKTOP => "<sprite name=dev_pc>",
+                DeviceType.MOBILE => "<sprite name=dev_mobile>",
+                DeviceType.BROWSER => "<sprite name=dev_web>",
+                _ => "",
+            };
+        }
+
         public static string BytesToString(long byteCount) {
             string[] suf = { "B", "KB", "MB", "GB", "TB", "PB", "EB" }; // Longs run out around EB
             if (byteCount == 0) {

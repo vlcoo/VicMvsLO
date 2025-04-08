@@ -105,12 +105,13 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
     }
 
     public IEnumerator PingUpdateCoroutine() {
-        WaitForSeconds seconds = new(1);
+        WaitForSeconds seconds = new(2);
         CommandUpdatePing pingCommand = new();
         while (true) {
             QuantumGame game;
             if (Runner && (game = Runner.Game) != null) {
                 pingCommand.PingMs = (int) Ping.Value;
+                pingCommand.Device = (byte) Utils.GetDeviceType();
                 foreach (int slot in game.GetLocalPlayerSlots()) {
                     game.SendCommand(slot, pingCommand);
                 }

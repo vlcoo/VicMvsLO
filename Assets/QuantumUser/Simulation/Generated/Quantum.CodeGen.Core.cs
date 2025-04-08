@@ -3123,40 +3123,42 @@ namespace Quantum {
   }
   [StructLayout(LayoutKind.Explicit)]
   public unsafe partial struct PlayerData : Quantum.IComponent {
-    public const Int32 SIZE = 52;
+    public const Int32 SIZE = 56;
     public const Int32 ALIGNMENT = 4;
-    [FieldOffset(20)]
+    [FieldOffset(24)]
     public PlayerRef PlayerRef;
-    [FieldOffset(36)]
+    [FieldOffset(40)]
     public QBoolean IsRoomHost;
-    [FieldOffset(28)]
+    [FieldOffset(32)]
     public QBoolean IsLoaded;
     [FieldOffset(0)]
     public Byte Character;
-    [FieldOffset(1)]
-    public Byte Palette;
-    [FieldOffset(3)]
-    public Byte RequestedTeam;
-    [FieldOffset(40)]
-    public QBoolean IsSpectator;
-    [FieldOffset(44)]
-    public QBoolean ManualSpectator;
-    [FieldOffset(48)]
-    public QBoolean VotedToContinue;
-    [FieldOffset(16)]
-    public Int32 Wins;
     [FieldOffset(2)]
-    public Byte RealTeam;
-    [FieldOffset(8)]
-    public Int32 LastChatMessage;
-    [FieldOffset(32)]
-    public QBoolean IsReady;
-    [FieldOffset(24)]
-    public QBoolean IsInSettings;
+    public Byte Palette;
     [FieldOffset(4)]
-    public Int32 JoinTick;
+    public Byte RequestedTeam;
+    [FieldOffset(44)]
+    public QBoolean IsSpectator;
+    [FieldOffset(48)]
+    public QBoolean ManualSpectator;
+    [FieldOffset(52)]
+    public QBoolean VotedToContinue;
+    [FieldOffset(20)]
+    public Int32 Wins;
+    [FieldOffset(3)]
+    public Byte RealTeam;
     [FieldOffset(12)]
+    public Int32 LastChatMessage;
+    [FieldOffset(36)]
+    public QBoolean IsReady;
+    [FieldOffset(28)]
+    public QBoolean IsInSettings;
+    [FieldOffset(8)]
+    public Int32 JoinTick;
+    [FieldOffset(16)]
     public Int32 Ping;
+    [FieldOffset(1)]
+    public Byte Device;
     public override Int32 GetHashCode() {
       unchecked { 
         var hash = 10271;
@@ -3176,12 +3178,14 @@ namespace Quantum {
         hash = hash * 31 + IsInSettings.GetHashCode();
         hash = hash * 31 + JoinTick.GetHashCode();
         hash = hash * 31 + Ping.GetHashCode();
+        hash = hash * 31 + Device.GetHashCode();
         return hash;
       }
     }
     public static void Serialize(void* ptr, FrameSerializer serializer) {
         var p = (PlayerData*)ptr;
         serializer.Stream.Serialize(&p->Character);
+        serializer.Stream.Serialize(&p->Device);
         serializer.Stream.Serialize(&p->Palette);
         serializer.Stream.Serialize(&p->RealTeam);
         serializer.Stream.Serialize(&p->RequestedTeam);
