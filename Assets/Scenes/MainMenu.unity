@@ -8846,7 +8846,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: -159.57446, y: 0}
+  m_SizeDelta: {x: -160.47266, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &135605472
 MonoBehaviour:
@@ -10820,15 +10820,27 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: NSMB.UI.MainMenu.Submenus.Prompts.StageChoosePromptSubmenu,
+      - m_Target: {fileID: 2030938839}
+        m_TargetAssemblyTypeName: NSMB.UI.MainMenu.MainMenuCanvas, Assembly-CSharp
+        m_MethodName: PlayCursorSound
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 185745560}
+        m_TargetAssemblyTypeName: NSMB.UI.MainMenu.Submenus.Prompts.CharacterChoosePromptSubmenu,
           Assembly-CSharp
-        m_MethodName: StageSelected
+        m_MethodName: CharacterSelected
         m_Mode: 2
         m_Arguments:
-          m_ObjectArgument: {fileID: 11400000, guid: d2dda38051a030947927f7fe9bce6e56,
+          m_ObjectArgument: {fileID: 11400000, guid: fc6bd40a1a06a05459376e99f98dcfed,
             type: 2}
-          m_ObjectArgumentAssemblyTypeName: VersusStageData, Quantum.Simulation
+          m_ObjectArgumentAssemblyTypeName: CharacterAsset, Quantum.Simulation
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -13971,15 +13983,27 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: NSMB.UI.MainMenu.Submenus.Prompts.StageChoosePromptSubmenu,
+      - m_Target: {fileID: 2030938839}
+        m_TargetAssemblyTypeName: NSMB.UI.MainMenu.MainMenuCanvas, Assembly-CSharp
+        m_MethodName: PlayCursorSound
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 185745560}
+        m_TargetAssemblyTypeName: NSMB.UI.MainMenu.Submenus.Prompts.CharacterChoosePromptSubmenu,
           Assembly-CSharp
-        m_MethodName: StageSelected
+        m_MethodName: CharacterSelected
         m_Mode: 2
         m_Arguments:
-          m_ObjectArgument: {fileID: 11400000, guid: d2dda38051a030947927f7fe9bce6e56,
+          m_ObjectArgument: {fileID: 11400000, guid: 954a2dc5007f97b49bb982869a1e258f,
             type: 2}
-          m_ObjectArgumentAssemblyTypeName: VersusStageData, Quantum.Simulation
+          m_ObjectArgumentAssemblyTypeName: CharacterAsset, Quantum.Simulation
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -28659,15 +28683,27 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: NSMB.UI.MainMenu.Submenus.Prompts.StageChoosePromptSubmenu,
+      - m_Target: {fileID: 2030938839}
+        m_TargetAssemblyTypeName: NSMB.UI.MainMenu.MainMenuCanvas, Assembly-CSharp
+        m_MethodName: PlayCursorSound
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 185745560}
+        m_TargetAssemblyTypeName: NSMB.UI.MainMenu.Submenus.Prompts.CharacterChoosePromptSubmenu,
           Assembly-CSharp
-        m_MethodName: StageSelected
+        m_MethodName: CharacterSelected
         m_Mode: 2
         m_Arguments:
-          m_ObjectArgument: {fileID: 11400000, guid: d2dda38051a030947927f7fe9bce6e56,
+          m_ObjectArgument: {fileID: 11400000, guid: c3be3db6aaa1c8b4482eb27168b89559,
             type: 2}
-          m_ObjectArgumentAssemblyTypeName: VersusStageData, Quantum.Simulation
+          m_ObjectArgumentAssemblyTypeName: CharacterAsset, Quantum.Simulation
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -31045,20 +31081,32 @@ MonoBehaviour:
     m_PressedTrigger: Pressed
     m_SelectedTrigger: Selected
     m_DisabledTrigger: Disabled
-  m_Interactable: 1
+  m_Interactable: 0
   m_TargetGraphic: {fileID: 491016592}
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: NSMB.UI.MainMenu.Submenus.Prompts.StageChoosePromptSubmenu,
+      - m_Target: {fileID: 2030938839}
+        m_TargetAssemblyTypeName: NSMB.UI.MainMenu.MainMenuCanvas, Assembly-CSharp
+        m_MethodName: PlayCursorSound
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 185745560}
+        m_TargetAssemblyTypeName: NSMB.UI.MainMenu.Submenus.Prompts.CharacterChoosePromptSubmenu,
           Assembly-CSharp
-        m_MethodName: StageSelected
+        m_MethodName: CharacterSelected
         m_Mode: 2
         m_Arguments:
-          m_ObjectArgument: {fileID: 11400000, guid: d2dda38051a030947927f7fe9bce6e56,
+          m_ObjectArgument: {fileID: 11400000, guid: 60f18dc1157f690458fec1faa4480514,
             type: 2}
-          m_ObjectArgumentAssemblyTypeName: VersusStageData, Quantum.Simulation
+          m_ObjectArgumentAssemblyTypeName: CharacterAsset, Quantum.Simulation
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -44003,15 +44051,27 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: NSMB.UI.MainMenu.Submenus.Prompts.StageChoosePromptSubmenu,
+      - m_Target: {fileID: 2030938839}
+        m_TargetAssemblyTypeName: NSMB.UI.MainMenu.MainMenuCanvas, Assembly-CSharp
+        m_MethodName: PlayCursorSound
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 185745560}
+        m_TargetAssemblyTypeName: NSMB.UI.MainMenu.Submenus.Prompts.CharacterChoosePromptSubmenu,
           Assembly-CSharp
-        m_MethodName: StageSelected
+        m_MethodName: CharacterSelected
         m_Mode: 2
         m_Arguments:
-          m_ObjectArgument: {fileID: 11400000, guid: d2dda38051a030947927f7fe9bce6e56,
+          m_ObjectArgument: {fileID: 11400000, guid: e968ca412c8f7184bbdfc221143d0314,
             type: 2}
-          m_ObjectArgumentAssemblyTypeName: VersusStageData, Quantum.Simulation
+          m_ObjectArgumentAssemblyTypeName: CharacterAsset, Quantum.Simulation
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -61661,15 +61721,27 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: NSMB.UI.MainMenu.Submenus.Prompts.StageChoosePromptSubmenu,
+      - m_Target: {fileID: 2030938839}
+        m_TargetAssemblyTypeName: NSMB.UI.MainMenu.MainMenuCanvas, Assembly-CSharp
+        m_MethodName: PlayCursorSound
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 185745560}
+        m_TargetAssemblyTypeName: NSMB.UI.MainMenu.Submenus.Prompts.CharacterChoosePromptSubmenu,
           Assembly-CSharp
-        m_MethodName: StageSelected
+        m_MethodName: CharacterSelected
         m_Mode: 2
         m_Arguments:
-          m_ObjectArgument: {fileID: 11400000, guid: d2dda38051a030947927f7fe9bce6e56,
+          m_ObjectArgument: {fileID: 11400000, guid: 1d4a483cc5cd2574e82a9284c6ee6a5c,
             type: 2}
-          m_ObjectArgumentAssemblyTypeName: VersusStageData, Quantum.Simulation
+          m_ObjectArgumentAssemblyTypeName: CharacterAsset, Quantum.Simulation
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -62774,15 +62846,27 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: NSMB.UI.MainMenu.Submenus.Prompts.StageChoosePromptSubmenu,
+      - m_Target: {fileID: 2030938839}
+        m_TargetAssemblyTypeName: NSMB.UI.MainMenu.MainMenuCanvas, Assembly-CSharp
+        m_MethodName: PlayCursorSound
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 185745560}
+        m_TargetAssemblyTypeName: NSMB.UI.MainMenu.Submenus.Prompts.CharacterChoosePromptSubmenu,
           Assembly-CSharp
-        m_MethodName: StageSelected
+        m_MethodName: CharacterSelected
         m_Mode: 2
         m_Arguments:
-          m_ObjectArgument: {fileID: 11400000, guid: d2dda38051a030947927f7fe9bce6e56,
+          m_ObjectArgument: {fileID: 11400000, guid: a0c41c3fc4cb0c041906d78b4d4ecc11,
             type: 2}
-          m_ObjectArgumentAssemblyTypeName: VersusStageData, Quantum.Simulation
+          m_ObjectArgumentAssemblyTypeName: CharacterAsset, Quantum.Simulation
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -74573,7 +74657,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 791989380}
   m_Direction: 2
   m_Value: 1
-  m_Size: 0.8068093
+  m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -75953,20 +76037,32 @@ MonoBehaviour:
     m_PressedTrigger: Pressed
     m_SelectedTrigger: Selected
     m_DisabledTrigger: Disabled
-  m_Interactable: 1
+  m_Interactable: 0
   m_TargetGraphic: {fileID: 1151417590}
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: NSMB.UI.MainMenu.Submenus.Prompts.StageChoosePromptSubmenu,
+      - m_Target: {fileID: 2030938839}
+        m_TargetAssemblyTypeName: NSMB.UI.MainMenu.MainMenuCanvas, Assembly-CSharp
+        m_MethodName: PlayCursorSound
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 185745560}
+        m_TargetAssemblyTypeName: NSMB.UI.MainMenu.Submenus.Prompts.CharacterChoosePromptSubmenu,
           Assembly-CSharp
-        m_MethodName: StageSelected
+        m_MethodName: CharacterSelected
         m_Mode: 2
         m_Arguments:
-          m_ObjectArgument: {fileID: 11400000, guid: d2dda38051a030947927f7fe9bce6e56,
+          m_ObjectArgument: {fileID: 11400000, guid: cf398b4e9a1864b40aff93b5d3ed6e8f,
             type: 2}
-          m_ObjectArgumentAssemblyTypeName: VersusStageData, Quantum.Simulation
+          m_ObjectArgumentAssemblyTypeName: CharacterAsset, Quantum.Simulation
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -76191,20 +76287,32 @@ MonoBehaviour:
     m_PressedTrigger: Pressed
     m_SelectedTrigger: Selected
     m_DisabledTrigger: Disabled
-  m_Interactable: 1
+  m_Interactable: 0
   m_TargetGraphic: {fileID: 1153797512}
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: NSMB.UI.MainMenu.Submenus.Prompts.StageChoosePromptSubmenu,
+      - m_Target: {fileID: 2030938839}
+        m_TargetAssemblyTypeName: NSMB.UI.MainMenu.MainMenuCanvas, Assembly-CSharp
+        m_MethodName: PlayCursorSound
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 185745560}
+        m_TargetAssemblyTypeName: NSMB.UI.MainMenu.Submenus.Prompts.CharacterChoosePromptSubmenu,
           Assembly-CSharp
-        m_MethodName: StageSelected
+        m_MethodName: CharacterSelected
         m_Mode: 2
         m_Arguments:
-          m_ObjectArgument: {fileID: 11400000, guid: d2dda38051a030947927f7fe9bce6e56,
+          m_ObjectArgument: {fileID: 11400000, guid: 95838a50d447e3443ac6ba46b37a2c19,
             type: 2}
-          m_ObjectArgumentAssemblyTypeName: VersusStageData, Quantum.Simulation
+          m_ObjectArgumentAssemblyTypeName: CharacterAsset, Quantum.Simulation
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -91383,15 +91491,27 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: NSMB.UI.MainMenu.Submenus.Prompts.StageChoosePromptSubmenu,
+      - m_Target: {fileID: 2030938839}
+        m_TargetAssemblyTypeName: NSMB.UI.MainMenu.MainMenuCanvas, Assembly-CSharp
+        m_MethodName: PlayCursorSound
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 185745560}
+        m_TargetAssemblyTypeName: NSMB.UI.MainMenu.Submenus.Prompts.CharacterChoosePromptSubmenu,
           Assembly-CSharp
-        m_MethodName: StageSelected
+        m_MethodName: CharacterSelected
         m_Mode: 2
         m_Arguments:
-          m_ObjectArgument: {fileID: 11400000, guid: d2dda38051a030947927f7fe9bce6e56,
+          m_ObjectArgument: {fileID: 11400000, guid: a776a4278d8ac4446ae0f7376e957c9f,
             type: 2}
-          m_ObjectArgumentAssemblyTypeName: VersusStageData, Quantum.Simulation
+          m_ObjectArgumentAssemblyTypeName: CharacterAsset, Quantum.Simulation
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -121919,20 +122039,32 @@ MonoBehaviour:
     m_PressedTrigger: Pressed
     m_SelectedTrigger: Selected
     m_DisabledTrigger: Disabled
-  m_Interactable: 1
+  m_Interactable: 0
   m_TargetGraphic: {fileID: 1530937483}
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: NSMB.UI.MainMenu.Submenus.Prompts.StageChoosePromptSubmenu,
+      - m_Target: {fileID: 2030938839}
+        m_TargetAssemblyTypeName: NSMB.UI.MainMenu.MainMenuCanvas, Assembly-CSharp
+        m_MethodName: PlayCursorSound
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 185745560}
+        m_TargetAssemblyTypeName: NSMB.UI.MainMenu.Submenus.Prompts.CharacterChoosePromptSubmenu,
           Assembly-CSharp
-        m_MethodName: StageSelected
+        m_MethodName: CharacterSelected
         m_Mode: 2
         m_Arguments:
-          m_ObjectArgument: {fileID: 11400000, guid: d2dda38051a030947927f7fe9bce6e56,
+          m_ObjectArgument: {fileID: 11400000, guid: c2e2e6abb2bd0bb4ba17c0fa25d37ed8,
             type: 2}
-          m_ObjectArgumentAssemblyTypeName: VersusStageData, Quantum.Simulation
+          m_ObjectArgumentAssemblyTypeName: CharacterAsset, Quantum.Simulation
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -127527,20 +127659,32 @@ MonoBehaviour:
     m_PressedTrigger: Pressed
     m_SelectedTrigger: Selected
     m_DisabledTrigger: Disabled
-  m_Interactable: 1
+  m_Interactable: 0
   m_TargetGraphic: {fileID: 1639709903}
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: NSMB.UI.MainMenu.Submenus.Prompts.StageChoosePromptSubmenu,
+      - m_Target: {fileID: 2030938839}
+        m_TargetAssemblyTypeName: NSMB.UI.MainMenu.MainMenuCanvas, Assembly-CSharp
+        m_MethodName: PlayCursorSound
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 185745560}
+        m_TargetAssemblyTypeName: NSMB.UI.MainMenu.Submenus.Prompts.CharacterChoosePromptSubmenu,
           Assembly-CSharp
-        m_MethodName: StageSelected
+        m_MethodName: CharacterSelected
         m_Mode: 2
         m_Arguments:
-          m_ObjectArgument: {fileID: 11400000, guid: d2dda38051a030947927f7fe9bce6e56,
+          m_ObjectArgument: {fileID: 11400000, guid: f37076d835479c74d8279fb0b379ac7f,
             type: 2}
-          m_ObjectArgumentAssemblyTypeName: VersusStageData, Quantum.Simulation
+          m_ObjectArgumentAssemblyTypeName: CharacterAsset, Quantum.Simulation
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -150364,20 +150508,32 @@ MonoBehaviour:
     m_PressedTrigger: Pressed
     m_SelectedTrigger: Selected
     m_DisabledTrigger: Disabled
-  m_Interactable: 1
+  m_Interactable: 0
   m_TargetGraphic: {fileID: 1953114099}
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: NSMB.UI.MainMenu.Submenus.Prompts.StageChoosePromptSubmenu,
+      - m_Target: {fileID: 2030938839}
+        m_TargetAssemblyTypeName: NSMB.UI.MainMenu.MainMenuCanvas, Assembly-CSharp
+        m_MethodName: PlayCursorSound
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 185745560}
+        m_TargetAssemblyTypeName: NSMB.UI.MainMenu.Submenus.Prompts.CharacterChoosePromptSubmenu,
           Assembly-CSharp
-        m_MethodName: StageSelected
+        m_MethodName: CharacterSelected
         m_Mode: 2
         m_Arguments:
-          m_ObjectArgument: {fileID: 11400000, guid: d2dda38051a030947927f7fe9bce6e56,
+          m_ObjectArgument: {fileID: 11400000, guid: 0793c009a3cba2b4b8a2bb8c39bee796,
             type: 2}
-          m_ObjectArgumentAssemblyTypeName: VersusStageData, Quantum.Simulation
+          m_ObjectArgumentAssemblyTypeName: CharacterAsset, Quantum.Simulation
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -151019,15 +151175,27 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: NSMB.UI.MainMenu.Submenus.Prompts.StageChoosePromptSubmenu,
+      - m_Target: {fileID: 2030938839}
+        m_TargetAssemblyTypeName: NSMB.UI.MainMenu.MainMenuCanvas, Assembly-CSharp
+        m_MethodName: PlayCursorSound
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 185745560}
+        m_TargetAssemblyTypeName: NSMB.UI.MainMenu.Submenus.Prompts.CharacterChoosePromptSubmenu,
           Assembly-CSharp
-        m_MethodName: StageSelected
+        m_MethodName: CharacterSelected
         m_Mode: 2
         m_Arguments:
-          m_ObjectArgument: {fileID: 11400000, guid: d2dda38051a030947927f7fe9bce6e56,
+          m_ObjectArgument: {fileID: 11400000, guid: 09e81522b2b01de4795694930b6fa176,
             type: 2}
-          m_ObjectArgumentAssemblyTypeName: VersusStageData, Quantum.Simulation
+          m_ObjectArgumentAssemblyTypeName: CharacterAsset, Quantum.Simulation
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
