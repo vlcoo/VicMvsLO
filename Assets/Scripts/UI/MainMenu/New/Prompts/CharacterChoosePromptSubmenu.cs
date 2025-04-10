@@ -1,5 +1,4 @@
 ﻿using Quantum;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -9,6 +8,7 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
         public GameObject characterPreviews;
         public PreviewPlayerAnimator currentCharacterPreview;
         public Image characterImage;
+        public PaletteSet currentPalette;
         
         public override void Show(bool first) {
             base.Show(first);
@@ -29,7 +29,7 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
             QuantumEvent.Subscribe<EventPlayerDataChanged>(this, OnPlayerDataChanged);
         }
 
-        public unsafe void CharacterSelected(CharacterAsset character) {
+        public void CharacterSelected(CharacterAsset character) {
             var game = NetworkHandler.Runner.Game;
             var allCharacters = game.Configurations.Simulation.CharacterDatas;
             var selectedCharacter = allCharacters.IndexOf(chara => 
@@ -45,6 +45,7 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
             if (currentCharacterPreview != null) currentCharacterPreview.SetVisible(false);
             currentCharacterPreview = GetCharacterPreview(character);
             currentCharacterPreview.SetSelected();
+            currentCharacterPreview.SetPalette(currentPalette, character);
         }
 
         private PreviewPlayerAnimator GetCharacterPreview(CharacterAsset character) {
@@ -67,9 +68,13 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
             Frame f = e.Game.Frames.Predicted;
             SimulationConfig config = f.SimulationConfig;
             PlayerData* data = QuantumUtils.GetPlayerData(f, e.Player);
+            var skins = ScriptableManager.Instance.skins;
+            int skinIndex = Mathf.Clamp(data != null ? data->Palette : 0, 0, skins.Length - 1);
             CharacterAsset characterAsset = config.CharacterDatas[Mathf.Clamp(data->Character, 0, config.CharacterDatas.Length)];
             currentCharacterPreview = GetCharacterPreview(characterAsset);
+            currentPalette = skins[skinIndex];
             currentCharacterPreview.SetVisible(true);
+            currentCharacterPreview.SetPalette(currentPalette, characterAsset);
         }
     }
 }
