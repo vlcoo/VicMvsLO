@@ -9,10 +9,7 @@ namespace NSMB.UI.MainMenu.Submenus {
         public override bool IsInSubmenu => teamChooser.content.activeSelf || paletteChooser.content.activeSelf;
 
         //---Serialized Variables
-        [SerializeField] private Image[] characterButtonImages, characterButtonLogos;
-        [SerializeField] private Sprite[] enabledCharacterButtonSprites, disabledCharacterButtonSprites;
-        [SerializeField] private Color enabledCharacterButtonLogoColor, disabledCharacterButtonLogoColor;
-        [SerializeField] private Image paletteBackground;
+        [SerializeField] private Image paletteBackground, characterImage;
         [SerializeField] private PaletteChooser paletteChooser;
         [SerializeField] private TeamChooser teamChooser;
         [SerializeField] private SpriteChangingToggle spectateToggle;
@@ -43,21 +40,6 @@ namespace NSMB.UI.MainMenu.Submenus {
             return base.TryGoBack(out playSound);
         }
 
-        public void OnCharacterClicked(int index) {
-            var game = NetworkHandler.Runner.Game;
-            foreach (int slot in game.GetLocalPlayerSlots()) {
-                game.SendCommand(slot, new CommandChangePlayerData {
-                    EnabledChanges = CommandChangePlayerData.Changes.Character,
-                    Character = (byte) index,
-                });
-            }
-            SetCharacterButtonState(game.Frames.Predicted, index, true);
-        }
-
-        public void OnCharacterToggled() {
-            OnCharacterClicked((currentCharacterIndex + 1) % characterButtonImages.Length);
-        }
-
         public void OnSpectateToggled() {
             QuantumGame game = NetworkHandler.Runner.Game;
             foreach (var slot in game.GetLocalPlayerSlots()) {
@@ -73,26 +55,10 @@ namespace NSMB.UI.MainMenu.Submenus {
             bool changed = currentCharacterIndex != index;
             currentCharacterIndex = index;
 
-            for (int i = 0; i < characterButtonImages.Length; i++) {
-                var image = characterButtonImages[i];
-                image.sprite = disabledCharacterButtonSprites[i];
-                image.transform.SetAsLastSibling();
-
-                if (i < characterButtonLogos.Length && characterButtonLogos[i]) {
-                    characterButtonLogos[i].color = disabledCharacterButtonLogoColor;
-                }
-            }
-
-            characterButtonImages[index].sprite = enabledCharacterButtonSprites[index];
-            paletteBackground.sprite = disabledCharacterButtonSprites[index];
-            characterButtonImages[index].transform.SetAsLastSibling();
-            if (index < characterButtonLogos.Length && characterButtonLogos[index]) {
-                characterButtonLogos[index].color = enabledCharacterButtonLogoColor;
-            }
-
             SimulationConfig config = f.SimulationConfig;
             CharacterAsset characterAsset = config.CharacterDatas[Mathf.Clamp(index, 0, config.CharacterDatas.Length)];
             paletteChooser.ChangeCharacter(characterAsset);
+            characterImage.sprite = characterAsset.ReadySprite;
 
             if (changed) {
                 Settings.Instance.generalCharacter = index;

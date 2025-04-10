@@ -6,6 +6,8 @@ using DG.Tweening;
 using HGS.Tone;
 using KaimiraGames;
 using MeltySynth;
+using System.IO.Compression;
+using System.Linq;
 using UnityEngine;
 
 public class Songinator : MonoBehaviour
@@ -85,12 +87,16 @@ public class Songinator : MonoBehaviour
 
     private void InitializeMeltySynth()
     {
+        
         // Load in the soundfont and create the synth and sequencer objects.
-        var sf = new SoundFont(new MemoryStream(CurrentSong.soundfont.Bytes));
-        Synth = new Synthesizer(sf,
-            new SynthesizerSettings(AudioSettings.outputSampleRate) {
-                EnableReverbAndChorus = false, BlockSize = 64, MaximumPolyphony = 128
-            });
+        Synth = new Synthesizer(new SoundFont(Decompress(CurrentSong.soundfont.Bytes)),
+            new SynthesizerSettings(AudioSettings.outputSampleRate)
+            {
+                EnableReverbAndChorus = false,
+                BlockSize = 64,
+                MaximumPolyphony = 128
+            }
+        );
         Sequencer = new MidiFileSequencer(Synth);
 
         Driver ??= gameObject.GetComponent<ToneAudioDriver>();
@@ -216,5 +222,14 @@ public class Songinator : MonoBehaviour
     public void SetOnMidiMessage(Synthesizer.OnMidiMessage func)
     {
         Synth.onMidiMessage += func;
+    }
+
+    public static MemoryStream Decompress(byte[] data) {
+        using var stream = new MemoryStream(data);
+        using var gzip = new GZipStream(stream, CompressionMode.Decompress);
+        var output = new MemoryStream();
+        gzip.CopyTo(output);
+        output.Position = 0;
+        return output;
     }
 }
