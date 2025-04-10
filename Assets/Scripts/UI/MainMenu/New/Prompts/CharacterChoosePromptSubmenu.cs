@@ -51,7 +51,7 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
         private PreviewPlayerAnimator GetCharacterPreview(CharacterAsset character) {
             for (int i = 0; i < characterPreviews.transform.childCount; i++) {
                 var child = characterPreviews.transform.GetChild(i);
-                if (child.gameObject.name.Contains(character.LegalEnglishName)) {
+                if (child.gameObject.name.ToLower().Contains(character.LegalEnglishName.ToLower().Replace(" ", ""))) {
                     return child.GetComponent<PreviewPlayerAnimator>();
                 }
             }
