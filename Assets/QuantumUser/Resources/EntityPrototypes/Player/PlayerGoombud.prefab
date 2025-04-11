@@ -5802,8 +5802,8 @@ MonoBehaviour:
   animator: {fileID: 2254935152879088866}
   smallAvatar: {fileID: 9000000, guid: 8029460324d6259119bd3b1401f032cf, type: 3}
   largeAvatar: {fileID: 9000000, guid: 8029460324d6259119bd3b1401f032cf, type: 3}
-  dust: {fileID: 2640999544399217334}
-  sparkles: {fileID: 4183801981748931522}
+  dust: {fileID: 257128573837661325}
+  sparkles: {fileID: 6841132472165640230}
   drillParticle: {fileID: 1247095597325529062}
   giantParticle: {fileID: 5753513023554451749}
   fireParticle: {fileID: 3430860213720222311}
@@ -5828,6 +5828,7 @@ MonoBehaviour:
   shellSlideData: {fileID: 11400000, guid: c74256c46183cf14ab95e81152a2d8d9, type: 2}
   spinnerDrillData: {fileID: 11400000, guid: 1aa16efb891dabe408c2a0c2a3ff045e, type: 2}
   propellerDrillData: {fileID: 11400000, guid: eef8bb198b37ff940a8a8de713e95481, type: 2}
+  excludeMaterialForSmall: 0
   sfx: {fileID: 5377451828833222271}
 --- !u!95 &2254935152879088866
 Animator:
@@ -6567,8 +6568,8 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: -0.0156, z: 0}
-  m_LocalScale: {x: 0.03, y: 0.03, z: 0.0278}
-  m_ConstrainProportionsScale: 0
+  m_LocalScale: {x: 0.054, y: 0.054, z: 0.05004}
+  m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 3363094232859023881}
   m_Father: {fileID: 8422425992379838804}
@@ -6790,8 +6791,8 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0.030843573, y: 0.7064338, z: -0.030843573, w: 0.7064338}
   m_LocalPosition: {x: 0, y: 0.03, z: 0}
-  m_LocalScale: {x: 3, y: 3, z: 3}
-  m_ConstrainProportionsScale: 0
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 9158645338611698786}
   m_Father: {fileID: 4824223341387914440}
@@ -7423,12 +7424,6 @@ ParticleSystem:
     type: 3}
   m_PrefabInstance: {fileID: 4279767949846419598}
   m_PrefabAsset: {fileID: 0}
---- !u!198 &2640999544399217334 stripped
-ParticleSystem:
-  m_CorrespondingSourceObject: {fileID: 2288529350662871608, guid: af9d4d0363a46ba45955d6934f065813,
-    type: 3}
-  m_PrefabInstance: {fileID: 4279767949846419598}
-  m_PrefabAsset: {fileID: 0}
 --- !u!114 &5754875421444610412 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 8410937341537386978, guid: af9d4d0363a46ba45955d6934f065813,
@@ -7936,6 +7931,12 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 8359472762825047238}
   m_PrefabAsset: {fileID: 0}
+--- !u!198 &6841132472165640230 stripped
+ParticleSystem:
+  m_CorrespondingSourceObject: {fileID: 3094612392314655968, guid: d758aa65baab42b43ba031de88063bb7,
+    type: 3}
+  m_PrefabInstance: {fileID: 8359472762825047238}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &8369525815624251330
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -8260,12 +8261,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 002ce74ca387a2143a9a5a0405207c9e, type: 3}
---- !u!198 &4183801981748931522 stripped
-ParticleSystem:
-  m_CorrespondingSourceObject: {fileID: 5736391937106539089, guid: 002ce74ca387a2143a9a5a0405207c9e,
-    type: 3}
-  m_PrefabInstance: {fileID: 8472427235865663891}
-  m_PrefabAsset: {fileID: 0}
 --- !u!198 &4288591306519824409 stripped
 ParticleSystem:
   m_CorrespondingSourceObject: {fileID: 5625058318464536970, guid: 002ce74ca387a2143a9a5a0405207c9e,

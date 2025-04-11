@@ -90,6 +90,7 @@ namespace NSMB.Entities.Player {
         [SerializeField] private AudioClip normalDrill, propellerDrill;
         [SerializeField] private LoopingSoundPlayer dustPlayer, drillPlayer;
         [SerializeField] private LoopingSoundData wallSlideData, shellSlideData, spinnerDrillData, propellerDrillData;
+        [SerializeField] private bool excludeMaterialForSmall;
 
         [SerializeField] private AudioSource sfx;
 
@@ -113,6 +114,9 @@ namespace NSMB.Entities.Player {
         private Vector3 previousPosition;
         private bool forceUpdate;
         private GameObject activeRespawnParticle;
+        private SkinnedMeshRenderer largeMesh;
+        private Material[] rememberedMaterialsLarge, rememberedMaterialsSmall;
+        private bool useSpecialSmall;
 
         public void OnValidate() {
             this.SetIfNull(ref animator);
@@ -173,6 +177,14 @@ namespace NSMB.Entities.Player {
             }
 
             GlowColor = Utils.Utils.GetPlayerColor(f, mario->PlayerRef);
+            
+            largeMesh = largeShellExclude.GetComponentInChildren<SkinnedMeshRenderer>();
+            if (smallModel == largeModel) useSpecialSmall = true;
+            if (excludeMaterialForSmall)
+            {
+                rememberedMaterialsLarge = largeMesh.materials;
+                rememberedMaterialsSmall = new[] { largeMesh.materials[0], largeMesh.materials[1] };
+            }
 
             if (Game.PlayerIsLocal(mario->PlayerRef)) {
                 MasterCanvas masterCanvas = FindObjectOfType<MasterCanvas>();
@@ -547,14 +559,24 @@ namespace NSMB.Entities.Player {
 
             // Model changing
             bool large = mario->CurrentPowerupState >= PowerupState.Mushroom;
-
-            largeModel.SetActive(large);
-            smallModel.SetActive(!large);
+            if (!useSpecialSmall)
+            {
+                largeModel.SetActive(large);
+                smallModel.SetActive(!large);
+            }
+            else
+            {
+                largeModel.SetActive(true);
+            }
             blueShell.SetActive(mario->CurrentPowerupState == PowerupState.BlueShell);
             propellerHelmet.SetActive(mario->CurrentPowerupState == PowerupState.PropellerMushroom);
             HammerHelm.SetActive(mario->CurrentPowerupState == PowerupState.HammerSuit && !mario->IsCrouching);
             HammerShell.SetActive(mario->CurrentPowerupState == PowerupState.HammerSuit && !mario->IsCrouching);
             HammerTuck.SetActive(mario->CurrentPowerupState == PowerupState.HammerSuit && mario->IsCrouching);
+            if (excludeMaterialForSmall)
+                largeMesh.materials = large ? rememberedMaterialsLarge : rememberedMaterialsSmall;
+            else if (useSpecialSmall)
+                largeModel.transform.GetChild(0).localScale = large ? new Vector3(1, 1, 1) : new Vector3(0.8f, 0.7f, 0.7f);
 
             Avatar targetAvatar = large ? largeAvatar : smallAvatar;
             bool changedAvatar = animator.avatar != targetAvatar;
