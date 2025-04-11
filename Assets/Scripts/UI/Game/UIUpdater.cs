@@ -241,7 +241,7 @@ namespace NSMB.UI.Game {
             bool teamsEnabled = rules.TeamsEnabled;
             bool livesEnabled = rules.IsLivesEnabled;
             bool timerEnabled = rules.TimerSeconds > 0;
-            bool minimapBoosEnabled = rules.SNoMinimap;
+            bool minimapBoosEnabled = false;    // TODO: temporarily disabled. maybe make boos appear when all Ms are off.
             int lapsRequirement = rules.Laps;
             bool lapsEnabled = lapsRequirement > 1 && stage.IsCampaignMap; // don't show counter if only 1 lap or in versus stage.
 

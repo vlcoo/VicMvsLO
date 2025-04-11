@@ -39,13 +39,10 @@ namespace NSMB.UI.Game.Track {
         }
 
         public override void OnLateUpdateView() {
-            if (stage.VerticalMap) {
-                float percentage = (targetTransform.position.y - levelMinY) * levelHeightReciprocal;
-                transform.localPosition = new(percentage * trackWidth - trackMaxX, transform.localPosition.y, transform.localPosition.z);
-            } else {
-                float percentage = (targetTransform.position.x - levelMinX) * levelWidthReciprocal;
-                transform.localPosition = new(percentage * trackWidth - trackMaxX, transform.localPosition.y, transform.localPosition.z);
-            }
+            float percentage;
+            if (stage.VerticalMap) percentage = (targetTransform.position.y - levelMinY) * levelHeightReciprocal;
+            else percentage = (targetTransform.position.x - levelMinX) * levelWidthReciprocal;
+            transform.localPosition = new(percentage * trackWidth - trackMaxX, transform.localPosition.y, transform.localPosition.z);
         }
     }
 }

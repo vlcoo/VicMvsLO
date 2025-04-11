@@ -1,7 +1,7 @@
 using Photon.Deterministic;
 
 namespace Quantum {
-    public class CommandChangePowerupChances : DeterministicCommand, ILobbyCommand {
+    public class CommandChangePowerupsHuds : DeterministicCommand, ILobbyCommand {
         public int ChanceMushroom;
         public int ChanceFireFlower;
         public int ChanceIceFlower;
@@ -50,7 +50,7 @@ namespace Quantum {
             }
         }
 
-        public enum PowerupChances : ushort {
+        public enum PowerupsHuds : uint {
             Mushroom = 1 << 0,
             FireFlower = 1 << 1,
             IceFlower = 1 << 2,

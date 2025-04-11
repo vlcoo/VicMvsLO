@@ -56,7 +56,6 @@ struct GameRules {
 	bool SNoLooping;
 	bool SNoCoins;
 	bool SNoPowerups;
-	bool SNoMinimap;
 	bool SShowCoinCount;
 	
 	int ChanceMushroom;
@@ -68,6 +67,12 @@ struct GameRules {
     int ChanceMiniMushroom;
     int ChanceMegaMushroom;
     int ChanceStarman;
+    
+    bool MStars;
+    bool MPlayers;
+    bool MHost;
+    bool MIceCubes;
+    int MTeamTarget;
 }
 
 enum GameState : Byte {

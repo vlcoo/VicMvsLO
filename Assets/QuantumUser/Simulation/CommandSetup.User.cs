@@ -19,7 +19,7 @@ namespace Quantum {
             factories.Add(new CommandChangePlayerData());
             factories.Add(new CommandChangeRules());
             factories.Add(new CommandChangeTriggers());
-            factories.Add(new CommandChangePowerupChances());
+            factories.Add(new CommandChangePowerupsHuds());
             factories.Add(new CommandChangeHost());
             factories.Add(new CommandUpdatePing());
             factories.Add(new CommandSetInSettings());

@@ -15,6 +15,9 @@ namespace NSMB.UI.Game.Track {
         //---Serialized Variables
         [SerializeField] private GameObject allImageParent;
         [SerializeField] private Image teamIcon;
+        [SerializeField] private Image hostIcon;
+        [SerializeField] private Image iceCubeIcon;
+        [SerializeField] private Image targetIcon;
 
         //---Private Variables
         private Coroutine flashRoutine;
@@ -28,7 +31,9 @@ namespace NSMB.UI.Game.Track {
                 teamIcon.sprite = f.SimulationConfig.Teams[mario->GetTeam(f)].spriteColorblind;
             }
 
-            stage.HidePlayersOnMinimap = f.Global->Rules.SNoMinimap;
+            stage.HidePlayersOnMinimap = f.Global->Rules.MPlayers;
+            hostIcon.enabled = QuantumUtils.GetPlayerData(f, mario->PlayerRef)->IsRoomHost;
+            targetIcon.enabled = f.Global->Rules.TeamsEnabled && f.Global->Rules.MTeamTarget == mario->GetTeam(f);
         }
 
         public override void OnDeactivate() {
@@ -53,6 +58,7 @@ namespace NSMB.UI.Game.Track {
                 image.enabled = controllingCamera || !stage.HidePlayersOnMinimap;
             }
             teamIcon.gameObject.SetActive(image.enabled && Settings.Instance.GraphicsColorblind && f.Global->Rules.TeamsEnabled && !controllingCamera);
+            
         }
 
         private void OnGameResynced(CallbackGameResynced e) {

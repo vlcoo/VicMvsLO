@@ -11,3 +11,12 @@ component Freezable {
 }
 
 signal OnEntityFreeze(EntityRef entity, EntityRef iceBlock);
+
+event EntityFrozen {
+	EntityRef Entity;
+	EntityRef IceBlock;
+}
+event EntityThawed {
+	EntityRef Entity;
+	EntityRef IceBlock;
+}

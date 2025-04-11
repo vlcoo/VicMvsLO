@@ -29,8 +29,13 @@ namespace Quantum {
         public bool SNoLooping;
         public bool SNoCoins;
         public bool SNoPowerups;
-        public bool SNoMinimap;
         public bool SShowCoinCount;
+
+        public bool MStars;
+        public bool MPlayers;
+        public bool MHost;
+        public bool MIceCubes;
+        public int MTeamTarget;
 
         public override void Serialize(BitStream stream) {
             uint changes = (uint) EnabledChanges;
@@ -61,8 +66,13 @@ namespace Quantum {
             stream.Serialize(ref SNoLooping);
             stream.Serialize(ref SNoCoins);
             stream.Serialize(ref SNoPowerups);
-            stream.Serialize(ref SNoMinimap);
             stream.Serialize(ref SShowCoinCount);
+            
+            stream.Serialize(ref MStars);
+            stream.Serialize(ref MPlayers);
+            stream.Serialize(ref MHost);
+            stream.Serialize(ref MIceCubes);
+            stream.Serialize(ref MTeamTarget);
         }
 
         public unsafe void Execute(Frame f, PlayerRef sender, PlayerData* playerData) {
@@ -103,8 +113,13 @@ namespace Quantum {
             if (rulesChanges.HasFlag(Rules.SNoLooping)) { rules.SNoLooping = SNoLooping; }
             if (rulesChanges.HasFlag(Rules.SNoCoins)) { rules.SNoCoins = SNoCoins; }
             if (rulesChanges.HasFlag(Rules.SNoPowerups)) { rules.SNoPowerups = SNoPowerups; }
-            if (rulesChanges.HasFlag(Rules.SNoMinimap)) { rules.SNoMinimap = SNoMinimap; }
             if (rulesChanges.HasFlag(Rules.SShowCoinCount)) { rules.SShowCoinCount = SShowCoinCount; }
+            
+            if (rulesChanges.HasFlag(Rules.MStars)) { rules.MStars = MStars; }
+            if (rulesChanges.HasFlag(Rules.MPlayers)) { rules.MPlayers = MPlayers; }
+            if (rulesChanges.HasFlag(Rules.MHost)) { rules.MHost = MHost; }
+            if (rulesChanges.HasFlag(Rules.MIceCubes)) { rules.MIceCubes = MIceCubes; }
+            if (rulesChanges.HasFlag(Rules.MTeamTarget)) { rules.MTeamTarget = MTeamTarget; }
             
             f.Global->Rules = rules;
             f.Events.RulesChanged(levelChanged);
@@ -125,24 +140,26 @@ namespace Quantum {
             DrawOnTimeUp = 1 << 7,
             Laps = 1 << 8,
             PowerupChances = 1 << 9,
-            // skipping to 12 in case we need to add more normal room rules
-            SNoReserve = 1 << 12,
-            SNoDroppedStars = 1 << 13,
-            SInstantDeath = 1 << 14,
-            SNoDefrost = 1 << 15,
-            SNoCollisions = 1 << 16,
-            SNoIframes = 1 << 17,
-            SHideSeek = 1 << 18,
-            SNoEnemies = 1 << 19,
-            SNoBahs = 1 << 20,
-            SPitWrap = 1 << 21,
-            SAllBricks = 1 << 22,
-            SNoLooping = 1 << 23,
-            SNoCoins = 1 << 24,
-            SNoPowerups = 1 << 25,
-            SNoMinimap = 1 << 26,
-            SShowCoinCount = 1 << 27,
-            
+            SNoReserve = 1 << 10,
+            SNoDroppedStars = 1 << 11,
+            SInstantDeath = 1 << 12,
+            SNoDefrost = 1 << 13,
+            SNoCollisions = 1 << 14,
+            SNoIframes = 1 << 15,
+            SHideSeek = 1 << 16,
+            SNoEnemies = 1 << 17,
+            SNoBahs = 1 << 18,
+            SPitWrap = 1 << 19,
+            SAllBricks = 1 << 20,
+            SNoLooping = 1 << 21,
+            SNoCoins = 1 << 22,
+            SNoPowerups = 1 << 23,
+            SShowCoinCount = 1 << 24,
+            MStars = 1 << 25,
+            MPlayers = 1 << 26,
+            MHost = 1 << 27,
+            MIceCubes = 1 << 28,
+            MTeamTarget = 1 << 29,
         }
     }
 }

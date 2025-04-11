@@ -195,8 +195,12 @@ public class ChangeableRule : Selectable, ISubmitHandler, IPointerClickHandler, 
             CommandChangeRules.Rules.SNoLooping => (bool) rules.SNoLooping,
             CommandChangeRules.Rules.SNoCoins => (bool) rules.SNoCoins,
             CommandChangeRules.Rules.SNoPowerups => (bool) rules.SNoPowerups,
-            CommandChangeRules.Rules.SNoMinimap => (bool) rules.SNoMinimap,
             CommandChangeRules.Rules.SShowCoinCount => (bool) rules.SShowCoinCount,
+            CommandChangeRules.Rules.MStars => (bool) rules.MStars,
+            CommandChangeRules.Rules.MPlayers => (bool) rules.MPlayers,
+            CommandChangeRules.Rules.MHost => (bool) rules.MHost,
+            CommandChangeRules.Rules.MIceCubes => (bool) rules.MIceCubes,
+            CommandChangeRules.Rules.MTeamTarget => rules.MTeamTarget,
             _ => null
         };
 

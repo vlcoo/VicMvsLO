@@ -18,8 +18,10 @@ namespace NSMB.UI.Game.Track {
 
         public void Start() {
             Frame f = QuantumRunner.DefaultGame.Frames.Predicted;
-            var star = f.Unsafe.GetPointer<BigStar>(targetEntity);
 
+            image.enabled = f.Global->Rules.MStars;
+            
+            var star = f.Unsafe.GetPointer<BigStar>(targetEntity);
             if (star->IsStationary) {
                 animator.enabled = true;
                 transform.localScale = Vector3.zero;

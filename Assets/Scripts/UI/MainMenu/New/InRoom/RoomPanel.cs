@@ -19,6 +19,7 @@ namespace NSMB.UI.MainMenu.Submenus {
         [SerializeField] private TMP_Text stageNameText;
         [SerializeField] private StagePreviewManager stagePreviewManager;
         [SerializeField] private MainMenuChat chat;
+        [SerializeField] private GameObject[] additionalRuleContainers;
 
         //---Private Variables
         private readonly List<ChangeableRule> rules = new();
@@ -26,10 +27,21 @@ namespace NSMB.UI.MainMenu.Submenus {
 
         public override void Initialize() {
             base.Initialize();
+            
             GetComponentsInChildren(true, rules);
             foreach (var rule in rules) {
                 rule.Initialize();
             }
+
+            // some prompt submenus have no script, so we initialize their rules for them.
+            foreach (var ruleContainer in additionalRuleContainers) {
+                List<ChangeableRule> additionalRules = new();
+                ruleContainer.GetComponentsInChildren(true, additionalRules);
+                foreach (var rule in additionalRules) {
+                    rule.Initialize();
+                }
+            }
+            
             chat.Initialize();
         }
 

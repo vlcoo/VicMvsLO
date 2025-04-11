@@ -82,11 +82,20 @@ public class SpecialToggleChangeableRule : ChangeableRule {
         case CommandChangeRules.Rules.SNoPowerups:
             cmd.SNoPowerups = (bool) value;
             break;
-        case CommandChangeRules.Rules.SNoMinimap:
-            cmd.SNoMinimap = (bool) value;
-            break;
         case CommandChangeRules.Rules.SShowCoinCount:
             cmd.SShowCoinCount = (bool) value;
+            break;
+        case CommandChangeRules.Rules.MStars:
+            cmd.MStars = (bool) value;
+            break;
+        case CommandChangeRules.Rules.MPlayers:
+            cmd.MPlayers = (bool) value;
+            break;
+        case CommandChangeRules.Rules.MHost:
+            cmd.MHost = (bool) value;
+            break;
+        case CommandChangeRules.Rules.MIceCubes:
+            cmd.MIceCubes = (bool) value;
             break;
         }
 

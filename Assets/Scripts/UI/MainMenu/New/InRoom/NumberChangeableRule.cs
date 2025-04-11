@@ -11,6 +11,7 @@ public class NumberChangeableRule : ChangeableRule {
     //---Serialized Variables
     [SerializeField] protected int minValue = 0, maxValue = 20, step = 1;
     [SerializeField] protected bool minimumValueIsOff;
+    [SerializeField] protected bool showAsLetters;
 
     protected override void IncreaseValueInternal() {
         int intValue = (int) value;
@@ -53,6 +54,9 @@ public class NumberChangeableRule : ChangeableRule {
         case CommandChangeRules.Rules.TimerSeconds:
             cmd.TimerMinutes = (int) value;
             break;
+        case CommandChangeRules.Rules.MTeamTarget:
+            cmd.MTeamTarget = (int) value;
+            break;
         }
 
         QuantumGame game = NetworkHandler.Game;
@@ -68,7 +72,10 @@ public class NumberChangeableRule : ChangeableRule {
         
         TranslationManager tm = GlobalController.Instance.translationManager;
         if (value is int intValue) {
-            label.text = labelPrefix + ((minimumValueIsOff && intValue == minValue) ? tm.GetTranslation("ui.generic.off") : intValue);
+            label.text = labelPrefix;
+            label.text += (minimumValueIsOff && intValue == minValue)
+                ? tm.GetTranslation("ui.generic.off")
+                : (showAsLetters ? ((char) (intValue + 'a')).ToString().ToUpper() : intValue);
         }
     }
 }
