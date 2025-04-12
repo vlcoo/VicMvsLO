@@ -47,6 +47,8 @@ namespace Quantum {
 
             // Try to not spawn inside blocks/walls
             PhysicsObjectSystem.TryEject((FrameThreadSafe) f, iceBlockEntity);
+            f.Signals.OnEntityFreeze(childEntity, iceBlockEntity);
+            f.Events.EntityFrozen(childEntity, iceBlockEntity);
         }
     }
 }

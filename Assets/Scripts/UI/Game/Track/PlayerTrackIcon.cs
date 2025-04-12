@@ -21,6 +21,7 @@ namespace NSMB.UI.Game.Track {
 
         //---Private Variables
         private Coroutine flashRoutine;
+        private bool iceCubeIconEnabled;
 
         public override void OnActivate(Frame f) {
             image.enabled = true;
@@ -32,8 +33,9 @@ namespace NSMB.UI.Game.Track {
             }
 
             stage.HidePlayersOnMinimap = f.Global->Rules.MPlayers;
-            hostIcon.enabled = QuantumUtils.GetPlayerData(f, mario->PlayerRef)->IsRoomHost;
+            hostIcon.enabled = f.Global->Rules.MHost && QuantumUtils.GetPlayerData(f, mario->PlayerRef)->IsRoomHost;
             targetIcon.enabled = f.Global->Rules.TeamsEnabled && f.Global->Rules.MTeamTarget == mario->GetTeam(f);
+            iceCubeIconEnabled = f.Global->Rules.MIceCubes;
         }
 
         public override void OnDeactivate() {
@@ -47,11 +49,13 @@ namespace NSMB.UI.Game.Track {
             QuantumCallback.Subscribe<CallbackGameResynced>(this, OnGameResynced);
             QuantumEvent.Subscribe<EventMarioPlayerDied>(this, OnMarioPlayerDied);
             QuantumEvent.Subscribe<EventMarioPlayerRespawned>(this, OnMarioPlayerRespawned);
+            QuantumEvent.Subscribe<EventEntityFrozen>(this, OnEntityFrozen);
+            QuantumEvent.Subscribe<EventEntityThawed>(this, OnEntityThawed);
         }
 
         public override void OnUpdateView() {
             bool controllingCamera = playerElements.CameraAnimator.Target == targetEntity;
-            transform.localScale = controllingCamera ? FlipY : TwoThirds;
+            image.transform.localScale = controllingCamera ? FlipY : TwoThirds;
 
             Frame f = PredictedFrame;
             if (flashRoutine == null) {
@@ -97,6 +101,16 @@ namespace NSMB.UI.Game.Track {
                 StopCoroutine(flashRoutine);
             }
             flashRoutine = null;
+        }
+
+        public void OnEntityFrozen(EventEntityFrozen e) {
+            if (!iceCubeIconEnabled || !e.Entity.Equals(targetEntity)) return;
+            iceCubeIcon.enabled = true;
+        }
+        
+        public void OnEntityThawed(EventEntityThawed e) {
+            if (!iceCubeIconEnabled || !e.Entity.Equals(targetEntity)) return;
+            iceCubeIcon.enabled = false;
         }
     }
 }

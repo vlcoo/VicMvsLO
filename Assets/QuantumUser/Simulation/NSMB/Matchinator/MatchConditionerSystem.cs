@@ -9,7 +9,6 @@ using Int32 = System.Int32;
 namespace Quantum
 {
     public class MatchConditionerSystem : SystemSignalsOnly, ISignalOnMarioPlayerCollectedStar, ISignalOnMarioPlayerCollectedCoin, ISignalOnMarioPlayerDied, ISignalOnEntityFreeze, ISignalOnGameStarting, ISignalOnMarioPlayerDisqualified, ISignalOnMarioPlayerJumped, ISignalOnMarioPlayerRespawned, ISignalOnMarioPlayerReceivedKnockback, ISignalOnMarioPlayerCollectedPowerup, ISignalOnMarioPlayerTookDamage, ISignalOnMarioPlayerReachedCoinLimit, ISignalOnMarioPlayerZeroedStars, ISignalOnMarioPlayerZeroedCoins, ISignalOnMarioTouchedGoal {
-        // TODO: initialize the trigger list in the correct place somewhere else!!
         public override unsafe void OnInit(Frame f) {
             // MOCK TRIGGER LIST for testing purposes...
             f.Global->Rules.Triggers = f.AllocateList<MatchConditionerTrigger>(20);
@@ -300,6 +299,7 @@ namespace Quantum
         }
 
         public unsafe void ActGiveXPowerup(Frame f, EntityRef entity, string parameter) {
+            if (parameter == "") parameter = "random";
             PowerupAsset newScriptable = parameter == "random"
                 ? f.SimulationConfig.AllPowerups[f.RNG->Next(0, f.SimulationConfig.AllPowerups.Length)]
                 : f.SimulationConfig.AllPowerups.FirstOrDefault(p => p.State.ToString() == parameter);
@@ -329,6 +329,7 @@ namespace Quantum
         }
 
         public unsafe void ActStun(Frame f, EntityRef entity, string parameter) {
+            if (parameter == "") parameter = "Bump";
             var mario = f.Unsafe.GetPointer<MarioPlayer>(entity);
             switch (parameter) {
                 case "Bump":
@@ -365,6 +366,7 @@ namespace Quantum
         }
 
         public unsafe void ActSpawnXPowerup(Frame f, EntityRef entity, string parameter) {
+            if (parameter == "") parameter = "random";
             PowerupAsset newScriptable = f.SimulationConfig.AllPowerups.FirstOrDefault(p => p.State.ToString() == parameter);
             if (newScriptable == null) { Err("powerup asset was null!!"); return; }
             MarioPlayerSystem.SpawnItem(f, entity, f.Unsafe.GetPointer<MarioPlayer>(entity), parameter == "random" ? default : newScriptable.Prefab);
@@ -392,6 +394,7 @@ namespace Quantum
         }
 
         public unsafe void ActGiveXReserve(Frame f, EntityRef entity, string parameter) {
+            if (parameter == "") parameter = "random";
             var mario = f.Unsafe.GetPointer<MarioPlayer>(entity);
             PowerupAsset newScriptable = parameter == "random"
                 ? f.SimulationConfig.AllPowerups[f.RNG->Next(0, f.SimulationConfig.AllPowerups.Length)]

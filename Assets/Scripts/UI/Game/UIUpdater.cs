@@ -25,7 +25,7 @@ namespace NSMB.UI.Game {
         [SerializeField] private Sprite storedItemNull;
         [SerializeField] private TMP_Text uiTeamStars, uiStars, uiCoins, uiDebug, uiLives, uiCountdown, uiLaps;
         [SerializeField] private Image itemReserve, itemColor, deathFade;
-        [SerializeField] private GameObject boos;
+        [SerializeField] private GameObject boos, storedItem;
         [SerializeField] private Animation reserveAnimation;
 
         [SerializeField] private TMP_Text winText;
@@ -73,6 +73,8 @@ namespace NSMB.UI.Game {
             foreach (MarioPlayerAnimator mario in MarioPlayerAnimator.AllMarioPlayers) {
                 OnMarioInitialized(game, f, mario);
             }
+            
+            storedItem.SetActive(!f.Global->Rules.SNoReserve);
         }
 
         public void Awake() {

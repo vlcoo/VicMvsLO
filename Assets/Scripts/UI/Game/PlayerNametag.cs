@@ -44,7 +44,7 @@ namespace NSMB.UI.Game {
 
             arrow.color = parent.GlowColor;
             text.color = Utils.Utils.SampleNicknameColor(nicknameColor, out constantNicknameColor);
-            gameObject.SetActive(true);
+            gameObject.SetActive(!f.Global->Rules.SHideSeek);
 
             UpdateText(f);
         }

@@ -91,7 +91,7 @@ namespace Quantum {
 
                 var contacts = f.ResolveList(physicsObject->Contacts);
                 var moveDistance = moveVelocity * (1 - hit.CastDistanceNormalized);
-                Debug.Log($"{moveDistance} - ({moveDistance.Magnitude}) -> {velocity}");
+                // Debug.Log($"{moveDistance} - ({moveDistance.Magnitude}) -> {velocity}");
 
                 //moveDistance -= FPVector2.Normalize(moveDistance) * PhysicsObjectSystem.RaycastSkin;
 

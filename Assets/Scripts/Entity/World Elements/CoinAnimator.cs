@@ -34,21 +34,22 @@ public unsafe class CoinAnimator : QuantumEntityViewComponent {
     }
 
     public override void OnDeactivate() {
-        sRenderer.enabled = false;
-
-        if (looseCoin) {
+        if (looseCoin && sRenderer.enabled) {
             sparkles.transform.SetParent(transform.parent);
             sparkles.gameObject.SetActive(true);
             sparkles.transform.position = sRenderer.transform.position;
             sparkles.Play();
             // Destroy(sparkles, 0.5f);
         }
+        
+        sRenderer.enabled = false;
     }
 
     public override void OnUpdateView() {
         using var profilerScope = HostProfiler.Start("CoinAnimator.OnUpdateView");
         Frame f = PredictedFrame;
-        if (!f.Exists(EntityRef)) {
+        if (!f.Exists(EntityRef) || f.Global->Rules.SNoCoins) {
+            sRenderer.enabled = false;
             return;
         }
 

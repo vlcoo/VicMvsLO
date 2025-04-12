@@ -1586,7 +1586,8 @@ namespace Quantum {
             var physicsObject = filter.PhysicsObject;
             var collider = filter.PhysicsCollider;
 
-            QuantumUtils.Decrement(ref mario->DamageInvincibilityFrames);
+            if (f.Global->Rules.SNoIframes) mario->DamageInvincibilityFrames = 0;
+            else QuantumUtils.Decrement(ref mario->DamageInvincibilityFrames);
 
             FPVector2 iceBlockSize = collider->Shape.Box.Extents;
             FP newHeight;
@@ -1862,6 +1863,8 @@ namespace Quantum {
         }
 
         public void SpawnReserveItem(Frame f, ref Filter filter) {
+            if (f.Global->Rules.SNoReserve) return;
+            
             var mario = filter.MarioPlayer;
             var reserveItem = f.FindAsset(mario->ReserveItem);
 
@@ -1977,6 +1980,8 @@ namespace Quantum {
         }
 
         public static void OnMarioMarioInteraction(Frame f, EntityRef marioAEntity, EntityRef marioBEntity) {
+            if (f.Global->Rules.SNoCollisions) return;
+            
             var marioA = f.Unsafe.GetPointer<MarioPlayer>(marioAEntity);
             var marioB = f.Unsafe.GetPointer<MarioPlayer>(marioBEntity);
 
