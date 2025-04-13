@@ -381,6 +381,12 @@ namespace Quantum {
             var stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
             int teamCount = 0;
 
+            // if (f.Global->Rules.SNoLooping) {
+            //     stage.IsWrappingLevel = false;
+            //     stage.CameraMinPosition.X = stage.TilemapWorldPosition.X + (stage.TileOrigin.x / 2);
+            //     stage.CameraMaxPosition.X = stage.CameraMinPosition.X + (stage.TileDimensions.x / 2);
+            // }
+
             var playerDatas = f.Filter<PlayerData>();
             int playerCount = 0;
             while (playerDatas.NextUnsafe(out _, out PlayerData* data)) {

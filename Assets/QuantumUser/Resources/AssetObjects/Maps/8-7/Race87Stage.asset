@@ -473,6 +473,11 @@ MonoBehaviour:
     - rid: 4893974530663383042
     - rid: 4893974530663383043
     - rid: 4893974530663383044
+  - Components:
+    - rid: 6475624356566269952
+    - rid: 6475624356566269953
+    - rid: 6475624356566269954
+    - rid: 6475624356566269955
   SerializedTriangleDataUncompressedSize: 8
   references:
     version: 2
@@ -3531,6 +3536,67 @@ MonoBehaviour:
       data:
         ColliderDisabled:
           Value: 0
+    - rid: 6475624356566269952
+      type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
+      data:
+        Position:
+          X:
+            RawValue: -1212416
+          Y:
+            RawValue: -393216
+        Rotation:
+          RawValue: 0
+    - rid: 6475624356566269953
+      type: {class: PhysicsCollider2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
+      data:
+        ShapeConfig:
+          ShapeType: 4
+          PolygonCollider:
+            Id:
+              Value: 0
+          CircleRadius:
+            RawValue: 0
+          CapsuleSize:
+            X:
+              RawValue: 0
+            Y:
+              RawValue: 0
+          EdgeExtent:
+            RawValue: 0
+          BoxExtents:
+            X:
+              RawValue: 32768
+            Y:
+              RawValue: 65536
+          PositionOffset:
+            X:
+              RawValue: 0
+            Y:
+              RawValue: 65536
+          RotationOffset:
+            RawValue: 0
+          UserTag: 0
+          IsPersistent: 1
+          CompoundShapes: []
+        Layer: 0
+        IsTrigger: 0
+        PhysicsMaterial:
+          Id:
+            Value: 0
+    - rid: 6475624356566269954
+      type: {class: PhysicsCallbacks2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
+      data:
+        CallbackFlags:
+          Value: 0
+    - rid: 6475624356566269955
+      type: {class: BreakableObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
+      data:
+        OriginalHeight:
+          RawValue: 262144
+        MinimumHeight:
+          RawValue: 0
+        IsStompable:
+          Value: 1
     - rid: 6594723402399875072
       type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
       data:

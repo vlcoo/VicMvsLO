@@ -145,6 +145,11 @@ public static unsafe class QuantumUtils {
     }
 
     public static FPVector2 WrapUnityTile(VersusStageData stage, FPVector2 unityTile, out WrapDirection wrapDirection) {
+        if (!stage.IsWrappingLevel) {
+            wrapDirection = WrapDirection.NoWrap;
+            return unityTile;
+        }
+        
         if (unityTile.X < stage.TileOrigin.x) {
             unityTile.X += stage.TileDimensions.x;
             wrapDirection = WrapDirection.Left;

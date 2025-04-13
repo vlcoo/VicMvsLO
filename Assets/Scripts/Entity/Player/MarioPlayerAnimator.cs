@@ -195,6 +195,8 @@ namespace NSMB.Entities.Player {
             AllMarioPlayers.RemoveWhere(ma => ma == null);
             AllMarioPlayers.Add(this);
             MarioPlayerInitialized?.Invoke(Game, f, this);
+            
+            if (f.Global->Rules.SHideSeek) models.transform.position = new Vector3(models.transform.position.x, models.transform.position.y, 6f);
 
             forceUpdate = true;
             OnUpdateView();
@@ -979,12 +981,15 @@ namespace NSMB.Entities.Player {
                 return;
             }
 
-            GameObject number = Instantiate(coinNumberParticle, e.CoinLocation.ToUnityVector3(), Quaternion.identity);
-            number.GetComponentInChildren<NumberParticle>().Initialize(
-                Utils.Utils.GetSymbolString(e.Coins.ToString(), Utils.Utils.numberSymbols),
-                Utils.Utils.GetPlayerColor(VerifiedFrame, e.Mario.PlayerRef),
-                e.ItemSpawned
-            );
+            if (PredictedFrame.Global->Rules.CoinsForPowerup > 0) {
+                GameObject number = Instantiate(coinNumberParticle, e.CoinLocation.ToUnityVector3(),
+                    Quaternion.identity);
+                number.GetComponentInChildren<NumberParticle>().Initialize(
+                    Utils.Utils.GetSymbolString(e.Coins.ToString(), Utils.Utils.numberSymbols),
+                    Utils.Utils.GetPlayerColor(VerifiedFrame, e.Mario.PlayerRef),
+                    e.ItemSpawned
+                );
+            }
 
             PlaySound(SoundEffect.World_Coin_Collect);
             if (e.ItemSpawned) {

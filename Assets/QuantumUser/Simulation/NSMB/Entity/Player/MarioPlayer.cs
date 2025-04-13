@@ -199,6 +199,9 @@ namespace Quantum {
                 Runner.Despawn(FrozenCube.Object);
             }
             */
+            
+            var freezable = f.Unsafe.GetPointer<Freezable>(entity);
+            IceBlockSystem.Destroy(f, freezable->FrozenCubeEntity, IceBlockBreakReason.HitWall);
 
             if (f.Exists(HeldEntity) && f.Unsafe.TryGetPointer(HeldEntity, out Holdable* holdable)) {
                 holdable->DropWithoutThrowing(f, HeldEntity);

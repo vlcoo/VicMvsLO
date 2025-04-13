@@ -166,13 +166,16 @@ enum TriggerAction {
 
 enum TriggerConstraint {
     Always,
-    Randomly,
     IsMoving,
     IsStationary,
     IsAirborne,
     IsGrounded,
-    IsXPowerup,   // random, mushroom, fire, ice, propeller, shell, hammer, starman, mega, mini
-    IsNotXPowerup,   // random, mushroom, fire, ice, propeller, shell, hammer, starman, mega, mini
+    IsXPowerup,   // small, mushroom, fire, ice, propeller, shell, hammer, starman, mega, mini
+    IsNotXPowerup,   // small, mushroom, fire, ice, propeller, shell, hammer, starman, mega, mini
+    IsFrozen,
+    IsNotFrozen,
+    IsUnderwater,
+    IsNotUnderwater,
     HasXCoins,  // any X in valid range vvv
     HasXStars,
     HasXLives,

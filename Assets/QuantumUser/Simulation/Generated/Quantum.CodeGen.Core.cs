@@ -139,13 +139,16 @@ namespace Quantum {
   }
   public enum TriggerConstraint : int {
     Always,
-    Randomly,
     IsMoving,
     IsStationary,
     IsAirborne,
     IsGrounded,
     IsXPowerup,
     IsNotXPowerup,
+    IsFrozen,
+    IsNotFrozen,
+    IsUnderwater,
+    IsNotUnderwater,
     HasXCoins,
     HasXStars,
     HasXLives,
