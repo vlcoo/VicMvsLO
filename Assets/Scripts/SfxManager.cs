@@ -1,10 +1,11 @@
 using NSMB.Extensions;
 using NSMB.Loading;
+using NSMB.Sound;
 using Photon.Deterministic;
 using Quantum;
 using UnityEngine;
 
-public class SfxManager : QuantumSceneViewComponent {
+public unsafe class SfxManager : QuantumSceneViewComponent {
 
     //---Serialized Variables
     [SerializeField] public AudioSource sfx;
@@ -23,11 +24,12 @@ public class SfxManager : QuantumSceneViewComponent {
         QuantumEvent.Subscribe<EventTimerExpired>(this, OnTimerExpired, NetworkHandler.FilterOutReplayFastForward);
         QuantumEvent.Subscribe<EventGameStarted>(this, OnGameStarted);
         QuantumEvent.Subscribe<EventGameEnded>(this, OnGameEnded);
+        QuantumEvent.Subscribe<EventMarioPlayerPreRespawned>(this, OnMarioPlayerPreRespawned, NetworkHandler.FilterOutReplayFastForward);
         
         stage = (VersusStageData) QuantumUnityDB.GetGlobalAsset(FindObjectOfType<QuantumMapData>().Asset.UserAsset);
     }
 
-    public override unsafe void OnUpdateView() {
+    public override void OnUpdateView() {
         if (NetworkHandler.IsReplayFastForwarding) {
             return;
         }
@@ -62,7 +64,7 @@ public class SfxManager : QuantumSceneViewComponent {
         sfx.outputAudioMixerGroup.audioMixer.SetFloat("SFXReverb", 0.0f);
     }
 
-    private unsafe void OnGameResynced(CallbackGameResynced e) {
+    private void OnGameResynced(CallbackGameResynced e) {
         Frame f = PredictedFrame;
         if (f.Global->Rules.IsTimerEnabled && f.Global->Timer < 60) {
             playedHurryUp = true;
@@ -70,7 +72,16 @@ public class SfxManager : QuantumSceneViewComponent {
         previousTimer = 0;
     }
 
-    private unsafe void OnTimerExpired(EventTimerExpired e) {
+    private void OnTimerExpired(EventTimerExpired e) {
         sfx.PlayOneShot(SoundEffect.UI_Countdown_1);
+    }
+
+    private void OnMarioPlayerPreRespawned(EventMarioPlayerPreRespawned e) {
+        Frame f = PredictedFrame;
+        var mario = f.Unsafe.GetPointer<MarioPlayer>(e.Entity);
+
+        if (Game.PlayerIsLocal(mario->PlayerRef) && !musicPlayer.IsPlaying) {
+            sfx.PlayOneShot(SoundEffect.UI_StartGame);
+        }
     }
 }

@@ -7,6 +7,7 @@ public class SecondaryCameraPositioner : MonoBehaviour {
     //---Serialized Variables
     [SerializeField] private Camera mainCamera;
     [SerializeField] private Camera ourCamera;
+    [SerializeField] private UnityEngine.LayerMask alwaysIgnoreMask;
 
     //---Private Variables
     private bool destroyed;
@@ -32,10 +33,11 @@ public class SecondaryCameraPositioner : MonoBehaviour {
         }
 
         float camX = mainCamera.transform.position.x;
-        bool enable = Mathf.Abs(camX - stage.StageWorldMin.X.AsFloat) < 7 || Mathf.Abs(camX - stage.StageWorldMax.X.AsFloat) < 7;
+        bool enable = Mathf.Abs(camX - stage.StageWorldMin.X.AsFloat) < (mainCamera.orthographicSize * mainCamera.aspect) || Mathf.Abs(camX - stage.StageWorldMax.X.AsFloat) < (mainCamera.orthographicSize * mainCamera.aspect);
 
         ourCamera.enabled = enable;
         ourCamera.orthographicSize = mainCamera.orthographicSize;
+        ourCamera.cullingMask = mainCamera.cullingMask & ~alwaysIgnoreMask;
 
         if (enable) {
             float middle = stage.StageWorldMin.X.AsFloat + stage.TileDimensions.x * 0.25f;

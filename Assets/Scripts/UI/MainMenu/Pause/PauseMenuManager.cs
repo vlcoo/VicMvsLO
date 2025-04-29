@@ -12,6 +12,10 @@ namespace NSMB.UI.Pause {
 
     public class PauseMenuManager : MonoBehaviour {
 
+        //---Properties
+        public static float UnpauseTime { get; set; }
+        public bool IsPaused => isPaused;
+
         //---Serialized Variables
         [SerializeField] private PlayerElements playerElements;
         [SerializeField] private InputCollector inputCollector;
@@ -26,7 +30,6 @@ namespace NSMB.UI.Pause {
 
         //---Private Variables
         private bool isPaused;
-
         private bool inputted;
         private int selected;
         private bool skipSound;
@@ -37,7 +40,6 @@ namespace NSMB.UI.Pause {
         private bool isInConfirmationForQuitting;
         private string originalNoText, originalYesText;
 
-        private float unpauseTime;
 
         public void OnValidate() {
             this.SetIfNull(ref playerElements, UnityExtensions.GetComponentType.Parent);
@@ -57,7 +59,7 @@ namespace NSMB.UI.Pause {
         }
 
         private unsafe void OnPause(InputAction.CallbackContext context) {
-            if (isPaused || unpauseTime == Time.unscaledTime || NetworkHandler.IsReplayFastForwarding) {
+            if (isPaused || UnpauseTime == Time.unscaledTime || NetworkHandler.IsReplayFastForwarding) {
                 return;
             }
 
@@ -80,7 +82,7 @@ namespace NSMB.UI.Pause {
             skipSound = true;
 
             QuantumGame game = QuantumRunner.DefaultGame;
-            isHost = game == null || game.PlayerIsLocal(QuantumUtils.GetHostPlayer(game.Frames.Predicted, out _));
+            isHost = game == null || game.PlayerIsLocal(game.Frames.Predicted.Global->Host);
             options[1].text.fontSharedMaterial = isHost || NetworkHandler.IsReplay ? enabledMaterial : disabledMaterial;
             SelectOption(0);
 
@@ -110,7 +112,7 @@ namespace NSMB.UI.Pause {
             if (playSound) {
                 GlobalController.Instance.PlaySound(SoundEffect.UI_Pause);
             }
-            unpauseTime = Time.unscaledTime;
+            UnpauseTime = Time.unscaledTime;
         }
 
         public void OnNavigate(InputAction.CallbackContext context) {
@@ -171,7 +173,7 @@ namespace NSMB.UI.Pause {
                 return;
             }
 
-            if (GlobalController.Instance.optionsManager.gameObject.activeSelf) {
+            if (GlobalController.Instance.optionsManager.gameObject.activeSelf || playerElements.ReplayUi.TabOpen) {
                 return;
             }
 
@@ -216,7 +218,7 @@ namespace NSMB.UI.Pause {
             } else {
                 QuantumGame game = NetworkHandler.Game;
                 Frame f = game.Frames.Predicted;
-                PlayerRef hostPlayer = QuantumUtils.GetHostPlayer(f, out _);
+                PlayerRef hostPlayer = f.Global->Host;
 
                 int index = game.GetLocalPlayers().IndexOf(hostPlayer);
                 if (index != -1) {

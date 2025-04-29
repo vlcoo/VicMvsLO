@@ -25,7 +25,7 @@ namespace NSMB.UI.Game {
         [SerializeField] private Sprite storedItemNull;
         [SerializeField] private TMP_Text uiTeamStars, uiStars, uiCoins, uiDebug, uiLives, uiCountdown, uiLaps;
         [SerializeField] private Image itemReserve, itemColor, deathFade;
-        [SerializeField] private GameObject boos, storedItem;
+        [SerializeField] private GameObject boos, reserveItemBox, storedItem;
         [SerializeField] private Animation reserveAnimation;
 
         [SerializeField] private TMP_Text winText;
@@ -37,13 +37,13 @@ namespace NSMB.UI.Game {
         private readonly List<Image> backgrounds = new();
         private GameObject teamsParent, starsParent, coinsParent, livesParent, timerParent, lapsParent;
         private Material timerMaterial;
-        private bool uiHidden;
 
         //private TeamManager teamManager;
         private int cachedCoins = -1, cachedTeamStars = -1, cachedStars = -1, cachedLives = -1, cachedTimer = -1, cachedLaps = -1;
         private PowerupAsset previousPowerup;
         private VersusStageData stage;
         private EntityRef previousTarget;
+        private bool previousMarioExists;
 
         private Coroutine endGameSequenceCoroutine, reserveSummonCoroutine;
 
@@ -123,8 +123,13 @@ namespace NSMB.UI.Game {
             Frame f = game.Frames.Predicted;
             //UpdateTrackIcons(f);
 
-            if (!Target.IsValid
-                || !f.Unsafe.TryGetPointer(Target, out MarioPlayer* mario)) {
+            bool marioExists = f.Unsafe.TryGetPointer(Target, out MarioPlayer* mario);
+            if (Target != previousTarget || marioExists != previousMarioExists) {
+                UpdateElementVisibility(f, marioExists);
+            }
+
+            if (!marioExists) {
+                previousMarioExists = false;
                 return;
             }
 
@@ -133,6 +138,7 @@ namespace NSMB.UI.Game {
             ApplyUIColor(f, mario);
 
             previousTarget = Target;
+            previousMarioExists = true;
         }
 
         private void OnMarioInitialized(QuantumGame game, Frame f, MarioPlayerAnimator mario) {
@@ -195,6 +201,15 @@ namespace NSMB.UI.Game {
             previousPowerup = powerup;
         }
 
+        private void UpdateElementVisibility(Frame f, bool marioExists) {
+            teamsParent.SetActive(marioExists && f.Global->Rules.TeamsEnabled);
+            starsParent.SetActive(marioExists);
+            livesParent.SetActive(marioExists && f.Global->Rules.IsLivesEnabled);
+            coinsParent.SetActive(marioExists);
+            timerParent.SetActive(f.Global->Rules.IsTimerEnabled);
+            reserveItemBox.SetActive(marioExists);
+        }
+
         private IEnumerator ReserveSummonCoroutine() {
             yield return new WaitForSeconds(reserveAnimation.GetClip("reserve-out").length);
             itemReserve.sprite = storedItemNull;
@@ -247,7 +262,8 @@ namespace NSMB.UI.Game {
             int lapsRequirement = rules.Laps;
             bool lapsEnabled = lapsRequirement > 1 && stage.IsCampaignMap; // don't show counter if only 1 lap or in versus stage.
 
-            if (rules.TeamsEnabled) {
+            // TEAMS
+            if (teamsEnabled) {
                 byte teamIndex = mario->GetTeam(f);
                 int teamStars = QuantumUtils.GetTeamStars(f, teamIndex);
                 if (cachedTeamStars != teamStars) {
@@ -255,10 +271,9 @@ namespace NSMB.UI.Game {
                     TeamAsset team = f.SimulationConfig.Teams[teamIndex];
                     uiTeamStars.text = (Settings.Instance.GraphicsColorblind ? team.textSpriteColorblind : team.textSpriteNormal) + Utils.Utils.GetSymbolString("x" + cachedTeamStars + (starsEnabled ? "/" + starRequirement : ""));
                 }
-            } else {
-                teamsParent.SetActive(false);
             }
 
+            // STARS
             if (mario->Stars != cachedStars) {
                 cachedStars = mario->Stars;
                 string starString = "Sx" + cachedStars;
@@ -268,7 +283,8 @@ namespace NSMB.UI.Game {
 
                 uiStars.text = Utils.Utils.GetSymbolString(starString);
             }
-            
+			
+            // COINS
             if (mario->Coins != cachedCoins) {
                 cachedCoins = mario->Coins;
                 uiCoins.text = Utils.Utils.GetSymbolString("Cx" + cachedCoins + (coinsEnabled ? "/" + coinRequirement : ""));
@@ -283,15 +299,15 @@ namespace NSMB.UI.Game {
                 lapsParent.SetActive(false);
             }
 
+            // LIVES
             if (livesEnabled) {
                 if (mario->Lives != cachedLives) {
                     cachedLives = mario->Lives;
                     uiLives.text = QuantumUnityDB.GetGlobalAsset(mario->CharacterAsset).UiString + Utils.Utils.GetSymbolString("x" + cachedLives);
                 }
-            } else {
-                livesParent.SetActive(false);
             }
 
+            // TIMER
             if (timerEnabled) {
                 float timeRemaining = f.Global->Timer.AsFloat;
                 int secondsRemaining = Mathf.Max(Mathf.CeilToInt(timeRemaining), 0);
@@ -301,8 +317,6 @@ namespace NSMB.UI.Game {
                     uiCountdown.text = Utils.Utils.GetSymbolString("Tx" + Utils.Utils.SecondsToMinuteSeconds(secondsRemaining));
                     timerParent.SetActive(true);
                 }
-            } else {
-                timerParent.SetActive(false);
             }
             
             PlayerTrackIcon.HideAllPlayerIcons = minimapBoosEnabled;
@@ -394,7 +408,6 @@ namespace NSMB.UI.Game {
             bool hasWinner = e.HasWinner;
 
             TranslationManager tm = GlobalController.Instance.translationManager;
-            TeamAsset[] allTeams = f.SimulationConfig.Teams;
             string resultText;
             string winner = null;
             bool local = false;
@@ -405,7 +418,7 @@ namespace NSMB.UI.Game {
             } else if (hasWinner) {
                 if (teamMode) {
                     // Winning team
-                    winner = tm.GetTranslation(allTeams[e.WinningTeam].nameTranslationKey);
+                    winner = tm.GetTranslation(f.FindAsset(f.SimulationConfig.Teams[e.WinningTeam]).nameTranslationKey);
                     resultText = tm.GetTranslationWithReplacements("ui.result.teamwin", "team", winner);
                     ChatManager.Instance.AddSystemMessage("ui.inroom.chat.server.ended.team", color: ChatManager.Red, "team", winner);
                 } else {
@@ -464,7 +477,9 @@ namespace NSMB.UI.Game {
         }
 
         private void OnToggleHUD(InputAction.CallbackContext context) {
-            toggler.alpha = (toggler.alpha > 0) ? 0 : 1;
+            if (NetworkHandler.Game.Frames.Predicted.Global->GameState < GameState.Ended) {
+                toggler.alpha = (toggler.alpha > 0) ? 0 : 1;
+            }
         }
     }
 }

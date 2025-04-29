@@ -14,11 +14,12 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
         [SerializeField] private List<GameObject> selectionTargets;
 
         [SerializeField] private bool changeText = true;
-        [SerializeField] private string translationKey;
+        [SerializeField] public string translationKey;
         [SerializeField] private bool twoSided;
 
         //---Private Variables
         private bool selected;
+        private string originalText;
 
         public void OnValidate() {
             this.SetIfNull(ref label);
@@ -28,7 +29,10 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
         }
 
         public void OnEnable() {
+            eventSystem = FindObjectOfType<EventSystem>();
             TranslationManager.OnLanguageChanged += OnLanguageChanged;
+
+            originalText ??= label.text;
             UpdateLabel();
         }
 
@@ -58,7 +62,12 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
 
         public void UpdateLabel() {
             if (changeText) {
-                label.text = GlobalController.Instance.translationManager.GetTranslation(translationKey);
+                if (string.IsNullOrWhiteSpace(translationKey)) {
+                    label.text = originalText;
+                } else {
+                    label.text = GlobalController.Instance.translationManager.GetTranslation(translationKey);
+                }
+
                 if (selected) {
                     if (twoSided) {
                         label.text = "» " + label.text + " «";

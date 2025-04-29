@@ -12,7 +12,8 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 using System.Text.RegularExpressions;
-using static BinaryReplayFile;
+using Quantum.Prototypes;
+using NSMB.Replay;
 
 public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, IConnectionCallbacks {
 
@@ -34,14 +35,15 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
     public static QuantumGame Game => Runner?.Game ?? QuantumRunner.DefaultGame;
     public static IEnumerable<Region> Regions => Client.RegionHandler.EnabledRegions.OrderBy(r => r.Code);
     public static string Region => Client?.CurrentRegion ?? Instance.lastRegion;
-    public static bool IsReplay { get; private set; }
-    public static int ReplayStart { get; private set; }
-    public static int ReplayLength { get; private set; }
+    public static bool IsReplay => CurrentReplay != null;
+    public static int ReplayStart => CurrentReplay?.Header.InitialFrameNumber ?? -1;
+    public static int ReplayLength => CurrentReplay?.Header.ReplayLengthInFrames ?? -1;
     public static int ReplayEnd => ReplayStart + ReplayLength;
     public static bool IsReplayFastForwarding { get; set; }
     public static string SavedRecordingPath { get; set; }
     public static List<byte[]> ReplayFrameCache => Instance.replayFrameCache;
     public static bool WasDisconnectedViaError { get; set; }
+    public static BinaryReplayFile CurrentReplay { get; private set; }
 
     //---Private Variables
     private RealtimeClient realtimeClient;
@@ -248,8 +250,8 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
             var deletions = manager.GetTemporaryReplaysToDelete();
             if (deletions != null) {
                 foreach (var replay in deletions) {
-                    Debug.Log($"[Replay] Automatically deleting temporary replay '{replay.ReplayFile.GetDisplayName()}' ({replay.FilePath}) to make room.");
-                    File.Delete(replay.FilePath);
+                    Debug.Log($"[Replay] Automatically deleting temporary replay '{replay.ReplayFile.Header.GetDisplayName()}' ({replay.ReplayFile.FilePath}) to make room.");
+                    File.Delete(replay.ReplayFile.FilePath);
                     manager.RemoveReplay(replay);
                 }
             }
@@ -308,7 +310,27 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
             }
         } while (outputStream == null);
 
-        BinaryReplayFile binaryReplay = BinaryReplayFile.FromReplayData(jsonReplay, f.Global->Rules, playerInformation, winner);
+        ref GameRules rules = ref f.Global->Rules;
+        BinaryReplayHeader header = new() {
+            Version = BinaryReplayHeader.GetCurrentVersion(),
+            UnixTimestamp = DateTimeOffset.Now.ToUnixTimeSeconds(),
+            InitialFrameNumber = jsonReplay.InitialTick,
+            ReplayLengthInFrames = jsonReplay.LastTick - jsonReplay.InitialTick,
+
+            Rules = new GameRulesPrototype {
+                Stage = rules.Stage,
+                StarsToWin = rules.StarsToWin,
+                CoinsForPowerup = rules.CoinsForPowerup,
+                Lives = rules.Lives,
+                TimerSeconds = rules.TimerSeconds,
+                CustomPowerupsEnabled = rules.CustomPowerupsEnabled,
+                TeamsEnabled = rules.TeamsEnabled,
+            },
+            PlayerInformation = playerInformation,
+            WinningTeam = winner,
+        };
+
+        BinaryReplayFile binaryReplay = BinaryReplayFile.FromReplayData(jsonReplay, header);
         long writtenBytes = binaryReplay.WriteToStream(outputStream);
         outputStream.Dispose();
 
@@ -329,7 +351,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
 
     private unsafe void UpdateRealtimeProperties() {
         Frame f = Game.Frames.Predicted;
-        PlayerRef host = QuantumUtils.GetHostPlayer(f, out _);
+        PlayerRef host = f.Global->Host;
         if (!Game.PlayerIsLocal(host)) {
             return;
         }
@@ -389,7 +411,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
             Communicator = new QuantumNetworkCommunicator(Client),
         };
 
-        IsReplay = false;
+        CurrentReplay = null;
         try {
             Runner = await QuantumRunner.StartGameAsync(sessionRunnerArguments);
             Runner.Game.AddPlayer(new RuntimePlayer {
@@ -412,7 +434,11 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
             errorTranslationKey = $"{message} ({returnCode})";
         }
 
-        OnError?.Invoke(errorTranslationKey, true);
+        ThrowError(errorTranslationKey, true);
+    }
+
+    public static void ThrowError(string key, bool network) {
+        OnError?.Invoke(key, network);
     }
 
     public void OnJoinRandomFailed(short returnCode, string message) { }
@@ -427,7 +453,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
     private void OnPluginDisconnect(CallbackPluginDisconnect e) {
         Debug.Log($"[Network] Disconnected via server plugin: {e.Reason}");
 
-        OnError?.Invoke(e.Reason, true);
+        ThrowError(e.Reason, true);
 
         if (Runner) {
             Runner.Shutdown(ShutdownCause.SimulationStopped);
@@ -436,6 +462,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
 
     private void OnGameDestroyed(CallbackGameDestroyed e) {
         SaveReplay(e.Game, -1);
+        CurrentReplay = null;
     }
 
     private unsafe void OnRulesChanged(EventRulesChanged e) {
@@ -498,13 +525,20 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
         if (Runner && Runner.IsRunning) {
             await Runner.ShutdownAsync();
         }
+        if (replay.LoadAllIfNeeded() != ReplayParseResult.Success) {
+            return;
+        }
 
-        IsReplay = true;
-        ReplayStart = replay.InitialFrameNumber;
-        ReplayLength = replay.ReplayLengthInFrames;
+        CurrentReplay = replay;
 
         var serializer = new QuantumUnityJsonSerializer();
-        var runtimeConfig = serializer.ConfigFromByteArray<RuntimeConfig>(replay.DecompressedRuntimeConfigData, compressed: true);
+        RuntimeConfig runtimeConfig;
+        try {
+            runtimeConfig = serializer.ConfigFromByteArray<RuntimeConfig>(replay.DecompressedRuntimeConfigData, compressed: false);
+        } catch {
+            // Bodge: support old 1.8 replays that double compressed.
+            runtimeConfig = serializer.ConfigFromByteArray<RuntimeConfig>(replay.DecompressedRuntimeConfigData, compressed: true);
+        }
         var deterministicConfig = DeterministicSessionConfig.FromByteArray(replay.DecompressedDeterministicConfigData);
         var inputStream = new Photon.Deterministic.BitStream(replay.DecompressedInputData);
         var replayInputProvider = new BitStreamReplayInputProvider(inputStream, ReplayEnd);
@@ -534,9 +568,13 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
 
     private unsafe void OnGameStarted(CallbackGameStarted e) {
         Frame f = e.Game.Frames.Verified;
-        if (f.ResolveList(f.Global->BannedPlayerIds).Contains(Client.UserId)) {
-            QuantumRunner.Default.Shutdown(ShutdownCause.SessionError);
-            OnError?.Invoke("ui.error.join.banned", true);
+        var bans = f.ResolveList(f.Global->BannedPlayerIds);
+        foreach (var ban in bans) {
+            if (ban.UserId == Client.UserId) {
+                QuantumRunner.Default.Shutdown(ShutdownCause.SessionError);
+                ThrowError("ui.error.join.banned", true);
+                return;
+            }
         }
     }
 

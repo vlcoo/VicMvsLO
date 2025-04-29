@@ -1,4 +1,6 @@
 using NSMB.Extensions;
+using Photon.Client;
+using Photon.Realtime;
 using Quantum;
 using System;
 using System.Collections;
@@ -7,7 +9,7 @@ using System.Linq;
 using UnityEngine;
 
 namespace NSMB.UI.MainMenu {
-    public class PlayerListHandler : MonoBehaviour {
+    public class PlayerListHandler : MonoBehaviour, IInRoomCallbacks {
 
         //---Events
         public static event Action<int> PlayerAdded;
@@ -42,6 +44,11 @@ namespace NSMB.UI.MainMenu {
         public void OnEnable() {
             // autoRefreshCoroutine = StartCoroutine(AutoUpdateCoroutine());
             ReorderEntries();
+
+            if (NetworkHandler.Client != null) {
+                UpdateLocks();
+                NetworkHandler.Client.AddCallbackTarget(this);
+            }
         }
 
         public void OnDisable() {
@@ -50,6 +57,7 @@ namespace NSMB.UI.MainMenu {
                 StopCoroutine(autoRefreshCoroutine);
                 autoRefreshCoroutine = null;
             }
+            NetworkHandler.Client.RemoveCallbackTarget(this);
         }
 
         public unsafe void PopulatePlayerEntries(Frame f) {
@@ -69,7 +77,7 @@ namespace NSMB.UI.MainMenu {
             }
 
             if (!GetPlayerEntry(player)) {
-                PlayerListEntry newEntry = GetUnusedPlayerEntry();
+                PlayerListEntry newEntry = GetPlayerEntry(PlayerRef.None);
                 newEntry.SetPlayer(f, player);
                 UpdateAllPlayerEntries(f);
 
@@ -101,11 +109,12 @@ namespace NSMB.UI.MainMenu {
         }
 
         public PlayerListEntry GetPlayerEntry(PlayerRef player) {
-            return playerListEntries.FirstOrDefault(ple => ple.player == player);
-        }
-
-        public PlayerListEntry GetUnusedPlayerEntry() {
-            return playerListEntries.FirstOrDefault(ple => ple.player == PlayerRef.None);
+            foreach (var ple in playerListEntries) {
+                if (ple.player == player) {
+                    return ple;
+                }
+            }
+            return null;
         }
 
         public PlayerListEntry GetPlayerEntryAtIndex(int index) {
@@ -148,6 +157,17 @@ namespace NSMB.UI.MainMenu {
             }
         }
 
+        private void UpdateLocks() {
+            if (NetworkHandler.Client.CurrentRoom == null) {
+                return;
+            }
+
+            int maxPlayers = NetworkHandler.Client.CurrentRoom.MaxPlayers;
+            for (int i = 0; i < playerListEntries.Count; i++) {
+                playerListEntries[i].lockImage.gameObject.SetActive(i >= maxPlayers);
+            }
+        }
+
         //---Callbacks
         private void OnPlayerAdded(EventPlayerAdded e) {
             Frame f = e.Game.Frames.Verified;
@@ -180,5 +200,17 @@ namespace NSMB.UI.MainMenu {
         private void OnGameStarted(CallbackGameStarted e) {
             PopulatePlayerEntries(e.Game.Frames.Predicted);
         }
+
+        public void OnPlayerEnteredRoom(Player newPlayer) { }
+
+        public void OnPlayerLeftRoom(Player otherPlayer) { }
+
+        public void OnRoomPropertiesUpdate(PhotonHashtable propertiesThatChanged) {
+            UpdateLocks();
+        }
+
+        public void OnPlayerPropertiesUpdate(Player targetPlayer, PhotonHashtable changedProps) { }
+
+        public void OnMasterClientSwitched(Player newMasterClient) { }
     }
 }

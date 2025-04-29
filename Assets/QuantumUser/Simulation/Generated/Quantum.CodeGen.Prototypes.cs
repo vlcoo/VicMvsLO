@@ -50,6 +50,20 @@ namespace Quantum.Prototypes {
   #endif //;
   
   [System.SerializableAttribute()]
+  [Quantum.Prototypes.Prototype(typeof(Quantum.BannedPlayerInfo))]
+  public unsafe partial class BannedPlayerInfoPrototype : StructPrototype {
+    [MaxStringByteCount(46, "Unicode")]
+    public string Nickname;
+    [MaxStringByteCount(38, "UTF-8")]
+    public string UserId;
+    partial void MaterializeUser(Frame frame, ref Quantum.BannedPlayerInfo result, in PrototypeMaterializationContext context);
+    public void Materialize(Frame frame, ref Quantum.BannedPlayerInfo result, in PrototypeMaterializationContext context = default) {
+        PrototypeValidator.AssignQString(this.Nickname, 48, in context, out result.Nickname);
+        PrototypeValidator.AssignQStringUtf8(this.UserId, 40, in context, out result.UserId);
+        MaterializeUser(frame, ref result, in context);
+    }
+  }
+  [System.SerializableAttribute()]
   [Quantum.Prototypes.Prototype(typeof(Quantum.BetterPhysicsContact))]
   public unsafe partial class BetterPhysicsContactPrototype : StructPrototype {
     public Hit Hit;
@@ -610,6 +624,21 @@ namespace Quantum.Prototypes {
     }
   }
   [System.SerializableAttribute()]
+  [Quantum.Prototypes.Prototype(typeof(Quantum.InteractionInitiator))]
+  public unsafe partial class InteractionInitiatorPrototype : ComponentPrototype<Quantum.InteractionInitiator> {
+    [HideInInspector()]
+    public Int32 _empty_prototype_dummy_field_;
+    partial void MaterializeUser(Frame frame, ref Quantum.InteractionInitiator result, in PrototypeMaterializationContext context);
+    public override Boolean AddToEntity(FrameBase f, EntityRef entity, in PrototypeMaterializationContext context) {
+        Quantum.InteractionInitiator component = default;
+        Materialize((Frame)f, ref component, in context);
+        return f.Set(entity, component) == SetResult.ComponentAdded;
+    }
+    public void Materialize(Frame frame, ref Quantum.InteractionInitiator result, in PrototypeMaterializationContext context = default) {
+        MaterializeUser(frame, ref result, in context);
+    }
+  }
+  [System.SerializableAttribute()]
   [Quantum.Prototypes.Prototype(typeof(Quantum.InvisibleBlock))]
   public unsafe partial class InvisibleBlockPrototype : ComponentPrototype<Quantum.InvisibleBlock> {
     public AssetRef<StageTile> BumpTile;
@@ -773,16 +802,14 @@ namespace Quantum.Prototypes {
     public FPVector2 Normal;
     public FP Distance;
     public Int32 Frame;
-    public Int32 TileX;
-    public Int32 TileY;
+    public Quantum.Prototypes.Vector2IntPrototype Tile;
     public MapEntityId Entity;
     public void Materialize(Frame frame, ref Quantum.PhysicsContact result, in PrototypeMaterializationContext context = default) {
         result.Position = this.Position;
         result.Normal = this.Normal;
         result.Distance = this.Distance;
         result.Frame = this.Frame;
-        result.TileX = this.TileX;
-        result.TileY = this.TileY;
+        this.Tile.Materialize(frame, ref result.Tile, in context);
         PrototypeValidator.FindMapEntity(this.Entity, in context, out result.Entity);
     }
   }
@@ -970,13 +997,13 @@ namespace Quantum.Prototypes {
   [Quantum.Prototypes.Prototype(typeof(Quantum.StageTileInstance))]
   public unsafe partial class StageTileInstancePrototype : StructPrototype {
     public AssetRef<StageTile> Tile;
-    public FP Rotation;
-    public FPVector2 Scale;
+    public UInt16 Rotation;
+    public Quantum.QEnum8<StageTileFlags> Flags;
     partial void MaterializeUser(Frame frame, ref Quantum.StageTileInstance result, in PrototypeMaterializationContext context);
     public void Materialize(Frame frame, ref Quantum.StageTileInstance result, in PrototypeMaterializationContext context = default) {
         result.Tile = this.Tile;
         result.Rotation = this.Rotation;
-        result.Scale = this.Scale;
+        result.Flags = this.Flags;
         MaterializeUser(frame, ref result, in context);
     }
   }

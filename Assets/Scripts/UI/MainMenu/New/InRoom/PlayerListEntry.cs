@@ -25,6 +25,7 @@ namespace NSMB.UI.MainMenu {
         public PlayerRef player;
         public float typingCounter;
         public Button button;
+        public Image lockImage;
         [NonSerialized] public int joinTick = int.MaxValue;
 
         //---Serialized Variables
@@ -116,6 +117,7 @@ namespace NSMB.UI.MainMenu {
             userId = default;
             joinTick = int.MaxValue;
             playerExistsGameObject.SetActive(false);
+            constantNicknameColor = true;
             dropdownOptions.SetActive(false);
         }
 
@@ -157,11 +159,13 @@ namespace NSMB.UI.MainMenu {
             }
 
             int characterIndex = playerData->Character;
-            characterIndex %= GlobalController.Instance.config.CharacterDatas.Length;
-            builder.Append(GlobalController.Instance.config.CharacterDatas[characterIndex].UiString);
+            var allCharacters = f.SimulationConfig.CharacterDatas;
+            characterIndex %= allCharacters.Length;
+            CharacterAsset character = f.FindAsset(allCharacters[characterIndex]);
+            builder.Append(character.UiString);
 
             if (f.Global->Rules.TeamsEnabled && Settings.Instance.GraphicsColorblind && !playerData->ManualSpectator) {
-                TeamAsset team = f.SimulationConfig.Teams[playerData->RequestedTeam];
+                TeamAsset team = f.FindAsset(f.SimulationConfig.Teams[playerData->RequestedTeam]);
                 builder.Append(team.textSpriteColorblindBig);
             }
 
@@ -269,7 +273,7 @@ namespace NSMB.UI.MainMenu {
 
         public unsafe void BanPlayer() {
             QuantumGame game = NetworkHandler.Game;
-            PlayerRef host = QuantumUtils.GetHostPlayer(game.Frames.Predicted, out _);
+            PlayerRef host = game.Frames.Predicted.Global->Host;
             if (game.PlayerIsLocal(host)) {
                 int slot = game.GetLocalPlayerSlots()[game.GetLocalPlayers().IndexOf(host)];
                 game.SendCommand(slot, new CommandBanPlayer {
@@ -281,7 +285,7 @@ namespace NSMB.UI.MainMenu {
 
         public unsafe void KickPlayer() {
             QuantumGame game = NetworkHandler.Game;
-            PlayerRef host = QuantumUtils.GetHostPlayer(game.Frames.Predicted, out _);
+            PlayerRef host = game.Frames.Predicted.Global->Host;
             if (game.PlayerIsLocal(host)) {
                 int slot = game.GetLocalPlayerSlots()[game.GetLocalPlayers().IndexOf(host)];
                 game.SendCommand(slot, new CommandKickPlayer {

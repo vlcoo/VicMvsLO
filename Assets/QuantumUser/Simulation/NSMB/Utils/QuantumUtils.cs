@@ -3,8 +3,6 @@ using Quantum;
 using Quantum.Collections;
 using System;
 using System.Collections.Generic;
-using UnityEngine;
-using Vector2Int = Quantum.Vector2Int;
 
 public static unsafe class QuantumUtils {
 
@@ -58,21 +56,6 @@ public static unsafe class QuantumUtils {
 
         return data;
     }
-
-    public static unsafe PlayerRef GetHostPlayer(Frame f, out PlayerData* data) {
-        var filter = f.Filter<PlayerData>();
-        filter.UseCulling = false;
-        while (filter.NextUnsafe(out _, out PlayerData* playerData)) {
-            if (playerData->IsRoomHost) {
-                data = playerData;
-                return playerData->PlayerRef;
-            }
-        }
-
-        data = null;
-        return PlayerRef.None;
-    }
-
 
     public static SoundEffect GetComboSoundEffect(int combo) {
         return ComboSounds[FPMath.Clamp(combo, 0, ComboSounds.Length - 1)];
@@ -145,11 +128,6 @@ public static unsafe class QuantumUtils {
     }
 
     public static FPVector2 WrapUnityTile(VersusStageData stage, FPVector2 unityTile, out WrapDirection wrapDirection) {
-        if (!stage.IsWrappingLevel) {
-            wrapDirection = WrapDirection.NoWrap;
-            return unityTile;
-        }
-        
         if (unityTile.X < stage.TileOrigin.x) {
             unityTile.X += stage.TileDimensions.x;
             wrapDirection = WrapDirection.Left;
@@ -170,11 +148,6 @@ public static unsafe class QuantumUtils {
     }
 
     public static FPVector2 WrapWorld(VersusStageData stage, FPVector2 worldPos, out WrapDirection wrapDirection) {
-        if (!stage.IsWrappingLevel) {
-            wrapDirection = WrapDirection.NoWrap;
-            return worldPos;
-        }
-        
         if (worldPos.X < stage.StageWorldMin.X) {
             worldPos.X += stage.TileDimensions.x / 2;
             wrapDirection = WrapDirection.Left;
@@ -222,7 +195,7 @@ public static unsafe class QuantumUtils {
         Span<byte> teamStars = stackalloc byte[Constants.MaxPlayers];
         GetTeamStars(f, teamStars);
 
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < Constants.MaxPlayers; i++) {
             byte stars = teamStars[i];
             if (winningTeam == null) {
                 winningTeam = i;
@@ -334,24 +307,11 @@ public static unsafe class QuantumUtils {
         }
 
         FP totalChance = 0;
-        foreach (PowerupAsset powerup in f.SimulationConfig.AllPowerups) {
+        foreach (AssetRef<PowerupAsset> powerupAsset in f.SimulationConfig.AllPowerups) {
+            PowerupAsset powerup = f.FindAsset(powerupAsset);
             if (powerup.State == PowerupState.MegaMushroom && !canSpawnMega) {
                 continue;
             }
-            
-            var ruleChanceMultiplier = (powerup.Type, powerup.State) switch {
-                (PowerupType.Basic, PowerupState.Mushroom) => f.Global->Rules.ChanceMushroom,
-                (PowerupType.Basic, PowerupState.MiniMushroom) => f.Global->Rules.ChanceMiniMushroom,
-                (PowerupType.Basic, PowerupState.FireFlower) => f.Global->Rules.ChanceFireFlower,
-                (PowerupType.Basic, PowerupState.IceFlower) => f.Global->Rules.ChanceIceFlower,
-                (PowerupType.Basic, PowerupState.PropellerMushroom) => f.Global->Rules.ChancePropellerMushroom,
-                (PowerupType.Basic, PowerupState.BlueShell) => f.Global->Rules.ChanceBlueShell,
-                (PowerupType.Basic, PowerupState.HammerSuit) => f.Global->Rules.ChanceHammerSuit,
-                (PowerupType.Basic, PowerupState.MegaMushroom) => f.Global->Rules.ChanceMegaMushroom,
-                (PowerupType.Starman, PowerupState.NoPowerup) => f.Global->Rules.ChanceStarman,
-                _ => 1
-            };
-            if (ruleChanceMultiplier == 0) continue;
 
             if ((powerup.BigPowerup && !big)
                 || (powerup.VerticalPowerup && !vertical)
@@ -364,7 +324,8 @@ public static unsafe class QuantumUtils {
         }
 
         FP rand = mario->RNG.Next(0, totalChance);
-        foreach (PowerupAsset powerup in f.SimulationConfig.AllPowerups) {
+        foreach (AssetRef<PowerupAsset> powerupAsset in f.SimulationConfig.AllPowerups) {
+            PowerupAsset powerup = f.FindAsset(powerupAsset);
             if (powerup.State == PowerupState.MegaMushroom && !canSpawnMega) {
                 continue;
             }
@@ -384,9 +345,8 @@ public static unsafe class QuantumUtils {
 
             rand -= chance;
         }
-        
-        Debug.Log("No powerup - spawning fallback...");
-        return f.SimulationConfig.FallbackPowerup;
+
+        return f.FindAsset(f.SimulationConfig.FallbackPowerup);
     }
 
     public static FP WrappedDistance(Frame f, FPVector2 a, FPVector2 b) {
@@ -542,8 +502,9 @@ public static unsafe class QuantumUtils {
     }
 
     public static PowerupAsset FindPowerupAsset(Frame f, PowerupState state) {
-        foreach (var powerup in f.SimulationConfig.AllPowerups) {
-            if (powerup.State == state) {
+        foreach (var powerupAsset in f.SimulationConfig.AllPowerups) {
+            if (f.TryFindAsset(powerupAsset, out PowerupAsset powerup)
+                && powerup.State == state) {
                 return powerup;
             }
         }

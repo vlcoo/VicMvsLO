@@ -31,6 +31,7 @@ namespace Quantum {
             // Moderation
             factories.Add(new CommandBanPlayer());
             factories.Add(new CommandKickPlayer());
+            factories.Add(new CommandUnbanPlayer());
         }
     }
 }

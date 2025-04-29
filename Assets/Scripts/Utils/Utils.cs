@@ -203,7 +203,7 @@ namespace NSMB.Utils {
                 return spectatorColor;
             }
 
-            Color color = teams[team].color;
+            Color color = f.FindAsset(teams[team]).color;
             Color.RGBToHSV(color, out float hue, out float saturation, out float value);
             return Color.HSVToRGB(hue, saturation * s, value * v);
         }
@@ -281,7 +281,7 @@ namespace NSMB.Utils {
                     byte.Parse(color[3..5], System.Globalization.NumberStyles.HexNumber),
                     byte.Parse(color[5..7], System.Globalization.NumberStyles.HexNumber),
                     255);
-            } else if (color.Equals("rainbow", StringComparison.InvariantCultureIgnoreCase)) {
+            } else if (color == "rainbow".AsSpan()) {
                 constant = false;
                 return GetRainbowColor();
             } else {

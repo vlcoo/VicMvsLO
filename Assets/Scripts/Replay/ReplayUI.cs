@@ -1,18 +1,24 @@
 ﻿using NSMB.Extensions;
+using NSMB.Sound;
 using NSMB.UI.Game;
+using NSMB.UI.Pause;
 using NSMB.Utils;
 using Quantum;
+using System.Collections;
 using System.Reflection;
 using System.Text;
 using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 public class ReplayUI : QuantumSceneViewComponent {
 
+    public bool IsOpen => replayUI.activeSelf;
+
     //---Serialized Variables
-    [SerializeField] private PlayerElements playerElements;
+    [SerializeField] public PlayerElements playerElements;
 
     [SerializeField] private GameObject replayUI, simulatingCanvas;
     [SerializeField] private Transform trackArrow, simulationTargetTrackArrow;
@@ -21,8 +27,15 @@ public class ReplayUI : QuantumSceneViewComponent {
     [SerializeField] private float minTrackX = -180, maxTrackX = 180;
     [SerializeField] private TMP_Text replayTimecode;
     [SerializeField] private TMP_Text replayPauseButton;
-
+    [SerializeField] private CanvasGroup replayCanvasGroup;
     [SerializeField] private InputActionReference mousePositionAction;
+    [SerializeField] private GameObject defaultSelection;
+
+    [SerializeField] private GameObject tabBlocker;
+
+    //---Properties
+    public bool TabOpen => activeTab;
+    public float ReplaySpeed => replaySpeed;
 
     //---Private Variables
     private float replaySpeed = 1;
@@ -31,9 +44,16 @@ public class ReplayUI : QuantumSceneViewComponent {
     private bool draggingArrow;
     private string replayLength;
     private StringBuilder builder = new();
+    private ReplayUITab activeTab;
+    private bool gameEnded;
 
     public void OnValidate() {
         this.SetIfNull(ref playerElements, UnityExtensions.GetComponentType.Parent);
+    }
+
+    public void Start() {
+        QuantumCallback.Subscribe<CallbackGameResynced>(this, OnGameResynced);
+        QuantumEvent.Subscribe<EventGameEnded>(this, OnGameEnded);
     }
 
     public override void OnActivate(Frame f) {
@@ -43,6 +63,7 @@ public class ReplayUI : QuantumSceneViewComponent {
             return;
         }
 
+        replayCanvasGroup.interactable = true;
         replayLength = Utils.SecondsToMinuteSeconds(NetworkHandler.ReplayLength / f.UpdateRate);
         trackArrowText.gameObject.SetActive(false);
         Settings.Controls.UI.Pause.performed += OnPause;
@@ -57,7 +78,8 @@ public class ReplayUI : QuantumSceneViewComponent {
     public void Update() {
         if (NetworkHandler.IsReplayFastForwarding) {
             float update = Time.deltaTime;
-            Frame f = NetworkHandler.Game.Frames.Predicted;
+            var runner = NetworkHandler.Runner;
+            Frame f = runner.Game.Frames.Predicted;
             float maxDelta = (fastForwardDestinationTick - f.Number) * f.DeltaTime.AsFloat;
 
             bool done = update >= maxDelta;
@@ -65,22 +87,39 @@ public class ReplayUI : QuantumSceneViewComponent {
                 update = maxDelta;
             }
 
-            NetworkHandler.Runner.Session.Update(update);
+            runner.Session.Update(update);
 
             if (done) {
                 FinishFastForward();
             }
         }
+
+        GameObject current = EventSystem.current.currentSelectedGameObject;
+        if (!current || !current.activeInHierarchy) {
+            EventSystem.current.SetSelectedGameObject(defaultSelection);
+        }
     }
 
-    private void FinishFastForward() {
+    private unsafe void FinishFastForward() {
         NetworkHandler.IsReplayFastForwarding = false;
         simulatingCanvas.SetActive(false);
         fastForwardDestinationTick = 0;
         Time.captureDeltaTime = 0;
-        Time.timeScale = replayPaused ? 0 : replaySpeed;
+
+        if (gameEnded) {
+            Time.timeScale = 1;
+        } else if (replayPaused) {
+            Time.timeScale = 0;
+        } else {
+            Time.timeScale = replaySpeed;
+        }
+        
         NetworkHandler.Runner.IsSessionUpdateDisabled = false;
         simulationTargetTrackArrow.gameObject.SetActive(false);
+
+        if (NetworkHandler.Game.Frames.Predicted.Global->GameState != GameState.Playing) {
+            FindObjectOfType<LoopingMusicPlayer>().Stop();
+        }
     }
 
     public override void OnUpdateView() {
@@ -103,6 +142,10 @@ public class ReplayUI : QuantumSceneViewComponent {
         newPadding.z = Mathf.Max((1f - bufferPercentage) * width + 8, 16);
         trackBufferMask.padding = newPadding;
 
+        if (draggingArrow && !replayCanvasGroup.interactable) {
+            StopArrowDrag();
+        }
+
         float percentage;
         if (draggingArrow) {
             Vector2 mousePositionPixels = mousePositionAction.action.ReadValue<Vector2>();
@@ -119,9 +162,27 @@ public class ReplayUI : QuantumSceneViewComponent {
         trackArrow.localPosition = new Vector3(percentage * (maxTrackX - minTrackX) + minTrackX, 0, 0);
     }
 
+    public void OpenTab(ReplayUITab tab) {
+        CloseTab();
+        activeTab = tab;
+        tab.gameObject.SetActive(true);
+        tabBlocker.SetActive(true);
+    }
+
+    public void CloseTab() {
+        if (!activeTab) {
+            return;
+        }
+
+        activeTab.gameObject.SetActive(false);
+        activeTab = null;
+        tabBlocker.SetActive(false);
+        PauseMenuManager.UnpauseTime = Time.unscaledTime;
+    }
+
     public bool ToggleReplayControls() {
         replayUI.SetActive(!replayUI.activeSelf);
-        playerElements.spectationUI.SetActive(replayUI.activeSelf);
+        //playerElements.spectationUI.SetActive(replayUI.activeSelf);
         return replayUI.activeSelf;
     }
 
@@ -200,9 +261,26 @@ public class ReplayUI : QuantumSceneViewComponent {
         }
     }
 
-    public void ReplayChangeSpeed(Slider slider) {
+    public void FrameAdvance() {
+        replayPaused = true;
+        Time.timeScale = 0;
+        replayPauseButton.text = "►";
+
+        StartCoroutine(FrameAdvanceCoroutine());
+    }
+
+    private IEnumerator FrameAdvanceCoroutine() {
+        Frame f = NetworkHandler.Game.Frames.Predicted;
+        Time.timeScale = 1;
+        Time.captureDeltaTime = f.DeltaTime.AsFloat;
+        yield return null;
+        Time.timeScale = 0;
+        Time.captureDeltaTime = 0;
+    }
+
+    public void ChangeReplaySpeed(int index) {
         float[] speeds = { 0.25f, 0.5f, 1f, 2f, 4f };
-        replaySpeed = speeds[Mathf.RoundToInt(slider.value)];
+        replaySpeed = speeds[index];
 
         if (!replayPaused) {
             Time.timeScale = replaySpeed;
@@ -210,16 +288,22 @@ public class ReplayUI : QuantumSceneViewComponent {
     }
 
     public void StartArrowDrag() {
-        draggingArrow = true;
-        trackArrowText.gameObject.SetActive(true);
+        if (replayCanvasGroup.interactable) {
+            draggingArrow = true;
+            trackArrowText.gameObject.SetActive(true);
+        }
     }
 
     public void StopArrowDrag() {
-        QuantumRunner runner = NetworkHandler.Runner;
-        Frame f = runner.Game.Frames.Predicted;
-
         draggingArrow = false;
         trackArrowText.gameObject.SetActive(false);
+
+        if (!replayCanvasGroup.interactable) {
+            return;
+        }
+
+        QuantumRunner runner = NetworkHandler.Runner;
+        Frame f = runner.Game.Frames.Predicted;
 
         float newX = Mathf.Clamp(trackArrow.localPosition.x, minTrackX, maxTrackX);
         float percentage = (newX - minTrackX) / (maxTrackX - minTrackX);
@@ -257,6 +341,52 @@ public class ReplayUI : QuantumSceneViewComponent {
             Time.timeScale = 8;
             simulationTargetTrackArrow.position = trackArrow.position;
             simulationTargetTrackArrow.gameObject.SetActive(true);
+        }
+    }
+
+    public void ResetReplay() {
+        QuantumRunner runner = NetworkHandler.Runner;
+        var session = runner.Session;
+
+        // It's a private method. Because of course it is.
+        NetworkHandler.IsReplayFastForwarding = true;
+        var resetMethod = session.GetType().GetMethod("Reset", BindingFlags.NonPublic | BindingFlags.Instance, null, new System.Type[] { typeof(byte[]), typeof(int), typeof(bool) }, null);
+        resetMethod.Invoke(session, new object[] { NetworkHandler.ReplayFrameCache[0], NetworkHandler.ReplayStart, true });
+        NetworkHandler.IsReplayFastForwarding = false;
+
+        // Fix accumulated time applying
+        if (session.AccumulatedTime > 0) {
+            var simulator = session.GetType().GetField("_simulator", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(session);
+            var adjustTimeMethod = simulator.GetType().GetMethod("AdjustClock", BindingFlags.Instance | BindingFlags.Public, null, new System.Type[] { typeof(double) }, null);
+            adjustTimeMethod.Invoke(simulator, new object[] { -session.AccumulatedTime });
+        }
+
+        replayPaused = false;
+        Time.timeScale = replaySpeed;
+    }
+
+    private unsafe void OnGameResynced(CallbackGameResynced e) {
+        if (NetworkHandler.IsReplay) {
+            gameEnded = false;
+            replayCanvasGroup.interactable = true;
+            if (NetworkHandler.IsReplayFastForwarding) {
+                if (e.Game.Frames.Predicted.Global->GameState != GameState.Playing) {
+                    FindObjectOfType<LoopingMusicPlayer>().Stop();
+                }
+            } else {
+                Time.timeScale = replaySpeed;
+            }
+        }
+    }
+
+    private void OnGameEnded(EventGameEnded e) {
+        if (NetworkHandler.IsReplay) {
+            gameEnded = true;
+            replayCanvasGroup.interactable = false;
+            FinishFastForward();
+            replayPaused = false;
+            Time.timeScale = 1;
+            CloseTab();
         }
     }
 
