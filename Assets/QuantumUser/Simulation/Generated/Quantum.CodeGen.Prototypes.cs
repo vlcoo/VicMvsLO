@@ -392,11 +392,16 @@ namespace Quantum.Prototypes {
     public Int32 ChanceMiniMushroom;
     public Int32 ChanceMegaMushroom;
     public Int32 ChanceStarman;
-    public QBoolean MStars;
-    public QBoolean MPlayers;
-    public QBoolean MHost;
-    public QBoolean MIceCubes;
-    public Int32 MTeamTarget;
+    public QBoolean HStars;
+    public QBoolean HPlayers;
+    public QBoolean HHost;
+    public QBoolean HIceCubes;
+    public Int32 HTeamTarget;
+    public QBoolean HStarCount;
+    public QBoolean HLifeCount;
+    public QBoolean HLapCount;
+    public QBoolean HCoinCount;
+    public QBoolean HNicknames;
     partial void MaterializeUser(Frame frame, ref Quantum.GameRules result, in PrototypeMaterializationContext context);
     public void Materialize(Frame frame, ref Quantum.GameRules result, in PrototypeMaterializationContext context = default) {
         result.Stage = this.Stage;
@@ -442,11 +447,16 @@ namespace Quantum.Prototypes {
         result.ChanceMiniMushroom = this.ChanceMiniMushroom;
         result.ChanceMegaMushroom = this.ChanceMegaMushroom;
         result.ChanceStarman = this.ChanceStarman;
-        result.MStars = this.MStars;
-        result.MPlayers = this.MPlayers;
-        result.MHost = this.MHost;
-        result.MIceCubes = this.MIceCubes;
-        result.MTeamTarget = this.MTeamTarget;
+        result.HStars = this.HStars;
+        result.HPlayers = this.HPlayers;
+        result.HHost = this.HHost;
+        result.HIceCubes = this.HIceCubes;
+        result.HTeamTarget = this.HTeamTarget;
+        result.HStarCount = this.HStarCount;
+        result.HLifeCount = this.HLifeCount;
+        result.HLapCount = this.HLapCount;
+        result.HCoinCount = this.HCoinCount;
+        result.HNicknames = this.HNicknames;
         MaterializeUser(frame, ref result, in context);
     }
   }

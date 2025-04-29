@@ -68,11 +68,16 @@ struct GameRules {
     int ChanceMegaMushroom;
     int ChanceStarman;
     
-    bool MStars;
-    bool MPlayers;
-    bool MHost;
-    bool MIceCubes;
-    int MTeamTarget;
+    bool HStars;
+    bool HPlayers;
+    bool HHost;
+    bool HIceCubes;
+    int HTeamTarget;
+    bool HStarCount;
+    bool HLifeCount;
+    bool HLapCount;
+    bool HCoinCount;
+    bool HNicknames;
 }
 
 enum GameState : Byte {

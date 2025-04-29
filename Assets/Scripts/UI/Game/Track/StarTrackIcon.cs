@@ -19,7 +19,7 @@ namespace NSMB.UI.Game.Track {
         public void Start() {
             Frame f = QuantumRunner.DefaultGame.Frames.Predicted;
 
-            image.enabled = f.Global->Rules.MStars;
+            image.enabled = f.Global->Rules.HStars;
             
             var star = f.Unsafe.GetPointer<BigStar>(targetEntity);
             if (star->IsStationary) {

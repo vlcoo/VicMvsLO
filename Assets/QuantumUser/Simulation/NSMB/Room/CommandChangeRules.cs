@@ -31,11 +31,16 @@ namespace Quantum {
         public bool SNoPowerups;
         public bool SShowCoinCount;
 
-        public bool MStars;
-        public bool MPlayers;
-        public bool MHost;
-        public bool MIceCubes;
-        public int MTeamTarget;
+        public bool HStars;
+        public bool HPlayers;
+        public bool HHost;
+        public bool HIceCubes;
+        public int HTeamTarget;
+        public bool HStarCount;
+        public bool HLifeCount;
+        public bool HLapCount;
+        public bool HCoinCount;
+        public bool HNicknames;
 
         public override void Serialize(BitStream stream) {
             uint changes = (uint) EnabledChanges;
@@ -68,11 +73,16 @@ namespace Quantum {
             stream.Serialize(ref SNoPowerups);
             stream.Serialize(ref SShowCoinCount);
             
-            stream.Serialize(ref MStars);
-            stream.Serialize(ref MPlayers);
-            stream.Serialize(ref MHost);
-            stream.Serialize(ref MIceCubes);
-            stream.Serialize(ref MTeamTarget);
+            stream.Serialize(ref HStars);
+            stream.Serialize(ref HPlayers);
+            stream.Serialize(ref HHost);
+            stream.Serialize(ref HIceCubes);
+            stream.Serialize(ref HTeamTarget);
+            stream.Serialize(ref HStarCount);
+            stream.Serialize(ref HLifeCount);
+            stream.Serialize(ref HLapCount);
+            stream.Serialize(ref HCoinCount);
+            stream.Serialize(ref HNicknames);
         }
 
         public unsafe void Execute(Frame f, PlayerRef sender, PlayerData* playerData) {
@@ -115,11 +125,16 @@ namespace Quantum {
             if (rulesChanges.HasFlag(Rules.SNoPowerups)) { rules.SNoPowerups = SNoPowerups; }
             if (rulesChanges.HasFlag(Rules.SShowCoinCount)) { rules.SShowCoinCount = SShowCoinCount; }
             
-            if (rulesChanges.HasFlag(Rules.MStars)) { rules.MStars = MStars; }
-            if (rulesChanges.HasFlag(Rules.MPlayers)) { rules.MPlayers = MPlayers; }
-            if (rulesChanges.HasFlag(Rules.MHost)) { rules.MHost = MHost; }
-            if (rulesChanges.HasFlag(Rules.MIceCubes)) { rules.MIceCubes = MIceCubes; }
-            if (rulesChanges.HasFlag(Rules.MTeamTarget)) { rules.MTeamTarget = MTeamTarget; }
+            if (rulesChanges.HasFlag(Rules.HStars)) { rules.HStars = HStars; }
+            if (rulesChanges.HasFlag(Rules.HPlayers)) { rules.HPlayers = HPlayers; }
+            if (rulesChanges.HasFlag(Rules.HHost)) { rules.HHost = HHost; }
+            if (rulesChanges.HasFlag(Rules.HIceCubes)) { rules.HIceCubes = HIceCubes; }
+            if (rulesChanges.HasFlag(Rules.HTeamTarget)) { rules.HTeamTarget = HTeamTarget; }
+            if (rulesChanges.HasFlag(Rules.HStarCount)) { rules.HStarCount = HStarCount; }
+            if (rulesChanges.HasFlag(Rules.HLifeCount)) { rules.HLifeCount = HLifeCount; }
+            if (rulesChanges.HasFlag(Rules.HLapCount)) { rules.HLapCount = HLapCount; }
+            if (rulesChanges.HasFlag(Rules.HCoinCount)) { rules.HCoinCount = HCoinCount; }
+            if (rulesChanges.HasFlag(Rules.HNicknames)) { rules.HNicknames = HNicknames; }
             
             f.Global->Rules = rules;
             f.Events.RulesChanged(levelChanged);
@@ -129,7 +144,7 @@ namespace Quantum {
             }
         }
 
-        public enum Rules : uint {
+        public enum Rules : ulong {
             Stage = 1 << 0,
             StarsToWin = 1 << 1,
             CoinsForPowerup = 1 << 2,
@@ -155,11 +170,16 @@ namespace Quantum {
             SNoCoins = 1 << 22,
             SNoPowerups = 1 << 23,
             SShowCoinCount = 1 << 24,
-            MStars = 1 << 25,
-            MPlayers = 1 << 26,
-            MHost = 1 << 27,
-            MIceCubes = 1 << 28,
-            MTeamTarget = 1 << 29,
+            HStars = 1 << 25,
+            HPlayers = 1 << 26,
+            HHost = 1 << 27,
+            HIceCubes = 1 << 28,
+            HTeamTarget = 1 << 29,
+            HStarCount = 1 << 30,
+            HLifeCount = 1L << 31,
+            HLapCount = 1L << 32,
+            HCoinCount = 1L << 33,
+            HNicknames = 1L << 34,
         }
     }
 }

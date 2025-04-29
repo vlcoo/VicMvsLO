@@ -54,8 +54,8 @@ public class NumberChangeableRule : ChangeableRule {
         case CommandChangeRules.Rules.TimerSeconds:
             cmd.TimerMinutes = (int) value;
             break;
-        case CommandChangeRules.Rules.MTeamTarget:
-            cmd.MTeamTarget = (int) value;
+        case CommandChangeRules.Rules.HTeamTarget:
+            cmd.HTeamTarget = (int) value;
             break;
         }
 
