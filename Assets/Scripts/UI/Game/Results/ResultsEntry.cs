@@ -30,7 +30,6 @@ public class ResultsEntry : MonoBehaviour {
             usernameText.text = info.Value.Nickname.ToString().ToValidUsername(f, player);
             nicknameColor = info.Value.NicknameColor.ToString();
             usernameText.color = Utils.SampleNicknameColor(nicknameColor, out constantNicknameColor);
-            characterIcon.sprite = f.SimulationConfig.CharacterDatas[info.Value.Character].ReadySprite;
 
             if (stars < 0) {
                 starCountText.text = "<sprite name=hudnumber_x>";

@@ -164,17 +164,6 @@ namespace NSMB.UI.Game {
             }
         }
 
-        private unsafe void ToggleUI(Frame f, bool hidden) {
-            uiHidden = hidden;
-
-            teamsParent.SetActive(!hidden && f.Global->Rules.TeamsEnabled);
-            starsParent.SetActive(!hidden);
-            livesParent.SetActive(!hidden);
-            coinsParent.SetActive(!hidden);
-            timerParent.SetActive(!hidden);
-            lapsParent.SetActive(!hidden);
-        }
-
         private void UpdateStoredItemUI(MarioPlayer* mario, bool playAnimation) {
             PowerupAsset powerup = QuantumUnityDB.GetGlobalAsset(mario->ReserveItem);
             if (previousPowerup == powerup) {
@@ -268,7 +257,7 @@ namespace NSMB.UI.Game {
                 int teamStars = QuantumUtils.GetTeamStars(f, teamIndex);
                 if (cachedTeamStars != teamStars) {
                     cachedTeamStars = teamStars;
-                    TeamAsset team = f.SimulationConfig.Teams[teamIndex];
+                    TeamAsset team = f.FindAsset(f.SimulationConfig.Teams[teamIndex]);
                     uiTeamStars.text = (Settings.Instance.GraphicsColorblind ? team.textSpriteColorblind : team.textSpriteNormal) + Utils.Utils.GetSymbolString("x" + cachedTeamStars + (starsEnabled ? "/" + starRequirement : ""));
                 }
             }

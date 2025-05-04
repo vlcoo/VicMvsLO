@@ -16,7 +16,7 @@ namespace NSMB.Replay {
         private static readonly byte[] MagicBuffer = new byte[MagicHeaderLength];
 
         // Header
-        private const string MagicHeader = "MvLO-RP";
+        private const string MagicHeader = "vcmi-RP";
         public GameVersion Version;
         public long UnixTimestamp;
         public int InitialFrameNumber;

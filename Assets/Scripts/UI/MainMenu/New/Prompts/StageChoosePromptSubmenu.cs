@@ -26,7 +26,7 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
             QuantumGame game = NetworkHandler.Game;
             var allStages = game.Configurations.Simulation.AllStages;
             var selectedStage = allStages.FirstOrDefault(map => 
-                ((VersusStageData)QuantumUnityDB.GetGlobalAsset(map.UserAsset)).LegalEnglishName == stage.LegalEnglishName);
+                ((VersusStageData)QuantumUnityDB.GetGlobalAsset(game.Frames.Predicted.FindAsset(map).UserAsset)).LegalEnglishName == stage.LegalEnglishName);
             
             if (selectedStage == null) {
                 Debug.LogError("Stage not found in allStages");
@@ -39,7 +39,7 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
                 Stage = (AssetRef<Map>)selectedStage,
             };
 
-            var slot = game.GetLocalPlayerSlots()[game.GetLocalPlayers().IndexOf(QuantumUtils.GetHostPlayer(game.Frames.Predicted, out _))];
+            var slot = game.GetLocalPlayerSlots()[game.GetLocalPlayers().IndexOf(game.Frames.Predicted.Global->Host)];
             game.SendCommand(slot, cmd);
             Canvas.GoBack();
         }

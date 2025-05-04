@@ -33,7 +33,7 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
             var game = NetworkHandler.Runner.Game;
             var allCharacters = game.Configurations.Simulation.CharacterDatas;
             var selectedCharacter = allCharacters.IndexOf(chara => 
-                chara.LegalEnglishName == character.LegalEnglishName);
+                game.Frames.Predicted.FindAsset(chara).LegalEnglishName == character.LegalEnglishName);
             foreach (int slot in game.GetLocalPlayerSlots()) {
                 game.SendCommand(slot, new CommandChangePlayerData {
                     EnabledChanges = CommandChangePlayerData.Changes.Character,
@@ -70,7 +70,7 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
             PlayerData* data = QuantumUtils.GetPlayerData(f, e.Player);
             var skins = ScriptableManager.Instance.skins;
             int skinIndex = Mathf.Clamp(data != null ? data->Palette : 0, 0, skins.Length - 1);
-            CharacterAsset characterAsset = config.CharacterDatas[Mathf.Clamp(data->Character, 0, config.CharacterDatas.Length)];
+            CharacterAsset characterAsset = f.FindAsset(config.CharacterDatas[Mathf.Clamp(data->Character, 0, config.CharacterDatas.Length)]);
             currentCharacterPreview = GetCharacterPreview(characterAsset);
             currentPalette = skins[skinIndex];
             currentCharacterPreview.SetVisible(true);

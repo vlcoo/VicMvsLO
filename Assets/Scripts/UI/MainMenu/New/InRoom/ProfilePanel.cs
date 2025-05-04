@@ -56,7 +56,7 @@ namespace NSMB.UI.MainMenu.Submenus {
             currentCharacterIndex = index;
 
             SimulationConfig config = f.SimulationConfig;
-            CharacterAsset characterAsset = config.CharacterDatas[Mathf.Clamp(index, 0, config.CharacterDatas.Length)];
+            CharacterAsset characterAsset = f.FindAsset(config.CharacterDatas[Mathf.Clamp(index, 0, config.CharacterDatas.Length)]);
             paletteChooser.ChangeCharacter(characterAsset);
             characterImage.sprite = characterAsset.ReadySprite;
 

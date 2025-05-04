@@ -59,7 +59,7 @@ namespace NSMB.Loading {
                 }
 
                 var characters = f.SimulationConfig.CharacterDatas;
-                character = characters[characterIndex % characters.Length];
+                character = f.FindAsset(characters[characterIndex % characters.Length]);
             }
 
             mario.Initialize(character);

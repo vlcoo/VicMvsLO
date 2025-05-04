@@ -300,9 +300,10 @@ namespace Quantum
 
         public unsafe void ActGiveXPowerup(Frame f, EntityRef entity, string parameter) {
             if (parameter == "") parameter = "random";
-            PowerupAsset newScriptable = parameter == "random"
-                ? f.SimulationConfig.AllPowerups[f.RNG->Next(0, f.SimulationConfig.AllPowerups.Length)]
-                : f.SimulationConfig.AllPowerups.FirstOrDefault(p => p.State.ToString() == parameter);
+            PowerupAsset newScriptable = f.FindAsset(
+                parameter == "random"
+                    ? f.SimulationConfig.AllPowerups[f.RNG->Next(0, f.SimulationConfig.AllPowerups.Length)]
+                    : f.SimulationConfig.AllPowerups.FirstOrDefault(p => f.FindAsset(p).State.ToString() == parameter));
             if (newScriptable == null) { Err("powerup asset was null!!"); return; }
             PowerupReserveResult result = PowerupSystem.CollectPowerup(f, entity, f.Unsafe.GetPointer<MarioPlayer>(entity), f.Unsafe.GetPointer<PhysicsObject>(entity), newScriptable, true);
             f.Events.MarioPlayerCollectedPowerup(entity, result, newScriptable);
@@ -367,7 +368,7 @@ namespace Quantum
 
         public unsafe void ActSpawnXPowerup(Frame f, EntityRef entity, string parameter) {
             if (parameter == "") parameter = "random";
-            PowerupAsset newScriptable = f.SimulationConfig.AllPowerups.FirstOrDefault(p => p.State.ToString() == parameter);
+            PowerupAsset newScriptable = f.FindAsset(f.SimulationConfig.AllPowerups.FirstOrDefault(p => f.FindAsset(p).State.ToString() == parameter));
             if (newScriptable == null) { Err("powerup asset was null!!"); return; }
             MarioPlayerSystem.SpawnItem(f, entity, f.Unsafe.GetPointer<MarioPlayer>(entity), parameter == "random" ? default : newScriptable.Prefab);
         }
@@ -396,9 +397,10 @@ namespace Quantum
         public unsafe void ActGiveXReserve(Frame f, EntityRef entity, string parameter) {
             if (parameter == "") parameter = "random";
             var mario = f.Unsafe.GetPointer<MarioPlayer>(entity);
-            PowerupAsset newScriptable = parameter == "random"
-                ? f.SimulationConfig.AllPowerups[f.RNG->Next(0, f.SimulationConfig.AllPowerups.Length)]
-                : f.SimulationConfig.AllPowerups.FirstOrDefault(p => p.State.ToString() == parameter);
+            PowerupAsset newScriptable = f.FindAsset(
+                parameter == "random"
+                    ? f.SimulationConfig.AllPowerups[f.RNG->Next(0, f.SimulationConfig.AllPowerups.Length)]
+                    : f.SimulationConfig.AllPowerups.FirstOrDefault(p => f.FindAsset(p).State.ToString() == parameter));
             if (newScriptable == null) { Err("powerup asset was null!!"); return; }
             mario->ReserveItem = newScriptable;
             f.Events.MarioPlayerCollectedPowerup(entity, PowerupReserveResult.ReserveNewPowerup, newScriptable);

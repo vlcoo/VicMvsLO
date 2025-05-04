@@ -68,7 +68,7 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
                 Remove = false,
             };
 
-            var slot = game.GetLocalPlayerSlots()[game.GetLocalPlayers().IndexOf(QuantumUtils.GetHostPlayer(game.Frames.Predicted, out _))];
+            var slot = game.GetLocalPlayerSlots()[game.GetLocalPlayers().IndexOf(game.Frames.Predicted.Global->Host)];
             game.SendCommand(slot, cmd);
         }
         
@@ -80,7 +80,7 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
                 Remove = true,
             };
 
-            var slot = game.GetLocalPlayerSlots()[game.GetLocalPlayers().IndexOf(QuantumUtils.GetHostPlayer(game.Frames.Predicted, out _))];
+            var slot = game.GetLocalPlayerSlots()[game.GetLocalPlayers().IndexOf(game.Frames.Predicted.Global->Host)];
             game.SendCommand(slot, cmd);
         }
         
@@ -101,7 +101,7 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
                 TriggerConstraintTarget = (int)entry.Trigger.ConstraintTarget,
             };
 
-            var slot = game.GetLocalPlayerSlots()[game.GetLocalPlayers().IndexOf(QuantumUtils.GetHostPlayer(game.Frames.Predicted, out _))];
+            var slot = game.GetLocalPlayerSlots()[game.GetLocalPlayers().IndexOf(game.Frames.Predicted.Global->Host)];
             game.SendCommand(slot, cmd);
         }
         
