@@ -31,8 +31,6 @@ namespace Photon.Realtime
     #if SUPPORTED_UNITY
     using UnityEngine;
     using Debug = UnityEngine.Debug;
-    #endif
-    #if SUPPORTED_UNITY || NETFX_CORE
     using SupportClass = Photon.Client.SupportClass;
     #endif
 
@@ -101,7 +99,7 @@ namespace Photon.Realtime
                 }
 
                 this.EnabledRegions.Sort((a, b) => a.Ping.CompareTo(b.Ping));
-                
+
                 // in some locations, clients will get very similar results to various regions.
                 // in those places, it is best to select alphabetical from those with very similar ping.
                 int similarPingCutoff = (int)(this.EnabledRegions[0].Ping * pingSimilarityFactor);
@@ -157,7 +155,7 @@ namespace Photon.Realtime
         }
 
         /// <summary>Initializes the regions of this RegionHandler with values provided from the Name Server (as OperationResponse for OpGetRegions).</summary>
-        public void SetRegions(OperationResponse opGetRegions)
+        public void SetRegions(OperationResponse opGetRegions, RealtimeClient client = null)
         {
             if (opGetRegions.OperationCode != OperationCode.GetRegions)
             {
@@ -173,8 +171,10 @@ namespace Photon.Realtime
             string[] servers = opGetRegions[ParameterCode.Address] as string[];
             if (regions == null || servers == null || regions.Length != servers.Length)
             {
-                //TODO: log error
-                //Debug.LogError("The region arrays from Name Server are not ok. Must be non-null and same length. " + (regions == null) + " " + (servers == null) + "\n" + opGetRegions.ToStringFull());
+                if (client != null)
+                {
+                    Log.Error("RegionHandler.SetRegions() failed. Received regions and servers must be non null and of equal length. Could not read regions.", client.LogLevel, client.LogPrefix);
+                }
                 return;
             }
 
@@ -183,7 +183,13 @@ namespace Photon.Realtime
 
             for (int i = 0; i < regions.Length; i++)
             {
-                Region tmp = new Region(regions[i], servers[i]);
+                string server = servers[i];
+                if (client != null && client.AddressRewriter != null)
+                {
+                    server = client.AddressRewriter(server, ServerConnection.MasterServer);
+                }
+
+                Region tmp = new Region(regions[i], server);
                 if (string.IsNullOrEmpty(tmp.Code))
                 {
                     continue;
@@ -201,10 +207,9 @@ namespace Photon.Realtime
         private int previousPing;
         private string previousSummaryProvided;
 
-
         /// <summary>If the previous Best Region's ping is now higher by this much, ping all regions and find a new Best Region.</summary>
         private float rePingFactor = 1.2f;
-        
+
         /// <summary>How much higher a region's ping can be from the absolute best, to be considered the Best Region (by ping and name).</summary>
         private float pingSimilarityFactor = 1.2f;
 
@@ -541,7 +546,6 @@ namespace Photon.Realtime
             MonoBehaviourEmpty.BuildInstance("RegionPing_" + this.region.Code).StartCoroutineAndDestroy(this.RegionPingCoroutine());
             #else
             bool queued = false;
-            #if !NETFX_CORE
             try
             {
                 queued = ThreadPool.QueueUserWorkItem(o => this.RegionPingThreaded());
@@ -550,14 +554,13 @@ namespace Photon.Realtime
             {
                 queued = false;
             }
-            #endif
+
             if (!queued)
             {
                 Log.Error("RegionPinger.Start() failed. Could not queue region pinging. Please contact us.");
                 return false;
             }
             #endif
-
 
             return true;
         }
@@ -610,9 +613,8 @@ namespace Photon.Realtime
                         // if ping.Done() did not become true in MaxMillisecondsPerPing, ping.Successful is false and we apply MaxMillisecondsPerPing as rtt below
                         break;
                     }
-                    #if !NETFX_CORE
+
                     System.Threading.Thread.Sleep(1);
-                    #endif
                 }
 
 
@@ -624,7 +626,6 @@ namespace Photon.Realtime
                 replyCount++;
                 this.region.Ping = (int)((rttSum) / replyCount);
 
-                #if !NETFX_CORE
                 int i = 4;
                 while (!this.ping.Done() && i > 0)
                 {
@@ -632,7 +633,6 @@ namespace Photon.Realtime
                     System.Threading.Thread.Sleep(100);
                 }
                 System.Threading.Thread.Sleep(10);
-                #endif
             }
 
 

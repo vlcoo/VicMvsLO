@@ -80,7 +80,7 @@ public enum SoundEffect : byte {
     [SoundData("powerup/propellermushroom_spin")] Powerup_PropellerMushroom_Spin = 58,
     [SoundData("powerup/propellermushroom_start")] Powerup_PropellerMushroom_Start = 59,
     [SoundData("powerup/hammer_throw")] Powerup_HammerSuit_Throw = 106, //HARDCODED: DO NOT CHANGE WITHOUT CHANGING POWERUPS SCRIPTABLES
-
+    [SoundData("powerup/hammersuit_bounce")] Powerup_HammerSuit_Bounce = 109,
 
     //UI Sounds / Songs / Jingles
     [SoundData("ui/hurry_up")] UI_HurryUp = 60,
@@ -106,6 +106,7 @@ public enum SoundEffect : byte {
     [SoundData("ui/file_select")] UI_FileSelect = 98,
     [SoundData("ui/chat_keyup")] UI_Chat_KeyUp = 102,
     [SoundData("ui/chat_keydown")] UI_Chat_KeyDown = 103,
+    [SoundData("ui/chat_fulltype")] UI_Chat_FullType = 108,
     [SoundData("ui/chat_send")] UI_Chat_Send = 104,
 
     //World Elements

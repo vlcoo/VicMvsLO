@@ -55,6 +55,11 @@ namespace Quantum {
     [Serializable]
     public struct PhysicsColliderGeneric {
       /// <summary>
+      /// Is this prototype toggled on.
+      /// </summary>
+      [HideInInspector]
+      public bool IsEnabled;
+      /// <summary>
       /// Is the collider a trigger.
       /// </summary>
       [DrawIf(nameof(SourceCollider), 0)]
@@ -62,16 +67,12 @@ namespace Quantum {
       /// <summary>
       /// The physics material to be set on the collider component.
       /// </summary>
-      public AssetRef<PhysicsMaterial> Material;
+      // Keep Quantum namespace here for migration with Unity 6 purposes.
+      public AssetRef<Quantum.PhysicsMaterial> Material;
       /// <summary>
       /// The source collider to be used for the shape.
       /// </summary>
       public Component SourceCollider;
-      /// <summary>
-      /// Is this prototype toggled on.
-      /// </summary>
-      [HideInInspector]
-      public bool IsEnabled;
       /// <summary>
       /// The 2D shape.
       /// </summary>
@@ -272,19 +273,14 @@ namespace Quantum {
     /// <summary>
     /// The transform 2d info.
     /// </summary>
-    [DrawIf("TransformMode", (int)QuantumEntityPrototypeTransformMode.Transform2D, mode: DrawIfMode.Hide)]
     public Transform2DVerticalInfo Transform2DVertical;
     /// <summary>
     /// The physics collider info.
     /// </summary>
-    [DrawIf("TransformMode", (int)QuantumEntityPrototypeTransformMode.None, CompareOperator.NotEqual, DrawIfMode.Hide)]
     public PhysicsColliderGeneric PhysicsCollider;
     /// <summary>
     /// The physics body info.
     /// </summary>
-    [DrawIf("PhysicsCollider.IsTrigger", 0, mode: DrawIfMode.Hide)]
-    [DrawIf("PhysicsCollider.IsEnabled", 1, mode: DrawIfMode.Hide)]
-    [DrawIf("TransformMode", (int)QuantumEntityPrototypeTransformMode.None, CompareOperator.NotEqual, DrawIfMode.Hide)]
     [Tooltip("To enable make sure PhysicsCollider is enabled and not a trigger")]
     public PhysicsBodyGeneric PhysicsBody = new PhysicsBodyGeneric() {
       Config2D = PhysicsBody2D.ConfigFlags.Default,
@@ -302,20 +298,14 @@ namespace Quantum {
     /// <summary>
     /// The pathfinder agent info.
     /// </summary>
-    [DrawIf("TransformMode", (int)QuantumEntityPrototypeTransformMode.None, CompareOperator.NotEqual, DrawIfMode.Hide)]
     public NavMeshPathfinderInfo NavMeshPathfinder;
     /// <summary>
     /// The navmesh steering agent info.
     /// </summary>
-    [DrawIf("NavMeshPathfinder.IsEnabled", 1, mode: DrawIfMode.Hide)]
-    [DrawIf("TransformMode", (int)QuantumEntityPrototypeTransformMode.None, CompareOperator.NotEqual, DrawIfMode.Hide)]
     public NavMeshSteeringAgentInfo NavMeshSteeringAgent;
     /// <summary>
     /// The navmesh avoidance agent info.
     /// </summary>
-    [DrawIf("NavMeshPathfinder.IsEnabled", 1, mode: DrawIfMode.Hide)]
-    [DrawIf("NavMeshSteeringAgent.IsEnabled", 1, mode: DrawIfMode.Hide)]
-    [DrawIf("TransformMode", (int)QuantumEntityPrototypeTransformMode.None, CompareOperator.NotEqual, DrawIfMode.Hide)]
     public NavMeshAvoidanceAgentInfo NavMeshAvoidanceAgent;
     /// <summary>
     /// The entity view asset reference.

@@ -2,8 +2,8 @@ using Photon.Deterministic;
 
 namespace Quantum {
 
-    public unsafe class IceBlockSystem : SystemMainThreadFilterStage<IceBlockSystem.Filter>, ISignalOnThrowHoldable, ISignalOnEntityBumped, ISignalOnBeforeInteraction,
-        ISignalOnBobombExplodeEntity, ISignalOnTryLiquidSplash, ISignalOnEntityChangeUnderwaterState {
+    public unsafe class IceBlockSystem : SystemMainThreadEntityFilter<IceBlock, IceBlockSystem.Filter>, ISignalOnThrowHoldable, ISignalOnEntityBumped,
+        ISignalOnBeforeInteraction, ISignalOnBobombExplodeEntity, ISignalOnTryLiquidSplash, ISignalOnEntityChangeUnderwaterState {
 
         public struct Filter {
             public EntityRef Entity;
@@ -136,7 +136,11 @@ namespace Quantum {
                 if ((iceBlock->IsSliding && iceBlock->FacingRight == rightContact) || mario->IsInShell) {
                     var holdable = f.Unsafe.GetPointer<Holdable>(iceBlockEntity);
                     bool dropStars = !f.Unsafe.TryGetPointer(holdable->PreviousHolder, out MarioPlayer* holderMario) || mario->GetTeam(f) != holderMario->GetTeam(f);
-                    mario->DoKnockback(f, marioEntity, contact.Normal.X > 0, dropStars ? 1 : 0, !dropStars, iceBlockEntity);
+                    bool damaged = mario->DoKnockback(f, marioEntity, contact.Normal.X > 0, dropStars ? 1 : 0, KnockbackStrength.Normal, iceBlockEntity);
+                    if (damaged) {
+                        FPVector2 particlePos = (f.Unsafe.GetPointer<Transform2D>(marioEntity)->Position + f.Unsafe.GetPointer<Transform2D>(iceBlockEntity)->Position) / 2;
+                        f.Events.PlayKnockbackEffect(marioEntity, iceBlockEntity, KnockbackStrength.Normal, particlePos);
+                    }
 
                     Destroy(f, iceBlockEntity, IceBlockBreakReason.HitWall);
                     return;
@@ -213,7 +217,7 @@ namespace Quantum {
             }
         }
 
-        public void OnEntityBumped(Frame f, EntityRef entity, FPVector2 tileWorldPosition, EntityRef blockBump) {
+        public void OnEntityBumped(Frame f, EntityRef entity, FPVector2 tileWorldPosition, EntityRef blockBump, QBoolean fromBelow) {
             if (f.Has<IceBlock>(entity)) {
                 Destroy(f, entity, IceBlockBreakReason.BlockBump);
             }

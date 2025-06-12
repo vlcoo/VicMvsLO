@@ -8,11 +8,12 @@ namespace Quantum {
         public bool IsWallsliding => WallslideLeft || WallslideRight;
         public bool IsCrouchedInShell => CurrentPowerupState == PowerupState.BlueShell && IsCrouching && !IsInShell;
         public bool IsDamageable => !IsStarmanInvincible && DamageInvincibilityFrames == 0;
+        public bool IsInKnockback => CurrentKnockback != KnockbackStrength.None;
 
-        public byte GetTeam(Frame f) {
+        public byte? GetTeam(Frame f) {
             var data = QuantumUtils.GetPlayerData(f, PlayerRef);
             if (data == null) {
-                return 0;
+                return null;
             } else {
                 return (byte) (data->RealTeam % Constants.MaxPlayers);
             }
@@ -69,7 +70,7 @@ namespace Quantum {
                 }
             }
 
-            return (input.Sprint.IsDown || forceHold)
+            return (input.Sprint.IsDown || forceHold || (f.Exists(HeldEntity) && !f.IsPlayerVerifiedOrLocal(PlayerRef)))
                 && !freezable->IsFrozen(f) && CurrentPowerupState != PowerupState.MiniMushroom && !IsSkidding 
                 && !IsInKnockback && KnockbackGetupFrames == 0 && !IsTurnaround && !IsPropellerFlying && !IsSpinnerFlying && !IsCrouching && !IsDead
                 && !IsInShell && !WallslideLeft && !WallslideRight && (f.Exists(item) || physicsObject->IsTouchingGround || JumpState < JumpState.DoubleJump)
@@ -164,7 +165,9 @@ namespace Quantum {
             RespawnFrames = 78;
 
             if ((f.Global->Rules.IsLivesEnabled && QuantumUtils.Decrement(ref Lives)) || Disconnected) {
-                SpawnStars(f, entity, 1);
+                if (stars) {
+                    SpawnStars(f, entity, 1);
+                }
                 DeathAnimationFrames = (Stars > 0) ? (byte) 30 : (byte) 36;
             } else {
                 if (stars) {
@@ -186,10 +189,10 @@ namespace Quantum {
             IsSkidding = false;
             IsTurnaround = false;
             IsGroundpounding = false;
-            IsInKnockback = false;
+            CurrentKnockback = KnockbackStrength.None;
             WallslideRight = false;
             WallslideLeft = false;
-            SwimForceJumpTimer = 0;
+            ForceJumpTimer = 0;
             
             /*
             IsWaterWalking = false;
@@ -356,12 +359,12 @@ namespace Quantum {
             IsCrouching = false;
             IsSliding = false;
             IsTurnaround = false;
-            IsInKnockback = false;
+            CurrentKnockback = KnockbackStrength.None;
             IsGroundpounding = false;
             IsSkidding = false;
             IsInShell = false;
             IsTurnaround = false;
-            SwimForceJumpTimer = 0;
+            ForceJumpTimer = 0;
 
             physicsObject->IsFrozen = true;
             physicsObject->Velocity = FPVector2.Zero;
@@ -377,7 +380,7 @@ namespace Quantum {
             IsRespawning = false;
             DamageInvincibilityFrames = 120;
             CoyoteTimeFrames = 0;
-            SwimForceJumpTimer = 0;
+            ForceJumpTimer = 0;
 
             physicsObject->IsFrozen = false;
             physicsObject->DisableCollision = false;
@@ -386,61 +389,81 @@ namespace Quantum {
             f.Signals.OnMarioPlayerRespawned(entity);
         }
 
-        public void DoKnockback(Frame f, EntityRef entity, bool fromRight, int starsToDrop, bool weak, EntityRef attacker, bool ignoreInvincible = false) {
+        public bool DoKnockback(Frame f, EntityRef entity, bool fromRight, int starsToDrop, KnockbackStrength strength, EntityRef attacker, bool bypassDamageInvincibility = false) {
             var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(entity);
             if (physicsObject->IsUnderwater) {
-                weak = false;
+                strength = KnockbackStrength.Normal;
             }
 
-            if (IsInKnockback && ((IsInWeakKnockback && weak) || !IsInWeakKnockback)) {
-                return;
+            if (IsImmuneFromKnockbackStrength(CurrentKnockback, strength)) {
+                return false;
             }
 
             var freezable = f.Unsafe.GetPointer<Freezable>(entity);
-            if ((!ignoreInvincible && DamageInvincibilityFrames > 0) || f.Exists(CurrentPipe) || (freezable->IsFrozen(f) && freezable->FrozenCubeEntity != attacker) || IsDead || MegaMushroomStartFrames > 0 || MegaMushroomEndFrames > 0) {
-                return;
+            if ((!bypassDamageInvincibility && DamageInvincibilityFrames > 0) || f.Exists(CurrentPipe) || (freezable->IsFrozen(f) && freezable->FrozenCubeEntity != attacker) || IsDead || MegaMushroomStartFrames > 0 || MegaMushroomEndFrames > 0) {
+                return false;
             }
 
-            if (CurrentPowerupState == PowerupState.MiniMushroom && starsToDrop > 1) {
+            if (IsInKnockback) {
+                ResetKnockback(f, entity);
+            }
+
+            if (CurrentPowerupState == PowerupState.MiniMushroom && strength >= KnockbackStrength.Groundpound) {
                 SpawnStars(f, entity, starsToDrop - 1);
                 Powerdown(f, entity, false);
-                return;
+                return true;
             }
 
             if (IsInKnockback || IsInWeakKnockback) {
                 starsToDrop = Math.Min(1, starsToDrop);
             }
 
-            IsInKnockback = true;
-            IsInWeakKnockback = weak;
-            KnockbackWasOriginallyFacingRight = FacingRight;
-            KnockbackTick = f.Number;
-
-            //IsInForwardsKnockback = FacingRight != fromRight;
-            //KnockbackAttacker = attacker;
-
             // Don't go into walls
             var transform = f.Unsafe.GetPointer<Transform2D>(entity);
             var collider = f.Unsafe.GetPointer<PhysicsCollider2D>(entity);
 
-            if (!weak && PhysicsObjectSystem.Raycast((FrameThreadSafe) f, null, transform->Position + collider->Shape.Centroid, fromRight ? FPVector2.Left : FPVector2.Right, FP._0_33, out _)) {
+            /*
+            if (strength > KnockbackStrength.Bump && PhysicsObjectSystem.Raycast((FrameThreadSafe) f, null, transform->Position + collider->Shape.Centroid, fromRight ? FPVector2.Left : FPVector2.Right, FP._0_33, out _)) {
                 fromRight = !fromRight;
             }
+            */
 
-            physicsObject->Velocity = new FPVector2(
-                (fromRight ? -1 : 1) *
-                    ((starsToDrop + 2) / (FP) 3) *
-                    FP._1_50 *
-                    (CurrentPowerupState == PowerupState.MegaMushroom ? 3 : 1) *
-                    (CurrentPowerupState == PowerupState.MiniMushroom ? FP._1_50 : 1) *
-                    (weak ? FP._0_50 : 1),
+            var physics = f.FindAsset(PhysicsAsset);
+            FPVector2 knockbackVelocity = strength switch {
+                KnockbackStrength.Groundpound => new(FP.FromString("8.25") / 2, FP.FromString("3.5")),
+                KnockbackStrength.FireballBump => new(FP.FromString("3.75") / 2, 0),
+                KnockbackStrength.CollisionBump => new(FP.FromString("2.5"), FP.FromString("3.5")),
+                KnockbackStrength.Normal or _ => new(FP.FromString("3.75") / 2, FP.FromString("3.5")),
+            };
+            if (CurrentKnockback == KnockbackStrength.CollisionBump) {
+                knockbackVelocity = FPVector2.Zero;
+            }
+            knockbackVelocity.X *= fromRight ? -1 : 1;
+            if (CurrentPowerupState == PowerupState.MiniMushroom) {
+                knockbackVelocity.X *= physics.KnockbackMiniMultiplier.X;
+                knockbackVelocity.Y *= physics.KnockbackMiniMultiplier.Y;
+            }
 
-                // Don't go upwards if we got hit by a fireball
-                f.Has<Projectile>(attacker) ? 0 : Constants._4_50
-            );
+            bool forceWeak = false;
+            if (freezable->IsFrozen(f)) {
+                strength = KnockbackStrength.FireballBump;
+                forceWeak = true;
+            } else if (strength == KnockbackStrength.FireballBump && !physicsObject->IsTouchingGround) {
+                FacingRight = fromRight;
+                knockbackVelocity.X *= FP._0_75;
+            }
 
-            //IsOnGround = false;
-            //PreviousTickIsOnGround = false;
+            CurrentKnockback = strength;
+            IsInWeakKnockback = forceWeak || (CurrentPowerupState != PowerupState.MegaMushroom && (strength == KnockbackStrength.CollisionBump || (strength == KnockbackStrength.FireballBump && physicsObject->IsTouchingGround)));
+
+            physicsObject->Velocity = knockbackVelocity;
+            physicsObject->IsTouchingGround = false;
+            physicsObject->WasTouchingGround = false;
+            physicsObject->HoverFrames = 0;
+
+            KnockbackWasOriginallyFacingRight = FacingRight;
+            KnockbackTick = f.Number;
+            KnockForwards = FacingRight != fromRight;
             IsInShell = false;
             IsGroundpounding = false;
             IsSpinnerFlying = false;
@@ -452,26 +475,28 @@ namespace Quantum {
             WallslideLeft = WallslideRight = false;
 
             SpawnStars(f, entity, starsToDrop);
-            //HandleLayerState();
-            FPVector2 attackerPosition = default;
-            if (f.Unsafe.TryGetPointer(attacker, out Transform2D* attackerTransform)) {
-                attackerPosition = attackerTransform->Position;
-            }
-            f.Events.MarioPlayerReceivedKnockback(entity, attacker, weak, attackerPosition);
+            return true;
+        }
+
+        private static bool IsImmuneFromKnockbackStrength(KnockbackStrength currentStrength, KnockbackStrength newStrength) {
+            return currentStrength == newStrength
+                || (currentStrength == KnockbackStrength.Groundpound && newStrength == KnockbackStrength.Normal)
+                || (currentStrength == KnockbackStrength.Normal && newStrength == KnockbackStrength.Groundpound);
             f.Signals.OnMarioPlayerReceivedKnockback(entity, attacker, weak ? 0 : (starsToDrop > 1 ? 2 : 1));
         }
 
         public void ResetKnockback(Frame f, EntityRef entity) {
             var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(entity);
+            if (IsInWeakKnockback) {
+                physicsObject->Velocity.X = 0;
+            }
             KnockbackGetupFrames = (byte) (IsInWeakKnockback || physicsObject->IsUnderwater ? 0 : 25);
-            DamageInvincibilityFrames = (byte) (60 + KnockbackGetupFrames);
+            DamageInvincibilityFrames = (byte) (90 + KnockbackGetupFrames);
             ////DoEntityBounce = false;
-            IsInKnockback = false;
+            CurrentKnockback = KnockbackStrength.None;
             IsInWeakKnockback = false;
-            //IsForwardsKnockback = false;
             FacingRight = KnockbackWasOriginallyFacingRight;
-            
-            physicsObject->Velocity.X = 0;
+
         }
 
         public void EnterPipe(Frame f, EntityRef mario, EntityRef pipe) {

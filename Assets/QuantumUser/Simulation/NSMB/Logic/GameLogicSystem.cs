@@ -96,7 +96,6 @@ namespace Quantum {
                     // Now playing
                     f.Global->GameState = GameState.Playing;
                     f.Events.GameStateChanged(GameState.Playing);
-                    f.Global->StartFrame = f.Number;
 
                     var playerDatas = f.Filter<PlayerData>();
                     while (playerDatas.NextUnsafe(out _, out PlayerData* data)) {
@@ -106,9 +105,10 @@ namespace Quantum {
 
                 } else if (f.Global->GameStartFrames == 79) {
                     f.Events.RecordingStarted();
-
+                    
                 } if (f.Global->GameStartFrames == 78) {
                     // Respawn all players and enable systems
+                    f.Global->StartFrame = f.Number;
                     f.SystemEnable<StartDisabledSystemGroup>();
                     f.Signals.OnGameStarting();
                     f.Events.GameStarted();
@@ -170,8 +170,8 @@ namespace Quantum {
                     continue;
                 }
 
-                if (aliveTeam == -1) {
-                    aliveTeam = mario->GetTeam(f);
+                if (aliveTeam == -1 && mario->GetTeam(f) is byte team) {
+                    aliveTeam = team;
                 } else {
                     oneOrNoTeamAlive = false;
                     break;

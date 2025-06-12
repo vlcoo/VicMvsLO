@@ -1,6 +1,7 @@
 using Photon.Deterministic;
 using Quantum;
 using Quantum.Collections;
+using Quantum.Core;
 using System;
 using System.Collections.Generic;
 
@@ -143,7 +144,7 @@ public static unsafe class QuantumUtils {
         return unityTile;
     }
 
-    public static FPVector2 WrapWorld(Frame f, FPVector2 worldPos, out WrapDirection wrapDirection) {
+    public static FPVector2 WrapWorld(FrameBase f, FPVector2 worldPos, out WrapDirection wrapDirection) {
         return WrapWorld(f.FindAsset<VersusStageData>(f.Map.UserAsset), worldPos, out wrapDirection);
     }
 
@@ -192,12 +193,14 @@ public static unsafe class QuantumUtils {
         int? winningTeam = null;
         bool tie = false;
 
-        Span<byte> teamStars = stackalloc byte[Constants.MaxPlayers];
-        GetTeamStars(f, teamStars);
+        Span<short> teamStars = stackalloc short[Constants.MaxPlayers];
+        GetAllTeamsStars(f, teamStars);
 
         for (int i = 0; i < Constants.MaxPlayers; i++) {
-            byte stars = teamStars[i];
-            if (winningTeam == null) {
+            short stars = teamStars[i];
+            if (stars < 0) {
+                continue;
+            } else if (winningTeam == null) {
                 winningTeam = i;
                 winningStars = stars;
                 tie = false;
@@ -229,20 +232,37 @@ public static unsafe class QuantumUtils {
         return result;
     }
 
-    public static void GetTeamStars(Frame f, Span<byte> teamStars) {
+    public static void GetAllTeamsStars(Frame f, Span<short> teamStars) {
         var allPlayers = f.Filter<MarioPlayer>();
         allPlayers.UseCulling = false;
+
+        for (int i = 0; i < teamStars.Length; i++) {
+            teamStars[i] = -1;
+        }
+
         while (allPlayers.NextUnsafe(out _, out MarioPlayer* mario)) {
-            if (mario->Lives <= 0 && f.Global->Rules.IsLivesEnabled) {
+            if (mario->Disconnected || (mario->Lives <= 0 && f.Global->Rules.IsLivesEnabled)) {
+                continue;
+            }
+            if (mario->GetTeam(f) is not byte team) {
                 continue;
             }
 
-            byte team = mario->GetTeam(f);
+            if (teamStars[team] == -1) {
+                teamStars[team] = 0;
+            }
 
             if (team < teamStars.Length) {
                 teamStars[team] += mario->Stars;
             }
         }
+    }
+
+    public static int? GetTeamStars(Frame f, byte? nullableTeam) {
+        if (nullableTeam is not byte team) {
+            return null;
+        }
+        return GetTeamStars(f, team);
     }
 
     public static int GetTeamStars(Frame f, byte team) {
@@ -261,12 +281,12 @@ public static unsafe class QuantumUtils {
         return sum;
     }
 
-    public static byte GetFirstPlaceStars(Frame f) {
-        Span<byte> teamStars = stackalloc byte[Constants.MaxPlayers];
-        GetTeamStars(f, teamStars);
+    public static short GetFirstPlaceStars(Frame f) {
+        Span<short> teamStars = stackalloc short[Constants.MaxPlayers];
+        GetAllTeamsStars(f, teamStars);
 
-        byte max = 0;
-        foreach (byte stars in teamStars) {
+        short max = 0;
+        foreach (short stars in teamStars) {
             if (stars > max) {
                 max = stars;
             }
@@ -281,7 +301,7 @@ public static unsafe class QuantumUtils {
 
         // "Losing" variable based on ln(x+1), x being the # of stars we're behind
 
-        int ourStars = GetTeamStars(f, mario->GetTeam(f));
+        int ourStars = GetTeamStars(f, mario->GetTeam(f)) ?? 0;
         int leaderStars = GetFirstPlaceStars(f);
 
         var rules = f.Global->Rules;

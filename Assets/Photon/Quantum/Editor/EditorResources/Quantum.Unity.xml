@@ -49,86 +49,6 @@
         <member name="M:Quantum.QuantumUnityHostProfiler.EndLastNamedMarker">
             <inheritdoc cref="M:Quantum.Profiling.IHostProfiler.EndLastNamedMarker"/>
         </member>
-        <member name="T:Quantum.QuantumUnityLogger">
-            <summary>
-            A log wrapper around the Quantum static logger to bind to the Unity debug logging.
-            Toggle the LogLevel using `Quantum.Log.LogLevel`. It get's initialized using the defines:
-              QUANTUM_LOGLEVEL_TRACE, QUANTUM_LOGLEVEL_DEBUG, QUANTUM_LOGLEVEL_INFO, QUANTUM_LOGLEVEL_WARN, QUANTUM_LOGLEVEL_ERROR
-            </summary>
-        </member>
-        <member name="F:Quantum.QuantumUnityLogger.NameUnavailableObjectDestroyedLabel">
-            <summary>
-            Customize logged object names for destroyed objects.
-            </summary>
-        </member>
-        <member name="F:Quantum.QuantumUnityLogger.NameUnavailableInWorkerThreadLabel">
-            <summary>
-            Customize logged object names from other threads.
-            </summary>
-        </member>
-        <member name="F:Quantum.QuantumUnityLogger.UseGlobalPrefix">
-            <summary>
-            If true, all messages will be prefixed with [Quantum] tag
-            </summary>
-        </member>
-        <member name="F:Quantum.QuantumUnityLogger.UseColorTags">
-            <summary>
-            If true, some parts of messages will be enclosed with &lt;color&gt; tags.
-            </summary>
-        </member>
-        <member name="F:Quantum.QuantumUnityLogger.AddHashCodePrefix">
-            <summary>
-            If true, each log message that has a source parameter will be prefixed with a hash code of the source object. 
-            </summary>
-        </member>
-        <member name="F:Quantum.QuantumUnityLogger.GlobalPrefixColor">
-            <summary>
-            Color of the global prefix (see <see cref="F:Quantum.QuantumUnityLogger.UseGlobalPrefix"/>).
-            </summary>
-        </member>
-        <member name="F:Quantum.QuantumUnityLogger.MinRandomColor">
-            <summary>
-            Min Random Color
-            </summary>
-        </member>
-        <member name="F:Quantum.QuantumUnityLogger.MaxRandomColor">
-            <summary>
-            Max Random Color
-            </summary>
-        </member>
-        <member name="F:Quantum.QuantumUnityLogger.GlobalPrefix">
-            <summary>
-            A prefix tag added to each log.
-            </summary>
-            
-        </member>
-        <member name="P:Quantum.QuantumUnityLogger.DefinedLogLevel">
-            <summary>
-            Returns the log level defined by QUANTUM_LOGLEVEL_(..) defines.
-            </summary>
-        </member>
-        <member name="M:Quantum.QuantumUnityLogger.#ctor(System.Threading.Thread)">
-            <summary>
-            Create unity logger instance.
-            </summary>
-            <param name="mainThread">The thread used by <see cref="P:Quantum.QuantumUnityLogger.IsInMainThread"/> or <see langword="null"/> to use the current thread.</param>
-        </member>
-        <member name="M:Quantum.QuantumUnityLogger.Log(Quantum.LogType,System.String,Quantum.LogContext@)">
-            <summary>
-            Log a message that will call <see cref="M:UnityEngine.Debug.Log(System.Object,UnityEngine.Object)"/>.
-            </summary>
-            <param name="logType">Log type.</param>
-            <param name="message">The log message.</param>
-            <param name="logContext">The context object or <see langword="null"/>.</param>
-        </member>
-        <member name="M:Quantum.QuantumUnityLogger.LogException(System.Exception,Quantum.LogContext@)">
-            <summary>
-            Log an exception.
-            <para>Tries to force console windows double click to the exception source when UNITY_EDITOR is defined, otherwise will also call <see cref="M:UnityEngine.Debug.LogException(System.Exception,UnityEngine.Object)"/>.</para>
-            </summary>
-            <param name="ex">Exception to log.</param>
-            <param name="logContext">Log context or <see langword="null"/></param>
-        </member>
         <member name="T:Quantum.QuantumMapData">
             <summary>
             Unity component that holds and bakes the map data for a Quantum map from a given scene.
@@ -882,6 +802,14 @@
             Draws gizmos for the Quantum simulation.
             </summary>
         </member>
+        <member name="M:Quantum.QuantumGameGizmos.DrawShape2DGizmo(Quantum.Shape2D,UnityEngine.Vector3,UnityEngine.Quaternion,UnityEngine.Color,System.Single,Quantum.Frame,Quantum.QuantumGizmoStyle)">
+            <inheritdoc cref="M:Quantum.QuantumGameGizmos.DrawShape3DGizmo(Quantum.Shape3D,UnityEngine.Vector3,UnityEngine.Quaternion,UnityEngine.Color,Quantum.QuantumGizmoStyle)"/> 
+        </member>
+        <member name="M:Quantum.QuantumGameGizmos.DrawShape3DGizmo(Quantum.Shape3D,UnityEngine.Vector3,UnityEngine.Quaternion,UnityEngine.Color,Quantum.QuantumGizmoStyle)">
+            <summary>
+            Draws a gizmo of a given shape at the specified position and rotation
+            </summary>
+        </member>
         <member name="M:Quantum.QuantumGameGizmos.InvalidateNavMeshGizmos">
             <summary>
             Invalidates the navmesh gizmos.
@@ -911,6 +839,23 @@
               manually.
               New meshes are created when the region mask changed.
             </summary>
+        </member>
+        <member name="T:Quantum.QuantumLogInitializer">
+            <summary>
+            Initializes the logging system for Quantum. Use <see cref="M:Quantum.QuantumLogInitializer.InitializeUser(Quantum.LogLevel@,Quantum.TraceChannels@)"/> to completely override the log level and trace channels or
+            to provide a custom logger. Use <see cref="M:Quantum.QuantumLogInitializer.InitializeUnityLoggerUser(Quantum.QuantumUnityLogger@)"/> to override default Unity logger settings.
+            </summary>
+        </member>
+        <member name="M:Quantum.QuantumLogInitializer.Initialize">
+            <summary>
+            Initializes the logging system for Quantum. This method is called automatically when the assembly is loaded.
+            </summary>
+        </member>
+        <member name="T:Quantum.QuantumUnityLogger">
+            <inheritdoc/>
+        </member>
+        <member name="M:Quantum.QuantumUnityLogger.#ctor(System.Threading.Thread,System.Boolean)">
+            <inheritdoc/>
         </member>
         <member name="T:Quantum.DebugMesh">
             <summary>
@@ -1285,6 +1230,26 @@
             </summary>
             <param name="value">The info to store.</param>
         </member>
+        <member name="P:Quantum.QuantumGizmoCallbackAttribute.RuntimeOnly">
+            <summary>
+            Should the gizmo be drawn only at runtime.
+            </summary>
+        </member>
+        <member name="P:Quantum.QuantumGizmoCallbackAttribute.FieldName">
+            <summary>
+            The name of the field to draw the gizmo for.
+            </summary>
+        </member>
+        <member name="P:Quantum.QuantumGizmoCallbackAttribute.SelectionValidation">
+            <summary>
+            The name of the method to call to validate the selection.
+            </summary>
+        </member>
+        <member name="M:Quantum.QuantumGizmoCallbackAttribute.#ctor(System.String,System.Boolean,System.String)">
+            <summary>
+            Attribute used to mark a method as a callback for drawing a gizmo in the Unity editor for Quantum user-defined gizmo entries.
+            </summary>
+        </member>
         <member name="T:Quantum.QuantumCallbackHandler_DebugDraw">
             <summary>
             A handler object that registers to Quantum callbacks and draws debug shapes issued from the simulation.
@@ -1605,6 +1570,16 @@
             Is toggled during <see cref="M:Quantum.IQuantumViewComponent.Activate(Quantum.Frame,Quantum.QuantumGame,Quantum.QuantumEntityView)"/> and <see cref="M:Quantum.IQuantumViewComponent.Deactivate"/>."/>
             </summary>
         </member>
+        <member name="P:Quantum.IQuantumViewComponent.IsActiveAndEnabled">
+            <summary>
+            Returns <see cref="P:Quantum.IQuantumViewComponent.IsActive"/>
+            </summary>
+        </member>
+        <member name="P:Quantum.IQuantumViewComponent.IsInitialized">
+            <summary>
+            The initialized state has to kept track of by the view component to not call it multiple times.
+            </summary>
+        </member>
         <member name="T:Quantum.QuantumCallbackHandler_FrameDiffer">
             <summary>
             A handler object to subscribe to Quantum callbacks to open the frame dump differ in builds
@@ -1650,7 +1625,9 @@
         </member>
         <member name="F:Quantum.QuantumEntityView.ManualDisposal">
             <summary>
-            If enabled the QuantumEntityViewUpdater will not destroy (or disable, in case of map entities) this instance, and you are responsible for removing it from the game world yourself.\n\nYou will still receive the OnEntityDestroyed callback.
+            If enabled the QuantumEntityViewUpdater will not destroy (or disable, in case of map entities) this instance.
+            The responsibility to destroy the game object is on the user.
+            The <see cref="F:Quantum.QuantumEntityView.OnEntityDestroyed"/> callback will still be called.
             </summary>
         </member>
         <member name="P:Quantum.QuantumEntityView.ManualDiposal">
@@ -2567,14 +2544,14 @@
             The current input offset.
             </summary>
         </member>
-        <member name="F:Quantum.QuantumStats.ToggleButtonText">
+        <member name="F:Quantum.QuantumStats.ToggleOn">
             <summary>
-            Toggle button text.
+            Active state.
             </summary>
         </member>
-        <member name="F:Quantum.QuantumStats.Toggles">
+        <member name="F:Quantum.QuantumStats.ToggleOff">
             <summary>
-            The UI objects to toggle on/off.
+            Inactive state.
             </summary>
         </member>
         <member name="F:Quantum.QuantumStats.StartEnabled">
@@ -2585,6 +2562,16 @@
         <member name="F:Quantum.QuantumStats.UseCurrentBandwidth">
             <summary>
             Use only the last second to measure <see cref="F:Quantum.QuantumStats.NetworkOut"/> and <see cref="F:Quantum.QuantumStats.NetworkOut"/> instead of the total time.
+            </summary>
+        </member>
+        <member name="F:Quantum.QuantumStats.ShowCompactStats">
+            <summary>
+            Shows frame and ping information on the toggle button.
+            </summary>
+        </member>
+        <member name="F:Quantum.QuantumStats.CompactStatsText">
+            <summary>
+            The text field set when <see cref="F:Quantum.QuantumStats.ShowCompactStats"/> is <see langword="true"/>."/>
             </summary>
         </member>
         <member name="M:Quantum.QuantumStats.ResetNetworkStats">
@@ -2713,6 +2700,21 @@
             A version number that is increased every time an asset is added or removed.
             </summary>
         </member>
+        <member name="M:Quantum.QuantumUnityDB.CreateRuntimeDeterministicGuid(Quantum.AssetObject)">
+            <summary>
+            Returns a deterministic <see cref="T:Quantum.AssetGuid"/> for the given <paramref name="assetObject"/>. Used for adding static assets at runtime to the DB.
+            </summary>
+            <param name="assetObject">The <see cref="T:Quantum.AssetObject"/> generate the <see cref="T:Quantum.AssetGuid"/> for.</param>
+            <returns>The generated <see cref="T:Quantum.AssetGuid"/>.</returns>
+        </member>
+        <member name="M:Quantum.QuantumUnityDB.CreateRuntimeDeterministicGuid(System.String,System.Type)">
+            <summary>
+            Creates a deterministic guid based on the asset name and type.
+            </summary>
+            <param name="assetName"></param>
+            <param name="assetType"></param>
+            <returns></returns>
+        </member>
         <member name="M:Quantum.QuantumUnityDB.AddSource(Quantum.IQuantumAssetObjectSource,Quantum.AssetGuid,System.String)">
             <summary>
             Registers a source for the asset with the given <paramref name="guid"/> and an optional <paramref name="path"/>.
@@ -2741,6 +2743,17 @@
             </summary>
             <param name="guid"></param>
             <returns><c>true</c> if there was a matching source to remove</returns>
+        </member>
+        <member name="M:Quantum.QuantumUnityDB.CreateRuntimeDeterministicGuid(System.String)">
+            <summary>
+            Creates a deterministic GUID based and the provided path.
+            </summary>
+        </member>
+        <member name="M:Quantum.QuantumUnityDB.CreateRuntimeDeterministicGuid``1(System.ReadOnlySpan{``0},System.Int64)">
+            <summary>
+            Creates a deterministic GUID based and the provided data.
+            </summary>
+            <remarks>T.GetHashCode() must be deterministic.</remarks>
         </member>
         <member name="P:Quantum.QuantumUnityDB.Global">
             <summary>
@@ -2991,6 +3004,7 @@
             <summary>
             The base class to inherit entity view components from.
             Entity view components can be used to add features to entity views and gain simple access to all relevant Quantum game API and the Quantum entity.
+            The view component is not updated (OnUpdateView, OnLateUpdateView) if the behaviour has been disabled.
             </summary>
             <typeparam name="T">The type of the custom view context used by this view component. Can be `IQuantumEntityViewContext` if not required.</typeparam>
         </member>
@@ -3025,12 +3039,18 @@
         </member>
         <member name="P:Quantum.QuantumViewComponent`1.IsActive">
             <summary>
-            Is the view component currently activated.
+            Is the view component currently activated and not inside the pool.
+            </summary>
+        </member>
+        <member name="P:Quantum.QuantumViewComponent`1.IsActiveAndEnabled">
+            <summary>
+            Returns <see langword="true"/> if the view component is <see cref="P:Quantum.QuantumViewComponent`1.IsActive"/>, 
+            not null and <see cref="P:UnityEngine.Behaviour.enabled"/> and the gameObject not null and <see cref="P:UnityEngine.GameObject.activeInHierarchy"/>.
             </summary>
         </member>
         <member name="P:Quantum.QuantumViewComponent`1.IsInitialized">
             <summary>
-            Returns true if the view component has been initialized.
+            Returns <see langword="true"/> if the view component has been initialized.
             </summary>
         </member>
         <member name="F:Quantum.QuantumViewComponent`1._game">
@@ -3631,7 +3651,13 @@
         <member name="M:Quantum.QuantumUnityStaticDispatcherAdapter`2.SubscribeManual``1(Quantum.DispatchableHandler{``0},Quantum.DispatchableFilter,System.Boolean)">
             <inheritdoc cref="M:Quantum.DispatcherBase.SubscribeManual``1(Quantum.DispatchableHandler{``0},System.Boolean,Quantum.DispatchableFilter)"/>
         </member>
+        <member name="M:Quantum.QuantumUnityStaticDispatcherAdapter`2.SubscribeManual``1(Quantum.DispatchableHandler{``0},Photon.Deterministic.IDeterministicGame,System.Boolean)">
+            <inheritdoc cref="M:Quantum.DispatcherBase.SubscribeManual``1(Quantum.DispatchableHandler{``0},System.Boolean,Quantum.DispatchableFilter)"/>
+        </member>
         <member name="M:Quantum.QuantumUnityStaticDispatcherAdapter`2.Unsubscribe(Quantum.DispatcherSubscription)">
+            <inheritdoc cref="M:Quantum.DispatcherBase.Unsubscribe(Quantum.DispatcherSubscription)"/>
+        </member>
+        <member name="M:Quantum.QuantumUnityStaticDispatcherAdapter`2.Unsubscribe(Quantum.DispatcherSubscription@)">
             <inheritdoc cref="M:Quantum.DispatcherBase.Unsubscribe(Quantum.DispatcherSubscription)"/>
         </member>
         <member name="M:Quantum.QuantumUnityStaticDispatcherAdapter`2.UnsubscribeListener(System.Object)">
@@ -4369,11 +4395,16 @@
               to a menu scene / game bootstrap).
             </summary>
         </member>
-        <member name="F:Quantum.QuantumRunnerLocalDebug.DeltaTypeType">
+        <member name="F:Quantum.QuantumRunnerLocalDebug.DeltaTimeType">
             <summary>
-            Set the <see cref="F:Quantum.QuantumRunnerLocalDebug.DeltaTypeType" /> to <see cref="F:Quantum.SimulationUpdateTime.EngineDeltaTime" /> to not progress the
+            Set the <see cref="F:Quantum.QuantumRunnerLocalDebug.DeltaTimeType" /> to <see cref="F:Quantum.SimulationUpdateTime.EngineDeltaTime" /> to not progress the
             simulation during break points.
             Has to be set before starting the runner and can only be changed on the runner directly during runtime: <see cref="P:Quantum.SessionRunner.DeltaTimeType"/>.
+            </summary>
+        </member>
+        <member name="P:Quantum.QuantumRunnerLocalDebug.DeltaTypeType">
+            <summary>
+            Use <see cref="F:Quantum.QuantumRunnerLocalDebug.DeltaTimeType" /> instead.
             </summary>
         </member>
         <member name="F:Quantum.QuantumRunnerLocalDebug.RecordingFlags">
@@ -4390,6 +4421,11 @@
         <member name="F:Quantum.QuantumRunnerLocalDebug.RuntimeConfig">
             <summary>
             Configure the RuntimeConfig used for the local simulation.
+            </summary>
+        </member>
+        <member name="F:Quantum.QuantumRunnerLocalDebug.UseRandomSeed">
+            <summary>
+            If set to true, the <see cref="F:Quantum.RuntimeConfig.Seed"/> seed will be set to a random value.
             </summary>
         </member>
         <member name="F:Quantum.QuantumRunnerLocalDebug.SessionConfig">
@@ -4420,11 +4456,6 @@
         <member name="F:Quantum.QuantumRunnerLocalDebug.PreloadAddressables">
             <summary>
             Enabled loading Addressables before simulation start.
-            </summary>
-        </member>
-        <member name="F:Quantum.QuantumRunnerLocalDebug.IsTaskProfilerEnabled">
-            <summary>
-            Enable the Quantum task profiler. Must be set before starting. Works with debug and release Quantum dlls.
             </summary>
         </member>
         <member name="F:Quantum.QuantumRunnerLocalDebug.DynamicAssetDB">
@@ -4985,7 +5016,7 @@
             The shutdown handler used to keep track of disconnect events from the QuantumRunner. Requires a reference to clean up during destruction.
             </summary>
         </member>
-        <member name="P:Quantum.QuantumMultiClientPlayer.DetroyPlayerCallback">
+        <member name="P:Quantum.QuantumMultiClientPlayer.DestroyPlayerCallback">
             <summary>
             The callback to notify the MultiClientRunner class of pressing exit.
             </summary>
@@ -5188,6 +5219,58 @@
         <member name="T:Quantum.QuantumNavMeshDebugDrawer">
             <summary>
             Obsolete script. Navmesh editor gizmos are now rendered with the map.
+            </summary>
+        </member>
+        <member name="T:Quantum.QuantumMenuSceneInfo">
+            <summary>
+            Info asset for creating configurable selectable scenes in the Photon menu.
+            This type was moved to the SDK to simplify adding scenes automatically (e.g. when installing another unity package).
+            </summary>
+        </member>
+        <member name="F:Quantum.QuantumMenuSceneInfo.RuntimeConfig">
+            <summary>
+            When using a menu config the runtime config from the QuantumMenuConnectArgs.RuntimeConfig is always overwritten.
+            </summary>
+        </member>
+        <member name="P:Quantum.QuantumMenuSceneInfo.Map">
+            <summary>
+            Quantum map that is loaded. Must be set.
+            </summary>
+        </member>
+        <member name="P:Quantum.QuantumMenuSceneInfo.SystemsConfig">
+            <summary>
+            Override Quantum systems configuration for this scene. Can be null.
+            If this is set it will overwrite the <see cref="F:Quantum.RuntimeConfig.SystemsConfig"/> settings during the connection sequence.
+            </summary>
+        </member>
+        <member name="F:Quantum.QuantumMenuSceneInfo.Name">
+            <summary>
+            Displayed scene name.
+            </summary>
+        </member>
+        <member name="P:Quantum.QuantumMenuSceneInfo.NameOrSceneName">
+            <summary>
+            Returns either <see cref="F:Quantum.QuantumMenuSceneInfo.Name"/> or <see cref="P:Quantum.QuantumMenuSceneInfo.SceneName"/>.
+            </summary>
+        </member>
+        <member name="F:Quantum.QuantumMenuSceneInfo.ScenePath">
+            <summary>
+            The path to the scene asset.
+            </summary>
+        </member>
+        <member name="P:Quantum.QuantumMenuSceneInfo.SceneName">
+            <summary>
+            Gets the filename of the ScenePath to set as Unity scene to load during connection sequence.
+            </summary>
+        </member>
+        <member name="F:Quantum.QuantumMenuSceneInfo.Preview">
+            <summary>
+            The sprite displayed as scene preview in the scene selection UI.
+            </summary>
+        </member>
+        <member name="F:Quantum.QuantumMenuSceneInfo.IsHidden">
+            <summary>
+            Don't use this scene.
             </summary>
         </member>
         <member name="T:Quantum.QuantumMapLoader">
@@ -5404,10 +5487,24 @@
         </member>
         <member name="M:Quantum.FPMathUtils.ToFPVector3(UnityEngine.Vector3)">
             <summary>
-            Converts a Unity vector3 to a Quantum FPVector3, with each component being rounded towards zero.
+            Converts a Unity Vector3 to a Quantum FPVector3, with each component being rounded towards zero.
             </summary>
             <param name="v">Unity vector3</param>
             <returns>Quantum vector3</returns>
+        </member>
+        <member name="M:Quantum.FPMathUtils.ToVector3Int(Photon.Deterministic.IntVector3)">
+            <summary>
+            Converts a Quantum IntVector3 object to a Unity Vector3Int.
+            </summary>
+            <param name="v">The IntVector3 object to convert.</param>
+            <returns>The converted Unity Vector3Int.</returns>
+        </member>
+        <member name="M:Quantum.FPMathUtils.ToVector2Int(Photon.Deterministic.IntVector2)">
+            <summary>
+            Converts a Quantum IntVector2 into a Unity Vector2Int.
+            </summary>
+            <param name="v">The Quantum IntVector2 to convert.</param>
+            <returns>The converted Unity Vector2Int.</returns>
         </member>
         <member name="M:Quantum.FPMathUtils.ToFPMatrix4X4(UnityEngine.Matrix4x4)">
             <summary>
@@ -5639,7 +5736,7 @@
             interpret large integers as floating point numbers.
             </summary>
             <param name="json">JSON to process</param>
-            <param name="minDigits">Digit threshold to perform the enquoting</param>
+            <param name="minDigits">Digit threshold to perfom the enquoting</param>
             <returns><paramref name="json"/> with long integers enquoted.</returns>
         </member>
         <member name="M:Quantum.JsonUtilityExtensions.ToJsonWithTypeAnnotation(System.Object,Quantum.JsonUtilityExtensions.InstanceIDHandlerDelegate)">
@@ -5819,7 +5916,7 @@
             <summary>
             The view bind behaviour controls when the view is created. For entities on the predicted or entities on the verified frame. 
             Because the verified frame is confirmed by the server this bind behaviour will show local entity views delayed.
-            When using non-verifed it may happen that they get destroyed when the frame is finally confirmed by the server.
+            When using non-verified it may happen that they get destroyed when the frame is finally confirmed by the server.
             </summary>
         </member>
         <member name="F:Quantum.QuantumEntityViewBindBehaviour.NonVerified">
@@ -6519,6 +6616,11 @@
             <param name="tick">Requested frame number</param>
             <returns>True if an object with that frame number was found</returns>
         </member>
+        <member name="T:Quantum.QuantumUnityInputSystemWithLegacyFallback">
+            <summary>
+            This script simplifies the transition between the new Unity Input System and the legacy Input Manager.
+            </summary>
+        </member>
         <member name="T:Quantum.QuantumStaticBoxCollider2D">
             <summary>
             The script will create a static 2D Quantum box collider during map baking.
@@ -6928,6 +7030,11 @@
             A all-purpose physics collider info.
             </summary>
         </member>
+        <member name="F:Quantum.QuantumEntityPrototype.PhysicsColliderGeneric.IsEnabled">
+            <summary>
+            Is this prototype toggled on.
+            </summary>
+        </member>
         <member name="F:Quantum.QuantumEntityPrototype.PhysicsColliderGeneric.IsTrigger">
             <summary>
             Is the collider a trigger.
@@ -6941,11 +7048,6 @@
         <member name="F:Quantum.QuantumEntityPrototype.PhysicsColliderGeneric.SourceCollider">
             <summary>
             The source collider to be used for the shape.
-            </summary>
-        </member>
-        <member name="F:Quantum.QuantumEntityPrototype.PhysicsColliderGeneric.IsEnabled">
-            <summary>
-            Is this prototype toggled on.
             </summary>
         </member>
         <member name="F:Quantum.QuantumEntityPrototype.PhysicsColliderGeneric.Shape2D">
@@ -7734,6 +7836,12 @@
             Allows optional gizmo values to be serialized in the inspector.
             </summary>
         </member>
+        <member name="M:Quantum.OptionalGizmoBool.#ctor(System.Boolean)">
+            <summary>
+            Create a new optional gizmo value with the given value.
+            </summary>
+            <param name="value"></param>
+        </member>
         <member name="P:Quantum.OptionalGizmoBool.HasValue">
             <summary>
             Does this optional value have a value.
@@ -7809,6 +7917,14 @@
             Create a new gizmo entry with the given color.
             </summary>
             <param name="color"></param>
+        </member>
+        <member name="T:Quantum.QuantumUserGizmoEntry">
+            <summary>
+            User defined gizmo entry.
+            </summary>
+        </member>
+        <member name="M:Quantum.QuantumUserGizmoEntry.#ctor(UnityEngine.Color)">
+            <inheritdoc />
         </member>
         <member name="T:Quantum.PhysicsComponentGizmoEntry">
             <summary>
@@ -8132,15 +8248,25 @@
             Open the overlay for the Quantum gizmos.
             </summary>
         </member>
+        <member name="F:Quantum.QuantumLogConstants.DefinedLogLevel">
+            <summary>
+            The log level based on current defines. 
+            </summary>
+        </member>
         <member name="T:Quantum.QuantumRunnerLocalReplay">
             <summary>
             An example of how to start a Quantum replay simulation from a replay file.
             </summary>
         </member>
-        <member name="F:Quantum.QuantumRunnerLocalReplay.DeltaTypeType">
+        <member name="F:Quantum.QuantumRunnerLocalReplay.DeltaTimeType">
             <summary>
-            Set the <see cref="F:Quantum.QuantumRunnerLocalReplay.DeltaTypeType" /> to <see cref="F:Quantum.SimulationUpdateTime.EngineDeltaTime" /> to not progress the
+            Set the <see cref="F:Quantum.QuantumRunnerLocalReplay.DeltaTimeType" /> to <see cref="F:Quantum.SimulationUpdateTime.EngineDeltaTime" /> to not progress the
             simulation time during break points.
+            </summary>
+        </member>
+        <member name="P:Quantum.QuantumRunnerLocalReplay.DeltaTypeType">
+            <summary>
+            Use <see cref="F:Quantum.QuantumRunnerLocalReplay.DeltaTimeType" /> instead.
             </summary>
         </member>
         <member name="F:Quantum.QuantumRunnerLocalReplay.ReplayFile">
@@ -8176,6 +8302,27 @@
         <member name="M:Quantum.QuantumRunnerLocalReplay.Update">
             <summary>
             Unity Update event will update the simulation if a custom <see cref="F:Quantum.QuantumRunnerLocalReplay.SimulationSpeedMultiplier"/> was set.
+            </summary>
+        </member>
+        <member name="T:Quantum.NavmeshRegionImportMode">
+            <summary>
+            How Quantum navmesh regions are imported from the Unity navmesh.
+            </summary>
+        </member>
+        <member name="F:Quantum.NavmeshRegionImportMode.Disabled">
+            <summary>
+            Regions are not imported.
+            </summary>
+        </member>
+        <member name="F:Quantum.NavmeshRegionImportMode.Advanced">
+            <summary>
+            Requires <see cref="T:Quantum.QuantumNavMeshRegion"/> scripts to setup region data to increase the max region count to 64.
+            Supports using different region names for different maps.
+            </summary>
+        </member>
+        <member name="F:Quantum.NavmeshRegionImportMode.Simple">
+            <summary>
+            Uses the Unity NavMesh areas to directly generate regions and use according area names. Limited to 30 different global regions.
             </summary>
         </member>
         <member name="T:Quantum.QuantumNavMesh">
@@ -8274,9 +8421,14 @@
             The agent radius that the navmesh is build for. The value is retrieved from Unity settings when baking in Editor.
             </summary>
         </member>
-        <member name="F:Quantum.QuantumNavMesh.ImportSettings.ImportRegions">
+        <member name="P:Quantum.QuantumNavMesh.ImportSettings.ImportRegions">
             <summary>
             Toggle the Quantum region import.
+            </summary>
+        </member>
+        <member name="F:Quantum.QuantumNavMesh.ImportSettings.ImportRegionMode">
+            <summary>
+            Toggle the region import mode. Default is Simple.
             </summary>
         </member>
         <member name="F:Quantum.QuantumNavMesh.ImportSettings.RegionDetectionMargin">
@@ -8311,6 +8463,16 @@
             <param name="triangles">Mesh triangles collection.</param>
             <param name="reporter">Progress bar.</param>
         </member>
+        <member name="M:Quantum.QuantumNavMesh.ImportUtils.ImportRegionsSimple(Quantum.NavMeshBakeDataTriangle[]@,System.Collections.Generic.List{System.String}@,System.Collections.Generic.Dictionary{System.Int32,System.String},System.Collections.Generic.List{System.Int32},System.Action{System.Single})">
+            <summary>
+            Use the Unity navmesh areas encoded into the Unity navmesh to generate Quantum regions.
+            </summary>
+            <param name="triangles">Imported Navmesh triangles</param>
+            <param name="regionMap">The global region map, will add new regions</param>
+            <param name="unityAreaMap">Map a Unity area id to a area name</param>
+            <param name="regionIncludeList">Include these region ids</param>
+            <param name="reporter">Progress bar</param>
+        </member>
         <member name="M:Quantum.QuantumNavMesh.ImportUtils.ImportRegions(UnityEngine.SceneManagement.Scene,Quantum.QuantumNavMesh.Vertex[]@,Quantum.NavMeshBakeDataTriangle[]@,System.Int32,System.Collections.Generic.List{System.String}@,System.Single)">
             <summary>
             Tries to identify what region individual vertices belong to. Uses the original <see cref="T:Quantum.QuantumNavMeshRegion"/> scripts to cast vertices against.
@@ -8342,6 +8504,11 @@
         <member name="M:Quantum.QuantumNavMesh.ImportUtils.SplitTriangle(Quantum.NavMeshBakeDataTriangle[]@,System.Int32,System.Int32,System.Int32)">
             <summary>
             Splits a triangle into two triangles by inserting a new vertex at the edge between <paramref name="v0"/> and v0 + 1.
+            </summary>
+        </member>
+        <member name="M:Quantum.QuantumNavMesh.CreateUnityNavmeshAreaMap">
+            <summary>
+            Create a dictionary that maps Unity NavMesh area ids to area names.
             </summary>
         </member>
         <member name="M:Quantum.QuantumNavMesh.ImportFromUnity(UnityEngine.SceneManagement.Scene,Quantum.QuantumNavMesh.ImportSettings,System.String)">

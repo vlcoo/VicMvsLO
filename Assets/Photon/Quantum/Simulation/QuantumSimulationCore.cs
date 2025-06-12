@@ -1518,7 +1518,7 @@ namespace Quantum {
             try {
               // create player data
               RuntimePlayerData data;
-              data.ActorId = game.Session.GameMode == DeterministicGameMode.Replay ? 0 : BitConverter.ToInt32(rpc, 0);
+              data.ActorId = BitConverter.ToInt32(rpc, 0);
               data.PlayerSlot = BitConverter.ToInt32(rpc, 4);
               data.Player = Context.AssetSerializer.PlayerFromByteArray<RuntimePlayer>(rpc, 8, rpc.Length - 8, compressed: true);
 
@@ -2534,6 +2534,7 @@ namespace Quantum {
         { typeof(CallbackLocalPlayerRemoveConfirmed), CallbackLocalPlayerRemoveConfirmed.ID },
         { typeof(CallbackLocalPlayerAddFailed), CallbackLocalPlayerAddFailed.ID },
         { typeof(CallbackLocalPlayerRemoveFailed), CallbackLocalPlayerRemoveFailed.ID },
+        { typeof(CallbackTaskProfilerReportGenerated), CallbackTaskProfilerReportGenerated.ID },
       };
     }
 
@@ -2553,6 +2554,11 @@ namespace Quantum {
     /// <returns>True if the callback has been handled by any subscriber</returns>
     public bool Publish(CallbackBase e) {
       return base.InvokeMeta(e.ID, e);
+    }
+    
+    /// <inheritdoc cref="ICallbackDispatcher.HasAnyListeners"/>
+    public bool HasAnyListeners(CallbackBase e) {
+      return base.HasAnyActiveListeners(e.ID, e);
     }
   }
 }
@@ -2787,11 +2793,17 @@ namespace Quantum {
   /// <para>Access and method to this class is always safe from the clients point of view.</para>
   /// </summary>
   public unsafe partial class QuantumGame : IDeterministicGame {
+    
     /// <summary>
     /// A callback that is invoked after the <see cref="IDeterministicGame.OnSimulate"/> callback.
     /// It uses the <see cref="FrameContext.ProfilerContext"/> to create a report.
     /// </summary>
-    public event Action<ProfilerContextData> ProfilerSampleGenerated;
+    [Obsolete("Non functional, use " + nameof(CallbackTaskProfilerReportGenerated) + " instead", true)]
+    [LastSupportedVersion("3.0")]
+    public event Action<ProfilerContextData> ProfilerSampleGenerated {
+      add {}
+      remove { }
+    }
 
     /// <summary>
     /// Stores the different frames the simulation uses during one tick.
@@ -3148,7 +3160,6 @@ namespace Quantum {
         args.ResourceManager = _resourceManager;
         args.InitialDynamicAssets = _initialDynamicAssets;
         args.UseSharedChecksumSerialized = (_flags & QuantumGameFlags.DisableSharedChecksumSerializer) != QuantumGameFlags.DisableSharedChecksumSerializer;
-        args.IsTaskProfilerEnabled = (_flags & QuantumGameFlags.EnableTaskProfiler) == QuantumGameFlags.EnableTaskProfiler;
 
         // toggle various parts of the context code
         args.UsePhysics2D = _systemsAll.FirstOrDefault(x => x is PhysicsSystem2D) != null;
@@ -3308,12 +3319,13 @@ namespace Quantum {
       using var profilerScope = HostProfiler.Markers.OnSimulate.Start();
 
       var f = (Frame)state;
-
+      
       try {
         // reset profiling
+        var isTaskProfilerEnabled = _callbackDispatcher?.HasAnyListeners(_callbackTaskProfilerReportGenerated) ?? false;
         Profiler profiler;
         using (HostProfiler.Markers.OnSimulateInitProfiler.Start()) {
-          f.Context.ProfilerContext.Reset();
+          f.Context.ProfilerContext.Reset(isTaskProfilerEnabled);
           profiler = f.Context.ProfilerContext.GetProfilerForTaskThread(0);
         }
 
@@ -3342,7 +3354,7 @@ namespace Quantum {
               try {
                 handle = _systemsRoot[i].OnSchedule(f, handle);
               } catch (Exception exn) {
-                LogSimulationException(exn);
+                Log.Exception("## Simulation Code Threw Exception ##", exn);
               }
             }
           }
@@ -3357,10 +3369,14 @@ namespace Quantum {
         } catch (Exception exn) {
           Log.Exception(exn);
         }
-
-        if (ProfilerSampleGenerated != null) {
-          var data = f.Context.ProfilerContext.CreateReport(f.Number, f.IsVerified);
-          ProfilerSampleGenerated(data);
+        
+        if (isTaskProfilerEnabled) {
+          _callbackTaskProfilerReportGenerated.Report = f.Context.ProfilerContext.CreateReport(f.Number, f.IsVerified);
+          try {
+            _callbackDispatcher.Publish(_callbackTaskProfilerReportGenerated);
+          } finally {
+            _callbackTaskProfilerReportGenerated.Report = default;
+          }
         }
 
 #if PROFILER_FRAME_AVERAGE
@@ -3368,7 +3384,7 @@ namespace Quantum {
       Log.Info("Frame Average: " +  f.Context.ProfilerContext.GetFrameTimeAverage());
 #endif
       } catch (Exception exn) {
-        LogSimulationException(exn);
+        Log.Exception("## Simulation Code Threw Exception ##", exn);
       }
     }
 
@@ -3573,7 +3589,7 @@ namespace Quantum {
               f.Unsafe.CommitAllCommands();
             }
           } catch (Exception exn) {
-            LogSimulationException(exn);
+            Log.Exception("## Simulation Code Threw Exception ##", exn);
           }
         }
 
@@ -3590,14 +3606,14 @@ namespace Quantum {
                 f.Unsafe.CommitAllCommands();
               }
             } catch (Exception exn) {
-              LogSimulationException(exn);
+              Log.Exception("## Simulation Code Threw Exception ##", exn);
             }
           }
         }
 
         f.Context.OnFrameSimulationEnd();
       } catch (Exception e) {
-        LogSimulationException(e);
+        Log.Exception("## Simulation Code Threw Exception ##", e);
       }
     }
 
@@ -3656,11 +3672,7 @@ namespace Quantum {
         return false;
       }
     }
-
-    void LogSimulationException(Exception exn) {
-      Log.Exception("## Simulation Code Threw Exception ##", exn);
-    }
-
+    
     /// <summary>
     /// Creates information send to the server when detecting a checksum error.
     /// </summary>
@@ -4278,6 +4290,10 @@ namespace Quantum {
     /// Callback when removing a local player failed.
     /// </summary>
     PlayerRemoveFailed,
+    /// <summary>
+    /// Callback when profiler report has been generated.
+    /// </summary>
+    ProfilerReportGenerated,
     /// <summary>
     /// A tag where user callbacks can start.
     /// </summary>
@@ -4897,6 +4913,23 @@ namespace Quantum {
     public string Message;
   }
 
+  /// <summary>
+  /// Callback when <see cref="ProfilerContextData"/> has been generated.
+  /// </summary>
+  public sealed class CallbackTaskProfilerReportGenerated : QuantumGame.CallbackBase {
+    /// <summary>
+    /// The const CallbackProfilerReportGenerated callback id.
+    /// </summary>
+    public new const Int32 ID = (int)CallbackId.ProfilerReportGenerated;
+
+    internal CallbackTaskProfilerReportGenerated(QuantumGame game) : base(ID, game) { }
+
+    /// <summary>
+    /// The profiler report.
+    /// </summary>
+    public ProfilerContextData Report;
+  }
+  
   partial class QuantumGame {
     /// <summary>
     /// The base class of Quantum callbacks.
@@ -4966,6 +4999,7 @@ namespace Quantum {
     private CallbackLocalPlayerRemoveConfirmed _callbackLocalPlayerRemoveConfirmed;
     private CallbackLocalPlayerAddFailed _callbackLocalPlayerAddFailed;
     private CallbackLocalPlayerRemoveFailed _callbackLocalPlayerRemoveFailed;
+    private CallbackTaskProfilerReportGenerated _callbackTaskProfilerReportGenerated;
 
     /// <summary>
     /// Initializes all callbacks.
@@ -4989,6 +5023,7 @@ namespace Quantum {
       _callbackLocalPlayerRemoveConfirmed = new CallbackLocalPlayerRemoveConfirmed(this);
       _callbackLocalPlayerAddFailed = new CallbackLocalPlayerAddFailed(this);
       _callbackLocalPlayerRemoveFailed = new CallbackLocalPlayerRemoveFailed(this);
+      _callbackTaskProfilerReportGenerated = new CallbackTaskProfilerReportGenerated(this);
     }
 
 
@@ -5223,6 +5258,8 @@ namespace Quantum {
 #region Assets/Photon/Quantum/Simulation/Game/QuantumGameFlags.cs
 
 namespace Quantum {
+  using System;
+
   /// <summary>
   /// This class contains values for flags that will be accessible with <see cref="QuantumGame.GameFlags"/>.
   /// Built-in flags control some aspects of QuantumGame inner workings, without affecting the simulation
@@ -5252,6 +5289,7 @@ namespace Quantum {
     /// <summary>
     /// Set this flag to enables the Quantum task profiler in debug or release configurations.
     /// </summary>
+    [Obsolete("No longer used")]
     public const int EnableTaskProfiler = 1 << 3;
     /// <summary>
     /// Custom user flags start from this value. Flags are accessible with <see cref="QuantumGame.GameFlags"/>.
@@ -5471,7 +5509,7 @@ namespace Quantum {
           if (!_loadedAllStatics) {
             // console first
             if (logInitForConsole) {
-              Log.InitForConsole();
+              Log.InitializeForConsole(new LogSettings(LogLevel.Info, default));
             }
 
             // try to figure out platform if not set
@@ -6914,7 +6952,7 @@ namespace Quantum {
 #endregion
 
 
-#region Assets/Photon/Quantum/Simulation/Runner/DotNetSessionRunner.cs
+#region Assets/Photon/Quantum/Simulation/Runner/DotNetSessionContext.cs
 
 namespace Quantum {
   using System;
@@ -6922,16 +6960,14 @@ namespace Quantum {
   using Photon.Deterministic;
 
   /// <summary>
-  /// This class implements the <see cref="IDeterministicSessionRunner"/> interface and contains code to glue together the Quantum server and Quantum session runner.
-  /// This was formerly part of the Quantum Server SDK.
+  /// This class implements the <see cref="IDeterministicSessionContext"/> interface inside the simulation project.
+  /// It's used on the custom server to access Quantum simulation code like the resource manager and command serialization.
+  /// A static resource manager is created during Init() that is shared between multiple server simulation instances.
   /// </summary>
-  public class DotNetSessionRunner : IDeterministicSessionRunner {
+  public class DotNetSessionContext : IDeterministicSessionContext {
     static ResourceManagerStatic _sharedResourceManager;
     static Object _lock = new Object();
-    CallbackDispatcher _callbackDispatcher;
-    EventDispatcher _eventDispatcher;
-    SessionRunner _runner;
-    IDisposable _eventSubscriptionGameResult;
+    DeterministicCommandSerializer _commandSerializer;
 
     /// <summary>
     /// Get and set the AssetSerializer directly after <see cref="IDeterministicSessionRunner"/> creation, until it is possible to pass it internally.
@@ -6945,30 +6981,26 @@ namespace Quantum {
     public ResourceManagerStatic CustomResourceManager { get; set; }
 
     /// <summary>
-    /// Grants access to the Quantum session runner.
+    /// Returns the command serializer created when the simulation started.
     /// </summary>
-    public SessionRunner Runner => _runner;
+    public DeterministicCommandSerializer CommandSerializer => _commandSerializer;
 
     /// <summary>
-    /// Access Quantum events.
+    /// Access the shared resource manager that was created from the asset database input during the initial creation of the first server instance.
     /// </summary>
-    public object EventDispatcher => _eventDispatcher;
+    public IResourceManager SharedResourceManager => _sharedResourceManager;
 
     /// <summary>
-    /// Access Quantum callbacks.
+    /// Return the resource manager assigned to the session context. 
+    /// If no custom resource manager is assigned the static shared resource manager is returned.
     /// </summary>
-    public object CallbackDispatcher => _callbackDispatcher;
-
-    /// <summary>
-    /// Callback raised on game result events from the simulation.
-    /// </summary>
-    public Action<byte[]> OnGameResult { get; set; }
+    public object ResourceManager => CustomResourceManager ?? _sharedResourceManager;
 
     /// <summary>
     /// Initialized the server simulation. It initializes static classes like FPLut, Native.Utils and instantiates a static resource manager that is shared over multiple server simulations.
     /// This method throws exceptions on errors.
     /// </summary>
-    public void Init(DeterministicSessionRunnerInitArguments args) {
+    public void Init(DeterministicSessionContextInitArguments args) {
       AssetSerializer ??= (IAssetSerializer)args.AssetSerializer;
       Assert.Always(AssetSerializer != null, "AssetSerializer required");
 
@@ -7020,12 +7052,111 @@ namespace Quantum {
     /// Disposes the Quantum runner.
     /// </summary>
     public void Shutdown() {
+      _commandSerializer = null;
+    }
+
+
+    /// <summary>
+    /// Implements the start of the Quantum online session. Instantiates a Quantum runner.
+    /// </summary>
+    /// <param name="args">Start arguments</param>
+    public void Start(DeterministicSessionContextStartArguments args) {
+      var resourceManager = ResourceManager as ResourceManagerStatic;
+      var runtimeConfig = AssetSerializer.ConfigFromByteArray<RuntimeConfig>(args.RuntimeConfig, compressed: true);
+
+      var simulationConfig = (SimulationConfig)resourceManager.GetAsset(runtimeConfig.SimulationConfig.Id);
+      if (simulationConfig != null) {
+        _commandSerializer = new DeterministicCommandSerializer();
+        _commandSerializer.RegisterFactories(DeterministicCommandSetup.GetCommandFactories(runtimeConfig, simulationConfig));
+        _commandSerializer.CommandSerializerStreamRead.Reading = true;
+        _commandSerializer.CommandSerializerStreamWrite.Writing = true;
+      } else {
+        Log.Warn($"Could not create command serializer, simulation config {runtimeConfig.SimulationConfig.Id} not found.");
+      }
+    }
+  }
+}
+
+
+#endregion
+
+
+#region Assets/Photon/Quantum/Simulation/Runner/DotNetSessionRunner.cs
+
+namespace Quantum {
+  using System;
+  using Photon.Deterministic;
+
+  /// <summary>
+  /// This class implements the <see cref="IDeterministicSessionRunner"/> interface and contains code to glue together the Quantum server and Quantum session runner.
+  /// This was formerly part of the Quantum Server SDK.
+  /// The class will also work without running the server simulation only as wrapper for access to custom simulation code as resource manager and command serialization for example.
+  /// </summary>
+  public class DotNetSessionRunner : IDeterministicSessionRunner {
+    CallbackDispatcher _callbackDispatcher;
+    EventDispatcher _eventDispatcher;
+    SessionRunner _runner;
+    IDisposable _eventSubscriptionGameResult;
+    DynamicAssetDB _dynamicAssetDB;
+
+    /// <summary>
+    /// Get and set the AssetSerializer directly after <see cref="IDeterministicSessionRunner"/> creation, until it is possible to pass it internally.
+    /// </summary>
+    public IAssetSerializer AssetSerializer { get; set; }
+
+    /// <summary>
+    /// Access the initial dynamic asset db, gets created after <see cref="AddInitialDynamicAsset(AssetObject)"/> was used.
+    /// Will be disposed and nulled after <see cref="Start(DeterministicSessionRunnerStartArguments)"/>.
+    /// </summary>
+    public DynamicAssetDB InitialDynamicAssetDB => _dynamicAssetDB;
+
+    /// <summary>
+    /// Grants access to the Quantum session runner.
+    /// </summary>
+    public SessionRunner Runner => _runner;
+
+    /// <summary>
+    /// Access Quantum events.
+    /// </summary>
+    public object EventDispatcher => _eventDispatcher;
+
+    /// <summary>
+    /// Access Quantum callbacks.
+    /// </summary>
+    public object CallbackDispatcher => _callbackDispatcher;
+
+    /// <summary>
+    /// Callback raised on game result events from the simulation.
+    /// </summary>
+    public Action<byte[]> OnGameResult { get; set; }
+
+    /// <summary>
+    /// Add an initial dynamic asset. Needs to be performed before the simulation starts. Use DeterministicServer.OnDeterministicSessionCanStart().
+    /// </summary>
+    /// <param name="asset">Asset to add to initial dynamic asset db.</param>
+    /// <returns>Guid of the asset or invalid guid when the simulation has already been started.</returns>
+    public AssetGuid AddInitialDynamicAsset(AssetObject asset) {
+      if (_runner != null) {
+        return AssetGuid.Invalid;
+      }
+
+      _dynamicAssetDB ??= new DynamicAssetDB(DotNetRunnerFactory.CreateNativeAllocator());
+
+      return _dynamicAssetDB.AddAsset(asset);
+    }
+
+    /// <summary>
+    /// Disposes the Quantum runner.
+    /// </summary>
+    public void Shutdown() {
       _eventSubscriptionGameResult?.Dispose();
       _eventSubscriptionGameResult = null;
       _eventDispatcher?.Clear();
       _eventDispatcher = null;
       _callbackDispatcher?.Clear();
       _callbackDispatcher = null;
+      _dynamicAssetDB?.Dispose();
+      _dynamicAssetDB = null;
 
       if (_runner == null) {
         return;
@@ -7041,6 +7172,8 @@ namespace Quantum {
     /// </summary>
     /// <param name="args">Start arguments</param>
     public void Start(DeterministicSessionRunnerStartArguments args) {
+      Assert.Always(AssetSerializer != null, "AssetSerializer required");
+
       var gameFlags = 0;
       // tag the server sim as Server (notably to receive game events that target the server and not receive events that target the client exclusively)
       gameFlags |= QuantumGameFlags.Server;
@@ -7054,7 +7187,7 @@ namespace Quantum {
         RunnerFactory = new DotNetRunnerFactory(),
         TaskRunner = new InactiveTaskRunner(), // force the server simulation to run in single thread (scales better)
         AssetSerializer = AssetSerializer,
-        ResourceManager = CustomResourceManager ?? _sharedResourceManager,
+        ResourceManager = args.ResourceManager as ResourceManagerStatic,
         CallbackDispatcher = _callbackDispatcher,
         EventDispatcher = _eventDispatcher,
         ReplayProvider = args.InputProvider,
@@ -7062,9 +7195,15 @@ namespace Quantum {
         SessionConfig = args.SessionConfig,
         GameMode = DeterministicGameMode.Replay,
         GameFlags = gameFlags,
+        InitialDynamicAssets = _dynamicAssetDB,
       });
 
+      // Register to the game result to be able to fire the OnGameResult callback.
       _eventSubscriptionGameResult = _eventDispatcher.SubscribeManual((EventGameResult e) => OnGameResultEvent(e));
+
+      // clear the initial dynamic asset argument right away, not used anymore.
+      _dynamicAssetDB?.Dispose();
+      _dynamicAssetDB = null;
     }
 
     private void OnGameResultEvent(EventGameResult e) {
@@ -7119,6 +7258,7 @@ namespace Quantum {
       data = _runner.Session.FramePredicted.Serialize(DeterministicFrameSerializeMode.Serialize);
       return true;
     }
+
   }
 }
 

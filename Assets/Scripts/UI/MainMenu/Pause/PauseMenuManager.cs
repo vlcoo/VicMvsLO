@@ -34,6 +34,7 @@ namespace NSMB.UI.Pause {
         private int selected;
         private bool skipSound;
         private bool isHost;
+        private float pauseTime;
 
         private bool isInConfirmation;
         private bool isInConfirmationYesSelected;
@@ -96,6 +97,7 @@ namespace NSMB.UI.Pause {
             if (playSound) {
                 GlobalController.Instance.PlaySound(SoundEffect.UI_Pause);
             }
+            pauseTime = Time.unscaledTime;
         }
 
         public void Unpause(bool playSound) {
@@ -131,9 +133,10 @@ namespace NSMB.UI.Pause {
 
             Vector2 input = context.ReadValue<Vector2>();
             if (isInConfirmation) {
-                if (input.x < 0.2f) {
+                bool rtl = GlobalController.Instance.translationManager.RightToLeft;
+                if ((!rtl && input.x < 0.2f) || (rtl && input.x > 0.2f)) {
                     SelectConfirmYes(true);
-                } else if (input.x > 0.2f) {
+                } else if ((!rtl && input.x > 0.2f) || (rtl && input.x < 0.2f)) {
                     SelectConfirmNo(true);
                 }
                 return;
@@ -169,7 +172,7 @@ namespace NSMB.UI.Pause {
         }
 
         public void OnCancel(InputAction.CallbackContext context) {
-            if (!isPaused) {
+            if (!isPaused || pauseTime == Time.unscaledTime) {
                 return;
             }
 

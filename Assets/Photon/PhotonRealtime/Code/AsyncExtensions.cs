@@ -1,4 +1,4 @@
-﻿// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // <copyright company="Exit Games GmbH">
 // Photon Realtime API - Copyright (C) 2022 Exit Games GmbH
 // </copyright>
@@ -6,10 +6,10 @@
 // <author>developer@photonengine.com</author>
 // -----------------------------------------------------------------------------
 
-
 #if UNITY_2017_4_OR_NEWER
 #define SUPPORTED_UNITY
 #endif
+
 
 namespace Photon.Realtime
 {

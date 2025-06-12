@@ -351,6 +351,13 @@
             <param name="player">The reference to the player being added.</param>
             <param name="firstTime">Indicates if this is the first time the player is added.</param>
         </member>
+        <member name="M:Quantum.Asteroids.AsteroidsPlayerSystem.OnPlayerDisconnected(Quantum.Frame,Quantum.PlayerRef)">
+            <summary>
+            Called when a new player is disconnected. This callback handles the ship destruction.
+            </summary>
+            <param name="f">The game frame.</param>
+            <param name="player">The reference to the player being desconnected.</param>
+        </member>
         <member name="T:Quantum.SystemMainThreadFilter`1">
              <summary>
              This type of system uses a FilterStruct of type T to filter a set of entities based on it, 
@@ -430,6 +437,9 @@
             <param name="e"></param>
             <returns>True if the callback has been handled by any subscriber</returns>
         </member>
+        <member name="M:Quantum.CallbackDispatcher.HasAnyListeners(Quantum.CallbackBase)">
+            <inheritdoc cref="M:Quantum.ICallbackDispatcher.HasAnyListeners(Quantum.CallbackBase)"/>
+        </member>
         <member name="F:Quantum.ShutdownCause.Ok">
             <summary>
             Expected shutdown
@@ -491,6 +501,7 @@
             <summary>
             This class implements the <see cref="T:Photon.Deterministic.IDeterministicSessionRunner"/> interface and contains code to glue together the Quantum server and Quantum session runner.
             This was formerly part of the Quantum Server SDK.
+            The class will also work without running the server simulation only as wrapper for access to custom simulation code as resource manager and command serialization for example.
             </summary>
         </member>
         <member name="P:Quantum.DotNetSessionRunner.AssetSerializer">
@@ -498,10 +509,10 @@
             Get and set the AssetSerializer directly after <see cref="T:Photon.Deterministic.IDeterministicSessionRunner"/> creation, until it is possible to pass it internally.
             </summary>
         </member>
-        <member name="P:Quantum.DotNetSessionRunner.CustomResourceManager">
+        <member name="P:Quantum.DotNetSessionRunner.InitialDynamicAssetDB">
             <summary>
-            Assign a custom resource manager which will use the cached static resource manager as <see cref="P:Quantum.ResourceManagerStatic.FallbackResourceManager"/>.
-            Must be set right after creation.
+            Access the initial dynamic asset db, gets created after <see cref="M:Quantum.DotNetSessionRunner.AddInitialDynamicAsset(Quantum.AssetObject)"/> was used.
+            Will be disposed and nulled after <see cref="M:Quantum.DotNetSessionRunner.Start(Photon.Deterministic.DeterministicSessionRunnerStartArguments)"/>.
             </summary>
         </member>
         <member name="P:Quantum.DotNetSessionRunner.Runner">
@@ -524,11 +535,12 @@
             Callback raised on game result events from the simulation.
             </summary>
         </member>
-        <member name="M:Quantum.DotNetSessionRunner.Init(Photon.Deterministic.DeterministicSessionRunnerInitArguments)">
+        <member name="M:Quantum.DotNetSessionRunner.AddInitialDynamicAsset(Quantum.AssetObject)">
             <summary>
-            Initialized the server simulation. It initializes static classes like FPLut, Native.Utils and instantiates a static resource manager that is shared over multiple server simulations.
-            This method throws exceptions on errors.
+            Add an initial dynamic asset. Needs to be performed before the simulation starts. Use DeterministicServer.OnDeterministicSessionCanStart().
             </summary>
+            <param name="asset">Asset to add to initial dynamic asset db.</param>
+            <returns>Guid of the asset or invalid guid when the simulation has already been started.</returns>
         </member>
         <member name="M:Quantum.DotNetSessionRunner.Shutdown">
             <summary>
@@ -3294,6 +3306,11 @@
             Callback when removing a local player failed.
             </summary>
         </member>
+        <member name="F:Quantum.CallbackId.ProfilerReportGenerated">
+            <summary>
+            Callback when profiler report has been generated.
+            </summary>
+        </member>
         <member name="F:Quantum.CallbackId.UserCallbackIdStart">
             <summary>
             A tag where user callbacks can start.
@@ -3705,6 +3722,21 @@
         <member name="F:Quantum.CallbackLocalPlayerRemoveFailed.Message">
             <summary>
             The error debug message.
+            </summary>
+        </member>
+        <member name="T:Quantum.CallbackTaskProfilerReportGenerated">
+            <summary>
+            Callback when <see cref="T:Quantum.Profiling.ProfilerContextData"/> has been generated.
+            </summary>
+        </member>
+        <member name="F:Quantum.CallbackTaskProfilerReportGenerated.ID">
+            <summary>
+            The const CallbackProfilerReportGenerated callback id.
+            </summary>
+        </member>
+        <member name="F:Quantum.CallbackTaskProfilerReportGenerated.Report">
+            <summary>
+            The profiler report.
             </summary>
         </member>
         <member name="T:Quantum.ISignalOnCollision2D">
@@ -4409,6 +4441,57 @@
             </summary>
             <param name="frame"></param>
             <returns></returns>
+        </member>
+        <member name="T:Quantum.DotNetSessionContext">
+            <summary>
+            This class implements the <see cref="T:Photon.Deterministic.IDeterministicSessionContext"/> interface inside the simulation project.
+            It's used on the custom server to access Quantum simulation code like the resource manager and command serialization.
+            A static resource manager is created during Init() that is shared between multiple server simulation instances.
+            </summary>
+        </member>
+        <member name="P:Quantum.DotNetSessionContext.AssetSerializer">
+            <summary>
+            Get and set the AssetSerializer directly after <see cref="T:Photon.Deterministic.IDeterministicSessionRunner"/> creation, until it is possible to pass it internally.
+            </summary>
+        </member>
+        <member name="P:Quantum.DotNetSessionContext.CustomResourceManager">
+            <summary>
+            Assign a custom resource manager which will use the cached static resource manager as <see cref="P:Quantum.ResourceManagerStatic.FallbackResourceManager"/>.
+            Must be set right after creation.
+            </summary>
+        </member>
+        <member name="P:Quantum.DotNetSessionContext.CommandSerializer">
+            <summary>
+            Returns the command serializer created when the simulation started.
+            </summary>
+        </member>
+        <member name="P:Quantum.DotNetSessionContext.SharedResourceManager">
+            <summary>
+            Access the shared resource manager that was created from the asset database input during the initial creation of the first server instance.
+            </summary>
+        </member>
+        <member name="P:Quantum.DotNetSessionContext.ResourceManager">
+            <summary>
+            Return the resource manager assigned to the session context. 
+            If no custom resource manager is assigned the static shared resource manager is returned.
+            </summary>
+        </member>
+        <member name="M:Quantum.DotNetSessionContext.Init(Photon.Deterministic.DeterministicSessionContextInitArguments)">
+            <summary>
+            Initialized the server simulation. It initializes static classes like FPLut, Native.Utils and instantiates a static resource manager that is shared over multiple server simulations.
+            This method throws exceptions on errors.
+            </summary>
+        </member>
+        <member name="M:Quantum.DotNetSessionContext.Shutdown">
+            <summary>
+            Disposes the Quantum runner.
+            </summary>
+        </member>
+        <member name="M:Quantum.DotNetSessionContext.Start(Photon.Deterministic.DeterministicSessionContextStartArguments)">
+            <summary>
+            Implements the start of the Quantum online session. Instantiates a Quantum runner.
+            </summary>
+            <param name="args">Start arguments</param>
         </member>
         <member name="T:Quantum.ISignalOnComponentAdded`1">
             <inheritdoc cref="M:Quantum.ISignalOnComponentAdded`1.OnAdded(Quantum.Frame,Quantum.EntityRef,`0*)"/>

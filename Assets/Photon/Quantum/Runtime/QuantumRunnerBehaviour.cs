@@ -41,7 +41,7 @@ namespace Quantum {
       OnPostRenderInternal(camera);
     }
 
-    void OnPostRenderInternal( Camera camera) {
+    void OnPostRenderInternal(Camera camera) {
       if (Runner == null) {
         return;
       }
@@ -54,6 +54,16 @@ namespace Quantum {
         return;
       }
 
+#if UNITY_EDITOR
+      if (UnityEditor.Handles.ShouldRenderGizmos() == false) {
+        return;
+      }
+
+      if (QuantumGameGizmosSettingsScriptableObject.Global.Settings.DebugDraw.Enabled == false) {
+        return;
+      }
+#endif
+      
       DebugDraw.OnPostRender(camera);
     }
   }

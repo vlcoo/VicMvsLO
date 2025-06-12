@@ -20,7 +20,7 @@ public class VersusStageGizmos : MonoBehaviour {
     }
 
     public unsafe void OnDrawGizmos() {
-        if (!mapData || !mapData.Asset) {
+        if (!mapData) {
             return;
         }
 

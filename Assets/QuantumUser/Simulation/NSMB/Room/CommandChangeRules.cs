@@ -145,6 +145,7 @@ namespace Quantum {
         }
 
         public enum Rules : uint {
+            None = 0,
             Stage = 1 << 0,
             StarsToWin = 1 << 1,
             CoinsForPowerup = 1 << 2,

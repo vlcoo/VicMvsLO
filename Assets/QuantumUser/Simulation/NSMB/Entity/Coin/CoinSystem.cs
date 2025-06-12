@@ -31,6 +31,7 @@ namespace Quantum {
                 if (QuantumUtils.Decrement(ref coin->Lifetime)
                     || filter.Transform->Position.Y < stage.StageWorldMin.Y) {
 
+                    f.Events.CollectableDespawned(entity, filter.Transform->Position, false);
                     f.Destroy(entity);
                     return;
                 }
@@ -104,6 +105,7 @@ namespace Quantum {
                 coinInteractable->ColliderDisabled = true;
                 f.Events.CoinChangeCollected(coinEntity, *coin, true);
             } else {
+                f.Events.CollectableDespawned(coinEntity, coinTransform->Position, true);
                 f.Destroy(coinEntity);
             }
         }
@@ -122,7 +124,7 @@ namespace Quantum {
             f.Events.MarioPlayerCollectedCoin(marioEntity, *mario, newCoins, item, worldLocation, fromBlock, downwards);
         }
 
-        public void OnEntityBumped(Frame f, EntityRef entity, FPVector2 position, EntityRef bumpOwner) {
+        public void OnEntityBumped(Frame f, EntityRef entity, FPVector2 position, EntityRef bumpOwner, QBoolean fromBelow) {
             if (!f.Unsafe.TryGetPointer(entity, out Coin* coin)
                 || !f.Unsafe.TryGetPointer(entity, out Transform2D* transform)
                 || coin->IsCollected) {
@@ -147,8 +149,7 @@ namespace Quantum {
         }
 
         public void OnEntityCrushed(Frame f, EntityRef entity) {
-            if (f.Unsafe.TryGetPointer(entity, out Coin* coin)
-                && !coin->IsFloating) {
+            if (f.Unsafe.TryGetPointer(entity, out Coin* coin) && !coin->IsFloating) {
                 coin->Lifetime = 0;
             }
         }

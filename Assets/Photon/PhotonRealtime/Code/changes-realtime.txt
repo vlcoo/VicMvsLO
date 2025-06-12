@@ -3,6 +3,38 @@ Photon Realtime C# Client - Changelog
 www.photonengine.com  -  Join our Discord Server: https://dashboard.photonengine.com/account/profile
 
 
+Version 5.1.2 (19. November 2024 - rev7770)
+    Changed: IConnectionCallbacks.OnConnected() and the related callback message OnConnectedMsg are now obsolete and no longer called. Both will be removed in a later version.
+    Note: Use OnConnectedToMaster instead. To confirm the client connected in a debug scenario, check the debug log level output.
+	
+	Added: Warning log to RealtimeFallback() about lack of service calls.
+	Added: DisconnectCause.ClientServiceInactivity used after the KeepAliveInBackground.
+	Changed: ConnectionHandler.DisconnectAfterKeepAlive is now obsolete. After the KeepAliveInBackground, the client will disconnect with DisconnectCause.ClientServiceInactivity.
+	Changed: Protocol Fallback. Any fallback is only done towards WSS (when another protocol fails). Unlike before, a fallback is done when the initial connection to a Name Server or Master Server fails. 
+	Note: WSS is commonly used on the Name Server connection (due to AuthOnceWss), so the initial UDP connection attempt is on the Master Server. This can fallback now, too.
+
+Version 5.1.1 (22. Oktober 2024 - rev7739)
+    Changed: Disconnect() is now separate from the internally used Disconnect(DisconnectCause cause). Simplifies the public API.
+    Fixed: Internally used CheckIfClientIsReadyToCallOperation() conditions for JoinRandomGame, FindFriends, GetGameList, GetLobbyStats and JoinLobby, which are allowed while in a lobby.
+    Changed: Player.InternalCacheProperties and RoomInfo.InternalCacheProperties to strip entries with null-values. A server plugin might delete keys by sending them with null-values.
+    Changed: OnRoomPropertiesUpdateMsg now has "changedProps" (like OnPlayerPropertiesUpdateMsg has).
+    Changed: OnRoomPropertiesUpdateMsg.propertiesThatChanged is obsolete.
+
+Version 5.1.0 (01. Oktober 2024 - rev7714)
+    Added: Support for Discord Activities.
+    Added: RealtimeClient.AddressRewriter function. Useful to rewrite addresses, when some relay must be used (e.g. in case of Discord Activities). Used when setting server addresses.
+    Internal: Added optional parameter to SetRegions to pass RealtimeClient. If AddressRewriter is set, this calls it. Also used to log.
+    Added: ToProtocolAddress to format addresses correctly for the given protocol. This includes scheme where needed, port and path. Calls AddressRewriter if set.
+    Internal: GetNameServerAddress now uses ToProtocolAddress.
+    Changed: EnableProtocolFallback will only fall back to WSS, if it is not yet in use (to not compromise security).
+    Changed: ReplacePortWithAlternative has a null check for the address and 0 check for the port. It is now the same in v4 and v5. Removed third parameter.
+    Removed: Usage of NETFX_CORE define.
+    Changed: The Authenticate response on the Name Server will first apply the expected protocol for the Master Server connection. Then read the address and maybe rewrite it.
+	Removed: Unity special cases of using SocketUdpAsync / SocketTcpAsync for .Net 4.x for Mono specifically. Recent Unity versions (2019 tested) no longer run into issues with receiving data in blocking mode.
+
+Version 5.0.11 (28. August 2024 - rev7655)
+    No notable changes.
+
 Version 5.0.10 (10 July 2024 - rev7627)
     Fixed: EventBetter now assignes an instance to EventBetterWorker.EventBetterInstance.
     Changed: Player.UpdateNickNameOnJoined() avoids sending the NickName if it is empty and also not found in the props.

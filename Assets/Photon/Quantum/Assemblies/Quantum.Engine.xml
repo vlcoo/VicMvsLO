@@ -794,6 +794,11 @@
             The bit that indicates that the AssetGuid is dynamic (reserved for DynamicAssetDB assets).
             </summary>
         </member>
+        <member name="F:Quantum.AssetGuid.RuntimeBit">
+            <summary>
+            The bit that indicates that the AssetGuid is runtime generated.
+            </summary>
+        </member>
         <member name="F:Quantum.AssetGuid.ReservedBits">
             <summary>
             The reserved bits of the AssetGuid.
@@ -822,6 +827,16 @@
         <member name="P:Quantum.AssetGuid.IsDynamic">
             <summary>
             Returns <see langword="true"/> if the AssetGuid is valid and dynamic (reserved for DynamicAssetDB assets).
+            </summary>
+        </member>
+        <member name="P:Quantum.AssetGuid.IsRuntimeGenerated">
+            <summary>
+            Returns <see langword="true"/> if the AssetGuid is valid and runtime generated.
+            </summary>
+        </member>
+        <member name="P:Quantum.AssetGuid.Type">
+            <summary>
+            Type of the guid.
             </summary>
         </member>
         <member name="M:Quantum.AssetGuid.#ctor(System.Int64)">
@@ -921,6 +936,31 @@
             <param name="result">When this method returns, contains the parsed AssetGuid if the parsing succeeded, or default if the parsing failed.</param>
             <param name="includeBrackets">Indicates whether the string representation includes brackets.</param>
             <returns><see langword="true"/> if the parsing succeeded; otherwise, <see langword="false"/>.</returns>
+        </member>
+        <member name="T:Quantum.AssetGuidType">
+            <summary>
+            Type of <see cref="T:Quantum.AssetGuid"/>.
+            </summary>
+        </member>
+        <member name="F:Quantum.AssetGuidType.Default">
+            <summary>
+            Static asset, guid is known before simulation starts. 
+            </summary>
+        </member>
+        <member name="F:Quantum.AssetGuidType.RuntimeGenerated">
+            <summary>
+            Static asset, guid is generated at runtime.
+            </summary>
+        </member>
+        <member name="F:Quantum.AssetGuidType.DynamicSequential">
+            <summary>
+            Dynamic asset, value has been sequentially generated. Not meant to be used directly.
+            </summary>
+        </member>
+        <member name="F:Quantum.AssetGuidType.DynamicExplicit">
+            <summary>
+            Dynamic asset, value has been precalculated.
+            </summary>
         </member>
         <member name="T:Quantum.AssetObject">
             <summary>
@@ -1963,9 +2003,11 @@
         <member name="M:Quantum.NavMesh.FindClosestTriangleFast(Photon.Deterministic.FPVector3,Quantum.NavMeshRegionMask)">
             <summary>
             Searches the closest triangle to the input position by using the fallback triangle saved for each grid cell. Result is quite inaccurate.
+            To use this API the navmesh generation must generate fallback triangles enabled by setting to something else than <see cref="F:Quantum.NavMeshBakeDataFindClosestTriangle.None"/>.
             </summary>
             <param name="position">Input position</param>
             <param name="regionMask">Triangle regions are checked if they are active</param>
+            <remarks>This is only available if the NavMesh has been baked with the option to calculate the center grid.</remarks>
             <returns><see langword="true"/> if a triangle was found </returns>
         </member>
         <member name="M:Quantum.NavMesh.FindRandomPointOnTriangle(System.Int32,Photon.Deterministic.RNGSession*,Photon.Deterministic.FPVector3@)">
@@ -2561,6 +2603,13 @@
             <param name="asset">The asset to add.</param>
             <returns>The AssetGuid assigned to the added asset.</returns>
         </member>
+        <member name="M:Quantum.DynamicAssetDB.AddAsset(Quantum.AssetObject,Quantum.AssetGuid)">
+            <summary>
+            Adds an asset to the DynamicAssetDB and assigns it a passed AssetGuid.
+            </summary>
+            <param name="asset">The asset to add.</param>
+            <param name="guid">The AssetGuid to be assigned to the added asset. Needs to be of <see cref="F:Quantum.AssetGuidType.DynamicExplicit"/> type.</param>
+        </member>
         <member name="M:Quantum.DynamicAssetDB.AddAssetWithValidDynamicGuid(Quantum.AssetObject)">
             <summary>
             Adds an asset to the DynamicAssetDB with a valid dynamic AssetGuid. Does
@@ -2657,13 +2706,6 @@
             <summary>
             If <see cref="F:Quantum.DynamicAssetDB.IsLegacyModeEnabled"/> is disabled, invokes <see cref="M:Quantum.AssetObject.Disposed(Quantum.IResourceManager,Photon.Deterministic.Native.Allocator)"/> on all assets.
             </summary>
-        </member>
-        <member name="M:Quantum.DynamicAssetDB.StripDynamicFlag(Quantum.AssetGuid)">
-            <summary>
-            Strips the dynamic flag from the specified AssetGuid.
-            </summary>
-            <param name="guid">The AssetGuid to strip the dynamic flag from.</param>
-            <returns>The AssetGuid with the dynamic flag stripped.</returns>
         </member>
         <member name="T:Quantum.IResourceManager">
             <summary>
@@ -3339,6 +3381,11 @@
             none of the fields that use this type will be included in the prototype.
             </summary>
         </member>
+        <member name="T:Quantum.Core.OnlyInPrototypeAttribute">
+            <summary>
+            Applied on a field prevents it being emit into state object.
+            </summary>
+        </member>
         <member name="T:Quantum.Core.FixedBufferDynamicLengthAttribute">
             <summary>
             Points to a field that contains the length of a fixed buffer in bytes. If used, the CodeGen will generate
@@ -3800,6 +3847,22 @@
             var assetId = f.AddAsset(material);
             </code></example>
         </member>
+        <member name="M:Quantum.Core.FrameBase.AddAsset(Quantum.AssetObject,Quantum.AssetGuid)">
+            <summary>
+            Adds a dynamic asset to the frame with a guid know ahead of time.
+            Dynamic Asset DB assigns Guids for dynamic assets, so <paramref name="asset"/> can not
+            have <see cref="P:Quantum.AssetObject.Guid"/> set before calling this method.
+            </summary>
+            <param name="asset">Asset object</param>
+            <param name="guid">A guid to be assigned. Needs to be of <see cref="F:Quantum.AssetGuidType.DynamicExplicit"/> type</param>
+            <example><code>
+            PhysicsMaterial material = new PhysicsMaterial {
+              Restitution = 1,
+              FrictionCombineFunction = PhysicsCombineFunction.Average,
+              RestitutionCombineFunction = PhysicsCombineFunction.Average };
+            f.AddAsset(material, new AssetGuid(1234, AssetGuidType.DynamicExplicit));
+            </code></example>
+        </member>
         <member name="M:Quantum.Core.FrameBase.ReplaceAsset(Quantum.AssetGuid,Quantum.AssetObject)">
             <summary>
             Replaces a dynamic asset in the frame. 
@@ -4102,7 +4165,7 @@
             <param name="entity">Entity reference</param>
             <param name="componentIndex">
             The index of the component to be added.
-            See also <see cref="M:Quantum.ComponentTypeId.GetComponentIndex(System.Type)"/> or <see cref="P:Quantum.ComponentTypeId`1.Id"/> to retrieve the index of a component type.
+            See also <see cref="M:Quantum.ComponentTypeId.GetComponentIndex(System.Type)"/> or <see cref="F:Quantum.ComponentTypeId`1.Id"/> to retrieve the index of a component type.
             </param>
             <param name="value"
             >A pointer to data that should be copied as value to the component added.
@@ -4125,7 +4188,7 @@
             <param name="entity">Entity reference</param>
             <param name="componentIndex">
             The index of the component to be added.
-            See also <see cref="M:Quantum.ComponentTypeId.GetComponentIndex(System.Type)"/> or <see cref="P:Quantum.ComponentTypeId`1.Id"/> to retrieve the index of a component type.
+            See also <see cref="M:Quantum.ComponentTypeId.GetComponentIndex(System.Type)"/> or <see cref="F:Quantum.ComponentTypeId`1.Id"/> to retrieve the index of a component type.
             </param>
             <param name="result">
             A pointer to the component added.
@@ -4148,7 +4211,7 @@
             <param name="entity">Entity reference</param>
             <param name="componentIndex">
             The index of the component to be added.
-            See also <see cref="M:Quantum.ComponentTypeId.GetComponentIndex(System.Type)"/> or <see cref="P:Quantum.ComponentTypeId`1.Id"/> to retrieve the index of a component type.
+            See also <see cref="M:Quantum.ComponentTypeId.GetComponentIndex(System.Type)"/> or <see cref="F:Quantum.ComponentTypeId`1.Id"/> to retrieve the index of a component type.
             </param>
             <param name="value"
             >A pointer to data that should be copied as value to the component added.
@@ -4188,7 +4251,7 @@
             <param name="entity">Entity reference</param>
             <param name="componentIndex">
             The index of the component to be added.
-            See also <see cref="M:Quantum.ComponentTypeId.GetComponentIndex(System.Type)"/> or <see cref="P:Quantum.ComponentTypeId`1.Id"/> to retrieve the index of a component type.
+            See also <see cref="M:Quantum.ComponentTypeId.GetComponentIndex(System.Type)"/> or <see cref="F:Quantum.ComponentTypeId`1.Id"/> to retrieve the index of a component type.
             </param>
             <param name="result">A pointer to the component added or already existing. <see langword="null"/> if the <paramref name="entity"/> does not exist.</param>
             <exception cref="T:System.IndexOutOfRangeException">If the <paramref name="componentIndex"/> does not identify a valid component.</exception>
@@ -4216,7 +4279,7 @@
             <param name="entity">Entity ref</param>
             <param name="componentIndex">
             The index of the component being set.
-            See also <see cref="M:Quantum.ComponentTypeId.GetComponentIndex(System.Type)"/> or <see cref="P:Quantum.ComponentTypeId`1.Id"/> to get the index of a component.
+            See also <see cref="M:Quantum.ComponentTypeId.GetComponentIndex(System.Type)"/> or <see cref="F:Quantum.ComponentTypeId`1.Id"/> to get the index of a component.
             </param>
             <param name="value">
             A pointer to data that should be copied as value to the component.
@@ -5065,11 +5128,6 @@
             The initial dynamic asset db.
             </summary>
         </member>
-        <member name="F:Quantum.Core.FrameContext.Args.IsTaskProfilerEnabled">
-            <summary>
-            Set to <see langword="true"/> to enable the task profiler.
-            </summary>
-        </member>
         <member name="F:Quantum.Core.FrameContext.Args.HeapConfig">
             <summary>
             The global Quantum heap configuration.
@@ -5897,8 +5955,8 @@
             </summary>
             <param name="ptr">The <see cref="T:Quantum.Collections.QDictionary`2"/> Ptr.</param>
             <param name="serializer">The <see cref="T:Quantum.FrameSerializer"/> instance into which the struct will be serialized.</param>
-            <param name="keySerializer">A delegate for serializing the <see cref="T:Quantum.Collections.QDictionary`2"/> keys.</param>
-            <param name="valSerializer">A delegate for serializing the <see cref="T:Quantum.Collections.QDictionary`2"/> values.</param>
+            <param name="keySerializer">A delegate for serializing the QDictionary{K, V} keys.</param>
+            <param name="valSerializer">A delegate for serializing the QDictionary{K, V} values.</param>
         </member>
         <member name="M:Quantum.Collections.QDictionary`2.op_Implicit(Quantum.Collections.QDictionary{`0,`1})~Quantum.Collections.QDictionaryPtr{`0,`1}">
             <summary>
@@ -6406,6 +6464,13 @@
             <summary>
             Sorts the elements in the entire list using the specified comparer.
             </summary>
+            <para>
+            The sorting uses Quicksort algorithm and produces and unstable sorting result, 
+            which means that the relative order of equal elements is not guaranteed to be preserved.
+            </para>
+            <para>
+            To remove randomness when sorting entities include the entity index in the comparison.
+            </para>
             <param name="comparer">
             The <see cref="T:System.Collections.Generic.IComparer`1"/> implementation to use when comparing elements.
             If not informed, the default comparer <see cref="P:System.Collections.Generic.Comparer`1.Default"/> is used.
@@ -8941,22 +9006,22 @@
             </summary>
             <typeparam name="T"></typeparam>
         </member>
-        <member name="P:Quantum.ComponentTypeId`1.Id">
+        <member name="F:Quantum.ComponentTypeId`1.Id">
             <summary>
             Component type ID/index.
             </summary>
         </member>
-        <member name="P:Quantum.ComponentTypeId`1.Size">
+        <member name="F:Quantum.ComponentTypeId`1.Size">
             <summary>
             Component type size in bytes.
             </summary>
         </member>
-        <member name="P:Quantum.ComponentTypeId`1.Flags">
+        <member name="F:Quantum.ComponentTypeId`1.Flags">
             <summary>
             Component type flags.
             </summary>
         </member>
-        <member name="P:Quantum.ComponentTypeId`1.Callbacks">
+        <member name="F:Quantum.ComponentTypeId`1.Callbacks">
             <summary>
             Component type callbacks.
             </summary>
@@ -9948,7 +10013,7 @@
         </member>
         <member name="M:Quantum.FrameChecksumerBitStream.#ctor">
             <summary>
-            Contructor.
+            Constructor.
             </summary>
         </member>
         <member name="M:Quantum.FrameChecksumerBitStream.#ctor(System.UInt64)">
@@ -10289,20 +10354,23 @@
             <param name="fixedSize">Array fixed size</param>
             <exception cref="T:System.InvalidOperationException">Not supported.</exception>
         </member>
-        <member name="M:Quantum.FrameChecksumerBitStream.SerializeArrayLength``1(``0[]@)">
+        <member name="M:Quantum.FrameChecksumerBitStream.SerializeArrayLength``1(``0[]@,System.Int32)">
             <summary>
             Updates the checksum with an array.
             </summary>
             <typeparam name="T">Array type</typeparam>
             <param name="array">Array reference</param>
+            <param name="maxLength">The max size of the input array.</param>
+            <returns>The length of the array secured by maxLength.</returns>
         </member>
-        <member name="M:Quantum.FrameChecksumerBitStream.SerializeArray``1(``0[]@,Photon.Deterministic.BitStream.ArrayElementSerializer{``0})">
+        <member name="M:Quantum.FrameChecksumerBitStream.SerializeArray``1(``0[]@,Photon.Deterministic.BitStream.ArrayElementSerializer{``0},System.Int32)">
             <summary>
             Updates the checksum with an array ans a custom serializer.
             </summary>
             <typeparam name="T">Type of array</typeparam>
             <param name="array">Array reference</param>
             <param name="serializer">Serializer callback</param>
+            <param name="maxLength">The max size of the input array.</param>
         </member>
         <member name="M:Quantum.FrameChecksumerBitStream.ReadLong">
             <summary>
@@ -10416,6 +10484,11 @@
             </summary>
             <param name="e"></param>
             <returns>True if there were any event handlers. Currently, this value is unused.</returns>
+        </member>
+        <member name="M:Quantum.ICallbackDispatcher.HasAnyListeners(Quantum.CallbackBase)">
+            <summary>
+            Returns true if the callback has any listeners.
+            </summary>
         </member>
         <member name="T:Quantum.IDispatchable">
             <summary>
@@ -11561,7 +11634,7 @@
                  Log.Info("Triangle set successfully.");
                }
                else {
-                Log.Error("Failed to set triangle.");
+                LogError?.Log("Failed to set triangle.");
               }
              }
              </code>
@@ -11619,12 +11692,37 @@
                  Log.Info("Triangle added successfully.");
                }
                else {
-                Log.Error("Failed to add triangle.");
+                LogError?.Log("Failed to add triangle.");
                }
              }
              </code>
              </example>
              <seealso cref="M:Quantum.EditMeshScope.AddTriangle(Quantum.TriangleCCW@)"/>
+        </member>
+        <member name="M:Quantum.EditMeshScope.SetUsedCount(System.Int32)">
+            <summary>
+            Set the triangle used count for this mesh.
+            </summary>
+            <param name="count"></param>
+            <returns>
+            <c>true</c> if the new <paramref name="count"/> is in the range [0, Capacity] and different from the previous count.
+            <c>false</c> otherwise.
+            </returns>
+        </member>
+        <member name="M:Quantum.EditMeshScope.RemoveTriangle(System.Int32)">
+            <summary>
+            Removes a single triangle from the mesh collider.
+            </summary>
+            <param name="triangleIndex">The <see cref="F:Quantum.TriangleCCW.TriIndexInStaticData">index</see> of the triangle to remove.</param>
+            <returns>True if the triangle was successfully removed, false otherwise.</returns>
+        </member>
+        <member name="M:Quantum.EditMeshScope.RemoveTriangles(System.Int32,System.Int32)">
+            <summary>
+            Removes multiple triangles from the mesh collider.
+            </summary>
+            <param name="start">The starting <see cref="F:Quantum.TriangleCCW.TriIndexInStaticData">index</see> of the triangles to remove.</param>
+            <param name="count">The number of triangles to remove.</param>
+            <returns>True if the triangles were successfully removed, false otherwise.</returns>
         </member>
         <member name="M:Quantum.EditMeshScope.GetTriangle(System.Int32)">
              <summary>
@@ -11709,6 +11807,14 @@
             <param name="source">The buffer of triangles to read.</param>
             <param name="runtimeTriangles">The triangle dictionary lookup to read.</param>
         </member>
+        <member name="M:Quantum.DynamicMap.SerializeRuntimeTriangles(Quantum.UnmanagedTriangleArray,System.Collections.Generic.SortedDictionary{System.Int32,Quantum.MeshUnmanagedTrianglesRef})">
+            <summary>
+            Serializes runtime triangle structures.
+            </summary>
+            <param name="tris">The destination for the read triangles.</param>
+            <param name="meshes">The dictionary from collider index to triangle references.</param>
+            <returns>Raw byte array with the serialized data.</returns>
+        </member>
         <member name="M:Quantum.DynamicMap.ReadRuntimeTriangles(Quantum.ByteStream,System.Collections.Generic.SortedDictionary{System.Int32,Quantum.MeshUnmanagedTrianglesRef},Photon.Deterministic.Native.Allocator,Quantum.UnmanagedTriangleArray@)">
             <summary>
             Reads the runtime triangles from the given stream.
@@ -11718,7 +11824,34 @@
             <param name="allocator">The allocator for this asset.</param>
             <param name="dest">The destination for the read triangles.</param>
         </member>
-        <member name="M:Quantum.DynamicMap.AddMeshCollider(Quantum.Core.FrameBase,System.Collections.Generic.IList{Photon.Deterministic.FPVector3},System.Collections.Generic.IList{System.Int32},System.Int32,System.Nullable{Quantum.StaticColliderData},System.Boolean,System.Nullable{Photon.Deterministic.FPVector3},System.Nullable{Photon.Deterministic.FPQuaternion})">
+        <member name="M:Quantum.DynamicMap.DeserializeRuntimeTriangles(System.Byte[],Quantum.UnmanagedTriangleArray@,System.Collections.Generic.SortedDictionary{System.Int32,Quantum.MeshUnmanagedTrianglesRef},Photon.Deterministic.Native.Allocator)">
+            <summary>
+            Deserializes triangle data into runtime structures.
+            </summary>
+            <param name="data">Raw serialized data.</param>
+            <param name="tris">The destination for the read triangles.</param>
+            <param name="meshes">The dictionary from collider index to triangle references.</param>
+            <param name="allocator">The allocator for this asset.</param>
+        </member>
+        <member name="M:Quantum.DynamicMap.ReserveMeshColliders(Quantum.Core.FrameBase,System.Int32,System.Int32,System.Nullable{Quantum.StaticColliderData},System.Boolean)">
+            <summary>
+            Pre-allocates space for a specified number of mesh colliders.
+            </summary>
+            <param name="f">The current Frame. Must be Verified.</param>
+            <param name="count">Number of mesh colliders to reserve space for.</param>
+            <param name="capacity">Triangle capacity for each mesh collider.</param>
+            <param name="staticData">Optional static data template for the reserved colliders.</param>
+            <param name="resetPhysics">If static physics data should be reset. Necessary after reserving all colliders.</param>
+            <returns><see langword="true"/> if reservation was successful, <see langword="false"/> otherwise.</returns>
+            <example>
+            How to reserve space for mesh colliders:
+            <code>
+            // Basic usage - reserve space for 10 mesh colliders with 100 triangles each
+            dynamicMap.ReserveMeshColliders(frame, 10, 100);
+            </code>
+            </example>
+        </member>
+        <member name="M:Quantum.DynamicMap.AddMeshCollider(Quantum.Core.FrameBase,System.Collections.Generic.IList{Photon.Deterministic.FPVector3},System.Collections.Generic.IList{System.Int32},System.Int32,System.Nullable{Quantum.StaticColliderData},System.Boolean,System.Nullable{Photon.Deterministic.FPVector3},System.Nullable{Photon.Deterministic.FPQuaternion},System.Nullable{Quantum.AssetRef{Quantum.PhysicsMaterial}},System.Boolean)">
              <summary>
              Adds a mesh collider to the map.
              </summary>
@@ -11730,6 +11863,8 @@
              <param name="additionalCapacity">Extra empty triangles to allocate.</param>
              <param name="staticData">The static information for the created collider.</param>
              <param name="resetPhysics">If the physics engine should be reset after adding.</param>
+             <param name="material">The physics material asset object. If null, it will use the default physics material.</param>
+             <param name="smoothSphereCollisions">If the mesh collider should have smooth sphere collisions.</param>
              <returns>The collider index of the created collider. -1 if it failed to create.</returns>
              <example>
              How to add a mesh collider to a dynamic map:
@@ -11743,7 +11878,7 @@
              int meshColliderIndex = dynamicMap.AddMeshCollider(frame, vertices);
             
              if(meshColliderIndex == -1) {
-               Log.Error("Failed to add mesh collider");
+               LogError?.Log("Failed to add mesh collider");
              }
              else {
                Log.Info("Added mesh collider with index: " + meshColliderIndex);
@@ -11766,7 +11901,7 @@
               Log.Info("Removed mesh collider with index: " + meshColliderIndex);
             }
             else {
-              Log.Error("Failed to remove mesh collider with index: " + meshColliderIndex);
+              LogError?.Log("Failed to remove mesh collider with index: " + meshColliderIndex);
             }
             </code>
             </example>
@@ -11826,10 +11961,31 @@
               Log.Info("Removed 3D collider with index: " + colliderIndex);
             }
             else {
-              Log.Error("Failed to remove 3D collider with index: " + colliderIndex);
+              LogError?.Log("Failed to remove 3D collider with index: " + colliderIndex);
             }
             </code>
             </example>
+        </member>
+        <member name="M:Quantum.DynamicMap.MoveLastColliderInfo3DToTarget(Quantum.Core.FrameBase,System.Int32)">
+            <summary>
+            Moves source to target, so that it can be safely removed.
+            Source is always the last collider in the array.
+            </summary>
+            <param name="f"></param>
+            <param name="target"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Quantum.DynamicMap.RemoveAllColliders3D(Quantum.Core.FrameBase)">
+            <summary>
+            Removes all 3D colliders.
+            </summary>
+            <param name="f"></param>
+        </member>
+        <member name="M:Quantum.DynamicMap.RemoveAllColliders2D(Quantum.Core.FrameBase)">
+            <summary>
+            Removes all 2D colliders.
+            </summary>
+            <param name="f"></param>
         </member>
         <member name="M:Quantum.DynamicMap.RemoveCollider2D(Quantum.Core.FrameBase,System.Int32,System.Boolean)">
             <summary>
@@ -11846,12 +12002,12 @@
               Log.Info("Removed 2D collider with index: " + colliderIndex);
             }
             else {
-              Log.Error("Failed to remove 2D collider with index: " + colliderIndex);
+              LogError?.Log("Failed to remove 2D collider with index: " + colliderIndex);
             }
             </code>
             </example>
         </member>
-        <member name="M:Quantum.DynamicMap.FromStaticMap(Quantum.Map)">
+        <member name="M:Quantum.DynamicMap.FromStaticMap``1(Quantum.Map)">
             <summary>
             Converts a static map to a dynamic map.
             </summary>
@@ -12383,6 +12539,12 @@
             Spiral around the current cell to find a closest triangle in neighbors.
             This could result in empty fallback triangles, which will unlikely cause any problems.
             Requires to set <see cref="F:Quantum.NavMeshBakeData.ClosestTriangleCalculationDepth"/>.
+            </summary>
+        </member>
+        <member name="F:Quantum.NavMeshBakeDataFindClosestTriangle.None">
+            <summary>
+            No fallback triangle search. 
+            Will speed up navmesh baking considerably but make <see cref="M:Quantum.NavMesh.FindClosestTriangleFast(Photon.Deterministic.FPVector3,Quantum.NavMeshRegionMask)"/> be not usable.
             </summary>
         </member>
         <member name="T:Quantum.NavMeshBakeDataLink">
@@ -13055,7 +13217,7 @@
             <param name="navmesh">The navmesh to operate on</param>
             <param name="regionMask">Region mask is used to check if navmesh parts are active or inactive</param>
             <param name="automaticTargetCorrection">If the target is outside the navmesh the position will be tried to be corrected.</param>
-            <param name="automaticTargetCorrectionRadius">The range to validated the start and target position.</param>
+            <param name="automaticTargetCorrectionRadius">The range to validate the start and target position.</param>
             <param name="quality">The path quality</param>
             <returns>The corrected start position</returns>
             \ingroup NavigationApi
@@ -13070,7 +13232,7 @@
             <param name="navmesh">Navmesh to check</param>
             <param name="triangleStart">Optionally provide the triangle that the start position is on</param>
             <param name="triangleDestination">Optionally provide the triangle that the destination position is on</param>
-            <returns><see langword="true"/> if there is a unobstructed line of sight on the navmesh</returns>
+            <returns><see langword="true"/> if there is an unobstructed line of sight on the navmesh</returns>
             \ingroup NavigationApi
         </member>
         <member name="M:Quantum.Navigation.LineOfSight(Photon.Deterministic.FPVector2,Photon.Deterministic.FPVector2,Quantum.NavMeshRegionMask,Quantum.NavMesh,System.Int32,System.Int32)">
@@ -13843,7 +14005,7 @@
             // Check if a region id is active
             var isRegionActive = f.NavMeshRegionMask-&gt;IsRegionEnabled(regionId);
             // Check if a NavMeshRegionMask (found on the pathfinder component) is active
-            var isRegionAcitve = f.Unsafe.GetPointer&lt;NavMeshPathfinder&gt;(entity)-&gt;RegionMask.IsSubset(*f.NavMeshRegionMask);
+            var isRegionActive = f.Unsafe.GetPointer&lt;NavMeshPathfinder&gt;(entity)-&gt;RegionMask.IsSubset(*f.NavMeshRegionMask);
             </code></example>
         </member>
         <member name="F:Quantum.NavMeshRegionMask.SIZE">
@@ -17144,6 +17306,11 @@
         <member name="P:Quantum.Shape2D.CompoundShape2D.Count">
             <summary>
             The number of shapes in the compound buffer.
+            </summary>
+        </member>
+        <member name="P:Quantum.Shape2D.CompoundShape2D.Capacity">
+            <summary>
+            The current number of shapes that can be held by the compound buffer.
             </summary>
         </member>
         <member name="M:Quantum.Shape2D.CompoundShape2D.CopyFrom(Quantum.Core.FrameBase,Quantum.Shape2D@)">
@@ -20603,6 +20770,34 @@
             <param name="matrix4X4">The optional matrix to apply to the collider.</param>
             <returns>An instance of <see cref="T:Quantum.MeshTriangleVerticesCcw"/>.</returns>
         </member>
+        <member name="T:Quantum.TriangleCCW.VertexHashMapper">
+            <summary>
+            Uses a <see cref="T:Quantum.ByteSerializerHashMapper`1"/> to more efficiently serialize
+            triangles with shared vertices to a <see cref="T:Quantum.ByteStream"/>.
+            <example>
+            How to serialize:
+            <code>
+            var sourceTris = new TriangleCCW[42];
+            var vertexHashMapper = new VertexHashMapper();
+            stream.WriteInt(sourceTris.Length);
+            for (int i = 0; i &lt; sourceTris.Length; i++) {
+              sourceTris[i].Serialize(stream, write: true, vertexHashMapper);
+            }
+            </code>
+            </example>
+            <example>
+            How to de-serialize:
+            <code>
+            var trisCount = stream.ReadInt();
+            var destTris = new TriangleCCW[trisCount];
+            var vertexHashMapper = new VertexHashMapper();
+            for (int i = 0; i &lt; trisCount; i++) {
+              destTris[i].Serialize(stream, write: false, vertexHashMapper);
+            }
+            </code>
+            </example>
+            </summary>
+        </member>
         <member name="F:Quantum.TriangleCCW.SIZE">
             <summary>
             The size of the struct in bytes.
@@ -20911,6 +21106,11 @@
         <member name="P:Quantum.Shape3D.CompoundShape3D.Count">
             <summary>
             The number of shapes in the compound buffer.
+            </summary>
+        </member>
+        <member name="P:Quantum.Shape3D.CompoundShape3D.Capacity">
+            <summary>
+            The current number of shapes that can be held by the compound buffer.
             </summary>
         </member>
         <member name="M:Quantum.Shape3D.CompoundShape3D.CopyFrom(Quantum.Core.FrameBase,Quantum.Shape3D@)">
@@ -21927,25 +22127,44 @@
             </summary>
         </member>
         <member name="F:Quantum.QueryOptions.HitStatics">
-            <summary>Includes the hit colliders on the query-checking.</summary>
+            <summary>
+             The query checks static colliders.
+             Include also <see cref="F:Quantum.QueryOptions.HitTriggers"/> in order to check static trigger colliders.
+             </summary>
         </member>
         <member name="F:Quantum.QueryOptions.HitKinematics">
-            <summary>Includes the kinematic physics bodies on the query-checking.</summary>
+            <summary>
+            The query checks colliders with no physics body or with Kinematic physics body.
+            Include also <see cref="F:Quantum.QueryOptions.HitTriggers"/> in order to check trigger colliders.
+            </summary>
         </member>
         <member name="F:Quantum.QueryOptions.HitDynamics">
-            <summary>Includes the dynamic physics bodies on the query-checking.</summary>
+            <summary>
+            The query checks colliders with dynamic (not kinematic) physics body.
+            </summary>
         </member>
         <member name="F:Quantum.QueryOptions.HitTriggers">
-            <summary>Includes the triggers physics bodies on the query-checking.</summary>
+            <summary>
+            The query also checks trigger colliders.
+            Combine this with both or either <see cref="F:Quantum.QueryOptions.HitStatics"/> and/or <see cref="F:Quantum.QueryOptions.HitKinematics"/>.
+            </summary>
         </member>
         <member name="F:Quantum.QueryOptions.HitAll">
-            <summary>Allows to query-checking all the types of colliders.</summary>
+            <summary>
+            The query checks all colliders: statics, kinematics and dynamics, including trigger colliders.
+            To filter some of these options out, combine specific flags instead.
+            </summary>
         </member>
         <member name="F:Quantum.QueryOptions.ComputeDetailedInfo">
-            <summary>Allows the query to compute the normal, penetration and contact point between two shapes.</summary>
+            <summary>
+            Detailed info (e.g. contact point, normal, penetration) will be computed for the query hits.
+            </summary>
         </member>
         <member name="F:Quantum.QueryOptions.DetectOverlapsAtCastOrigin">
-            <summary>Allows the shape cast query to detect if another shape overlaps with the shape at position zero, then it computes the normal, penetration and contact point.</summary>
+            <summary>
+            For Ray and Shape casts, the query will consider other colliders that may be overlapping with the cast
+            feature at the cast origin. By default, such overlaps are not considered hits.
+            </summary>
         </member>
         <member name="T:Quantum.CharacterMovementType">
             <summary>
@@ -22405,11 +22624,10 @@
             Represents a profiler context that manages profiling data.
             </summary>
         </member>
-        <member name="M:Quantum.Profiling.ProfilerContext.#ctor(System.Boolean)">
+        <member name="M:Quantum.Profiling.ProfilerContext.#ctor(System.Int32)">
             <summary>
             Initializes a new instance of the <see cref="T:Quantum.Profiling.ProfilerContext"/> class.
             </summary>
-            <param name="enabled">Indicates whether the profiler is enabled.</param>
         </member>
         <member name="M:Quantum.Profiling.ProfilerContext.GetFrameTimeAverage">
             <summary>
@@ -22422,7 +22640,7 @@
             Begins a simulation.
             </summary>
         </member>
-        <member name="M:Quantum.Profiling.ProfilerContext.Reset">
+        <member name="M:Quantum.Profiling.ProfilerContext.Reset(System.Boolean)">
             <summary>
             Resets the profiler context.
             </summary>
@@ -23813,6 +24031,19 @@
             <param name="rotation">The initial rotation.</param>
             <returns>New initialized Transform3D component.</returns>
         </member>
+        <member name="M:Quantum.Transform3D.RotateAround(Photon.Deterministic.FPVector3,Photon.Deterministic.FPVector3,Photon.Deterministic.FP,System.Boolean)">
+            <summary>
+            Rotates around a given pivot point.
+            <para>
+            The method works as expected but does generate slightly different results than Unity's Transform.RotateAround(). 
+            The algorithm may be subject to change in future versions.
+            </para>
+            </summary>
+            <param name="point">The pivot point.</param>
+            <param name="axis">What axis to rotate.</param>
+            <param name="angle">The angle.</param>
+            <param name="rotateTransform"></param>
+        </member>
         <member name="M:Quantum.Transform3D.Teleport(Quantum.Core.FrameBase,Photon.Deterministic.FPVector3)">
             <inheritdoc cref="M:Quantum.Transform2D.Teleport(Quantum.Core.FrameBase,Photon.Deterministic.FPVector2)"/>
         </member>
@@ -24518,6 +24749,28 @@
             <param name="value">The value to write or read</param>
             <returns>The input value or the value read from the stream</returns>
         </member>
+        <member name="T:Quantum.ByteSerializerHashMapper`1">
+            <summary>
+            Maps value hashes to an indexed collection of previous values.
+            Can be used in combination with a <see cref="T:Quantum.ByteStream"/> to avoid serializing the same value multiple times.
+            </summary>
+            <typeparam name="T">
+            The type of the value to be serialized/hashed.
+            Must have a deterministic <see cref="M:System.ValueType.GetHashCode"/> implementation.
+            Ideally should also override <see cref="M:System.ValueType.GetHashCode"/> in order to avoid boxing allocations.
+            </typeparam>
+        </member>
+        <member name="M:Quantum.ByteSerializerHashMapper`1.#ctor(System.Int32)">
+            <summary>
+            Constructor.
+            </summary>
+            <param name="capacity">Default value capacity.</param>
+        </member>
+        <member name="M:Quantum.ByteSerializerHashMapper`1.Clear">
+            <summary>
+            Clears internal structures. Must be done once before serializing or de-serializing a sequence of values.
+            </summary>
+        </member>
         <member name="M:Quantum.CodeDocHelper.Deconstruct(System.Int32@)">
             <summary>
             Tuple-like deconstructor method for this struct.
@@ -24885,6 +25138,11 @@
             The rotation of the rectangle.
             </summary>
         </member>
+        <member name="F:Quantum.Draw.DebugRectangle.Rotation2D">
+            <summary>
+            The rotation of the rectangle in 2D.
+            </summary>
+        </member>
         <member name="F:Quantum.Draw.DebugRectangle.Color">
             <summary>
             The color of the rectangle.
@@ -24893,6 +25151,11 @@
         <member name="F:Quantum.Draw.DebugRectangle.Wire">
             <summary>
             Draw the rectangle as a wireframe.
+            </summary>
+        </member>
+        <member name="F:Quantum.Draw.DebugRectangle.Is2D">
+            <summary>
+            Indicates that the capsule is 2D.
             </summary>
         </member>
         <member name="T:Quantum.Draw.DebugBox">
@@ -25393,6 +25656,17 @@
             <see langword="true"/> if the timer is <see cref="P:Quantum.FrameTimer.IsValid">valid</see> and the current <paramref name="frame"/> number is greater than or equal to the target frame <see cref="F:Quantum.FrameTimer.Value"/>.
             <see langword="false"/> othewise.
             </returns>
+        </member>
+        <member name="M:Quantum.FrameTimer.IsExpiredThisFrame(Quantum.Core.FrameBase)">
+            <summary>
+            If the timer expired during this frame.
+            </summary>
+            <param name="frame">The current Frame instance.</param>
+            <returns>
+            <see langword="true"/> if the timer is <see cref="M:Quantum.FrameTimer.IsExpired(Quantum.Core.FrameBase)">expired</see> and the current <paramref name="frame"/> number is equal to the target frame number <see cref="F:Quantum.FrameTimer.Value"/>.
+            <see langword="false"/> othewise.
+            </returns>
+            <remarks>Useful for one time operations that happen only at timer expiry.</remarks>
         </member>
         <member name="M:Quantum.FrameTimer.IsRunning(Quantum.Core.FrameBase)">
             <summary>

@@ -1,3 +1,4 @@
+using NSMB.Extensions;
 using NSMB.Replay;
 using NSMB.Translation;
 using NSMB.UI.MainMenu;
@@ -6,6 +7,7 @@ using System;
 using System.Collections;
 using System.IO;
 using TMPro;
+using Unity.Profiling;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -20,7 +22,7 @@ public class ReplayListEntry : MonoBehaviour {
 
     //---Serialized Variables
     [SerializeField] private MainMenuCanvas canvas;
-    [SerializeField] internal GameObject defaultSelection;
+    [SerializeField] internal GameObject defaultSelection, mainPanel, buttonPanel;
     [SerializeField] private TMP_Text nameText, dateText, favoriteButtonText;
     [SerializeField] public TMP_Text warningText;
     [SerializeField] private Image mapImage;
@@ -35,20 +37,42 @@ public class ReplayListEntry : MonoBehaviour {
     private ReplayListManager manager;
     private Coroutine showHideButtonsCoroutine;
 
+    public void Initialize(ReplayListManager ourManager, BinaryReplayFile ourReplay) {
+        manager = ourManager;
+        ReplayFile = ourReplay;
+        // gameObject.SetActive(true);
+    }
+
     public void OnEnable() {
         TranslationManager.OnLanguageChanged += OnLanguageChanged;
-        OnLanguageChanged(GlobalController.Instance.translationManager);
     }
 
     public void OnDisable() {
         TranslationManager.OnLanguageChanged -= OnLanguageChanged;
     }
 
-    public void Initialize(ReplayListManager ourManager, BinaryReplayFile ourReplay) {
-        manager = ourManager;
-        ReplayFile = ourReplay;
-        gameObject.SetActive(true);
+    public void Update() {
+        //UpdateVisibility();
     }
+
+    /*
+    private static readonly Vector3[] corners = new Vector3[4];
+    public void UpdateVisibility(Rect parentRect) {
+        if (mainPanel.activeSelf) {
+            return;
+        }
+
+        RectTransform ourRectTransform = ((RectTransform) transform);
+        ourRectTransform.GetWorldCorners(corners);
+        Vector3 topLeft = corners[1];
+        Rect ourRect = new Rect(topLeft, ourRectTransform.rect.size);
+
+        if (parentRect.Overlaps(ourRect)) {
+            mainPanel.SetActive(true);
+            buttonPanel.SetActive(true);
+        }
+    }
+    */
 
     public void UpdateNavigation(ReplayListEntry previous) {
         if (previous) {
@@ -72,7 +96,7 @@ public class ReplayListEntry : MonoBehaviour {
             if (showHideButtonsCoroutine != null) {
                 StopCoroutine(showHideButtonsCoroutine);
             }
-            showHideButtonsCoroutine = StartCoroutine(SmoothResize(48, 0.1f));
+            showHideButtonsCoroutine = StartCoroutine(SmoothResize(48, /*0.1f*/ 0));
         }
         canvasGroup.interactable = false;
         button.interactable = true;
@@ -88,7 +112,7 @@ public class ReplayListEntry : MonoBehaviour {
             if (showHideButtonsCoroutine != null) {
                 StopCoroutine(showHideButtonsCoroutine);
             }
-            showHideButtonsCoroutine = StartCoroutine(SmoothResize(86, 0.1f));
+            showHideButtonsCoroutine = StartCoroutine(SmoothResize(86, /*0.1f*/ 0));
             canvasGroup.interactable = true;
             button.interactable = false;
             canvas.PlayCursorSound();
@@ -160,19 +184,28 @@ public class ReplayListEntry : MonoBehaviour {
         manager.StartDeletion(this);
     }
 
+    static ProfilerMarker x = new("UpdateText");
     public void UpdateText() {
         if (ReplayFile == null) {
             return;
         }
 
+        x.Begin(gameObject);
+
         TranslationManager tm = GlobalController.Instance.translationManager;
         BinaryReplayHeader header = ReplayFile.Header;
 
-        nameText.text = header.GetDisplayName();
-        dateText.text = DateTime.UnixEpoch.AddSeconds(header.UnixTimestamp).ToLocalTime().ToString();
-        
+        nameText.SetTextIfDifferent(header.GetDisplayName());
+        dateText.SetTextIfDifferent(ReplayListManager.DateTimeToLocalizedString(DateTime.UnixEpoch.AddSeconds(header.UnixTimestamp), false, false));
+
+        bool rtl = tm.RightToLeft;
+        warningText.SetHorizontalAlignmentIfDifferent(rtl ? HorizontalAlignmentOptions.Left : HorizontalAlignmentOptions.Right);
+        dateText.SetHorizontalAlignmentIfDifferent(rtl ? HorizontalAlignmentOptions.Right : HorizontalAlignmentOptions.Left);
+        nameText.SetHorizontalAlignmentIfDifferent(rtl ? HorizontalAlignmentOptions.Right : HorizontalAlignmentOptions.Left);
+
+        string finalWarningText;
         if (!header.IsCompatible) {
-            warningText.text = tm.GetTranslationWithReplacements("ui.extras.replays.incompatible", "version", header.Version.ToString());
+            finalWarningText = tm.GetTranslationWithReplacements("ui.extras.replays.incompatible", "version", header.Version.ToString());
             warningText.color = criticalColor;
             foreach (var button in compatibleButtons) {
                 button.interactable = false;
@@ -180,34 +213,39 @@ public class ReplayListEntry : MonoBehaviour {
         } else if (IsTemporary) {
             int? deletion = manager.GetReplaysUntilDeletion(this);
             if (deletion.HasValue && deletion == 1) {
-                warningText.text = tm.GetTranslation("ui.extras.replays.temporary.next");
+                finalWarningText = tm.GetTranslation("ui.extras.replays.temporary.next");
                 warningText.color = criticalColor;
             } else if (deletion.HasValue && deletion <= 5) {
-                warningText.text = tm.GetTranslationWithReplacements("ui.extras.replays.temporary", "expire", deletion.ToString());
+                finalWarningText = tm.GetTranslationWithReplacements("ui.extras.replays.temporary", "expire", deletion.ToString());
                 warningText.color = criticalColor;
             } else {
-                warningText.text = tm.GetTranslation("ui.extras.replays.temporary.nodelete");
+                finalWarningText = tm.GetTranslation("ui.extras.replays.temporary.nodelete");
                 warningText.color = warningColor;
             }
         } else if (IsFavorited) {
-            warningText.text = tm.GetTranslation("ui.extras.replays.favorited");
+            finalWarningText = tm.GetTranslation("ui.extras.replays.favorited");
             warningText.color = favoriteColor;
         } else {
-            warningText.text = "";
+            finalWarningText = "";
         }
+        warningText.SetTextIfDifferent(finalWarningText);
 
         mapImage.sprite = header.GetMapSprite();
         if (!mapImage.sprite) {
             mapImage.sprite = defaultMapSprite;
         }
 
+        string finalFavoriteButtonText;
         if (IsTemporary) {
-            favoriteButtonText.text = tm.GetTranslation("ui.extras.replays.actions.save");
+            finalFavoriteButtonText = tm.GetTranslation("ui.extras.replays.actions.save");
         } else if (IsFavorited) {
-            favoriteButtonText.text = tm.GetTranslation("ui.extras.replays.actions.unfavorite");
+            finalFavoriteButtonText = tm.GetTranslation("ui.extras.replays.actions.unfavorite");
         } else {
-            favoriteButtonText.text = tm.GetTranslation("ui.extras.replays.actions.favorite");
+            finalFavoriteButtonText = tm.GetTranslation("ui.extras.replays.actions.favorite");
         }
+        favoriteButtonText.SetTextIfDifferent(finalFavoriteButtonText);
+
+        x.End();
     }
 
     private void OnLanguageChanged(TranslationManager tm) {

@@ -1,6 +1,7 @@
 using JimmysUnityUtilities;
 using NSMB.Extensions;
 using Quantum;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -53,8 +54,8 @@ public class ResultsHandler : MonoBehaviour {
         // Generate scores
         Dictionary<int, int> teamRankings = null;
         if (f.Global->HasWinner) {
-            byte[] teamScores = new byte[10];
-            QuantumUtils.GetTeamStars(f, teamScores);
+            Span<short> teamScores = stackalloc short[10];
+            QuantumUtils.GetAllTeamsStars(f, teamScores);
 
             Dictionary<int, int> teamScoresDict = new();
             for (int i = 0; i < teamScores.Length; i++) {
@@ -66,7 +67,9 @@ public class ResultsHandler : MonoBehaviour {
             int repeatedCount = 0;
             int currentRanking = 1;
             foreach ((int teamIndex, int stars) in teamScoresDict.OrderByDescending(x => x.Value)) {
-                if (previousStarCount == stars) {
+                if (stars < 0) {
+                        teamRankings[teamIndex] = Constants.MaxPlayers;
+                    } else if (previousStarCount == stars) {
                     repeatedCount++;
                     teamRankings[teamIndex] = currentRanking - 1;
                 } else {
@@ -85,8 +88,18 @@ public class ResultsHandler : MonoBehaviour {
         for (int i = 0; i < f.Global->RealPlayers; i++) {
             infos.Add(f.Global->PlayerInfo[i]);
         }
-        foreach (var info in infos.OrderByDescending(x => x.GetStarCount(f))) {
-            int rank = teamRankings != null ? teamRankings[info.Team] : -1;
+        infos.Sort((x, y) => {
+                int starDiff = y.GetStarCount(f) - x.GetStarCount(f);
+                if (starDiff != 0) {
+                    return starDiff;
+                }
+
+                int xRank = teamRankings != null ? teamRankings[x.Team] : Constants.MaxPlayers;
+                int yRank = teamRankings != null ? teamRankings[y.Team] : Constants.MaxPlayers;
+                return xRank - yRank;
+            });
+            foreach (var info in infos) {
+            int rank = teamRankings != null ? teamRankings[info.Team] : Constants.MaxPlayers;
             entries[initializeCount].Initialize(f, info, rank, initializeCount * delayPerEntry, info.GetStarCount(f));
             initializeCount++;
         }

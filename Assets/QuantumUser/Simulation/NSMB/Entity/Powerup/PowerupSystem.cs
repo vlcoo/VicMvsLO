@@ -2,7 +2,8 @@ using Photon.Deterministic;
 
 namespace Quantum {
 
-    public unsafe class PowerupSystem : SystemMainThreadFilterStage<PowerupSystem.Filter>, ISignalOnEntityBumped, ISignalOnEntityCrushed {
+    public unsafe class PowerupSystem : SystemMainThreadEntityFilter<Powerup, PowerupSystem.Filter>, ISignalOnEntityBumped, ISignalOnEntityCrushed,
+        ISignalOnStageReset {
 
         public static readonly FP CameraYOffset = FP.FromString("1.68");
         private static readonly FP BumpForce = Constants._5_50;
@@ -54,7 +55,7 @@ namespace Quantum {
 
                     if (QuantumUtils.Decrement(ref powerup->SpawnAnimationFrames)) {
                         if (PhysicsObjectSystem.BoxInGround((FrameThreadSafe) f, transform->Position, filter.Collider->Shape, false, stage, entity)) {
-                            // TODO: poof effect.
+                            f.Events.CollectableDespawned(entity, f.Unsafe.GetPointer<Transform2D>(entity)->Position, false);
                             f.Destroy(entity);
                             return;
                         }
@@ -118,6 +119,7 @@ namespace Quantum {
             }
 
             if (QuantumUtils.Decrement(ref powerup->Lifetime)) {
+                f.Events.CollectableDespawned(entity, transform->Position, false);
                 f.Destroy(entity);
             }
         }
@@ -178,8 +180,9 @@ namespace Quantum {
             // Change the player's powerup state
             PowerupReserveResult result = CollectPowerup(f, marioEntity, mario, marioPhysicsObject, newScriptable);
 
-            f.Destroy(powerupEntity);
             f.Events.MarioPlayerCollectedPowerup(marioEntity, result, newScriptable);
+            f.Events.CollectableDespawned(powerupEntity, f.Unsafe.GetPointer<Transform2D>(powerupEntity)->Position, true);
+            f.Destroy(powerupEntity);
         }
 
         public static PowerupReserveResult CollectPowerup(Frame f, EntityRef marioEntity, MarioPlayer* mario, PhysicsObject* marioPhysicsObject, PowerupAsset newPowerup, bool ignoreReserve = false) {
@@ -267,7 +270,7 @@ namespace Quantum {
             return ignoreReserve ? PowerupReserveResult.NoneButPlaySound : PowerupReserveResult.ReserveOldPowerup;
         }
 
-        public void OnEntityBumped(Frame f, EntityRef entity, FPVector2 position, EntityRef bumpOwner) {
+        public void OnEntityBumped(Frame f, EntityRef entity, FPVector2 position, EntityRef bumpOwner, QBoolean fromBelow) {
             if (!f.Unsafe.TryGetPointer(entity, out Transform2D* transform)
                 || !f.Unsafe.TryGetPointer(entity, out Powerup* powerup)
                 || !f.Unsafe.TryGetPointer(entity, out PhysicsObject* physicsObject)
@@ -288,7 +291,25 @@ namespace Quantum {
         public void OnEntityCrushed(Frame f, EntityRef entity) {
             if (f.Unsafe.TryGetPointer(entity, out Powerup* powerup)
                 && powerup->SpawnAnimationFrames <= 0) {
+
+                f.Events.CollectableDespawned(entity, f.Unsafe.GetPointer<Transform2D>(entity)->Position, false);
                 f.Destroy(entity);
+            }
+        }
+
+        public void OnStageReset(Frame f, QBoolean full) {
+            VersusStageData stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
+            Filter filter = default;
+            var filterStruct = f.Unsafe.FilterStruct<Filter>();
+            while (filterStruct.Next(&filter)) {
+                if (filter.Powerup->SpawnAnimationFrames > 0 || !filter.Collider->Enabled) {
+                    continue;
+                }
+                
+                if (PhysicsObjectSystem.BoxInGround((FrameThreadSafe) f, filter.Transform->Position, filter.Collider->Shape, stage: stage, entity: filter.Entity)) {
+                    // Insta-despawn. Crushed by blocks respawning.
+                    filter.Powerup->Lifetime = 1;
+                }
             }
         }
     }

@@ -341,7 +341,7 @@ namespace Quantum {
       playerGO.transform.parent = gameObject.transform;
       var player = playerGO.AddComponent<QuantumMultiClientPlayer>();
       player.Runner = runner;
-      player.DetroyPlayerCallback = DestroyPlayer;
+      player.DestroyPlayerCallback = DestroyPlayer;
       player.CreateInput(PlayerInputTemplate);
       player.CreateEntityViewUpdater(EntityViewUpdaterTemplate, runner.Game);
       player.BindView(playerUi, IsFirstPlayer, true);
@@ -402,7 +402,7 @@ namespace Quantum {
       player.Runner = mainPlayer.Runner;
       player.MainPlayer = mainPlayer;
       player.PlayerSlot = playerSlot;
-      player.DetroyPlayerCallback = DestroyPlayer;
+      player.DestroyPlayerCallback = DestroyPlayer;
       player.CreateInput(PlayerInputTemplate);
       player.CreateEntityViewUpdater(EntityViewUpdaterTemplate, mainPlayer.Runner.Game);
       player.BindView(playerUi, IsFirstPlayer, false);

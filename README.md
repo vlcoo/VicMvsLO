@@ -33,7 +33,7 @@ Windows, Linux, and Mac Builds: https://github.com/ipodtouch0218/NSMB-MarioVsLui
 <details>
   <summary><h2>Opening in Unity Editor</h2></summary>
 
-1. Install Unity 2022.3.16f1 (or newer) via Unity Hub (Installs > Install Editor > Scroll to bottom, if you do not see the version of your choice here, switch to the "Archive" tab and open the "download archive" link)
+1. Install Unity 6000.0.48f1 (or newer) via Unity Hub (Installs > Install Editor > Scroll to bottom, if you do not see the version of your choice here, switch to the "Archive" tab and open the "download archive" link)
 2. Download and install [git](https://git-scm.com/downloads). Do NOT use the .zip download, as it will cause errors within Unity.
 3. Open Command Prompt (Windows) or Terminal (MacOS / Linux)
 4. Navigate to the folder you want the source code to be in using `cd <path>`. For example, `cd %USERPROFILE%\Documents` will save it in My Documents.
@@ -54,6 +54,7 @@ Windows, Linux, and Mac Builds: https://github.com/ipodtouch0218/NSMB-MarioVsLui
 
 ### Contributors:
 * [Amy54Desu](https://github.com/Amy54Desu)
+* [AprilShade](https://github.com/AprilShade)
 * [ArianLust](https://github.com/ArianLust)
 * [AtwerJ](https://github.com/AtwerJ)
 * [Ave](https://github.com/AutumnLeafy)
@@ -72,7 +73,6 @@ Windows, Linux, and Mac Builds: https://github.com/ipodtouch0218/NSMB-MarioVsLui
 * [Pordrack](https://github.com/Pordrack)
 * [skarph](https://github.com/skarph)
 * [Skillz](https://github.com/Skillz808)
-* [ShadowWalker13](https://github.com/ShadowWalker13)
 * [TheMoogle](https://github.com/TheMoogle)
 * [Tombuntu](https://github.com/ReXiSp)
 * [xFrostyCake123](https://github.com/xFrostyCake123)
@@ -87,43 +87,59 @@ Windows, Linux, and Mac Builds: https://github.com/ipodtouch0218/NSMB-MarioVsLui
 * vincells
 
 ### Translators:
-* 3UP
-* Akselai
-* AtwerJ
-* Bilhal
-* Cecilia
-* Davo
-* Filipianosol
-* Flandre Scarlet
-* Flichka
-* Freeze
-* HatsuneMiku
-* haywireghost
-* HD Erick Games
-* Hyruyoshi
-* Iketarou
-* Kate Karui
-* Lyroy The Toad
-* marbo
-* Mark19
-* MasterMindo
-* Med Animations
-* miyavmeow
-* Mr-STF
-* ossdekasaihassei
-* Shadow_Walker13
-* Snick, It's Him.
-* Thebababois369
-* Tombuntu
-* vlco_o
+* 3UP *(ja-jp)*
+* 6Alexis8 *(fr-fr)*
+* Akselai *(zh-cn, zh-tw)*
+* Aktan *(de-de)*
+* AprilShade *(en-gb)*
+* ArianLust *(de-de)*
+* Atwer *(fr-FR)*
+* Bilhal *(el-gr)*
+* Cecilia *(es-es)*
+* Davodio *(de-de)*
+* Filipianosol *(pl-pl)*
+* Floofdoge *(ar-eg)*
+* Foxyyy *(es-la)*
+* Freeze *(es-la)*
+* HatsuneMiku *(pl-pl)*
+* haywireghost *(es-la)*
+* HD Erick Games *(pt-br)*
+* Hyruyoshi *(fr-fr)*
+* ibroekmahphone *(ru-ru)*
+* Iketarou *(ja-jp)*
+* IvythePoS *(es-la)*
+* Kate Karui *(sv-sv)*
+* Lyroy The Toad *(it-it)*
+* Maestrike *(it-it)*
+* marbo *(pt-br)*
+* Mark19 *(es-es)*
+* MasterMindo *(it-it)*
+* Med Animations *(ar-eg)*
+* Meddourk95 *(ar-eg)*
+* Moddimation *(de-de)*
+* miyavmeow *(tr-tr)*
+* Mr-STF *(es-la)*
+* MUI_Noam *(he-il)*
+* notossdekasaihassei *(ja-jp)*
+* ossdekasaihassei *(ja-jp)*
+* pixelated *(he-il)*
+* SadenceZinzap *(tr-tr)*
+* SLG64 *(es-la)*
+* Snayp *(fr-fr)*
+* Thebababois369 *(id-id)*
+* Tombuntu *(ja-jp)*
+* Windows10V *(pt-br)*
+* vlco_o *(es-es, ro-ro)*
 
 ### QA Testing:
+* AprilShade
 * Ave
+* CreativeGhost
 * Cubby Crazes
 * Fawndue
 * Grape
+* MiiBumm
 * mindnomad
-* Shadow_Walker13
 * TheCyVap
 
 ### Level Design:

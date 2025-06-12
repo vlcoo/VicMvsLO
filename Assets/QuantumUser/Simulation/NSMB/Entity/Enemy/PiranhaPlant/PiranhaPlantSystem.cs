@@ -1,8 +1,7 @@
 using Photon.Deterministic;
-using UnityEngine;
 
 namespace Quantum {
-    public unsafe class PiranhaPlantSystem : SystemMainThreadFilterStage<PiranhaPlantSystem.Filter>, ISignalOnTileChanged, ISignalOnEnemyRespawned,
+    public unsafe class PiranhaPlantSystem : SystemMainThreadEntityFilter<PiranhaPlant, PiranhaPlantSystem.Filter>, ISignalOnTileChanged, ISignalOnEnemyRespawned,
         ISignalOnBreakableObjectChangedHeight, ISignalOnIceBlockBroken {
         
         public struct Filter {

@@ -1,9 +1,8 @@
 using Photon.Deterministic;
-using UnityEngine;
 
 namespace Quantum {
 
-    public unsafe class HoldableObjectSystem : SystemMainThreadFilterStage<HoldableObjectSystem.Filter>, ISignalOnComponentRemoved<Holdable>,
+    public unsafe class HoldableObjectSystem : SystemMainThreadEntityFilter<Holdable, HoldableObjectSystem.Filter>, ISignalOnComponentRemoved<Holdable>,
         ISignalOnTryLiquidSplash, ISignalOnEntityFreeze {
         
         public struct Filter {
@@ -37,7 +36,12 @@ namespace Quantum {
             }
 
             var physicsObject = filter.PhysicsObject;
-            physicsObject->Velocity = FPVector2.Zero;
+
+            FPVector2 newVel = FPVector2.Zero;
+            if (f.Unsafe.TryGetPointer(holdable->Holder, out PhysicsObject* holderPhysicsObject)) {
+                newVel = holderPhysicsObject->Velocity + holderPhysicsObject->ParentVelocity;
+            }
+            physicsObject->Velocity = newVel;
             physicsObject->WasTouchingGround = false;
             physicsObject->IsTouchingGround = false;
 

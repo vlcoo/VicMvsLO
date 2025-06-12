@@ -23,7 +23,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
 
     //---Constants
     public static readonly string RoomIdValidChars = "BCDFGHJKLMNPRQSTVWXYZ";
-    private static readonly int RoomIdLength = 8;
+    public static readonly int RoomIdLength = 4;
     private static readonly List<DisconnectCause> NonErrorDisconnectCauses = new() {
         DisconnectCause.None, DisconnectCause.DisconnectByClientLogic, DisconnectCause.ApplicationQuit,
     };
@@ -33,7 +33,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
     public static long? Ping => Client?.RealtimePeer.Stats.RoundtripTime;
     public static QuantumRunner Runner { get; private set; }
     public static QuantumGame Game => Runner?.Game ?? QuantumRunner.DefaultGame;
-    public static IEnumerable<Region> Regions => Client.RegionHandler.EnabledRegions.OrderBy(r => r.Code);
+    public static IEnumerable<Region> Regions => Client?.RegionHandler?.EnabledRegions?.OrderBy(r => r.Code);
     public static string Region => Client?.CurrentRegion ?? Instance.lastRegion;
     public static bool IsReplay => CurrentReplay != null;
     public static int ReplayStart => CurrentReplay?.Header.InitialFrameNumber ?? -1;
@@ -72,6 +72,9 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
         QuantumEvent.Subscribe<EventRecordingStarted>(this, OnRecordingStarted);
         QuantumEvent.Subscribe<EventGameEnded>(this, OnGameEnded);
         QuantumEvent.Subscribe<EventRulesChanged>(this, OnRulesChanged);
+        QuantumEvent.Subscribe<EventPlayerKickedFromRoom>(this, OnPlayerKickedFromRoom);
+
+        CurrentReplay = null;
     }
 
     public void Update() {
@@ -218,7 +221,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
         }
         id = id.ToUpper();
         regionIndex = RoomIdValidChars.IndexOf(id[0]);
-        return regionIndex >= 0 && regionIndex < Regions.Count() && Regex.IsMatch(id, $"[{RoomIdValidChars}]{{8}}");
+        return regionIndex >= 0 && regionIndex < Regions.Count() && Regex.IsMatch(id, $"[{RoomIdValidChars}]{{{RoomIdLength}}}");
     }
 
     public static async Task<short> JoinRoom(EnterRoomArgs args) {
@@ -231,7 +234,9 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
     }
 
     public unsafe void SaveReplay(QuantumGame game, sbyte winner) {
-#if UNITY_STANDALONE
+#if !UNITY_STANDALONE
+        return;
+#endif
         if (IsReplay || game.RecordInputStream == null) {
             SavedRecordingPath = null;
             return;
@@ -339,7 +344,6 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
         // Complete
         Debug.Log($"[Replay] Saved new temporary replay '{finalFilePath}' ({Utils.BytesToString(writtenBytes)})");
         DisposeReplay();
-#endif
     }
 
     private void DisposeReplay() {
@@ -407,7 +411,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
             },
             SessionConfig = QuantumDeterministicSessionConfigAsset.DefaultConfig,
             GameMode = DeterministicGameMode.Multiplayer,
-            PlayerCount = 10,
+            PlayerCount = Constants.MaxPlayers,
             Communicator = new QuantumNetworkCommunicator(Client),
         };
 
@@ -467,6 +471,12 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
 
     private unsafe void OnRulesChanged(EventRulesChanged e) {
         UpdateRealtimeProperties();
+    }
+
+    private void OnPlayerKickedFromRoom(EventPlayerKickedFromRoom e) {
+        if (e.Game.PlayerIsLocal(e.Player)) {
+            Runner.Shutdown(ShutdownCause.Ok);
+        }
     }
 
     private void OnGameEnded(EventGameEnded e) {
@@ -540,9 +550,9 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
             runtimeConfig = serializer.ConfigFromByteArray<RuntimeConfig>(replay.DecompressedRuntimeConfigData, compressed: true);
         }
         var deterministicConfig = DeterministicSessionConfig.FromByteArray(replay.DecompressedDeterministicConfigData);
-        var inputStream = new Photon.Deterministic.BitStream(replay.DecompressedInputData);
+        var inputStream = new BitStream(replay.DecompressedInputData);
         var replayInputProvider = new BitStreamReplayInputProvider(inputStream, ReplayEnd);
-
+        
         // Disable checksums- they murder performance.
         deterministicConfig.ChecksumInterval = 0;
 
@@ -557,7 +567,6 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
             InitialTick = ReplayStart,
             FrameData = replay.DecompressedInitialFrameData,
             DeltaTimeType = SimulationUpdateTime.EngineDeltaTime,
-            GameFlags = QuantumGameFlags.EnableTaskProfiler,
         };
 
         GlobalController.Instance.loadingCanvas.Initialize(null);

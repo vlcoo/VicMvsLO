@@ -1,7 +1,7 @@
 using Photon.Deterministic;
 
 namespace Quantum {
-    public unsafe class ProjectileSystem : SystemMainThreadFilterStage<ProjectileSystem.Filter>, ISignalOnProjectileHitEntity {
+    public unsafe class ProjectileSystem : SystemMainThreadEntityFilter<Projectile, ProjectileSystem.Filter>, ISignalOnProjectileHitEntity {
         public struct Filter {
             public EntityRef Entity;
             public Transform2D* Transform;
@@ -83,9 +83,11 @@ namespace Quantum {
                 Destroy(f, projectileEntity, projectileAsset.DestroyParticleEffect);
             } else if (projectileAsset.Bounce) {
                 var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(projectileEntity);
-                projectile->Speed *= Constants._0_66;
-                physicsObject->Velocity.Y = projectileAsset.BounceStrength;
+                projectile->Speed *= Constants._0_85;
+                physicsObject->Gravity *= Constants._0_85;
+                physicsObject->Velocity.Y = projectile->Speed;
 
+                f.Events.EnemyKicked(hitEntity, false);
                 if (projectile->Speed < 1) {
                     Destroy(f, projectileEntity, projectileAsset.DestroyParticleEffect);
                 }

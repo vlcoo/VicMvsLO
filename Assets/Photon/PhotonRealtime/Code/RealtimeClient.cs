@@ -1,4 +1,4 @@
-﻿// -----------------------------------------------------------------------
+// -----------------------------------------------------------------------
 // <copyright file="RealtimeClient.cs" company="Exit Games GmbH">
 // Photon Realtime API - Copyright (C) 2022 Exit Games GmbH
 // </copyright>
@@ -26,8 +26,6 @@ namespace Photon.Realtime
     #if SUPPORTED_UNITY
     using UnityEngine;
     using Debug = UnityEngine.Debug;
-    #endif
-    #if SUPPORTED_UNITY || NETFX_CORE
     using SupportClass = Photon.Client.SupportClass;
     #endif
 
@@ -188,6 +186,13 @@ namespace Photon.Realtime
 
         /// <summary>The game server's address for a particular room. In use temporarily, as assigned by master.</summary>
         public string GameServerAddress { get; protected internal set; }
+
+        /// <summary>Provides a custom function to re-write server addresses in case the client must use a third party relay.</summary>
+        /// <remarks>
+        /// Discord Activities can only communicate with the domain discord.com.
+        /// A forwarding system based on paths is used to replace addresses that are not on that domain.
+        /// </remarks>
+        public Func<string, ServerConnection, string> AddressRewriter;
 
         /// <summary>The server this client is currently connected or connecting to.</summary>
         /// <remarks>
@@ -647,7 +652,7 @@ namespace Photon.Realtime
             {
                 this.Server = ServerConnection.MasterServer;
                 int portToUse = appSettings.IsDefaultPort ? this.ProtocolPorts.Get(this.RealtimePeer.TransportProtocol, ServerConnection.MasterServer) : appSettings.Port;
-                this.MasterServerAddress = string.Format("{0}:{1}", appSettings.Server, portToUse);
+                this.MasterServerAddress = this.ToProtocolAddress(appSettings.Server, portToUse, this.RealtimePeer.TransportProtocol);
 
                 if (!this.RealtimePeer.Connect(this.MasterServerAddress, this.AppSettings.GetAppId(this.ClientType), photonToken: this.TokenForInit, proxyServerAddress: this.AppSettings.ProxyServer))
                 {
@@ -863,7 +868,7 @@ namespace Photon.Realtime
         }
 
 
-        /// <summary>Disconnects the peer from a server or stays disconnected. If the client / peer was connected, a callback will be triggered.</summary>
+        /// <summary>Disconnects the client from a server or stays disconnected. If the client was connected, a callback will be triggered.</summary>
         /// <remarks>
         /// Disconnect will attempt to notify the server of the client closing the connection.
         ///
@@ -872,7 +877,13 @@ namespace Photon.Realtime
         /// This method will not change the current State, if this client State is PeerCreated, Disconnecting or Disconnected.
         /// In those cases, there is also no callback for the disconnect. The DisconnectedCause will only change if the client was connected.
         /// </remarks>
-        public void Disconnect(DisconnectCause cause = DisconnectCause.DisconnectByClientLogic)
+        public void Disconnect()
+        {
+            this.Disconnect(DisconnectCause.DisconnectByClientLogic);
+        }
+
+        /// <summary>Disconnects the client / peer from a server or stays disconnected. Internal method that sets the DisconnectedCause as well.</summary>
+        internal void Disconnect(DisconnectCause cause = DisconnectCause.DisconnectByClientLogic)
         {
             if (this.State == ClientState.Disconnecting || this.State == ClientState.Disconnected || this.State == ClientState.PeerCreated)
             {
@@ -1115,10 +1126,10 @@ namespace Photon.Realtime
                 this.RealtimePeer.SocketImplementationConfig[ConnectionProtocol.WebSocketSecure] = websocketType;
             }
 
-            #if NET_4_6 && (UNITY_EDITOR || !ENABLE_IL2CPP) && !NETFX_CORE
-            this.RealtimePeer.SocketImplementationConfig[ConnectionProtocol.Udp] = typeof(SocketUdpAsync);
-            this.RealtimePeer.SocketImplementationConfig[ConnectionProtocol.Tcp] = typeof(SocketTcpAsync);
-            #endif
+            //#if NET_4_6 && (UNITY_EDITOR || !ENABLE_IL2CPP)
+            //this.RealtimePeer.SocketImplementationConfig[ConnectionProtocol.Udp] = typeof(SocketUdpAsync);
+            //this.RealtimePeer.SocketImplementationConfig[ConnectionProtocol.Tcp] = typeof(SocketTcpAsync);
+            //#endif
         }
 
 
@@ -1136,42 +1147,64 @@ namespace Photon.Realtime
                 protocolPort = this.AppSettings.Port;
             }
 
-            switch (this.RealtimePeer.TransportProtocol)
+            return this.ToProtocolAddress(this.NameServerHost, protocolPort, this.RealtimePeer.TransportProtocol);
+
+        }
+
+
+        /// <summary>Build URI from address, use Scheme, Host and Path but set the port as defined by port-field or default port. Calls AddressRewriter if set.</summary>
+        /// <exception cref="ArgumentException"></exception>
+        private string ToProtocolAddress(string address, int port, ConnectionProtocol protocol)
+        {
+            string protocolScheme = String.Empty;
+
+            switch (protocol)
             {
                 case ConnectionProtocol.Udp:
                 case ConnectionProtocol.Tcp:
-                    return string.Format("{0}:{1}", NameServerHost, protocolPort);
+                    return string.Format("{0}:{1}", address, port);
+
                 case ConnectionProtocol.WebSocket:
-                    return string.Format("ws://{0}:{1}", NameServerHost, protocolPort);
+                    protocolScheme = "ws://";
+                    break;
                 case ConnectionProtocol.WebSocketSecure:
-                    return string.Format("wss://{0}:{1}", NameServerHost, protocolPort);
+                    protocolScheme = "wss://";
+                    break;
+
                 default:
-                    throw new ArgumentOutOfRangeException();
+                    throw new ArgumentOutOfRangeException($"Can not handle protocol: {protocol}.");
             }
+
+            Uri uri = new Uri(protocolScheme + address);
+            string result = $"{uri.Scheme}://{uri.Host}:{port}{uri.AbsolutePath}";
+
+            if (this.AddressRewriter != null)
+            {
+                result = this.AddressRewriter(result, ServerConnection.NameServer);
+            }
+
+            return result;
         }
 
 
         /// <summary>Internally used to replace a port value in an address with an alternative port (overriding the provided one).</summary>
-        protected internal static string ReplacePortWithAlternative(string address, ushort replacementPort, string addressToReplace)
+        protected internal static string ReplacePortWithAlternative(string address, ushort replacementPort)
         {
-            if (replacementPort == 0)
+            if (string.IsNullOrEmpty(address) || replacementPort == 0)
             {
                 return address;
             }
 
-            //Debug.LogWarning("Incoming MasterServer Address: "+this.MasterServerAddress);
             bool webSocket = address.StartsWith("ws");
             if (webSocket)
             {
                 UriBuilder urib = new UriBuilder(address);
                 urib.Port = replacementPort;
-                //Debug.LogWarning("New MasterServer Address: "+this.MasterServerAddress);
                 return urib.ToString();
             }
             else
             {
                 UriBuilder urib = new UriBuilder($"scheme://{address}");
-                //Debug.LogWarning("New MasterServer Address: "+this.MasterServerAddress);
                 return string.Format("{0}:{1}", urib.Host, replacementPort);
             }
         }
@@ -1528,7 +1561,7 @@ namespace Photon.Realtime
                 case OperationCode.GetGameList:
                 case OperationCode.GetLobbyStats:
                 case OperationCode.JoinLobby: // You don't have to explicitly leave a lobby to join another (client can be in one max, at any time)
-                    return this.State == ClientState.ConnectedToMasterServer;
+                    return this.State == ClientState.ConnectedToMasterServer || this.InLobby;
                 case OperationCode.GetRegions:
                     return this.State == ClientState.ConnectedToNameServer;
             }
@@ -1684,6 +1717,12 @@ namespace Photon.Realtime
 
                         if (this.Server == ServerConnection.NameServer)
                         {
+                            if (this.AppSettings.AuthMode == AuthModeOption.AuthOnceWss && this.RealtimePeer.TransportProtocol != this.AppSettings.Protocol)
+                            {
+                                Log.Info($"AuthOnceWss response switches TransportProtocol to: {this.AppSettings.Protocol}.", this.LogLevel, this.LogPrefix);
+                                this.RealtimePeer.TransportProtocol = this.AppSettings.Protocol;
+                            }
+
                             string receivedCluster = operationResponse[ParameterCode.Cluster] as string;
                             if (!string.IsNullOrEmpty(receivedCluster))
                             {
@@ -1694,16 +1733,14 @@ namespace Photon.Realtime
                             this.MasterServerAddress = operationResponse[ParameterCode.Address] as string;
 
 
-                            if (this.AppSettings.AuthMode == AuthModeOption.AuthOnceWss && this.RealtimePeer.TransportProtocol != this.AppSettings.Protocol)
-                            {
-                                Log.Info($"AuthOnceWss response switches TransportProtocol to: {this.AppSettings.Protocol}.", this.LogLevel, this.LogPrefix);
-                                this.RealtimePeer.TransportProtocol = this.AppSettings.Protocol;
-                            }
-
                             ushort replacementPort = this.ProtocolPorts.Get(this.RealtimePeer.TransportProtocol, ServerConnection.MasterServer);
                             if (replacementPort != 0)
                             {
-                                this.MasterServerAddress = ReplacePortWithAlternative(this.MasterServerAddress, replacementPort, "MasterServerAddress");
+                                this.MasterServerAddress = ReplacePortWithAlternative(this.MasterServerAddress, replacementPort);
+                            }
+                            if (this.AddressRewriter != null)
+                            {
+                                this.MasterServerAddress = this.AddressRewriter(this.MasterServerAddress, ServerConnection.MasterServer);
                             }
 
                             this.DisconnectToReconnect();
@@ -1776,7 +1813,7 @@ namespace Photon.Realtime
                         return;
                     }
 
-                    this.RegionHandler.SetRegions(operationResponse);
+                    this.RegionHandler.SetRegions(operationResponse, this);
 
                     if (this.clientWorkflow == ClientWorkflowOption.GetRegionsOnly)
                     {
@@ -1828,7 +1865,11 @@ namespace Photon.Realtime
                             ushort replacementPort = this.ProtocolPorts.Get(this.RealtimePeer.TransportProtocol, ServerConnection.GameServer);
                             if (replacementPort != 0)
                             {
-                                this.GameServerAddress = ReplacePortWithAlternative(this.GameServerAddress, replacementPort, "GameServerAddress");
+                                this.GameServerAddress = ReplacePortWithAlternative(this.GameServerAddress, replacementPort);
+                            }
+                            if (this.AddressRewriter != null)
+                            {
+                                this.GameServerAddress = this.AddressRewriter(this.GameServerAddress, ServerConnection.GameServer);
                             }
 
                             string roomName = operationResponse[ParameterCode.RoomName] as string;
@@ -1917,10 +1958,6 @@ namespace Photon.Realtime
             switch (statusCode)
             {
                 case StatusCode.Connect:
-                    if (this.LogLevel >= LogLevel.Debug)
-                    {
-                        this.lastStatsLogTime = this.RealtimePeer.ConnectionTime;
-                    }
 
                     if (this.State == ClientState.ConnectingToNameServer)
                     {
@@ -1935,11 +1972,16 @@ namespace Photon.Realtime
                     if (this.State == ClientState.ConnectingToMasterServer)
                     {
                         this.Server = ServerConnection.MasterServer;
-                        this.ConnectionCallbackTargets.OnConnected(); // if initial connect
+                        this.AppSettings.EnableProtocolFallback = false;    // after reaching the Master Server, automatic protocol fallback should not be happen anymore
                     }
 
 
-                    Log.Info($"Connected to {this.Server}: {this.CurrentServerAddress} ({this.CurrentRegion}) PeerID: {this.RealtimePeer.PeerID}", this.LogLevel, this.LogPrefix);
+                    if (this.LogLevel >= LogLevel.Info)
+                    {
+                        this.lastStatsLogTime = this.RealtimePeer.ConnectionTime;
+                        Log.Info($"Connected to {this.Server}: {this.CurrentServerAddress} ({this.CurrentRegion}) PeerID: {this.RealtimePeer.PeerID}", this.LogLevel, this.LogPrefix);
+                    }
+
 
                     if (this.RealtimePeer.TransportProtocol != ConnectionProtocol.WebSocketSecure)
                     {
@@ -2015,9 +2057,11 @@ namespace Photon.Realtime
                     {
                         case ClientState.ConnectWithFallbackProtocol:
                             this.AppSettings.EnableProtocolFallback = false;        // the client does a fallback only one time
-                            this.RealtimePeer.TransportProtocol = (this.RealtimePeer.TransportProtocol == ConnectionProtocol.Tcp) ? ConnectionProtocol.Udp : ConnectionProtocol.Tcp;
+                            this.AppSettings.Protocol = ConnectionProtocol.WebSocketSecure;
+                            this.RealtimePeer.TransportProtocol = ConnectionProtocol.WebSocketSecure;
                             this.AppSettings.UseNameServer = true;                 // this does not affect the ServerSettings file, just this RealtimeClient
                             this.AppSettings.Port = 0;                             // this does not affect the ServerSettings file, just this RealtimeClient
+                            this.AuthValues.Token = null;
 
                             if (!this.RealtimePeer.Connect(this.NameServerAddress, this.AppSettings.GetAppId(this.ClientType), photonToken: this.TokenForInit, proxyServerAddress: this.AppSettings.ProxyServer))
                             {
@@ -2048,7 +2092,7 @@ namespace Photon.Realtime
 
                         default:
                             string stacktrace = "";
-                            #if DEBUG && !NETFX_CORE
+                            #if DEBUG
                             stacktrace = new System.Diagnostics.StackTrace(true).ToString();
                             #endif
                             Log.Warn(string.Format("Unexpected Disconnect. State: {0}. {1}: {2} Trace: {3}", this.State, this.Server, this.CurrentServerAddress, stacktrace), this.LogLevel, this.LogPrefix);
@@ -2080,7 +2124,7 @@ namespace Photon.Realtime
                     this.DisconnectedCause = DisconnectCause.ExceptionOnConnect;
 
                     // if enabled, the client can attempt to connect with another networking-protocol to check if that connects
-                    if (this.AppSettings.EnableProtocolFallback && this.State == ClientState.ConnectingToNameServer)
+                    if (this.AppSettings.EnableProtocolFallback && (this.State == ClientState.ConnectingToNameServer || this.State == ClientState.ConnectingToMasterServer) && this.RealtimePeer.UsedProtocol != ConnectionProtocol.WebSocketSecure)
                     {
                         this.State = ClientState.ConnectWithFallbackProtocol;
                     }
@@ -2114,7 +2158,7 @@ namespace Photon.Realtime
                     this.DisconnectedCause = DisconnectCause.ClientTimeout;
 
                     // if enabled, the client can attempt to connect with another networking-protocol to check if that connects
-                    if (this.AppSettings.EnableProtocolFallback && this.State == ClientState.ConnectingToNameServer)
+                    if (this.AppSettings.EnableProtocolFallback && (this.State == ClientState.ConnectingToNameServer || this.State == ClientState.ConnectingToMasterServer) && this.RealtimePeer.UsedProtocol != ConnectionProtocol.WebSocketSecure)
                     {
                         this.State = ClientState.ConnectWithFallbackProtocol;
                     }

@@ -29,3 +29,9 @@ synced event MarioPlayerCollectedStar {
 synced event MarioPlayerDroppedStar {
 	EntityRef Entity;
 }
+
+event CollectableDespawned {
+	EntityRef Entity;
+	nothashed FPVector2 Position;
+	bool Collected;
+}

@@ -54,20 +54,31 @@ namespace Quantum {
         return false;
       }
 
+      // if the source collider is child (same object, immediate- or deep-child),
+      // avoid using the source's scale in order to not scale the settings twice
+      Vector2 sourceScale2D;
+      Vector3 sourceScale3D;
+      if (collider.transform.IsChildOf(reference)) {
+        sourceScale2D = Vector2.one;
+        sourceScale3D = Vector3.one;
+      } else {
+        sourceScale2D = collider.transform.lossyScale.ToFPVector2().ToUnityVector2();
+        sourceScale3D = collider.transform.lossyScale;
+      }
+
       switch (collider) {
 #if QUANTUM_ENABLE_PHYSICS3D && !QUANTUM_DISABLE_PHYSICS3D
         case BoxCollider box:
           config.ShapeType      = Shape2DType.Box;
-          config.BoxExtents     = Vector3.Scale(box.size / 2, box.transform.lossyScale).ToFPVector2();
+          config.BoxExtents     = Vector3.Scale(box.size / 2, sourceScale3D).ToFPVector2();
           config.PositionOffset = reference.transform.InverseTransformPoint(box.transform.TransformPoint(box.center)).ToFPVector2();
           config.RotationOffset = (Quaternion.Inverse(reference.transform.rotation) * box.transform.rotation).ToFPRotation2DDegrees();
           isTrigger             = box.isTrigger;
           break;
 
         case SphereCollider sphere:
-          var sphereScale = sphere.transform.lossyScale;
           config.ShapeType      = Shape2DType.Circle;
-          config.CircleRadius   = (Math.Max(Math.Max(Math.Abs(sphereScale.x), Math.Abs(sphereScale.y)), Math.Abs(sphereScale.z)) * sphere.radius).ToFP();
+          config.CircleRadius   = (Math.Max(Math.Max(Math.Abs(sourceScale3D.x), Math.Abs(sourceScale3D.y)), Math.Abs(sourceScale3D.z)) * sphere.radius).ToFP();
           config.PositionOffset = reference.transform.InverseTransformPoint(sphere.transform.TransformPoint(sphere.center)).ToFPVector2();
           config.RotationOffset = (Quaternion.Inverse(reference.transform.rotation) * sphere.transform.rotation).ToFPRotation2DDegrees();
           isTrigger             = sphere.isTrigger;
@@ -77,7 +88,7 @@ namespace Quantum {
 #if QUANTUM_ENABLE_PHYSICS2D && !QUANTUM_DISABLE_PHYSICS2D
         case BoxCollider2D box:
           config.ShapeType      = Shape2DType.Box;
-          config.BoxExtents     = Vector2.Scale(box.size / 2, box.transform.lossyScale.ToFPVector2().ToUnityVector2()).ToFPVector2();
+          config.BoxExtents     = Vector2.Scale(box.size / 2, sourceScale2D).ToFPVector2();
           config.PositionOffset = reference.transform.InverseTransformPoint(box.transform.TransformPoint(box.offset.ToFPVector2().ToUnityVector3())).ToFPVector2();
 
           var refBoxTransform2D = Transform2D.Create(reference.transform.position.ToFPVector2(), reference.transform.rotation.ToFPRotation2D());
@@ -87,9 +98,8 @@ namespace Quantum {
           break;
 
         case CircleCollider2D circle:
-          var circleScale = circle.transform.lossyScale.ToFPVector2().ToUnityVector2();
           config.ShapeType      = Shape2DType.Circle;
-          config.CircleRadius   = (Math.Max(Math.Abs(circleScale.x), Math.Abs(circleScale.y)) * circle.radius).ToFP();
+          config.CircleRadius   = (Math.Max(Math.Abs(sourceScale2D.x), Math.Abs(sourceScale2D.y)) * circle.radius).ToFP();
           config.PositionOffset = reference.transform.InverseTransformPoint(circle.transform.TransformPoint(circle.offset.ToFPVector2().ToUnityVector3())).ToFPVector2();
 
           var refCircleTransform2D = Transform2D.Create(reference.transform.position.ToFPVector2(), reference.transform.rotation.ToFPRotation2D());
@@ -99,14 +109,9 @@ namespace Quantum {
           break;
 
         case CapsuleCollider2D capsule:
-#if QUANTUM_XY
-          var capsuleScale = capsule.transform.lossyScale.ToFPVector2().ToUnityVector2();
-#else
-          var capsuleScale = new Vector2(capsule.transform.lossyScale.x,capsule.transform.lossyScale.z);
-#endif
           config.ShapeType      = Shape2DType.Capsule;
-          config.CapsuleSize.X   = (Math.Abs(capsuleScale.x) * capsule.size.x).ToFP();
-          config.CapsuleSize.Y   = (Math.Abs(capsuleScale.y) * capsule.size.y).ToFP();
+          config.CapsuleSize.X   = (Math.Abs(sourceScale2D.x) * capsule.size.x).ToFP();
+          config.CapsuleSize.Y   = (Math.Abs(sourceScale2D.y) * capsule.size.y).ToFP();
           config.PositionOffset = reference.transform.InverseTransformPoint(capsule.transform.TransformPoint(capsule.offset.ToFPVector2().ToUnityVector3())).ToFPVector2();
 
           var refCapsuleTransform2D = Transform2D.Create(reference.transform.position.ToFPVector2(), reference.transform.rotation.ToFPRotation2D());
@@ -158,30 +163,32 @@ namespace Quantum {
         return false;
       }
 
+      // if the source collider is child (same object, immediate- or deep-child),
+      // avoid using the source's scale in order to not scale the settings twice
+      var sourceScale = collider.transform.IsChildOf(reference) ? Vector3.one : collider.transform.lossyScale;
+
       switch (collider) {
 #if QUANTUM_ENABLE_PHYSICS3D && !QUANTUM_DISABLE_PHYSICS3D
         case BoxCollider box:
           config.ShapeType      = Shape3DType.Box;
-          config.BoxExtents     = Vector3.Scale(box.size / 2, box.transform.lossyScale).ToFPVector3();
+          config.BoxExtents     = Vector3.Scale(box.size / 2, sourceScale).ToFPVector3();
           config.PositionOffset = reference.transform.InverseTransformPoint(box.transform.TransformPoint(box.center)).ToFPVector3();
           config.RotationOffset = (Quaternion.Inverse(reference.transform.rotation) * box.transform.rotation).eulerAngles.ToFPVector3();
           isTrigger             = box.isTrigger;
           break;
 
         case SphereCollider sphere:
-          var sphereScale = sphere.transform.lossyScale;
           config.ShapeType      = Shape3DType.Sphere;
-          config.SphereRadius   = (Math.Max(Math.Max(Math.Abs(sphereScale.x), Math.Abs(sphereScale.y)), Math.Abs(sphereScale.z)) * sphere.radius).ToFP();
+          config.SphereRadius   = (Math.Max(Math.Max(Math.Abs(sourceScale.x), Math.Abs(sourceScale.y)), Math.Abs(sourceScale.z)) * sphere.radius).ToFP();
           config.PositionOffset = reference.transform.InverseTransformPoint(sphere.transform.TransformPoint(sphere.center)).ToFPVector3();
           config.RotationOffset = (Quaternion.Inverse(reference.transform.rotation) * sphere.transform.rotation).eulerAngles.ToFPVector3();
           isTrigger             = sphere.isTrigger;
           break;
 
         case CapsuleCollider capsule:
-          var capsuleScale = capsule.transform.lossyScale;
           config.ShapeType      = Shape3DType.Capsule;
-          config.CapsuleRadius   = (Math.Max(Math.Max(Math.Abs(capsuleScale.x), Math.Abs(capsuleScale.y)), Math.Abs(capsuleScale.z)) * capsule.radius).ToFP();
-          config.CapsuleHeight  =  (Math.Abs(capsuleScale.y) * capsule.height).ToFP();
+          config.CapsuleRadius   = (Math.Max(Math.Max(Math.Abs(sourceScale.x), Math.Abs(sourceScale.y)), Math.Abs(sourceScale.z)) * capsule.radius).ToFP();
+          config.CapsuleHeight  =  (Math.Abs(sourceScale.y) * capsule.height).ToFP();
           config.PositionOffset = reference.transform.InverseTransformPoint(capsule.transform.TransformPoint(capsule.center)).ToFPVector3();
           config.RotationOffset = (Quaternion.Inverse(reference.transform.rotation) * capsule.transform.rotation).eulerAngles.ToFPVector3();
           isTrigger             = capsule.isTrigger;
@@ -1120,11 +1127,9 @@ namespace Quantum {
         throw new ArgumentException(nameof(previousSceneName));
       }
 
-      /*
       if (string.IsNullOrEmpty(newSceneName)) {
         throw new ArgumentException(nameof(newSceneName));
       }
-      */
 
       VerboseLog($"Switching scenes from {previousSceneName} to {newSceneName} (unloadFirst: {unloadFirst})");
 
@@ -1146,13 +1151,10 @@ namespace Quantum {
         }
 
         PublishCallback(_callbackUnitySceneLoadBegin, newSceneName);
-        if (SceneUtility.GetBuildIndexByScenePath(newSceneName) != -1) {
-
-          yield return SceneManager.LoadSceneAsync(newSceneName, loadSceneMode);
-          var newScene = SceneManager.GetSceneByName(newSceneName);
-          if (newScene.IsValid()) {
-            SceneManager.SetActiveScene(newScene);
-          }
+        yield return SceneManager.LoadSceneAsync(newSceneName, loadSceneMode);
+        var newScene = SceneManager.GetSceneByName(newSceneName);
+        if (newScene.IsValid()) {
+          SceneManager.SetActiveScene(newScene);
         }
 
         PublishCallback(_callbackUnitySceneLoadDone, newSceneName);
@@ -1209,24 +1211,19 @@ namespace Quantum {
         return;
       }
 
-      var coroHost = QuantumMapLoader.Instance;
-      Debug.Assert(coroHost != null);
-
-      string previousScene = _currentMap?.Scene ?? string.Empty;
-      string newScene = map?.Scene ?? string.Empty;
-
-      bool isNewSceneLoaded = SceneManager.GetSceneByName(newScene).IsValid();
+      bool isNewSceneLoaded = SceneManager.GetSceneByName(map.Scene).IsValid();
       if (isNewSceneLoaded) {
         VerboseLog($"Scene {map.Scene} appears to have been loaded externally.");
         _currentMap               = map;
         _currentSceneNeedsCleanup = false;
-
-        if (loadMode == SimulationConfig.AutoLoadSceneFromMapMode.LoadThenUnloadPreviousScene || loadMode == SimulationConfig.AutoLoadSceneFromMapMode.UnloadPreviousSceneThenLoad) {
-          // Fallback: return 
-          _coroutine = coroHost.StartCoroutine(UnloadScene(previousScene));
-        }
         return;
       }
+
+      var coroHost = QuantumMapLoader.Instance;
+      Debug.Assert(coroHost != null);
+
+      string previousScene = _currentMap?.Scene ?? string.Empty;
+      string newScene      = map.Scene;
 
       _currentMap               = map;
       _currentSceneNeedsCleanup = true;
@@ -1234,14 +1231,14 @@ namespace Quantum {
       if (SceneManager.GetSceneByName(previousScene).IsValid()) {
         VerboseLog($"Previous scene \"{previousScene}\" was loaded, starting transition with mode {loadMode}");
         if (loadMode == SimulationConfig.AutoLoadSceneFromMapMode.LoadThenUnloadPreviousScene) {
-          _coroutine = coroHost.StartCoroutine(SwitchScene(previousScene, newScene, unloadFirst: false));
+          _coroutine  = coroHost.StartCoroutine(SwitchScene(previousScene, newScene, unloadFirst: false));
           _currentMap = map;
         } else if (loadMode == SimulationConfig.AutoLoadSceneFromMapMode.UnloadPreviousSceneThenLoad) {
-          _coroutine = coroHost.StartCoroutine(SwitchScene(previousScene, newScene, unloadFirst: true));
+          _coroutine  = coroHost.StartCoroutine(SwitchScene(previousScene, newScene, unloadFirst: true));
           _currentMap = map;
         } else {
           // legacy mode
-          _coroutine = coroHost.StartCoroutine(UnloadScene(previousScene));
+          _coroutine  = coroHost.StartCoroutine(UnloadScene(previousScene));
           _currentMap = null;
         }
       } else {
@@ -1605,12 +1602,25 @@ namespace Quantum {
       where TDispatchable : TDispatchableBase {
       return Dispatcher.SubscribeManual(handler, once, filter);
     }
+    
+    /// <inheritdoc cref="DispatcherBase.SubscribeManual{TDispatchable}(Quantum.DispatchableHandler{TDispatchable},bool,Quantum.DispatchableFilter)"/>
+    public static IDisposable SubscribeManual<TDispatchable>(DispatchableHandler<TDispatchable> handler, IDeterministicGame game, bool once = false)
+      where TDispatchable : TDispatchableBase {
+      return SubscribeManual(handler, g => g == game, once);
+    }
 
     /// <inheritdoc cref="DispatcherBase.Unsubscribe"/>
     public static bool Unsubscribe(DispatcherSubscription subscription) {
       return Dispatcher.Unsubscribe(subscription);
     }
 
+    /// <inheritdoc cref="DispatcherBase.Unsubscribe"/>
+    public static bool Unsubscribe(ref DispatcherSubscription subscription) {
+      var result = Dispatcher.Unsubscribe(subscription);
+      subscription = default;
+      return result;
+    }
+    
     /// <inheritdoc cref="DispatcherBase.UnsubscribeListener"/>
     public static bool UnsubscribeListener(object listener) {
       return Dispatcher.UnsubscribeListener(listener);
@@ -1620,12 +1630,20 @@ namespace Quantum {
     public static bool UnsubscribeListener<TDispatchable>(object listener) where TDispatchable : TDispatchableBase {
       return Dispatcher.UnsubscribeListener<TDispatchable>(listener);
     }
-
+    
+    public static bool IsSubscribed<TDispatchable>(object listener) where TDispatchable : TDispatchableBase {
+      return Dispatcher.IsListenerSubscribed<TDispatchable>(listener);
+    }
+    
     private static void EnsureWorkerExistsAndIsActive() {
       if (_worker) {
         if (!_worker.isActiveAndEnabled)
           throw new InvalidOperationException($"{typeof(QuantumUnityStaticDispatcherAdapterWorker)} is disabled");
 
+        return;
+      }
+
+      if (!Application.isPlaying) {
         return;
       }
 
@@ -1821,6 +1839,13 @@ namespace Quantum {
     /// Is toggled during <see cref="Activate"/> and <see cref="Deactivate"/>."/>
     /// </summary>
     bool IsActive { get; }
+    /// <summary>
+    /// Returns <see cref="IsActive"/>
+    /// </summary>
+    bool IsActiveAndEnabled { get; }
+    /// <summary>
+    /// The initialized state has to kept track of by the view component to not call it multiple times.
+    /// </summary>
     bool IsInitialized { get; }
   }
 }
@@ -2020,7 +2045,7 @@ namespace Quantum {
   /// <summary>
   /// The view bind behaviour controls when the view is created. For entities on the predicted or entities on the verified frame. 
   /// Because the verified frame is confirmed by the server this bind behaviour will show local entity views delayed.
-  /// When using non-verifed it may happen that they get destroyed when the frame is finally confirmed by the server.
+  /// When using non-verified it may happen that they get destroyed when the frame is finally confirmed by the server.
   /// </summary>
   public enum QuantumEntityViewBindBehaviour {
     /// <summary>
@@ -2434,6 +2459,7 @@ namespace Quantum {
   /// <summary>
   /// The base class to inherit entity view components from.
   /// Entity view components can be used to add features to entity views and gain simple access to all relevant Quantum game API and the Quantum entity.
+  /// The view component is not updated (OnUpdateView, OnLateUpdateView) if the behaviour has been disabled.
   /// </summary>
   /// <typeparam name="T">The type of the custom view context used by this view component. Can be `IQuantumEntityViewContext` if not required.</typeparam>
   public abstract class QuantumViewComponent<T> : QuantumMonoBehaviour, IQuantumViewComponent where T : IQuantumViewContext {
@@ -2462,11 +2488,16 @@ namespace Quantum {
     /// </summary>
     public T ViewContext { get; private set; }
     /// <summary>
-    /// Is the view component currently activated.
+    /// Is the view component currently activated and not inside the pool.
     /// </summary>
     public bool IsActive { get; private set; }
     /// <summary>
-    /// Returns true if the view component has been initialized.
+    /// Returns <see langword="true"/> if the view component is <see cref="IsActive"/>, 
+    /// not null and <see cref="Behaviour.enabled"/> and the gameObject not null and <see cref="GameObject.activeInHierarchy"/>.
+    /// </summary>
+    public bool IsActiveAndEnabled => IsActive && this != null && enabled && gameObject != null && gameObject.activeInHierarchy;
+    /// <summary>
+    /// Returns <see langword="true"/> if the view component has been initialized.
     /// </summary>
     public bool IsInitialized { get; private set; }
 
@@ -2693,7 +2724,7 @@ namespace Quantum {
   /// The gizmo settings for the Quantum game.
   /// </summary>
   [Serializable]
-  public class QuantumGameGizmosSettings {
+  public partial class QuantumGameGizmosSettings {
     /// <summary>
     /// The Unity overlay UI id used for the Quantum gizmos.
     /// </summary>
@@ -2709,6 +2740,9 @@ namespace Quantum {
     /// How bright the gizmos are when selected.
     /// </summary>
     [Range(1.1f, 2)] public float SelectedBrightness = 1.1f;
+
+    [Header("Debug Draw"), GizmoIconColor(ScriptHeaderBackColor.Green)]
+    public QuantumGizmoEntry DebugDraw = new QuantumGizmoEntry(Color.white) { Enabled = true };
 
     /// <summary>
     /// Draw the prediction area. Only available at runtime.
@@ -2781,22 +2815,21 @@ namespace Quantum {
     /// Draw the entity's physics joints.
     /// </summary>
     public JointGizmoEntry PhysicsJoints = new JointGizmoEntry(
-        QuantumGizmoColors.TransparentLimeGreen,
-        secondaryColor: QuantumGizmoColors.TransparentYellow,
-        warningColor: QuantumGizmoColors.TransparentRed) { Enabled = true, DisableFill = true, OnlyDrawSelected = true };
+      QuantumGizmoColors.TransparentLimeGreen,
+      secondaryColor: QuantumGizmoColors.TransparentYellow,
+      warningColor: QuantumGizmoColors.TransparentRed) { Enabled = true, DisableFill = true, OnlyDrawSelected = true };
 
     /// <summary>
     /// Should NavMesh components be scaled with the agent radius?
     /// </summary>
-    [Header("NavMesh Settings")]
-    public Boolean ScaleComponentsWithAgentRadius = true;
-    
+    [Header("NavMesh Settings")] public Boolean ScaleComponentsWithAgentRadius = true;
+
     /// <summary>
     /// Draw the NavMesh. The QuantumMap game object will trigger DrawOnlySelected.
     /// </summary>
     [Header("NavMesh Gizmos"), GizmoIconColor(ScriptHeaderBackColor.Blue)]
     public NavMeshGizmoEntry NavMesh = new NavMeshGizmoEntry(QuantumGizmoColors.TransparentLightBlue, QuantumGizmoColors.TransparentMaroon) { Enabled = true, OnlyDrawSelected = true };
-    
+
     /// <summary>
     /// Draw the border of the NavMesh.
     /// </summary>
@@ -2815,7 +2848,7 @@ namespace Quantum {
     /// <summary>
     /// Draw the NavMesh links.
     /// </summary>
-    public QuantumGizmoEntry NavMeshLinks = new QuantumGizmoEntry(QuantumGizmoColors.Blue) { OnlyDrawSelected = true };
+    public QuantumGizmoEntry NavMeshLinks = new QuantumGizmoEntry(QuantumGizmoColors.Blue) { Enabled = true, OnlyDrawSelected = true };
 
     /// <summary>
     /// Draw the vertex normals of the NavMesh.
@@ -2879,9 +2912,9 @@ namespace Quantum {
       if (physicsBody.HasValue == false) {
         return KinematicColliders;
       }
-      
+
       var body = physicsBody.Value;
-      
+
       if (body.IsKinematic) {
         entry = KinematicColliders;
       } else if (body.IsSleeping) {
@@ -2896,12 +2929,12 @@ namespace Quantum {
     }
 
     private QuantumGizmoEntry GetEntryForBody2D(PhysicsBody2D? physicsBody) {
-      if(physicsBody.HasValue == false) {
+      if (physicsBody.HasValue == false) {
         return KinematicColliders;
       }
-      
+
       var body = physicsBody.Value;
-      
+
       var entry = default(QuantumGizmoEntry);
       if (body.IsKinematic) {
         entry = KinematicColliders;
@@ -2924,11 +2957,11 @@ namespace Quantum {
     /// <returns></returns>
     public QuantumGizmoEntry GetEntryForPhysicsEntity3D(Frame frame, EntityRef handle) {
       var body = default(PhysicsBody3D?);
-      
+
       if (frame.TryGet(handle, out PhysicsBody3D physicsBody)) {
         body = physicsBody;
       }
-      
+
       var entry = GetEntryForBody3D(body);
       return entry;
     }
@@ -2941,13 +2974,46 @@ namespace Quantum {
     /// <returns></returns>
     public QuantumGizmoEntry GetEntryForPhysicsEntity2D(Frame frame, EntityRef handle) {
       var body = default(PhysicsBody2D?);
-      
+
       if (frame.TryGet(handle, out PhysicsBody2D physicsBody)) {
         body = physicsBody;
       }
-      
+
       var entry = GetEntryForBody2D(body);
       return entry;
+    }
+  }
+}
+
+#endregion
+
+
+#region Assets/Photon/Quantum/Runtime/Gizmos/Config/QuantumGizmoCallbackAttribute.cs
+
+namespace Quantum {
+  using System;
+
+  public class QuantumGizmoCallbackAttribute : Attribute {
+    /// <summary>
+    /// Should the gizmo be drawn only at runtime.
+    /// </summary>
+    public bool RuntimeOnly { get; set; }
+    /// <summary>
+    /// The name of the field to draw the gizmo for.
+    /// </summary>
+    public string FieldName { get; set; }
+    /// <summary>
+    /// The name of the method to call to validate the selection.
+    /// </summary>
+    public string SelectionValidation { get; set; }
+
+    /// <summary>
+    /// Attribute used to mark a method as a callback for drawing a gizmo in the Unity editor for Quantum user-defined gizmo entries.
+    /// </summary>
+    public QuantumGizmoCallbackAttribute(string fieldName, bool runtimeOnly = false, string selectionValidation = null) {
+      FieldName = fieldName;
+      SelectionValidation = selectionValidation;
+      RuntimeOnly = runtimeOnly;
     }
   }
 }
@@ -2970,6 +3036,10 @@ namespace Quantum {
 
     [SerializeField] private bool _value;
 
+    /// <summary>
+    /// Create a new optional gizmo value with the given value.
+    /// </summary>
+    /// <param name="value"></param>
     public OptionalGizmoBool(bool value) {
       _hasValue = true;
       this._value = value;
@@ -2995,6 +3065,7 @@ namespace Quantum {
     /// <param name="optional"></param>
     /// <returns></returns>
     public static implicit operator bool(OptionalGizmoBool optional) => optional.Value;
+
     /// <summary>
     /// Implicitly convert a bool to an optional gizmo value.
     /// </summary>
@@ -3039,7 +3110,7 @@ namespace Quantum {
     /// The color of the gizmo when it is inactive.
     /// </summary>
     public Color InactiveColor => Color.Desaturate();
-    
+
     /// <summary>
     /// The transparent version of the gizmo color.
     /// </summary>
@@ -3056,6 +3127,18 @@ namespace Quantum {
     /// <param name="color"></param>
     public QuantumGizmoEntry(Color color) {
       Color = color;
+    }
+  }
+
+  /// <summary>
+  /// User defined gizmo entry.
+  /// </summary>
+  [Serializable]
+  public class QuantumUserGizmoEntry : QuantumGizmoEntry {
+    /// <inheritdoc />
+    public QuantumUserGizmoEntry(Color color) : base(color) {
+      OnlyDrawSelected = false;
+      Enabled = true;
     }
   }
 
@@ -3084,7 +3167,7 @@ namespace Quantum {
     /// The secondary color of the joint gizmo.
     /// </summary>
     public Color SecondaryColor;
-    
+
     /// <summary>
     /// The warning color of the joint gizmo.
     /// </summary>
@@ -3132,7 +3215,7 @@ namespace Quantum {
     /// Should the normals of the border be drawn.
     /// </summary>
     public bool DrawNormals;
-    
+
     /// <summary>
     /// The color of the border normals.
     /// </summary>
@@ -3180,6 +3263,7 @@ namespace Quantum {
 #if UNITY_EDITOR
   using System;
   using System.Collections.Generic;
+  using System.Reflection;
   using Photon.Analyzer;
   using UnityEditor;
   using UnityEngine;
@@ -3232,6 +3316,13 @@ namespace Quantum {
     public float UpperAngle;
   }
 
+  internal class UserGizmoCallback {
+    public QuantumGizmoCallbackAttribute Attribute;
+    public MethodInfo Method;
+    public MethodInfo SelectionValidation;
+    public QuantumUserGizmoEntry Entry;
+  }
+
   /// <summary>
   /// Draws gizmos for the Quantum simulation.
   /// </summary>
@@ -3243,6 +3334,8 @@ namespace Quantum {
     [StaticField] private static readonly Dictionary<MonoBehaviour, StaticMeshColliderGizmoData> _meshGizmoData =
       new Dictionary<MonoBehaviour, StaticMeshColliderGizmoData>();
 
+    [StaticField] private static UserGizmoCallback[] _userCallbacks;
+
     private static QuantumEntityViewUpdater _evu;
     private static QuantumMapData _mapData;
 
@@ -3250,6 +3343,70 @@ namespace Quantum {
       SceneManager.sceneLoaded += (arg0, mode) => {
         InvalidatePhysicsGizmos();
       };
+
+      EditorApplication.update += InvokeGizmoUser;
+    }
+
+    [StaticFieldResetMethod]
+    private static void InvokeGizmoUser() {
+      var callbacks = GetUserCallbacks();
+      var evu = GetEntityViewUpdater();
+
+      var settings = QuantumGameGizmosSettingsScriptableObject.Global.Settings;
+
+      if (evu == null) {
+        return;
+      }
+
+      foreach (var callback in callbacks) {
+        bool runtimeOnly = callback.Attribute.RuntimeOnly;
+
+        if (runtimeOnly && !Application.isPlaying) {
+          continue;
+        }
+
+        bool selected = callback.SelectionValidation == null || (bool)callback.SelectionValidation.Invoke(settings, null);
+
+        if (ShouldDraw(callback.Entry, selected, false)) {
+          callback.Method.Invoke(settings, null);
+        }
+      }
+    }
+
+    private static UserGizmoCallback[] GetUserCallbacks() {
+      if (_userCallbacks == null) {
+        var gizmoSettings = QuantumGameGizmosSettingsScriptableObject.Global.Settings;
+
+        var userCallbacks = new List<UserGizmoCallback>();
+
+        // check the gizmoSettings for the attribute
+        var settingsType = gizmoSettings.GetType();
+        var settingsMethods = settingsType.GetMethods(
+          BindingFlags.Instance |
+          BindingFlags.Public |
+          BindingFlags.NonPublic |
+          BindingFlags.Static
+        );
+
+        foreach (var method in settingsMethods) {
+          var attributes = method.GetCustomAttributes(typeof(QuantumGizmoCallbackAttribute), false);
+          if (attributes.Length > 0) {
+            var attr = (QuantumGizmoCallbackAttribute)attributes[0];
+            userCallbacks.Add(new UserGizmoCallback {
+              Attribute = attr,
+              Method = method,
+              SelectionValidation = attr.SelectionValidation != null
+                ? settingsType.GetMethod(attr.SelectionValidation, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static)
+                : null,
+              Entry = (QuantumUserGizmoEntry)settingsType.GetField(attr.FieldName).GetValue(gizmoSettings)
+            });
+          }
+        }
+
+        _userCallbacks = userCallbacks.ToArray();
+      }
+
+      return _userCallbacks;
     }
 
     /// <summary>
@@ -4618,8 +4775,9 @@ namespace Quantum {
       }
     }
 
-    private static unsafe void DrawShape2DGizmo(Shape2D s, Vector3 pos, Quaternion rot, Color color, float height,
-      Frame currentFrame, QuantumGizmoStyle style = default) {
+    /// <inheritdoc cref="QuantumGameGizmos.DrawShape3DGizmo"/> 
+    public static unsafe void DrawShape2DGizmo(Shape2D s, Vector3 pos, Quaternion rot, Color color, float height,
+      Frame currentFrame = null, QuantumGizmoStyle style = default) {
       var localOffset = s.LocalTransform.Position.ToUnityVector3();
       var localRotation = s.LocalTransform.Rotation.ToUnityQuaternion();
 
@@ -5410,7 +5568,10 @@ namespace Quantum {
       DrawGizmosJointInternal(ref param, gizmosSettings, fill);
     }
 
-    private static unsafe void DrawShape3DGizmo(Shape3D s, Vector3 position, Quaternion rotation, Color color,
+    /// <summary>
+    /// Draws a gizmo of a given shape at the specified position and rotation
+    /// </summary>
+    public static unsafe void DrawShape3DGizmo(Shape3D s, Vector3 position, Quaternion rotation, Color color,
       QuantumGizmoStyle style = default) {
       var localOffset = s.LocalTransform.Position.ToUnityVector3();
       var localRotation = s.LocalTransform.Rotation.ToUnityQuaternion();
@@ -6386,6 +6547,7 @@ namespace Quantum {
   using UnityEngine;
   using UnityEngine.AddressableAssets;
   using UnityEngine.ResourceManagement.AsyncOperations;
+  using static InternalLogStreams;
 
   /// <summary>
   /// An Addressables-based implementation of the asset source pattern. The asset is loaded from the Addressables system.
@@ -6447,13 +6609,13 @@ namespace Quantum {
 
     /// <inheritdoc cref="QuantumAssetSourceResource{T}.WaitForResult"/>
     public T WaitForResult() {
-      Debug.Assert(_op.IsValid());
+      Assert.Check(_op.IsValid());
       if (!_op.IsDone) {
         try {
           _op.WaitForCompletion();
         } catch (Exception e) when (!Application.isPlaying && typeof(Exception) == e.GetType()) {
-          Debug.LogError($"An exception was thrown when loading asset: {RuntimeKey}; since this method " +
-            $"was called from the editor, it may be due to the fact that Addressables don't have edit-time load support. Please use EditorInstance instead.");
+          LogError?.Log($"An exception was thrown when loading asset: {RuntimeKey}; since this method " +
+                        $"was called from the editor, it may be due to the fact that Addressables don't have edit-time load support. Please use EditorInstance instead.");
           throw;
         }
       }
@@ -6462,12 +6624,12 @@ namespace Quantum {
         throw new InvalidOperationException($"Failed to load asset: {RuntimeKey}", _op.OperationException);
       }
       
-      Debug.AssertFormat(_op.Result != null, "_op.Result != null");
+      Assert.Check(_op.Result != null, "_op.Result != null");
       return ValidateResult(_op.Result);
     }
     
     private void LoadInternal(bool synchronous) {
-      Debug.Assert(!_op.IsValid());
+      Assert.Check(!_op.IsValid());
 
       _op = Addressables.LoadAssetAsync<UnityEngine.Object>(RuntimeKey);
       if (!_op.IsValid()) {
@@ -6608,7 +6770,7 @@ namespace Quantum {
     /// </summary>
     /// <returns>The loaded asset</returns>
     public T WaitForResult() {
-      Debug.Assert(_state != null);
+      Assert.Check(_state != null);
       if (_state is ResourceRequest asyncOp) {
         if (asyncOp.isDone) {
           FinishAsyncOp(asyncOp);
@@ -6662,7 +6824,7 @@ namespace Quantum {
     }
     
     private void LoadInternal(bool synchronous) {
-      Debug.Assert(_state == null);
+      Assert.Check(_state == null);
       try {
         if (synchronous) {
           _state = string.IsNullOrEmpty(SubObjectName) ? UnityResources.Load<T>(ResourcePath) : LoadNamedResource(ResourcePath, SubObjectName);
@@ -6881,6 +7043,7 @@ namespace Quantum {
   using UnityEngine.AddressableAssets;
   using UnityEngine.ResourceManagement.AsyncOperations;
 #endif
+  using static InternalLogStreams;
   
   /// <summary>
   /// If applied at the assembly level, allows <see cref="QuantumGlobalScriptableObject{T}"/> to be loaded with Addressables.
@@ -6913,10 +7076,11 @@ namespace Quantum {
         return new (instance, x => Addressables.Release(op));
       }
       
-      Log.Trace($"Failed to load addressable at address {Address} for type {type.FullName}: {op.OperationException}");
+      
+      LogTrace?.Log($"Failed to load addressable at address {Address} for type {type.FullName}: {op.OperationException}");
       return default;
 #else
-      Log.Trace($"Addressables are not enabled. Unable to load addressable for {type.FullName}");
+      LogTrace?.Log($"Addressables are not enabled. Unable to load addressable for {type.FullName}");
       return default;
 #endif
     }
@@ -6935,6 +7099,7 @@ namespace Quantum {
   using UnityEngine;
   using UnityEngine.Scripting;
   using Object = UnityEngine.Object;
+  using static InternalLogStreams;
   
   /// <summary>
   /// If applied at the assembly level, allows <see cref="QuantumGlobalScriptableObject{T}"/> to be loaded with Resources.
@@ -6972,7 +7137,7 @@ namespace Quantum {
         string defaultAssetPath = attribute.DefaultPath;
         var indexOfResources = defaultAssetPath.LastIndexOf("/Resources/", StringComparison.OrdinalIgnoreCase);
         if (indexOfResources < 0) {
-          Log.Trace($"The default path {defaultAssetPath} does not contain a /Resources/ folder. Unable to load resource for {type.FullName}.");
+          LogTrace?.Log($"The default path {defaultAssetPath} does not contain a /Resources/ folder. Unable to load resource for {type.FullName}.");
           return default;
         }
 
@@ -6989,7 +7154,7 @@ namespace Quantum {
 
       var instance = UnityEngine.Resources.Load(resourcePath, type);
       if (!instance) {
-        Log.Trace($"Unable to load resource at path {resourcePath} for type {type.FullName}");
+        LogTrace?.Log($"Unable to load resource at path {resourcePath} for type {type.FullName}");
         return default;
       }
 
@@ -8385,6 +8550,86 @@ namespace Quantum {
 #endregion
 
 
+#region Assets/Photon/Quantum/Runtime/QuantumLogConstants.cs
+
+
+
+namespace Quantum {
+  static partial class QuantumLogConstants {
+
+    /// <summary>
+    /// The log level based on current defines. 
+    /// </summary>
+    public const LogLevel DefinedLogLevel =
+#if QUANTUM_LOGLEVEL_DEBUG || QUANTUM_LOGLEVEL_TRACE
+      LogLevel.Debug;
+#elif QUANTUM_LOGLEVEL_INFO
+      LogLevel.Info;
+#elif QUANTUM_LOGLEVEL_WARN
+      LogLevel.Warn;
+#elif QUANTUM_LOGLEVEL_ERROR
+      LogLevel.Error;
+#elif QUANTUM_LOGLEVEL_NONE
+      LogLevel.None;
+#elif UNITY_EDITOR
+      LogLevel.Error;
+#elif DEBUG
+      LogLevel.Debug;
+#else
+      LogLevel.Error;
+#endif
+
+    public const TraceChannels DefinedTraceChannels = 0
+#if QUANTUM_TRACE_GLOBAL
+      | TraceChannels.Global
+#endif
+#if QUANTUM_TRACE_PHYSICS2D
+      | TraceChannels.Physics2D
+#endif
+#if QUANTUM_TRACE_PHYSICS3D
+      | TraceChannels.Physics3D
+#endif
+#if QUANTUM_TRACE_ASSETS
+      | TraceChannels.Assets
+#endif
+#if QUANTUM_TRACE_MEMORY
+      | TraceChannels.Memory
+#endif
+#if QUANTUM_TRACE_INPUT
+      | TraceChannels.Input
+#endif
+      ;
+  }
+}
+
+
+#endregion
+
+
+#region Assets/Photon/Quantum/Runtime/QuantumLogInitializer.Partial.cs
+
+namespace Quantum {
+  using System.Threading;
+
+  partial class QuantumLogInitializer {
+    static QuantumUnityLogger CreateLogger(bool isDarkMode) {
+      return new QuantumUnityLogger(Thread.CurrentThread, isDarkMode);
+    }
+
+    static partial void InitializeUnityLoggerUser(ref QuantumUnityLogger logger);
+  }
+
+  /// <inheritdoc/>
+  public class QuantumUnityLogger : QuantumUnityLoggerBase {
+    /// <inheritdoc/>
+    public QuantumUnityLogger(Thread mainThread, bool isDarkMode) : base(mainThread, isDarkMode) {
+    }
+  }
+}
+
+#endregion
+
+
 #region Assets/Photon/Quantum/Runtime/QuantumMapDataBaker.cs
 
 namespace Quantum {
@@ -9178,7 +9423,7 @@ namespace Quantum {
         try {
           var p = default(IProgressBar);
 
-          if (QuantumUnityLogger.DefinedLogLevel >= LogType.Debug) {
+          if (Log.Settings.Level <= LogLevel.Debug) {
             p = new NavMeshBakerBenchmarkerProgressBar($"Baking {bakeData.Name}");
           }
           
@@ -9294,7 +9539,7 @@ namespace Quantum {
     }
     
 #if UNITY_EDITOR
-    private static void UpdateManagedReferenceIds(Quantum.Map context, QuantumEntityPrototype prototype, ComponentPrototype[] componentPrototypes) {
+    public static void UpdateManagedReferenceIds(Quantum.Map context, QuantumEntityPrototype prototype, ComponentPrototype[] componentPrototypes) {
       
       var  id = GlobalObjectId.GetGlobalObjectIdSlow(prototype);
 
@@ -9359,6 +9604,37 @@ namespace Quantum {
 #endregion
 
 
+#region Assets/Photon/Quantum/Runtime/QuantumMenuSceneInfo.Partial.cs
+
+namespace Quantum {
+
+  public partial class QuantumMenuSceneInfo {
+    /// <summary>
+    /// When using a menu config the runtime config from the QuantumMenuConnectArgs.RuntimeConfig is always overwritten.
+    /// </summary>
+    public RuntimeConfig RuntimeConfig;
+    /// <summary>
+    /// Quantum map that is loaded. Must be set.
+    /// </summary>
+    public AssetRef<Map> Map {
+      get => RuntimeConfig.Map;
+      set => RuntimeConfig.Map = value;
+    }
+    /// <summary>
+    /// Override Quantum systems configuration for this scene. Can be null.
+    /// If this is set it will overwrite the <see cref="RuntimeConfig.SystemsConfig"/> settings during the connection sequence.
+    /// </summary>
+    public AssetRef<SystemsConfig> SystemsConfig {
+      get => RuntimeConfig.SystemsConfig;
+      set => RuntimeConfig.SystemsConfig = value;
+    }
+  }
+}
+
+
+#endregion
+
+
 #region Assets/Photon/Quantum/Runtime/QuantumMonoBehaviour.Partial.cs
 
 namespace Quantum {
@@ -9384,11 +9660,31 @@ namespace Quantum {
   using Photon.Deterministic;
   using UnityEngine;
   using UnityEngine.SceneManagement;
+  using UnityEngine.Serialization;
   using Object = System.Object;
   using Plane = UnityEngine.Plane;
 #if QUANTUM_ENABLE_AI && !QUANTUM_DISABLE_AI
   using UnityEngine.AI;
 #endif
+
+  /// <summary>
+  /// How Quantum navmesh regions are imported from the Unity navmesh.
+  /// </summary>
+  public enum NavmeshRegionImportMode {
+    /// <summary>
+    /// Regions are not imported.
+    /// </summary>
+    Disabled = 0,
+    /// <summary>
+    /// Requires <see cref="QuantumNavMeshRegion"/> scripts to setup region data to increase the max region count to 64.
+    /// Supports using different region names for different maps.
+    /// </summary>
+    Advanced = 1,
+    /// <summary>
+    /// Uses the Unity NavMesh areas to directly generate regions and use according area names. Limited to 30 different global regions.
+    /// </summary>
+    Simple = 2
+  }
 
   /// <summary>
   /// This class is a collection of utility methods to import Unity NavMesh data into Quantum NavMesh data.
@@ -9438,85 +9734,93 @@ namespace Quantum {
       /// <summary>
       /// The Unity NavMesh is a collection of non - connected triangles, this option is very important and combines shared vertices.
       /// </summary>
-      [Tooltip("The Unity NavMesh is a collection of non - connected triangles, this option is very important and combines shared vertices.")]
+      [InlineHelp]
       public bool WeldIdenticalVertices = true;
       /// <summary>
       /// Don't make the epsilon too small, vertices to fuse are missed, also don't make the value too big as it will deform your navmesh. Min = float.Epsilon.
       /// </summary>
-      [Tooltip("Don't make the epsilon too small, vertices to fuse are missed, also don't make the value too big as it will deform your navmesh. Min = float.Epsilon.")]
+      [InlineHelp]
       [Min(float.Epsilon)]
       [DrawIf("WeldIdenticalVertices", true)]
       public float WeldVertexEpsilon = 0.0001f;
       /// <summary>
       /// Post processes imported Unity navmesh with a Delaunay triangulation to reduce long triangles.
       /// </summary>
-      [Tooltip("Post processes imported Unity navmesh with a Delaunay triangulation to reduce long triangles.")]
+      [InlineHelp]
       public bool DelaunayTriangulation = false;
       /// <summary>
       /// In 3D the triangulation can deform the navmesh on slopes, check this option to restrict the triangulation to triangles that lie in the same plane.
       /// </summary>
-      [Tooltip("In 3D the triangulation can deform the navmesh on slopes, check this option to restrict the triangulation to triangles that lie in the same plane.")]
+      [InlineHelp]
       [DrawIf("DelaunayTriangulation", true)]
       public bool DelaunayTriangulationRestrictToPlanes = false;
       /// <summary>
       /// Sometimes vertices are lying on other triangle edges, this will lead to unwanted borders being detected, this option splits those vertices.
       /// </summary>
-      [Tooltip("Sometimes vertices are lying on other triangle edges, this will lead to unwanted borders being detected, this option splits those vertices.")]
+      [InlineHelp]
       public bool FixTrianglesOnEdges = true;
       /// <summary>
       /// Larger scaled navmeshes may require to increase this value (e.g. 0.001) when false-positive borders are detected. Min = float.Epsilon.
       /// </summary>
-      [Tooltip("Larger scaled navmeshes may require to increase this value (e.g. 0.001) when false-positive borders are detected. Min = float.Epsilon.")]
+      [InlineHelp]
       [Min(float.Epsilon)]
       [DrawIf("FixTrianglesOnEdges", true)]
       public float FixTrianglesOnEdgesEpsilon = float.Epsilon;
       /// <summary>
       /// Make the height offset considerably larger than FixTrianglesOnEdgesEpsilon to better detect degenerate triangles. Is the navmesh becomes deformed chose a smaller epsilon. . Min = float.Epsilon. Default is 0.05.
       /// </summary>
-      [Tooltip("Make the height offset considerably larger than FixTrianglesOnEdgesEpsilon to better detect degenerate triangles. Is the navmesh becomes deformed chose a smaller epsilon. . Min = float.Epsilon. Default is 0.05.")]
+      [InlineHelp]
       [Min(float.Epsilon)]
       [DrawIf("FixTrianglesOnEdges", true)]
       public float FixTrianglesOnEdgesHeightEpsilon = 0.05f;
       /// <summary>
       /// Automatically correct navmesh link position to the closest triangle by searching this distance (default is 0).
       /// </summary>
-      [Tooltip("Automatically correct navmesh link position to the closest triangle by searching this distance (default is 0).")]
+      [InlineHelp]
       public float LinkErrorCorrection = 0.0f;
       /// <summary>
       /// SpiralOut will be considerably faster but fallback triangles can be null.
       /// </summary>
-      [Tooltip("SpiralOut will be considerably faster but fallback triangles can be null.")]
-      public NavMeshBakeDataFindClosestTriangle ClosestTriangleCalculation = NavMeshBakeDataFindClosestTriangle.SpiralOut;
+      [InlineHelp]
+      public NavMeshBakeDataFindClosestTriangle ClosestTriangleCalculation = NavMeshBakeDataFindClosestTriangle.None;
       /// <summary>
       /// Number of cells to search triangles in neighbors.
       /// </summary>
-      [Tooltip("Number of cells to search triangles in neighbors.")]
+      [InlineHelp]
       [DrawIf("ClosestTriangleCalculation", (long)NavMeshBakeDataFindClosestTriangle.BruteForce, CompareOperator.NotEqual)]
       public int ClosestTriangleCalculationDepth = 3;
       /// <summary>
       /// Activate this and the navmesh baking will flip Y and Z to support navmeshes generated in the XY plane.
       /// </summary>
-      [Tooltip("Activate this and the navmesh baking will flip Y and Z to support navmeshes generated in the XY plane.")]
+      [InlineHelp]
       public bool EnableQuantum_XY;
       /// <summary>
       /// The agent radius that the navmesh is build for. The value is retrieved from Unity settings when baking in Editor.
       /// </summary>
-      [Tooltip("The agent radius that the navmesh is build for. The value is retrieved from Unity settings when baking in Editor.")]
+      [InlineHelp]
       public FP MinAgentRadius = FP._0_25;
       /// <summary>
       /// Toggle the Quantum region import.
       /// </summary>
-      [Tooltip("Toggle the Quantum region import.")]
-      public bool ImportRegions = true;
+      [Obsolete("Has been replaced by ImportRegionMode")]
+      public bool ImportRegions => ImportRegionMode == NavmeshRegionImportMode.Advanced;
+      /// <summary>
+      /// Toggle the region import mode. Default is Simple.
+      /// </summary>
+      [InlineHelp]
+      [FormerlySerializedAs("ImportRegions")]
+      public NavmeshRegionImportMode ImportRegionMode = NavmeshRegionImportMode.Simple;
       /// <summary>
       /// The artificial margin is necessary because the Unity NavMesh does not fit the source size very well. The value is added to the navmesh area and checked against all Quantum Region scripts to select the correct region id.
       /// </summary>
-      [Tooltip("The artificial margin is necessary because the Unity NavMesh does not fit the source size very well. The value is added to the navmesh area and checked against all Quantum Region scripts to select the correct region id.")]
-      [DrawIf("ImportRegions", true)]
+      [InlineHelp]
+      [DrawIf("ImportRegionMode", (int)NavmeshRegionImportMode.Advanced, mode: DrawIfMode.Hide)]
       public float RegionDetectionMargin = 0.4f;
       /// <summary>
       /// The region area ids to import.
       /// </summary>
+      [HideInInspector]
+      [DrawIf("ImportRegionMode", (int)NavmeshRegionImportMode.Disabled, compare: CompareOperator.Greater, mode: DrawIfMode.Hide)]
       public List<Int32> RegionAreaIds;
     }
 
@@ -9593,6 +9897,49 @@ namespace Quantum {
         //Debug.Log("Removed Unused Vertices: " + (vertices.Length - newVertices.Count));
 
         vertices = newVertices.ToArray();
+      }
+
+      /// <summary>
+      /// Use the Unity navmesh areas encoded into the Unity navmesh to generate Quantum regions.
+      /// </summary>
+      /// <param name="triangles">Imported Navmesh triangles</param>
+      /// <param name="regionMap">The global region map, will add new regions</param>
+      /// <param name="unityAreaMap">Map a Unity area id to a area name</param>
+      /// <param name="regionIncludeList">Include these region ids</param>
+      /// <param name="reporter">Progress bar</param>
+      public static void ImportRegionsSimple(ref NavMeshBakeDataTriangle[] triangles, ref List<string> regionMap, Dictionary<int, string> unityAreaMap, List<int> regionIncludeList, Action<float> reporter) {
+        for (int t = 0; t < triangles.Length; t++) {
+          reporter?.Invoke(t / (float)triangles.Length);
+          var areaId = triangles[t].Area;
+          switch (areaId) {
+            case 0:
+              triangles[t].RegionId = "MainArea";
+              break;
+            case 1:
+              // Skip pre-defined areas
+              // Todo: should Jump be ignored?
+              // case 2:
+              break;
+            default: {
+                if (regionIncludeList?.Contains(areaId) == false) {
+                  // Unselected areas are converted to main area, but they can keep the cost.
+                  triangles[t].RegionId = "MainArea";
+                  triangles[t].Cost = UnityEngine.AI.NavMesh.GetAreaCost(areaId).ToFP();
+                  break;
+                }
+                if (unityAreaMap.TryGetValue(areaId, out var regionId) == false) {
+                  Log.Error($"Failed to map Unity navmesh area {areaId}");
+                  break;
+                }
+                if (regionMap.Contains(regionId) == false) {
+                  regionMap.Add(regionId);
+                }
+                triangles[t].RegionId = regionId;
+                triangles[t].Cost = UnityEngine.AI.NavMesh.GetAreaCost(areaId).ToFP();
+                break;
+              }
+          }
+        }
       }
 
       /// <summary>
@@ -9788,6 +10135,33 @@ namespace Quantum {
     }
 
     /// <summary>
+    /// Create a dictionary that maps Unity NavMesh area ids to area names.
+    /// </summary>
+    public static Dictionary<int, string> CreateUnityNavmeshAreaMap() {
+      var unityNavmeshAreaMap = new Dictionary<int, string>();
+
+#if UNITY_2023_3_OR_NEWER
+      var unityAreaNames = UnityEngine.AI.NavMesh.GetAreaNames();
+      for (int i = 0; i < unityAreaNames.Length; i++) {
+        unityNavmeshAreaMap.Add(UnityEngine.AI.NavMesh.GetAreaFromName(unityAreaNames[i]), unityAreaNames[i]);
+      }
+
+      return unityNavmeshAreaMap;
+#else
+#if UNITY_EDITOR
+      // Only supported for Editor
+      var unityAreaNames = UnityEditor.GameObjectUtility.GetNavMeshAreaNames();
+      for (int i = 0; i < unityAreaNames.Length; i++) {
+        unityNavmeshAreaMap.Add(UnityEditor.GameObjectUtility.GetNavMeshAreaFromName(unityAreaNames[i]), unityAreaNames[i]);
+      }
+      return unityNavmeshAreaMap;
+#else
+      throw new Exception("GetNavMeshAreaNames is only supported in Editor or Unity version 2023.1+");
+#endif
+#endif
+    }
+
+    /// <summary>
     /// Import a Unity NavMesh into Quantum NavMesh data.
     /// </summary>
     /// <param name="scene">The Unity scene.</param>
@@ -9797,7 +10171,7 @@ namespace Quantum {
     public static NavMeshBakeData ImportFromUnity(Scene scene, ImportSettings settings, string name) {
       var result = new NavMeshBakeData();
 
-      using (var progressBar = QuantumUnityLogger.DefinedLogLevel >= LogType.Debug ? new ProgressBar("Importing Unity NavMesh", true) : null) {
+      using (var progressBar = Log.Settings.Level <= LogLevel.Debug ? new ProgressBar("Importing Unity NavMesh", true) : null) {
         progressBar?.SetInfo("Calculate Triangulation");
         var unityNavMeshTriangulation = UnityEngine.AI.NavMesh.CalculateTriangulation();
 
@@ -9885,20 +10259,34 @@ namespace Quantum {
         }
 
         // Import regions
+        var unityNavmeshAreaMap = settings.ImportRegionMode == NavmeshRegionImportMode.Simple ? CreateUnityNavmeshAreaMap() : new Dictionary<int, string>();
         List<string> regions = new List<string>() { "MainArea" };
-        if (settings.ImportRegions) {
-          progressBar?.SetInfo("Importing Regions");
-          for (int t = 0; t < Triangles.Length; t++) {
-            progressBar?.SetProgress(t / (float)Triangles.Length);
-            if (settings.RegionAreaIds != null && settings.RegionAreaIds.Contains(Triangles[t].Area) && string.IsNullOrEmpty(Triangles[t].RegionId)) {
-              ImportUtils.ImportRegions(scene, ref Vertices, ref Triangles, t, ref regions, settings.RegionDetectionMargin);
-            }
-          }
-          for (int t = 0; t < Triangles.Length; t++) {
-            if (Triangles[t].RegionId == null) {
+        progressBar?.SetInfo("Importing Regions");
+
+        switch (settings.ImportRegionMode) {
+          case NavmeshRegionImportMode.Disabled:
+            for (int t = 0; t < Triangles.Length; t++) {
+              progressBar?.SetProgress(t / (float)Triangles.Length);
               Triangles[t].RegionId = "MainArea";
             }
-          }
+            break;
+          case NavmeshRegionImportMode.Simple:
+            ImportUtils.ImportRegionsSimple(ref Triangles, ref regions, unityNavmeshAreaMap, settings.RegionAreaIds, (value) => progressBar?.SetProgress(value));
+            break;
+          case NavmeshRegionImportMode.Advanced:
+            for (int t = 0; t < Triangles.Length; t++) {
+              progressBar?.SetProgress(t / (float)Triangles.Length);
+              if (settings.RegionAreaIds != null && settings.RegionAreaIds.Contains(Triangles[t].Area) && string.IsNullOrEmpty(Triangles[t].RegionId)) {
+                ImportUtils.ImportRegions(scene, ref Vertices, ref Triangles, t, ref regions, settings.RegionDetectionMargin);
+              }
+            }
+
+            for (int t = 0; t < Triangles.Length; t++) {
+              if (Triangles[t].RegionId == null) {
+                Triangles[t].RegionId = "MainArea";
+              }
+            }
+            break;
         }
 
         // Set all vertex string ids (to work with manual editor)
@@ -9929,8 +10317,24 @@ namespace Quantum {
           var triangleGrid = new TriangleGrid(Vertices, Triangles);
 
           for (int l = 0; l < links.Count; l++) {
-            var navMeshRegion = links[l].Object.GetComponent<QuantumNavMeshRegion>();
-            var regionId = navMeshRegion != null && string.IsNullOrEmpty(navMeshRegion.Id) == false ? navMeshRegion.Id : string.Empty;
+            if (links[l].IsEnabled == false) {
+              // Skip links that are disabled or deactivated when importing
+              continue;
+            }
+
+            var regionId = string.Empty;
+            switch (settings.ImportRegionMode) {
+              case NavmeshRegionImportMode.Simple:
+                if (unityNavmeshAreaMap.TryGetValue(links[l].Area, out var areaName)) {
+                  regionId = areaName;
+                }
+                break;
+              case NavmeshRegionImportMode.Advanced:
+                var navMeshRegion = links[l].Object.GetComponent<QuantumNavMeshRegion>();
+                regionId = navMeshRegion != null && string.IsNullOrEmpty(navMeshRegion.Id) == false ? navMeshRegion.Id : string.Empty;
+                break;
+            }
+
             if (string.IsNullOrEmpty(regionId) == false && regions.Contains(regionId) == false) {
               // Add new region to global list
               regions.Add(regionId);
@@ -10027,6 +10431,7 @@ namespace Quantum {
       public float CostModifier;
       public bool Bidirectional;
       public bool AutoUpdatePosition;
+      public bool IsEnabled;
       public int Area;
       public GameObject Object;
 
@@ -10038,6 +10443,7 @@ namespace Quantum {
         CostModifier = link.costModifier;
         Bidirectional = link.bidirectional;
         AutoUpdatePosition = link.autoUpdate;
+        IsEnabled = link.enabled;
         Area = link.area;
         Object = link.gameObject;
       }
@@ -10054,6 +10460,7 @@ namespace Quantum {
         CostModifier = link.costOverride;
         Bidirectional = link.biDirectional;
         AutoUpdatePosition = link.autoUpdatePositions;
+        IsEnabled = link.enabled && link.activated;
         Area = link.area;
         Object = link.gameObject;
       }
@@ -11796,20 +12203,18 @@ namespace Quantum {
 #if QUANTUM_REMOTE_PROFILER
       if (!Application.isEditor) {
         var client = new QuantumProfilingClient(clientId, deterministicConfig, platformInfo);
-        ((QuantumGame)game).ProfilerSampleGenerated += (sample) => {
-          client.SendProfilingData(sample);
-          client.Update();
-        };
 
-        Application.quitting += () => {
-          if (client != null) {
-            try {
-              client.Dispose();
-            } catch (Exception e) {
-              Log.Error("Failed to dispose remote profiler on quit: " + e);
-            }
-          }
-        };
+        var subscription = QuantumCallback.SubscribeManual((CallbackTaskProfilerReportGenerated callback) => {
+          client.SendProfilingData(callback.Report);
+          client.Update();
+        }, game);
+
+        QuantumCallback.SubscribeManual((CallbackGameDestroyed callback) => {
+          subscription?.Dispose();
+          subscription = null;
+          client?.Dispose();
+          client = null;
+        }, game, once: true);
       }
 #endif
     }
@@ -11822,13 +12227,7 @@ namespace Quantum {
       DeterministicPlatformInfo info;
       info = new DeterministicPlatformInfo();
       info.Allocator = new QuantumUnityNativeAllocator();
-
-#if !UNITY_EDITOR && UNITY_WEBGL
-      // WebGL does not support multithreading. This forces the simulation to run in a single thread.
-      info.TaskRunner = new InactiveTaskRunner();
-#else
       info.TaskRunner = QuantumTaskRunnerJobs.GetInstance();
-#endif
 
 #if UNITY_EDITOR
 
@@ -12533,314 +12932,6 @@ public abstract class MapNavMeshUnity : Quantum.QuantumMapNavMeshUnity { }
 #endregion
 
 
-#region Assets/Photon/Quantum/Runtime/QuantumUnityLogger.cs
-
-namespace Quantum {
-  using System;
-  using System.Runtime.ExceptionServices;
-  using System.Text;
-  using System.Threading;
-  using Photon.Deterministic;
-  using UnityEditor;
-  using UnityEngine;
-
-  /// <summary>
-  /// A log wrapper around the Quantum static logger to bind to the Unity debug logging.
-  /// Toggle the LogLevel using `Quantum.Log.LogLevel`. It get's initialized using the defines:
-  ///   QUANTUM_LOGLEVEL_TRACE, QUANTUM_LOGLEVEL_DEBUG, QUANTUM_LOGLEVEL_INFO, QUANTUM_LOGLEVEL_WARN, QUANTUM_LOGLEVEL_ERROR
-  /// </summary>
-  public partial class QuantumUnityLogger : Quantum.ILogger {
-    /// <summary>
-    /// Implement this to modify values of this logger.
-    /// </summary>
-    /// <param name="logger"></param>
-    static partial void InitializePartial(ref QuantumUnityLogger logger);
-
-    /// <summary>
-    /// Customize logged object names for destroyed objects.
-    /// </summary>
-    public string NameUnavailableObjectDestroyedLabel = "(destroyed)";
-    /// <summary>
-    /// Customize logged object names from other threads.
-    /// </summary>
-    public string NameUnavailableInWorkerThreadLabel = "";
-    /// <summary>
-    /// If true, all messages will be prefixed with [Quantum] tag
-    /// </summary>
-    public bool UseGlobalPrefix;
-    /// <summary>
-    /// If true, some parts of messages will be enclosed with &lt;color&gt; tags.
-    /// </summary>
-    public bool UseColorTags;
-    /// <summary>
-    /// If true, each log message that has a source parameter will be prefixed with a hash code of the source object. 
-    /// </summary>
-    public bool AddHashCodePrefix;
-    /// <summary>
-    /// Color of the global prefix (see <see cref="UseGlobalPrefix"/>).
-    /// </summary>
-    public string GlobalPrefixColor;
-    /// <summary>
-    /// Min Random Color
-    /// </summary>
-    public Color32 MinRandomColor;
-    /// <summary>
-    /// Max Random Color
-    /// </summary>
-    public Color32 MaxRandomColor;
-    /// <summary>
-    /// A prefix tag added to each log.
-    /// </summary>
-    /// 
-    public string GlobalPrefix = "Quantum";
-    StringBuilder _builder = new StringBuilder();
-    Thread _mainThread;
-
-    /// <summary>
-    /// Returns the log level defined by QUANTUM_LOGLEVEL_(..) defines.
-    /// </summary>
-    public static LogType DefinedLogLevel {
-      get {
-        var definedLogLevel = LogType.Warn;
-#if QUANTUM_LOGLEVEL_TRACE
-        definedLogLevel = LogType.Trace;
-#elif QUANTUM_LOGLEVEL_DEBUG
-        definedLogLevel = LogType.Debug;
-#elif QUANTUM_LOGLEVEL_INFO
-        definedLogLevel = LogType.Info;
-#elif QUANTUM_LOGLEVEL_WARN
-        definedLogLevel = LogType.Warn;
-#elif QUANTUM_LOGLEVEL_ERROR
-        definedLogLevel = LogType.Error;
-#endif
-        return definedLogLevel;
-      }
-    }
-
-    /// <summary>
-    /// Create unity logger instance.
-    /// </summary>
-    /// <param name="mainThread">The thread used by <see cref="IsInMainThread"/> or <see langword="null"/> to use the current thread.</param>
-    public QuantumUnityLogger(Thread mainThread = null) {
-
-      _mainThread = mainThread ?? Thread.CurrentThread;
-
-      bool isDarkMode = false;
-#if UNITY_EDITOR
-      isDarkMode = UnityEditor.EditorGUIUtility.isProSkin;
-#endif
-
-      MinRandomColor = isDarkMode ? new Color32(158, 158, 158, 255) : new Color32(30, 30, 30, 255);
-      MaxRandomColor = isDarkMode ? new Color32(255, 255, 255, 255) : new Color32(90, 90, 90, 255);
-
-      UseColorTags = true;
-      UseGlobalPrefix = true;
-      GlobalPrefixColor = Color32ToRGBString(QuantumColor.Log);
-    }
-
-    /// <summary>
-    /// Log a message that will call <see cref="Debug.Log(object, UnityEngine.Object)"/>.
-    /// </summary>
-    /// <param name="logType">Log type.</param>
-    /// <param name="message">The log message.</param>
-    /// <param name="logContext">The context object or <see langword="null"/>.</param>
-    public void Log(LogType logType, string message, in LogContext logContext) {
-      Debug.Assert(_builder.Length == 0);
-      string fullMessage;
-
-      var obj = logContext.Source as UnityEngine.Object;
-
-      try {
-        if (logType == LogType.Debug) {
-          _builder.Append("[DEBUG] ");
-        } else if (logType == LogType.Trace) {
-          _builder.Append("[TRACE] ");
-        }
-
-        if (UseGlobalPrefix) {
-          if (UseColorTags) {
-            _builder.Append("<color=");
-            _builder.Append(GlobalPrefixColor);
-            _builder.Append(">");
-          }
-
-          _builder.Append("[");
-          _builder.Append(GlobalPrefix);
-
-          if (!string.IsNullOrEmpty(logContext.Prefix)) {
-            _builder.Append("/");
-            _builder.Append(logContext.Prefix);
-          }
-
-          _builder.Append("]");
-
-          if (UseColorTags) {
-            _builder.Append("</color>");
-          }
-          _builder.Append(" ");
-        } else {
-          if (!string.IsNullOrEmpty(logContext.Prefix)) {
-            _builder.Append(logContext.Prefix);
-            _builder.Append(": ");
-          }
-        }
-
-        if (obj) {
-          var pos = _builder.Length;
-          AppendNameThreadSafe(_builder, obj);
-          if (_builder.Length > pos) {
-            _builder.Append(": ");
-          }
-        } else if (logContext.Source != null) {
-          var pos = _builder.Length;
-          _builder.Append(logContext.Source);
-          if (_builder.Length > pos) {
-            _builder.Append(": ");
-          }
-        }
-
-        _builder.Append(message);
-
-        fullMessage = _builder.ToString();
-      } finally {
-        _builder.Clear();
-      }
-
-      switch (logType) {
-        case LogType.Error:
-          Debug.LogError(fullMessage, IsInMainThread ? obj : null);
-          break;
-        case LogType.Warn:
-          Debug.LogWarning(fullMessage, IsInMainThread ? obj : null);
-          break;
-        default:
-          Debug.Log(fullMessage, IsInMainThread ? obj : null);
-          break;
-      }
-    }
-
-    /// <summary>
-    /// Log an exception.
-    /// <para>Tries to force console windows double click to the exception source when UNITY_EDITOR is defined, otherwise will also call <see cref="Debug.LogException(Exception, UnityEngine.Object)"/>.</para>
-    /// </summary>
-    /// <param name="ex">Exception to log.</param>
-    /// <param name="logContext">Log context or <see langword="null"/></param>
-    public void LogException(Exception ex, in LogContext logContext) {
-      Log(LogType.Warn, $"{ex.GetType()} <i>See next error log entry for details.</i>", in logContext);
-
-#if UNITY_EDITOR
-      // this is to force console window double click to take you where the exception
-      // has been thrown, not where it has been logged
-      var edi = ExceptionDispatchInfo.Capture(ex);
-      var thread = new Thread(() => {
-        edi.Throw();
-      });
-      thread.Start();
-      thread.Join();
-#else
-      if (logContext.Source is UnityEngine.Object obj) {
-        Debug.LogException(ex, obj);
-      } else {
-        Debug.LogException(ex);
-      }
-#endif
-    }
-
-    int GetRandomColor(int seed) => GetRandomColor(seed, MinRandomColor, MaxRandomColor);
-
-    int GetColorSeed(string name) {
-      int hash = 0;
-      for (var i = 0; i < name.Length; ++i) {
-        hash = hash * 31 + name[i];
-      }
-
-      return hash;
-    }
-
-    static int GetRandomColor(int seed, Color32 min, Color32 max) {
-      var random = new RNGSession(seed);
-      var r = random.NextInclusive(min.r, max.r);
-      var g = random.NextInclusive(min.g, max.g);
-      var b = random.NextInclusive(min.b, max.b);
-      r = Mathf.Clamp(r, 0, 255);
-      g = Mathf.Clamp(g, 0, 255);
-      b = Mathf.Clamp(b, 0, 255);
-      int rgb = (r << 16) | (g << 8) | b;
-      return rgb;
-    }
-
-    static int Color32ToRGB24(Color32 c) {
-      return (c.r << 16) | (c.g << 8) | c.b;
-    }
-
-    static string Color32ToRGBString(Color32 c) {
-      return string.Format("#{0:X6}", Color32ToRGB24(c));
-    }
-
-    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-#if UNITY_EDITOR
-    [InitializeOnLoadMethod]
-#endif
-    static void Initialize() {
-      if (Quantum.Log.Initialized) {
-        return;
-      }
-
-      var logger = new QuantumUnityLogger(Thread.CurrentThread);
-
-      // Optional override of default values
-      InitializePartial(ref logger);
-
-      // ReSharper disable once ConditionIsAlwaysTrueOrFalse
-      if (logger != null) {
-        Quantum.Log.Init(logger, DefinedLogLevel);
-      }
-    }
-    
-    private void AppendNameThreadSafe(StringBuilder builder, UnityEngine.Object obj) {
-      
-      if  ((object)obj == null) throw new ArgumentNullException(nameof(obj));
-      
-      string name;
-      bool isDestroyed = obj == null;
-      
-      if (isDestroyed) {
-        name = NameUnavailableObjectDestroyedLabel;
-      } else if (!IsInMainThread) {
-        name = NameUnavailableInWorkerThreadLabel;
-      } else {
-        name = obj.name;
-      }
-      
-      if (UseColorTags) {
-        int colorSeed = GetColorSeed(name);
-        builder.AppendFormat("<color=#{0:X6}>", GetRandomColor(colorSeed));
-      }
-
-      if (AddHashCodePrefix) {
-        builder.AppendFormat("{0:X8}", obj.GetHashCode());
-      }
-
-      if (name?.Length > 0) {
-        if (AddHashCodePrefix) {
-          builder.Append(" ");
-        }
-        builder.Append(name);  
-      }
-
-      if (UseColorTags) {
-        builder.Append("</color>");
-      }
-    }
-
-    private bool IsInMainThread => _mainThread == Thread.CurrentThread;
-  }
-}
-
-
-#endregion
-
-
 #region Assets/Photon/Quantum/Runtime/QuantumUnityMemoryLayoutVerifierPlatform.cs
 
 namespace Quantum {
@@ -13039,12 +13130,8 @@ namespace Quantum {
   using System.Linq;
   using System.Reflection;
   using UnityEngine;
-#if UNITY_EDITOR
-  using static QuantumEditorLog;
-#else
-  using static Log;
-#endif
-
+  using static InternalLogStreams;
+  
   /// <summary>
   /// A base class for ScriptableObjects that are meant to be globally accessible, at edit-time and runtime. The way such objects
   /// are loaded is driven by usages of <see cref="QuantumGlobalScriptableObjectSourceAttribute"/> attributes. 
@@ -13099,14 +13186,14 @@ namespace Quantum {
       // seem to omit even OnDisable.
       
       if (!IsGlobal) {
-        Trace($"{LogPrefix}OnDisable called for {AsId(this)}, but is not global");
+        LogTrace?.Log($"{LogPrefix}OnDisable called for {AsId(this)}, but is not global");
         return;
       }
 
       if (s_unloadHandler != null) {
-        Trace($"{LogPrefix}OnDisable called for {AsId(this)}, setting global instance to null. The unload handler is still set, not going to be used.");
+        LogTrace?.Log($"{LogPrefix}OnDisable called for {AsId(this)}, setting global instance to null. The unload handler is still set, not going to be used.");
       } else {
-        Trace($"{LogPrefix}OnDisable called for {AsId(this)}, setting global instance to null.");
+        LogTrace?.Log($"{LogPrefix}OnDisable called for {AsId(this)}, setting global instance to null.");
       }
 
       Assert.Check(object.ReferenceEquals(this, s_instance), $"Expected this to be the global instance");
@@ -13180,12 +13267,12 @@ namespace Quantum {
 
       try {
         if (s_unloadHandler != null) {
-          Trace($"{LogPrefix} Unloading global instance {AsId(instance)} with unloader");
+          LogTrace?.Log($"{LogPrefix} Unloading global instance {AsId(instance)} with unloader");
           var unloader = s_unloadHandler;
           s_unloadHandler = null;
           unloader.Invoke(instance);
         } else {
-          Trace($"{LogPrefix} Instance {AsId(instance)} has no unloader, simply nulling it out");
+          LogTrace?.Log($"{LogPrefix} Instance {AsId(instance)} has no unloader, simply nulling it out");
         }
       } finally {
         s_instance = null;
@@ -13233,7 +13320,7 @@ namespace Quantum {
         if (result.Object) {
           var instance = (T)result.Object;
           unloadHandler = result.Unloader;
-          Trace($"{LogPrefix} Loader {sourceAttribute} was used to load {AsId(instance)}, has unloader: {unloadHandler != null}");
+          LogTrace?.Log($"{LogPrefix} Loader {sourceAttribute} was used to load {AsId(instance)}, has unloader: {unloadHandler != null}");
           return instance;
         }
 
@@ -13243,7 +13330,7 @@ namespace Quantum {
         }
       }
 
-      Trace($"{LogPrefix} No source attribute was able to load the global instance");
+      LogTrace?.Log($"{LogPrefix} No source attribute was able to load the global instance");
       unloadHandler = default;
       return default;
     }
@@ -13469,7 +13556,7 @@ namespace Quantum {
     /// interpret large integers as floating point numbers.
     /// </summary>
     /// <param name="json">JSON to process</param>
-    /// <param name="minDigits">Digit threshold to perform the enquoting</param>
+    /// <param name="minDigits">Digit threshold to perfom the enquoting</param>
     /// <returns><paramref name="json"/> with long integers enquoted.</returns>
     public static string EnquoteIntegers(string json, int minDigits = 8) {
       var result = Regex.Replace(json, $@"(?<="":\s*)(-?[0-9]{{{minDigits},}})(?=[,}}\n\r\s])", "\"$1\"", RegexOptions.Compiled);
@@ -13909,6 +13996,56 @@ namespace Quantum {
   }
 }
 #endif
+
+#endregion
+
+
+#region QuantumLogInitializer.cs
+
+namespace Quantum {
+  using System;
+  using UnityEngine;
+  
+#if UNITY_EDITOR
+  using UnityEditor;
+  using UnityEditor.Build;
+#endif
+  
+  /// <summary>
+  /// Initializes the logging system for Quantum. Use <see cref="InitializeUser"/> to completely override the log level and trace channels or
+  /// to provide a custom logger. Use <see cref="InitializeUnityLoggerUser"/> to override default Unity logger settings.
+  /// </summary>
+  public static partial class QuantumLogInitializer {
+    /// <summary>
+    /// Initializes the logging system for Quantum. This method is called automatically when the assembly is loaded.
+    /// </summary>
+#if UNITY_EDITOR
+    [UnityEditor.InitializeOnLoadMethod]
+#endif
+    [RuntimeInitializeOnLoadMethod]
+    public static void Initialize() {
+      var isDark = false;
+#if UNITY_EDITOR
+      isDark = UnityEditor.EditorGUIUtility.isProSkin;
+      QuantumEditorLog.Initialize(isDark);
+#endif
+      
+      LogLevel logLevel = QuantumLogConstants.DefinedLogLevel;
+      TraceChannels traceChannels = QuantumLogConstants.DefinedTraceChannels;
+      InitializeUser(ref logLevel, ref traceChannels);
+
+      if (Log.IsInitialized) {
+        return;
+      }
+
+      var logger = CreateLogger(isDarkMode: isDark);
+      InitializeUnityLoggerUser(ref logger);
+      Log.Initialize(logLevel, logger.CreateLogStream, traceChannels);
+    }
+    
+    static partial void InitializeUser(ref LogLevel logLevel, ref TraceChannels traceChannels);
+  }
+}
 
 #endregion
 
@@ -14774,9 +14911,12 @@ namespace Quantum {
     static void DrawRectangle(Draw.DebugRectangle rectangle) {
       GetMaterial(rectangle.Color).SetPass(0);
 
-      var m = Matrix4x4.TRS(rectangle.Center.ToUnityVector3(true), rectangle.Rotation.ToUnityQuaternion(true), rectangle.Size.ToUnityVector3(true));
+      if (rectangle.Is2D) {
+        GL.MultMatrix(Matrix4x4.TRS(rectangle.Center.ToUnityVector3(true), rectangle.Rotation2D.ToUnityQuaternion(), rectangle.Size.ToUnityVector3(true)));
+      } else {
+        GL.MultMatrix(Matrix4x4.TRS(rectangle.Center.ToUnityVector3(true), rectangle.Rotation.ToUnityQuaternion(true), rectangle.Size.ToUnityVector3(true)));
+      }
 
-      GL.MultMatrix(m);
       GL.PushMatrix();
 #if QUANTUM_XY
       if (rectangle.Wire) {
@@ -15539,12 +15679,30 @@ namespace Quantum {
     }
 
     /// <summary>
-    /// Converts a Unity vector3 to a Quantum FPVector3, with each component being rounded towards zero.
+    /// Converts a Unity Vector3 to a Quantum FPVector3, with each component being rounded towards zero.
     /// </summary>
     /// <param name="v">Unity vector3</param>
     /// <returns>Quantum vector3</returns>
     public static FPVector3 ToFPVector3(this Vector3 v) {
       return new FPVector3(v.x.ToFP(), v.y.ToFP(), v.z.ToFP());
+    }
+
+    /// <summary>
+    /// Converts a Quantum IntVector3 object to a Unity Vector3Int.
+    /// </summary>
+    /// <param name="v">The IntVector3 object to convert.</param>
+    /// <returns>The converted Unity Vector3Int.</returns>
+    public static Vector3Int ToVector3Int(this IntVector3 v) {
+      return new Vector3Int(v.X, v.Y, v.Z);
+    }
+
+    /// <summary>
+    /// Converts a Quantum IntVector2 into a Unity Vector2Int.
+    /// </summary>
+    /// <param name="v">The Quantum IntVector2 to convert.</param>
+    /// <returns>The converted Unity Vector2Int.</returns>
+    public static Vector2Int ToVector2Int(this IntVector2 v) {
+      return new Vector2Int(v.X, v.Y);
     }
 
     /// <summary>

@@ -32,10 +32,21 @@ public class SelectionCursor : MonoBehaviour {
         if (current != old) {
             fadeValue = 2f;
             old = current;
+            /* this works. but if the parent gets destroyed we lose the cursor forever. bummer.
+            if (current) {
+                if (current.transform.parent) {
+                    rectTransform.SetParent(current.transform.parent);
+                } else {
+                    rectTransform.SetParent(current.transform);
+                }
+            }
+            */
             newObject = true;
         }
 
-        if (!current || !current.activeInHierarchy || current.layer == LayerMask.NameToLayer("UINoCursor") || current.layer == LayerMask.NameToLayer("Default")) {
+        if (!current || !current.activeInHierarchy
+            || current.layer == LayerMask.NameToLayer("UINoCursor") || current.layer == LayerMask.NameToLayer("Default")
+            || (current.TryGetComponent(out Image currentImage) && currentImage.color.r == 0 && currentImage.color.a == 0)) {
             image.enabled = false;
             hidden = true;
             return;

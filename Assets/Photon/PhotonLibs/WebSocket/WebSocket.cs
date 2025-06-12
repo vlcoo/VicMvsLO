@@ -1,4 +1,4 @@
-﻿#if UNITY_WEBGL || WEBSOCKET || WEBSOCKET_PROXYCONFIG
+#if UNITY_WEBGL || WEBSOCKET || WEBSOCKET_PROXYCONFIG
 
 // --------------------------------------------------------------------------------------------------------------------
 // <summary>

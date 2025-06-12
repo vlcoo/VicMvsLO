@@ -8,7 +8,6 @@
 // <author>developer@photonengine.com</author>
 // ----------------------------------------------------------------------------
 
-
 #if UNITY_2017_4_OR_NEWER
 #define SUPPORTED_UNITY
 #endif
@@ -23,8 +22,6 @@ namespace Photon.Realtime
     #if SUPPORTED_UNITY
     using UnityEngine;
     using Debug = UnityEngine.Debug;
-    #endif
-    #if SUPPORTED_UNITY || NETFX_CORE
     using SupportClass = Photon.Client.SupportClass;
     #endif
 
@@ -1648,7 +1645,7 @@ namespace Photon.Realtime
         {
             if (!this.IsConnectedAndReady || this.Server != ServerConnection.MasterServer)
             {
-                Log.Info($"OpSettings() skipping because IsConnectedAndReady: {IsConnectedAndReady} / Server: {Server}", this.LogLevel, this.LogPrefix);
+                Log.Debug($"OpSettings() skipping because IsConnectedAndReady: {IsConnectedAndReady} / Server: {Server}", this.LogLevel, this.LogPrefix);
                 return false;
             }
 

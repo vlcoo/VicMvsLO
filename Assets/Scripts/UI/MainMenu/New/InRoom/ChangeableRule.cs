@@ -11,8 +11,11 @@ public class ChangeableRule : Selectable, ISubmitHandler, IPointerClickHandler, 
 
     //---Properties
     public virtual bool Editing {
-        get => _editing;
+        get => !clickToEdit || _editing;
         set {
+            if (!clickToEdit) {
+                return;
+            }
             label.color = value ? editingColor : inactiveColor;
             _editing = value;
             UpdateState();
@@ -28,7 +31,9 @@ public class ChangeableRule : Selectable, ISubmitHandler, IPointerClickHandler, 
     [SerializeField] protected MainMenuCanvas canvas;
     [SerializeField] protected TMP_Text label;
     [SerializeField] protected string labelPrefix;
-    [SerializeField] protected CommandChangeRules.Rules ruleType;
+    [SerializeField] public CommandChangeRules.Rules ruleType;
+    [SerializeField] private bool clickToEdit;
+    [SerializeField] protected bool dontAutosave;
     [SerializeField] private Color editingColor, inactiveColor;
     [SerializeField] private TMP_Text leftArrow, rightArrow;
     [SerializeField] protected AudioSource cursorSfx;
@@ -51,7 +56,7 @@ public class ChangeableRule : Selectable, ISubmitHandler, IPointerClickHandler, 
     }
 
     public virtual unsafe void OnSubmit(BaseEventData eventData) {
-        if (Editing) {
+        if (clickToEdit && Editing) {
             Editing = false;
             canvas.PlaySound(SoundEffect.UI_Back);
             return;
@@ -81,11 +86,11 @@ public class ChangeableRule : Selectable, ISubmitHandler, IPointerClickHandler, 
         case MoveDirection.Left:
             DecreaseValue();
             break;
-            /*
         default:
-            base.OnMove(eventData);
+            if (!clickToEdit) {
+                base.OnMove(eventData);
+            }
             break;
-            */
         }
     }
 
@@ -100,24 +105,25 @@ public class ChangeableRule : Selectable, ISubmitHandler, IPointerClickHandler, 
         Editing = true;
     }
 
-    Vector2 sum;
     public void OnScroll(PointerEventData eventData) {
         if (!Editing) {
             return;
         }
 
         if (eventData.scrollDelta.y > 0) {
-            IncreaseValue();
+            IncreaseValue(false);
         } else if (eventData.scrollDelta.y < 0) {
-            DecreaseValue();
+            DecreaseValue(false);
         }
     }
 
-    public unsafe void IncreaseValue() {
+    public unsafe void IncreaseValue(bool playSound = true) {
         QuantumGame game = NetworkHandler.Game;
         PlayerRef host = game.Frames.Predicted.Global->Host;
         if (!game.PlayerIsLocal(host)) {
-            canvas.PlaySound(SoundEffect.UI_Error);
+            if (playSound) {
+                canvas.PlaySound(SoundEffect.UI_Error);
+            }
             return;
         }
 
@@ -125,11 +131,13 @@ public class ChangeableRule : Selectable, ISubmitHandler, IPointerClickHandler, 
         UpdateState();
     }
 
-    public unsafe void DecreaseValue() {
+    public unsafe void DecreaseValue(bool playSound = true) {
         QuantumGame game = NetworkHandler.Game;
         PlayerRef host = game.Frames.Predicted.Global->Host;
         if (!game.PlayerIsLocal(host)) {
-            canvas.PlaySound(SoundEffect.UI_Error);
+            if (playSound) {
+                canvas.PlaySound(SoundEffect.UI_Error);
+            }
             return;
         }
 
@@ -153,8 +161,10 @@ public class ChangeableRule : Selectable, ISubmitHandler, IPointerClickHandler, 
         }
 #endif
         UpdateLabel();
-        leftArrow.enabled = Editing && CanDecreaseValue;
-        rightArrow.enabled = Editing && CanIncreaseValue;
+        try {
+            leftArrow.enabled = Editing && CanDecreaseValue;
+            rightArrow.enabled = Editing && CanIncreaseValue;
+        } catch { /* bodge */ }
     }
 
     protected virtual void UpdateLabel() {

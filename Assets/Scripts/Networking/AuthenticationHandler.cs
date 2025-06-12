@@ -5,15 +5,14 @@ using UnityEngine.Networking;
 using System;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
-using NSMB.UI.MainMenu;
 using Newtonsoft.Json;
-using JetBrains.Annotations;
-using NSMB.Translation;
 
 public class AuthenticationHandler {
 
     //---Static Variables
-    private static readonly string URL = "https://mariovsluigi.azurewebsites.net/auth/init";
+    private const string URL = "https://mariovsluigi.azurewebsites.net/auth/init";
+    private const string DiscordServerURL = "https://discord.gg/dgKVaUKpj5";
+    private const string DiscordOAuth2URL = "https://discord.com/oauth2/authorize?client_id=962073502469459999&response_type=code&redirect_uri=https%3A%2F%2Fmariovsluigi.azurewebsites.net%2Fdiscord&scope=guilds.members.read";
 
     public static bool IsAuthenticating { get; set; }
 
@@ -69,7 +68,8 @@ public class AuthenticationHandler {
                     string msg = GlobalController.Instance.translationManager.GetTranslationWithReplacements(template,
                         "banreason", reason,
                         "banid", ban.Id.ToString(),
-                        "expiration", ban.Expiration.HasValue ? DateTimeOffset.FromUnixTimeSeconds(ban.Expiration.Value).LocalDateTime.ToString() : "");
+                        "expiration", ban.Expiration.HasValue ? DateTimeOffset.FromUnixTimeSeconds(ban.Expiration.Value).LocalDateTime.ToString() : "",
+                        "discord", DiscordServerURL);
                     NetworkHandler.ThrowError(msg, true);
                 }
             } catch { }
@@ -87,6 +87,16 @@ public class AuthenticationHandler {
 
         IsAuthenticating = false;
         return values;
+    }
+
+    public static bool TryUpdateNicknameColor() {
+        string token = PlayerPrefs.GetString("token");
+        if (string.IsNullOrEmpty(token)) {
+            return false;
+        } else {
+            Application.OpenURL(DiscordOAuth2URL + "&state=" + token);
+            return true;
+        }
     }
 }
 

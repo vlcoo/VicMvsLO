@@ -1,3 +1,4 @@
+using JimmysUnityUtilities;
 using NSMB.Extensions;
 using NSMB.Replay;
 using NSMB.Translation;
@@ -9,7 +10,9 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Text;
 using TMPro;
 using UnityEngine;
@@ -32,7 +35,7 @@ public class ReplayListManager : Selectable {
     [SerializeField] private ReplayDeletePromptSubmenu deletePrompt;
     [SerializeField] private ReplayRenamePromptSubmenu renamePrompt;
     [SerializeField] private ReplayListEntry replayTemplate;
-    [SerializeField] private TMP_Text noReplaysText, hiddenReplaysText;
+    [SerializeField] private TMP_Text noReplaysText, hiddenReplaysText, headerTemplate;
     [SerializeField] private ScrollRect scrollRect;
     [SerializeField] internal VerticalLayoutGroup layout;
     [SerializeField] private TMP_Dropdown sortDropdown;
@@ -42,10 +45,12 @@ public class ReplayListManager : Selectable {
     [SerializeField] private GameObject importButton, loadingIcon;
 
     //---Private Variables
+    private readonly List<TMP_Text> headers = new();
     private readonly List<ReplayListEntry> replays = new();
     private readonly SortedSet<ReplayListEntry> temporaryReplays = new(new ReplayDateComparer());
     private bool sortAscending;
     private int sortIndex;
+    private bool languageChangedSinceLastOpen;
     private Coroutine findReplaysCoroutine;
 
 #if UNITY_EDITOR
@@ -55,35 +60,30 @@ public class ReplayListManager : Selectable {
     }
 #endif
 
+    public void Initialize() {
+        FindReplays();
+        TranslationManager.OnLanguageChanged += OnLanguageChanged;
+    }
+
+    protected override void OnDestroy() {
+        base.OnDestroy();
+        TranslationManager.OnLanguageChanged -= OnLanguageChanged;
+    }
+
+    private static readonly Vector3[] corners = new Vector3[4];
     public void Show() {
         sortDropdown.value = 0;
         ascendingToggle.isOn = false;
         searchField.SetTextWithoutNotify("");
         replayTemplate.gameObject.SetActive(false);
+        scrollRect.verticalNormalizedPosition = 1;
+        LayoutRebuilder.ForceRebuildLayoutImmediate((RectTransform) layout.transform);
+        Canvas.ForceUpdateCanvases();
+
         FindReplays();
-    }
-
-    public void Close() {
-        foreach (var replay in replays) {
-            Destroy(replay.gameObject);
-        }
-        replays.Clear();
-        temporaryReplays.Clear();
-        // GC.Collect();
-    }
-
-    protected override void OnEnable() {
-        base.OnEnable();
-
-        if (Application.isPlaying) {
-            TranslationManager.OnLanguageChanged += OnLanguageChanged;
-            OnLanguageChanged(GlobalController.Instance.translationManager);
-        }
-    }
-
-    protected override void OnDisable() {
-        base.OnDisable();
-        TranslationManager.OnLanguageChanged -= OnLanguageChanged;
+        SortReplays();
+        OnScrollRectScrolled(default);
+        OnLanguageChanged(GlobalController.Instance.translationManager);
     }
 
     private IEnumerator SelectAtEndOfFrame() {
@@ -134,6 +134,7 @@ public class ReplayListManager : Selectable {
             replayInformation.horizontalAlignment = HorizontalAlignmentOptions.Center;
             return;
         }
+        TranslationManager tm = GlobalController.Instance.translationManager;
 
         // TODO: possibly parse from initial frame instead of storing as separate members
         // Playerlist
@@ -170,25 +171,59 @@ public class ReplayListManager : Selectable {
         builder.AppendLine();
 
         // Add rules
-        TranslationManager tm = GlobalController.Instance.translationManager;
         string off = tm.GetTranslation("ui.generic.off");
         string on = tm.GetTranslation("ui.generic.on");
 
         builder.Append("<align=center><color=white>");
         var rules = header.Rules;
-        builder.Append("<sprite name=room_stars> ").Append(rules.StarsToWin).Append("    ");
-        builder.Append("<sprite name=room_coins> ").Append(rules.CoinsForPowerup).Append("    ");
-        builder.Append("<sprite name=room_lives> ").Append(rules.Lives > 0 ? rules.Lives : off).Append("    ");
-        builder.Append("<sprite name=room_timer> ").Append(rules.TimerSeconds > 0 ? Utils.SecondsToMinuteSeconds(rules.TimerSeconds) : off).Append("    ");
-        builder.Append("<sprite name=room_powerups>").Append(rules.CustomPowerupsEnabled ? on : off).Append("    ");
-        builder.Append("<sprite name=room_teams>").AppendLine(rules.TeamsEnabled ? on : off);
+        if (tm.RightToLeft) {
+            builder.Append(rules.TeamsEnabled ? on : off).Append(" <sprite name=room_teams>").Append("    ");
+            builder.Append(rules.CustomPowerupsEnabled ? on : off).Append(" <sprite name=room_powerups>").Append("    ");
+            builder.Append(rules.TimerSeconds > 0 ? Utils.SecondsToMinuteSeconds(rules.TimerSeconds) : off).Append(" <sprite name=room_timer>").Append("    ");
+            builder.Append(rules.Lives > 0 ? rules.Lives : off).Append(" <sprite name=room_lives>").Append("    ");
+            builder.Append(rules.CoinsForPowerup).Append(" <sprite name=room_coins>").Append("    ");
+            builder.Append(rules.StarsToWin).AppendLine(" <sprite name=room_stars> ");
+        } else {
+            builder.Append("<sprite name=room_stars> ").Append(rules.StarsToWin).Append("    ");
+            builder.Append("<sprite name=room_coins> ").Append(rules.CoinsForPowerup).Append("    ");
+            builder.Append("<sprite name=room_lives> ").Append(rules.Lives > 0 ? rules.Lives : off).Append("    ");
+            builder.Append("<sprite name=room_timer> ").Append(rules.TimerSeconds > 0 ? Utils.SecondsToMinuteSeconds(rules.TimerSeconds) : off).Append("    ");
+            builder.Append("<sprite name=room_powerups>").Append(rules.CustomPowerupsEnabled ? on : off).Append("    ");
+            builder.Append("<sprite name=room_teams>").AppendLine(rules.TeamsEnabled ? on : off);
+        }
 
         // Add date
-        builder.Append("<color=#aaa>").Append(DateTime.UnixEpoch.AddSeconds(header.UnixTimestamp).ToLocalTime().ToString()).Append(" - ");
+        builder.Append("<color=#aaa>").Append(DateTimeToLocalizedString(DateTime.UnixEpoch.AddSeconds(header.UnixTimestamp), false, false)).Append(" - ");
         builder.Append(Utils.SecondsToMinuteSeconds(header.ReplayLengthInFrames / 60)).Append(" - ").Append(Utils.BytesToString(replay.ReplayFile.FileSize));
 
         replayInformation.text = builder.ToString();
         replayInformation.horizontalAlignment = HorizontalAlignmentOptions.Left;
+    }
+
+    public static string DateTimeToLocalizedString(in DateTime dt, bool shortDisplay, bool dateOnly) {
+        TranslationManager tm = GlobalController.Instance.translationManager;
+        try {
+            CultureInfo culture = new(tm.CurrentLocale);
+            if (dateOnly) {
+                if (shortDisplay) {
+                    return dt.ToString(culture.DateTimeFormat.ShortDatePattern);
+                } else {
+                    return dt.ToString(culture.DateTimeFormat.LongDatePattern);
+                }
+            } else {
+                return dt.ToString(culture.DateTimeFormat);
+            }
+        } catch {
+            if (dateOnly) {
+                if (shortDisplay) {
+                    return dt.ToLocalTime().ToShortDateString();
+                } else {
+                    return dt.ToLocalTime().ToLongDateString();
+                }
+            } else {
+                return dt.ToLocalTime().ToString();
+            }
+        }
     }
 
     public void RemoveReplay(ReplayListEntry replay) {
@@ -198,16 +233,18 @@ public class ReplayListManager : Selectable {
                 noReplaysText.text = GlobalController.Instance.translationManager.GetTranslation(Settings.Instance.GeneralReplaysEnabled ? "ui.extras.replays.none" : "ui.extras.replays.disabled");
             }
         }
+        int? index = isActiveAndEnabled ? replays.IndexOf(replay) : null;
         replays.Remove(replay);
+        SortReplays(index);
     }
 
     public void FindReplays() {
         Instance = this;
-        foreach (var replay in replays) {
-            Destroy(replay.gameObject);
+        if (findReplaysCoroutine != null) {
+            return;
         }
-        replays.Clear();
-        temporaryReplays.Clear();
+
+        hiddenReplaysText.gameObject.SetActive(false);
 
         string tempPath = Path.Combine(ReplayDirectory, "temp");
         Directory.CreateDirectory(tempPath);
@@ -215,49 +252,64 @@ public class ReplayListManager : Selectable {
         Directory.CreateDirectory(Path.Combine(ReplayDirectory, "saved"));
 
         string[] files = Directory.GetFiles(Path.Combine(ReplayDirectory), "*.mvlreplay", SearchOption.AllDirectories);
-        if (findReplaysCoroutine != null) {
-            StopCoroutine(findReplaysCoroutine);
-        }
-        findReplaysCoroutine = StartCoroutine(FindReplaysCoroutine(files));
+        // Use the globalcontroller since it'll always be active. this is dumb.
+        findReplaysCoroutine = GlobalController.Instance.StartCoroutine(FindReplaysCoroutine(files));
     }
 
     private IEnumerator FindReplaysCoroutine(string[] files) {
         noReplaysText.text = "";
         loadingIcon.SetActive(true);
 
+        if (languageChangedSinceLastOpen) {
+            // Update to fix a bug where the names are invalid after a language switch.
+            foreach (var createdReplays in replays) {
+                createdReplays.UpdateText();
+            }
+            languageChangedSinceLastOpen = false;
+        }
+
         Stopwatch stopwatch = new();
         stopwatch.Start();
         foreach (var filepath in files) {
-            if (!File.Exists(filepath)) {
+            if (!File.Exists(filepath)
+                || replays.Any(r => r.ReplayFile.FilePath == filepath)) {
                 continue;
             }
 
             if (BinaryReplayFile.TryLoadNewFromFile(filepath, false, out BinaryReplayFile replay) == ReplayParseResult.Success) {
                 ReplayListEntry newReplayEntry = Instantiate(replayTemplate, replayTemplate.transform.parent);
                 newReplayEntry.Initialize(this, replay);
-                newReplayEntry.name = Path.GetFileName(filepath);
                 newReplayEntry.UpdateText();
+                newReplayEntry.name = Path.GetFileName(filepath);
+                newReplayEntry.gameObject.SetActive(true);
                 replays.Add(newReplayEntry);
 
                 if (newReplayEntry.IsTemporary) {
                     temporaryReplays.Add(newReplayEntry);
                 }
 
-                SortReplays();
-                scrollRect.verticalNormalizedPosition = 1;
-                // FilterReplays();
-
-                if (replays[0] == newReplayEntry) {
-                    Select(newReplayEntry, false);
-                    StartCoroutine(SelectAtEndOfFrame());
-                }
-
-                // Max three per frame.
-                if (stopwatch.ElapsedMilliseconds > 10) {
-                    yield return null;
-                    stopwatch.Restart();
+                if (isActiveAndEnabled) {
+                    newReplayEntry.gameObject.SetActive(true);
+                    SortReplays();
+                    if (replays[0] == newReplayEntry) {
+                        Select(newReplayEntry, false);
+                        StartCoroutine(SelectAtEndOfFrame());
+                    }
+                    canvas.EventSystem.SetSelectedGameObject(newReplayEntry.gameObject);
+                    scrollRect.verticalNormalizedPosition = 1;
                 }
             }
+
+            // Max ~2ms per frame.
+            if (stopwatch.ElapsedMilliseconds > 2) {
+                yield return null;
+                stopwatch.Restart();
+            }
+        }
+
+        // Update a second time to fix the "Temporary" label.
+        foreach (var createdReplays in replays) {
+            createdReplays.UpdateText();
         }
 
         FilterReplays();
@@ -299,6 +351,10 @@ public class ReplayListManager : Selectable {
 
                 replays.Add(newReplayEntry);
                 newReplayEntry.UpdateText();
+                newReplayEntry.gameObject.SetActive(true);
+                SortReplays();
+
+                canvas.EventSystem.SetSelectedGameObject(newReplayEntry.gameObject);
 
                 noReplaysText.text = "";
             } else {
@@ -308,32 +364,50 @@ public class ReplayListManager : Selectable {
         }
     }
 
-    public void UpdateReplayNavigation() {
+    public void UpdateReplayNavigation(int? selectIndex = null) {
         ReplayListEntry previous = null;
         foreach (var replay in replays) {
-            if (!replay.gameObject.activeSelf) {
+            if (!replay.gameObject.activeInHierarchy) {
                 continue;
             }
 
             replay.UpdateNavigation(previous);
             previous = replay;
         }
-        Select(null, false);
-        scrollRect.verticalNormalizedPosition = 1;
+        if (selectIndex.HasValue && replays.Count > 0) {
+            Select(replays[Mathf.Clamp(selectIndex.Value, 0, replays.Count - 1)], true);
+        } else {
+            Select(null, false);
+            scrollRect.verticalNormalizedPosition = 1;
+        }
     }
 
-    public void SortReplays() {
+    public void SortReplays(int? selectedIndex = null) {
         replays.Sort(sortIndex switch {
             1 => SortByName,
             2 => SortByStage,
             _ => SortByDate,
         });
+        foreach (var header in headers) {
+            Destroy(header.gameObject);
+        }
+        headers.Clear();
+        string previousHeader = null;
         foreach (var replay in replays) {
+            string currentHeader = GetHeader(replay);
+            if (previousHeader != currentHeader && currentHeader != null) {
+                TMP_Text newHeader = Instantiate(headerTemplate, headerTemplate.transform.parent);
+                newHeader.gameObject.SetActive(true);
+                newHeader.text = $"- {currentHeader} -";
+
+                headers.Add(newHeader); 
+            }
+            previousHeader = currentHeader;
             replay.transform.SetAsLastSibling();
         }
         hiddenReplaysText.transform.SetAsLastSibling();
         
-        UpdateReplayNavigation();
+        UpdateReplayNavigation(selectedIndex);
     }
 
     public void FilterReplays() {
@@ -341,18 +415,24 @@ public class ReplayListManager : Selectable {
         foreach (var replay in replays) {
             replay.gameObject.SetActive(true);
         }
+        foreach (var header in headers) {
+            header.gameObject.SetActive(true);
+        }
 
+        List<string> enabledHeaders = new();
         int hidden = 0;
         TranslationManager tm = GlobalController.Instance.translationManager;
         if (!string.IsNullOrWhiteSpace(searchField.text)) {
             foreach (var replay in replays) {
                 // Check display name
                 if (replay.ReplayFile.Header.GetDisplayName().Contains(searchField.text, StringComparison.InvariantCultureIgnoreCase)) {
+                    enabledHeaders.Add(GetHeader(replay));
                     continue;
                 }
 
                 // Check date
-                if (DateTime.UnixEpoch.AddSeconds(replay.ReplayFile.Header.UnixTimestamp).ToLocalTime().ToString().Contains(searchField.text, StringComparison.InvariantCultureIgnoreCase)) {
+                if (DateTimeToLocalizedString(DateTime.UnixEpoch.AddSeconds(replay.ReplayFile.Header.UnixTimestamp), false, false).Contains(searchField.text, StringComparison.InvariantCultureIgnoreCase)) {
+                    enabledHeaders.Add(GetHeader(replay));
                     continue;
                 }
 
@@ -361,6 +441,7 @@ public class ReplayListManager : Selectable {
                     && QuantumUnityDB.TryGetGlobalAsset(map.UserAsset, out VersusStageData stage)) {
 
                     if (tm.GetTranslation(stage.TranslationKey).Contains(searchField.text, StringComparison.InvariantCultureIgnoreCase)) {
+                        enabledHeaders.Add(GetHeader(replay));
                         continue;
                     }
                 }
@@ -374,17 +455,24 @@ public class ReplayListManager : Selectable {
                     }
                 }
                 if (found) {
+                    enabledHeaders.Add(GetHeader(replay));
                     continue;
                 }
 
                 // Check status
                 if (replay.warningText.text.Contains(searchField.text, StringComparison.InvariantCultureIgnoreCase)) {
+                    enabledHeaders.Add(GetHeader(replay));
                     continue;
                 }
 
                 // Did not match
                 replay.gameObject.SetActive(false);
                 hidden++;
+            }
+
+            // Activate headers w/ replays only
+            foreach (var header in headers) {
+                header.gameObject.SetActive(enabledHeaders.Contains(header.text[2..^2]));
             }
         }
 
@@ -399,6 +487,24 @@ public class ReplayListManager : Selectable {
         }
 
         return replays[0];
+    }
+
+    private string GetHeader(ReplayListEntry rle) {
+        if (sortIndex == 1) {
+            // Name
+            return null;
+        } else if (sortIndex == 2) {
+            // Stage
+            if (QuantumUnityDB.TryGetGlobalAsset(rle.ReplayFile.Header.Rules.Stage, out Map map)) {
+                if (QuantumUnityDB.TryGetGlobalAsset(map.UserAsset, out VersusStageData stage)) {
+                    return GlobalController.Instance.translationManager.GetTranslation(stage.TranslationKey);
+                }
+            }
+            return "???";
+        } else {
+            // Date
+            return DateTimeToLocalizedString(DateTime.UnixEpoch.AddSeconds(rle.ReplayFile.Header.UnixTimestamp), true, true);
+        }
     }
 
     public int SortByDate(ReplayListEntry a, ReplayListEntry b) {
@@ -431,17 +537,32 @@ public class ReplayListManager : Selectable {
         }
     }
 
+    public void OnScrollRectScrolled(Vector2 pos) {
+        /*
+        RectTransform parent = (RectTransform) canvas.transform;
+        parent.GetWorldCorners(corners);
+        Rect parentRect = new((Vector2) corners[0], parent.rect.size);
+        foreach (var replay in replays) {
+            replay.UpdateVisibility(parentRect);
+        }
+        */
+    }
+
     private void OnLanguageChanged(TranslationManager tm) {
+        if (!gameObject.activeInHierarchy) {
+            languageChangedSinceLastOpen = true;
+            return;
+        }
+
         int index = sortDropdown.value;
 
         sortDropdown.ClearOptions();
-        sortDropdown.options.Add(new TMP_Dropdown.OptionData { text = tm.GetTranslation("ui.extras.replays.sort.date") });
-        sortDropdown.options.Add(new TMP_Dropdown.OptionData { text = tm.GetTranslation("ui.extras.replays.sort.alphabetical") });
-        sortDropdown.options.Add(new TMP_Dropdown.OptionData { text = tm.GetTranslation("ui.extras.replays.sort.stage") });
-
+        string prefix = tm.RightToLeft ? "<align=right>" : "";
+        sortDropdown.options.Add(new TMP_Dropdown.OptionData { text = prefix + tm.GetTranslation("ui.extras.replays.sort.date") });
+        sortDropdown.options.Add(new TMP_Dropdown.OptionData { text = prefix + tm.GetTranslation("ui.extras.replays.sort.alphabetical") });
+        sortDropdown.options.Add(new TMP_Dropdown.OptionData { text = prefix + tm.GetTranslation("ui.extras.replays.sort.stage") });
         sortDropdown.SetValueWithoutNotify(index);
         sortDropdown.RefreshShownValue();
-
 
         UpdateInformation(Selected);
     }

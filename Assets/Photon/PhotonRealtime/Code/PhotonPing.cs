@@ -1,4 +1,4 @@
-﻿// ----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 // <copyright file="PhotonPing.cs" company="Exit Games GmbH">
 // Photon Realtime API - Copyright (C) 2022 Exit Games GmbH
 // </copyright>
@@ -22,7 +22,7 @@ namespace Photon.Realtime
     using System.Collections;
     using System.Threading;
 
-    #if !NO_SOCKET && !NETFX_CORE
+    #if !NO_SOCKET
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Net.Sockets;
@@ -77,7 +77,7 @@ namespace Photon.Realtime
     }
 
 
-    #if !NETFX_CORE && !NO_SOCKET
+    #if !NO_SOCKET
     /// <summary>Uses C# Socket class from System.Net.Sockets (as Unity usually does).</summary>
     /// <remarks>Incompatible with Windows 8 Store/Phone API.</remarks>
     public class PingMono : PhotonPing

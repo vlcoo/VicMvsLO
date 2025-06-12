@@ -16,10 +16,11 @@ MonoBehaviour:
     Path: QuantumUser/Resources/AssetObjects/Maps/Fortress/DefaultFortressStageData
     Guid:
       Value: 373777738286135472
-  StageAuthor: 
-  MusicComposer: 
+  ShowAuthorAndComposer: 0
+  StageAuthor: Nintendo
+  MusicComposer: Nintendo
   TranslationKey: level.default.fortress
-  LegalEnglishName: Fortress
+  GroupingTranslationKey: level.header.default
   DiscordStageImage: level-fortress
   Icon: {fileID: 21300000, guid: c8510af529294be40a5f09eeddf3d764, type: 3}
   OverrideAutomaticTilemapSettings: 0
@@ -47,8 +48,6 @@ MonoBehaviour:
     Y:
       RawValue: 26214
   OverrideAutomaticCameraSettings: 1
-  ForceOneScreenCameraHeight: 0
-  NoHorizontalCameraMovement: 0
   CameraMinPosition:
     X:
       RawValue: -65536000
@@ -67,8 +66,17 @@ MonoBehaviour:
   HidePlayersOnMinimap: 0
   SpawnBigPowerups: 0
   SpawnVerticalPowerups: 0
-  ReverbSfx: 0
-  VerticalMap: 0
+  MainMusic:
+  - Id:
+      Value: 369157696319829885
+  - Id:
+      Value: 386427822095829515
+  InvincibleMusic:
+    Id:
+      Value: 289056355789154037
+  MegaMushroomMusic:
+    Id:
+      Value: 451321131049702687
   TileData:
   - Tile:
       Id:
@@ -2667,4 +2675,3 @@ MonoBehaviour:
       RawValue: 327680
     Y:
       RawValue: 98304
-  IsCampaignMap: 0

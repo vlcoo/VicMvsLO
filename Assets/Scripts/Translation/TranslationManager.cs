@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using UnityEngine;
 using Newtonsoft.Json;
+using ArabicSupport;
 
 namespace NSMB.Translation {
 
@@ -101,18 +102,19 @@ namespace NSMB.Translation {
                 return;
             }
 
-            if (newLocale.ToLower().StartsWith("ar")) {
-                // Arabic. Needs special case.
+            CurrentLocale = newLocale;
+            RightToLeft = GetTranslation("rtl") == "true";
+
+            if (/* newLocale.ToLower().StartsWith("ar") */ RightToLeft) {
+                // Hopefully this ArabicFixer handles ALL rtl text...
                 foreach (string key in translations.Keys.ToList()) {
                     if (key == "rtl") continue;
                     try {
-                        translations[key] = ArabicSupport.ArabicFixer.Fix(translations[key], true);
+                        translations[key] = ArabicFixer.Fix(translations[key], true, false);
                     } catch { }
                 }
             }
 
-            CurrentLocale = newLocale;
-            RightToLeft = GetTranslation("rtl") == "true";
             // Call the change event
             OnLanguageChanged?.Invoke(this);
         }
@@ -156,8 +158,13 @@ namespace NSMB.Translation {
             // Open the files and get the locale name from the "lang" key
             foreach (LocaleData data in results) {
                 string json = data.Name;
-                Dictionary<string, string> keys = JsonConvert.DeserializeObject<Dictionary<string, string>>(json);
-                data.Name = keys["lang"];
+                try {
+                    Dictionary<string, string> keys = JsonConvert.DeserializeObject<Dictionary<string, string>>(json);
+                    data.Name = keys["lang"];
+                    data.RTL = keys["rtl"] == "true";
+                } catch {
+                    Debug.LogWarning("Failed to parse language file " + data.Locale);
+                }
             }
 
             return results
@@ -190,11 +197,13 @@ namespace NSMB.Translation {
         public string GetTranslation(string key) {
             key ??= "null";
 
-            if (translations != null && translations.TryGetValue(key.ToLower(), out string value) && !string.IsNullOrWhiteSpace(value))
+            if (translations != null && translations.TryGetValue(key.ToLower(), out string value) && !string.IsNullOrWhiteSpace(value)) {
                 return value;
+            }
 
-            if (defaultTranslations != null && defaultTranslations.TryGetValue(key.ToLower(), out string valueDef) && !string.IsNullOrWhiteSpace(valueDef))
+            if (defaultTranslations != null && defaultTranslations.TryGetValue(key.ToLower(), out string valueDef) && !string.IsNullOrWhiteSpace(valueDef)) {
                 return valueDef;
+            }
 
             return key;
         }
@@ -225,6 +234,7 @@ namespace NSMB.Translation {
 
         public class LocaleData : IEquatable<LocaleData> {
             public string Name, Locale;
+            public bool RTL;
 
             public bool Equals(LocaleData other) {
                 return Locale == other.Locale;

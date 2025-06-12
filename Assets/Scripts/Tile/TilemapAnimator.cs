@@ -1,11 +1,10 @@
 using NSMB.Extensions;
 using Quantum;
 using System.Collections.Generic;
-using Unity.Collections.LowLevel.Unsafe;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
-public class TilemapAnimator : MonoBehaviour {
+public class TilemapAnimator : QuantumSceneViewComponent<StageContext> {
 
     //---Serialized Variables
     [SerializeField] private Tilemap tilemap;
@@ -13,12 +12,17 @@ public class TilemapAnimator : MonoBehaviour {
 
     //---Private Variables
     private readonly Dictionary<EntityRef, AudioSource> entityBreakBlockSounds = new();
-    private readonly Dictionary<EventKey, Vector3Int> tileEventPositions = new();
-    private VersusStageData stage;
-
+    private readonly Dictionary<EventKey, Vector3Int> tilePositionData = new();
+    private readonly Dictionary<Vector3Int, List<TileChangeData>> tileUndoData = new();
+    private double startTime;
 
     public void OnValidate() {
         this.SetIfNull(ref tilemap);
+    }
+
+    public override void OnEnable() {
+        UseFindUpdater = true;
+        base.OnEnable();
     }
 
     public void Start() {
@@ -29,54 +33,58 @@ public class TilemapAnimator : MonoBehaviour {
         QuantumCallback.Subscribe<CallbackEventCanceled>(this, OnEventCanceled);
         QuantumCallback.Subscribe<CallbackEventConfirmed>(this, OnEventConfirmed);
 
-        stage = (VersusStageData) QuantumUnityDB.GetGlobalAsset(FindObjectOfType<QuantumMapData>().Asset.UserAsset);
         if (QuantumRunner.DefaultGame != null) {
             RefreshMap(QuantumRunner.DefaultGame.Frames.Verified);
         }
         tilemap.RefreshAllTiles();
+        startTime = Time.timeAsDouble;
+    }
+
+    public override void OnUpdateView() {
+        LevelWrapRenderPass.wrapAmount = ViewContext.Stage.TileDimensions.x * 0.5f;
     }
 
     private void OnGameStateChanged(EventGameStateChanged e) {
         if (e.NewState == GameState.Playing) {
             tilemap.RefreshAllTiles();
+            startTime = Time.timeAsDouble;
         }
     }
 
     private void OnEventCanceled(CallbackEventCanceled e) {
-        EventKey id = e.EventKey;
+        EventKey key = e.EventKey;
 
-        if (!tileEventPositions.TryGetValue(id, out Vector3Int coords)) {
+        if (!tilePositionData.TryGetValue(key, out Vector3Int coords)) {
             return;
         }
 
+        var undoData = tileUndoData[coords];
+        if (undoData.Count == 1) {
+            // This is a cancelled tile change event.
+            tilemap.SetTile(coords, undoData[0].tile);
+            tilemap.SetTransformMatrix(coords, undoData[0].transform);
+            tilemap.RefreshTile(coords);
+            if (undoData[0].tile is AnimatedTile at) {
+                tilemap.SetAnimationTime(coords, (float) (Time.timeAsDouble - startTime) * at.m_MaxSpeed % at.m_AnimatedSprites.Length);
+            }
+        }
 
-        // This is a tile change event.
-        // Refer back to the simulation
-        Frame f = e.Game.Frames.Predicted;
-        StageTileInstance tileInstance = stage.GetTileRelative(f, coords.x, coords.y);
+        if (undoData.Count > 0) {
+            undoData.RemoveAt(0);
+        }
 
-        var tile = QuantumUnityDB.GetGlobalAsset(tileInstance.Tile);
-        TileBase unityTile = tile ? tile.Tile : null;
-        Vector2 scale = new Vector2 {
-            x = tileInstance.Flags.HasFlag(StageTileFlags.MirrorX) ? -1 : 1,
-            y = tileInstance.Flags.HasFlag(StageTileFlags.MirrorY) ? -1 : 1,
-        };
-        Matrix4x4 mat = Matrix4x4.TRS(Vector3.zero, Quaternion.Euler(0, 0, tileInstance.Rotation / (float) (ushort.MaxValue / 360f)), scale);
-
-        // Debug.Log($"tile event cancelled at {coords}. Was {tilemap.GetTile(coords)?.name}, changing back to {unityTile}");
-
-        tilemap.SetTile(coords, unityTile);
-        tilemap.SetTransformMatrix(coords, mat);
-        tilemap.RefreshTile(coords);
-
-        tileEventPositions.Remove(id);
+        tilePositionData.Remove(key);
     }
 
     private void OnEventConfirmed(CallbackEventConfirmed e) {
-        if (tileEventPositions.TryGetValue(e.EventKey, out Vector3Int coords)) {
-            // Debug.Log($"tile event CONFIRMED at {coords}.");
+        if (tilePositionData.TryGetValue(e.EventKey, out Vector3Int coords)) {
+            if (tileUndoData.TryGetValue(coords, out List<TileChangeData> undoData)) {
+                if (undoData.Count > 0) {
+                    undoData.RemoveAt(0);
+                }
+            }
         }
-        tileEventPositions.Remove(e.EventKey);
+        tilePositionData.Remove(e.EventKey);
     }
 
     private void OnTileChanged(EventTileChanged e) {
@@ -90,16 +98,28 @@ public class TilemapAnimator : MonoBehaviour {
         TileBase unityTile = tile ? tile.Tile : null;
         Matrix4x4 mat = Matrix4x4.TRS(Vector3.zero, Quaternion.Euler(0, 0, e.NewTile.Rotation / (float) (ushort.MaxValue / 360f)), scale);
 
+        tilePositionData[e] = coords;
+        
+        if (!tileUndoData.TryGetValue(coords, out var list)) {
+            tileUndoData[coords] = list = new();
+        }
+        list.Add(new TileChangeData {
+            position = coords,
+            tile = tilemap.GetTile(coords),
+            transform = tilemap.GetTransformMatrix(coords),
+        });
+
         tilemap.SetTile(coords, unityTile);
         tilemap.SetTransformMatrix(coords, mat);
         tilemap.RefreshTile(coords);
-        
-        tileEventPositions[e] = coords;
+        if (unityTile is AnimatedTile at) {
+            tilemap.SetAnimationTime(coords, (float) (Time.timeAsDouble - startTime) * at.m_MaxSpeed % at.m_AnimatedSprites.Length);
+        }
     }
 
     private unsafe void OnTileBroken(EventTileBroken e) {
         ParticleSystem particle = Instantiate(tileBreakParticleSystem,
-            QuantumUtils.RelativeTileToWorld(stage, new Quantum.Vector2Int(e.TileX, e.TileY)).ToUnityVector2() + (Vector2.one * 0.25f), Quaternion.identity);
+            QuantumUtils.RelativeTileToWorld(ViewContext.Stage, new Quantum.Vector2Int(e.TileX, e.TileY)).ToUnityVector2() + (Vector2.one * 0.25f), Quaternion.identity);
 
         if (QuantumUnityDB.GetGlobalAsset(e.Tile.Tile) is BreakableBrickTile bbt) {
             var main = particle.main;
@@ -119,6 +139,7 @@ public class TilemapAnimator : MonoBehaviour {
     }
     
     private void RefreshMap(Frame f) {
+        VersusStageData stage = ViewContext.Stage;
         if (f == null
             || f.StageTiles == null 
             || f.StageTiles.Length != stage.TileDimensions.x * stage.TileDimensions.y) {
@@ -142,14 +163,11 @@ public class TilemapAnimator : MonoBehaviour {
                 tilemap.SetTile(coords, unityTile);
                 Matrix4x4 mat = Matrix4x4.TRS(Vector3.zero, Quaternion.Euler(0, 0, tileInstance.Rotation / (float) (ushort.MaxValue / 360f)), scale);
                 tilemap.SetTransformMatrix(coords, mat);
+                tilemap.RefreshTile(coords);
+                if (unityTile is AnimatedTile at) {
+                    tilemap.SetAnimationTime(coords, (float) (Time.timeAsDouble - startTime) * at.m_MaxSpeed % at.m_AnimatedSprites.Length);
+                }
             }
         }
-
-        tilemap.RefreshAllTiles();
-    }
-
-    public struct TileEventData {
-        public EventKey Id;
-        public TileChangeData ChangeData;
     }
 }

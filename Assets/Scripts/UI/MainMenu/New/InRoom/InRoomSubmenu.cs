@@ -63,7 +63,7 @@ namespace NSMB.UI.MainMenu.Submenus {
         //---Private Variables
         private InRoomSubmenuPanel selectedPanel;
         private int lastCountdownStartFrame;
-        private bool invalidStart;
+        private bool countdownStarted;
         private Coroutine fadeMusicCoroutine;
 
         public override void OnValidate() {
@@ -167,13 +167,14 @@ namespace NSMB.UI.MainMenu.Submenus {
         private unsafe void UpdateStartButton(QuantumGame game, Frame f, int? seconds = null) {
             TranslationManager tm = GlobalController.Instance.translationManager;
             bool isHost = game.PlayerIsLocal(f.Global->Host);
-            seconds ??= f.Global->GameStartFrames / 60;
+            seconds ??= Mathf.RoundToInt(f.Global->GameStartFrames / 60f);
 
             if (seconds <= 0) {
                 // Cancelled
                 startGameButton.interactable = !isHost || QuantumUtils.IsGameStartable(f);
                 if (isHost) {
                     startGameButtonText.text = tm.GetTranslation("ui.inroom.buttons.start");
+                    startGameButtonText.horizontalAlignment = tm.RightToLeft ? HorizontalAlignmentOptions.Right : HorizontalAlignmentOptions.Left;
                 } else {
                     // Check if we're readyed-up
                     bool ready;
@@ -185,6 +186,7 @@ namespace NSMB.UI.MainMenu.Submenus {
                         ready = false;
                     }
                     startGameButtonText.text = tm.GetTranslation(ready ? "ui.inroom.buttons.unready" : "ui.inroom.buttons.readyup");
+                    startGameButtonText.horizontalAlignment = tm.RightToLeft ? HorizontalAlignmentOptions.Right : HorizontalAlignmentOptions.Left;
                 }
 
                 // if (fadeMusicCoroutine != null) {
@@ -196,6 +198,7 @@ namespace NSMB.UI.MainMenu.Submenus {
                 // Starting
                 startGameButton.interactable = isHost;
                 startGameButtonText.text = tm.GetTranslationWithReplacements("ui.inroom.buttons.starting", "countdown", seconds.ToString());
+                startGameButtonText.horizontalAlignment = tm.RightToLeft ? HorizontalAlignmentOptions.Right : HorizontalAlignmentOptions.Left;
 
                 // if (seconds == 1) {
                 //     // Start fade
@@ -307,21 +310,16 @@ namespace NSMB.UI.MainMenu.Submenus {
 
             bool isHost = e.Game.PlayerIsLocal(f.Global->Host);
             
-            if (isHost
-                || (f.Number - lastCountdownStartFrame) > (f.UpdateRate * 3)
-                || !invalidStart) {
-
+            if (isHost || countdownStarted || (e.IsGameStarting && (f.Number - lastCountdownStartFrame) > (f.UpdateRate * 3))) {
                 Canvas.PlaySound(e.IsGameStarting ? SoundEffect.UI_FileSelect : SoundEffect.UI_Back);
                 if (e.IsGameStarting) {
                     ChatManager.Instance.AddSystemMessage("ui.inroom.chat.server.starting", ChatManager.Red, "countdown", "3");
-                    invalidStart = false;
+                    countdownStarted = true;
                 } else {
                     ChatManager.Instance.AddSystemMessage("ui.inroom.chat.server.startcancelled", ChatManager.Red);
-                    invalidStart = true;
+                    countdownStarted = false;
                 }
                 lastCountdownStartFrame = f.Number;
-            } else if (e.IsGameStarting) {
-                invalidStart = true;
             }
         }
 

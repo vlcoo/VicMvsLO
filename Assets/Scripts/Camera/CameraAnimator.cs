@@ -43,7 +43,7 @@ public unsafe class CameraAnimator : ResizingCamera {
     public override void Start() {
         base.Start();
         QuantumCallback.Subscribe<CallbackUpdateView>(this, OnUpdateView);
-        stage = (VersusStageData) QuantumUnityDB.GetGlobalAsset(FindObjectOfType<QuantumMapData>().Asset.UserAsset);
+        stage = (VersusStageData) QuantumUnityDB.GetGlobalAsset(FindFirstObjectByType<QuantumMapData>().Asset.UserAsset);
 
         Settings.Controls.Replay.Reset.performed += OnReset;
         OnScreenshake += OnScreenshakeCallback;
@@ -157,11 +157,12 @@ public unsafe class CameraAnimator : ResizingCamera {
     }
 
     private void UpdateCameraFreecamMode(CallbackUpdateView e) {
-        if (e.Game.Frames.Predicted.Global->GameState >= GameState.Ended) {
+        if (e.Game.Frames.Predicted.Global->GameState >= GameState.Ended
+            || playerElements.PauseMenu.IsPaused) {
             return;
         }
 
-        bool ignoreKeyboard = playerElements.PauseMenu.IsPaused || playerElements.ReplayUi.IsOpen;
+        bool ignoreKeyboard = playerElements.ReplayUi.IsOpen;
 
         // Movement
         Vector2 movement = Vector2.zero;
@@ -212,7 +213,7 @@ public unsafe class CameraAnimator : ResizingCamera {
         ourCamera.transform.position = newPosition;
 
         // Zoom
-        float zoomAmount = Settings.Controls.UI.ScrollWheel.ReadValue<Vector2>().y / -12f;
+        float zoomAmount = Settings.Controls.UI.ScrollWheel.ReadValue<Vector2>().y * -12;
         Vector3? worldPosBefore = (zoomAmount != 0) ? ourCamera.ViewportToWorldPoint(pointer) : null;
 
         if (!ignoreKeyboard) {
@@ -296,7 +297,8 @@ public unsafe class CameraAnimator : ResizingCamera {
     private void OnScreenshakeCallback(float screenshake) {
         Frame f = QuantumRunner.DefaultGame.Frames.Predicted;
 
-        if (!f.Unsafe.TryGetPointer(Target, out PhysicsObject* physicsObject)
+        if (!f.Exists(Target)
+            || !f.Unsafe.TryGetPointer(Target, out PhysicsObject* physicsObject)
             || physicsObject->IsTouchingGround) {
 
             screenshakeTimer += screenshake;

@@ -29,5 +29,22 @@ namespace NSMB.UI.Game.Track {
                 transform.localScale = ThreeFourths;
             }
         }
+        
+        public override void OnUpdateView() {
+            base.OnUpdateView();
+
+            if (PredictedFrame.Unsafe.TryGetPointer(targetEntity, out BigStar* star)) {
+                if (star->IsStationary) {
+                    animator.enabled = true;
+                    transform.localScale = Vector3.zero;
+                } else {
+                    animator.enabled = false;
+                    transform.localScale = ThreeFourths;
+                }
+                image.enabled = true;
+            } else {
+                image.enabled = false;
+            }
+        }
     }
 }

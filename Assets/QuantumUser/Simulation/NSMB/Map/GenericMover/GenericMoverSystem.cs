@@ -2,7 +2,7 @@ using Photon.Deterministic;
 using Quantum.Collections;
 
 namespace Quantum {
-    public unsafe class GenericMoverSystem : SystemMainThreadFilter<GenericMoverSystem.Filter>, ISignalOnComponentAdded<GenericMover>, ISignalOnComponentRemoved<GenericMover> {
+    public unsafe class GenericMoverSystem : SystemMainThreadEntityFilter<GenericMover, GenericMoverSystem.Filter>, ISignalOnComponentAdded<GenericMover>, ISignalOnComponentRemoved<GenericMover> {
         public struct Filter {
             public EntityRef Entity;
             public Transform2D* Transform;
@@ -10,8 +10,8 @@ namespace Quantum {
             public MovingPlatform* Platform;
         }
 
-        public override void Update(Frame f, ref Filter filter) {
-            if (f.Global->GameState != GameState.Playing) {
+        public override void Update(Frame f, ref Filter filter, VersusStageData stage) {
+            if (f.Global->GameState is not (GameState.Starting or GameState.Playing)) {
                 return;
             }
 

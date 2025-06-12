@@ -5,6 +5,7 @@ using NSMB.UI.Game.Scoreboard;
 using NSMB.UI.Pause;
 using NSMB.Utils;
 using Quantum;
+using System;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -15,13 +16,15 @@ namespace NSMB.UI.Game {
     public class PlayerElements : QuantumSceneViewComponent {
 
         public static HashSet<PlayerElements> AllPlayerElements = new();
+        public event Action OnCameraFocusChanged;
 
         //---Properties
         public PlayerRef Player { get; private set; }
         public EntityRef Entity { get; set; }
         public Canvas Canvas => canvas;
-        public Camera ScrollCamera => scrollCamera;
         public Camera Camera => ourCamera;
+        public Camera ScrollCamera => scrollCamera;
+        public Camera UICamera => uiCamera;
         public CameraAnimator CameraAnimator => cameraAnimator;
         public ReplayUI ReplayUi => replayUi;
         public PauseMenuManager PauseMenu => pauseMenu;
@@ -31,7 +34,7 @@ namespace NSMB.UI.Game {
         [SerializeField] private Canvas canvas;
         [SerializeField] private UIUpdater uiUpdater;
         [SerializeField] private CameraAnimator cameraAnimator;
-        [SerializeField] private Camera ourCamera, scrollCamera;
+        [SerializeField] private Camera ourCamera, scrollCamera, uiCamera;
         [SerializeField] private InputCollector inputCollector;
         [SerializeField] private ScoreboardUpdater scoreboardUpdater;
         [SerializeField] private ReplayUI replayUi;
@@ -126,13 +129,15 @@ namespace NSMB.UI.Game {
             }
 
             Frame f = PredictedFrame;
-            var mario = f.Unsafe.GetPointer<MarioPlayer>(Entity);
+            if (f.Unsafe.TryGetPointer(Entity, out MarioPlayer* mario)) {
+                RuntimePlayer runtimePlayer = f.GetPlayerData(mario->PlayerRef);
+                string username = runtimePlayer.PlayerNickname.ToValidUsername(f, mario->PlayerRef);
 
-            RuntimePlayer runtimePlayer = f.GetPlayerData(mario->PlayerRef);
-            string username = runtimePlayer.PlayerNickname.ToValidUsername(f, mario->PlayerRef);
+                TranslationManager tm = GlobalController.Instance.translationManager;
+                spectatingText.text = tm.GetTranslationWithReplacements("ui.game.spectating", "playername", username);
+            }
 
-            TranslationManager tm = GlobalController.Instance.translationManager;
-            spectatingText.text = tm.GetTranslationWithReplacements("ui.game.spectating", "playername", username);
+            OnCameraFocusChanged?.Invoke();
         }
 
         public void StartSpectating() {
@@ -235,8 +240,8 @@ namespace NSMB.UI.Game {
 
                 EntityRef newTarget = scoreboardUpdater.EntityAtPosition(index);
                 if (newTarget != EntityRef.None) {
-                    Entity = newTarget;
                     CameraAnimator.Mode = CameraAnimator.CameraMode.FollowPlayer;
+                    Entity = newTarget;
                     UpdateSpectateUI();
                 }
             }

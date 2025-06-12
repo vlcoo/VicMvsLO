@@ -11,10 +11,12 @@ public unsafe class VersusStageData : AssetObject {
 
     //---Serialized
     [Header("-- Information")]
+    public bool ShowAuthorAndComposer;
     public string StageAuthor;
     public string MusicComposer;
     public string TranslationKey;
     public string LegalEnglishName;
+    public string GroupingTranslationKey;
     public string DiscordStageImage;
 #if QUANTUM_UNITY
     public Sprite Icon;

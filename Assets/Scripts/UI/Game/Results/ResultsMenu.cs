@@ -44,7 +44,11 @@ namespace NSMB.UI.Game.Results {
             TranslationManager.OnLanguageChanged += OnLanguageChanged;
             RefreshAll();
 
-            checkmark.enabled = checkbox.enabled = countdown.enabled = !NetworkHandler.IsReplay;
+            if (!NetworkHandler.IsReplay) {
+                countdown.enabled = false;
+                checkmark.enabled = false;
+                checkbox.enabled = false;
+            }
         }
 
         public override void OnDisable() {
@@ -142,7 +146,7 @@ namespace NSMB.UI.Game.Results {
                 break;
             case 2:
                 exitPrompt = false;
-                labels[2].text = tm.GetTranslation("ui.pause.quit");
+                labels[2].text = tm.GetTranslation("ui.game.results.quittomainmenu");
                 break;
             }
             labels[index].color = labelDeselectedColor;
@@ -192,7 +196,7 @@ namespace NSMB.UI.Game.Results {
                 break;
             case 1:
                 if (NetworkHandler.IsReplay) {
-                    FindObjectOfType<ReplayUI>().ResetReplay();
+                    FindFirstObjectByType<ReplayUI>().ResetReplay();
                     sfx.PlayOneShot(SoundEffect.UI_Decide);
                 } else {
                     if (CanSaveReplay) {
@@ -209,7 +213,7 @@ namespace NSMB.UI.Game.Results {
                     NetworkHandler.Runner.Shutdown();
                 } else {
                     exitPrompt = true;
-                    labels[2].text = "» " + GlobalController.Instance.translationManager.GetTranslation(exitPrompt ? "ui.generic.confirmation" : "ui.pause.quit");
+                    labels[2].text = "» " + GlobalController.Instance.translationManager.GetTranslation(exitPrompt ? "ui.generic.confirmation" : "ui.game.results.quittomainmenu");
                 }
                 sfx.PlayOneShot(SoundEffect.UI_Decide);
                 break;

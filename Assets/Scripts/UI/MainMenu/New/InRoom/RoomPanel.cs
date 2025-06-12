@@ -2,7 +2,6 @@
 using Quantum;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -11,7 +10,6 @@ namespace NSMB.UI.MainMenu.Submenus {
     public class RoomPanel : InRoomSubmenuPanel {
 
         //---Properties
-        public override GameObject DefaultSelectedObject => rules[0].gameObject;
         public override bool IsInSubmenu => rules.Any(r => r.Editing);
 
         //---Serialized Variables
@@ -48,7 +46,6 @@ namespace NSMB.UI.MainMenu.Submenus {
         public unsafe void Start() {
             if (NetworkHandler.Runner && NetworkHandler.Runner.Game != null) {
                 Frame f = NetworkHandler.Runner.Game.Frames.Predicted;
-                UpdateRules(f.Global->Rules);
                 ChangeStage(f.FindAsset<VersusStageData>(f.FindAsset(f.Global->Rules.Stage).UserAsset));
             }
 
@@ -94,7 +91,6 @@ namespace NSMB.UI.MainMenu.Submenus {
 
         private unsafe void OnGameStarted(CallbackGameStarted e) {
             Frame f = e.Game.Frames.Predicted;
-            UpdateRules(f.Global->Rules);
             ChangeStage(f.FindAsset<VersusStageData>(f.FindAsset(f.Global->Rules.Stage).UserAsset));
         }
 
@@ -105,8 +101,6 @@ namespace NSMB.UI.MainMenu.Submenus {
             if (e.LevelChanged) {
                 ChangeStage(f.FindAsset<VersusStageData>(f.FindAsset(rules.Stage).UserAsset));
             }
-
-            UpdateRules(rules);
         }
 
         private void OnLanguageChanged(TranslationManager tm) {

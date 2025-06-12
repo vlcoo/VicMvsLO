@@ -1,3 +1,4 @@
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -88,7 +89,7 @@ namespace NSMB.Extensions {
             return Mathf.Clamp(scrollPos, 0f, 1f);
         }
 
-        // Missing component-wise multiply and divide operators for vector3
+        // Missing component-wise functions for vector3
         public static Vector3 Multiply(this Vector3 a, Vector3 b) {
             return new(a.x * b.x, a.y * b.y, a.z * b.z);
         }
@@ -147,6 +148,18 @@ namespace NSMB.Extensions {
             Self,
             Parent,
             Children
+        }
+
+        public static void SetTextIfDifferent(this TMP_Text text, string newText) {
+            if (!text.text.Equals(newText)) {
+                text.text = newText;
+            }
+        }
+
+        public static void SetHorizontalAlignmentIfDifferent(this TMP_Text text, HorizontalAlignmentOptions alignment) {
+            if (text.horizontalAlignment != alignment) {
+                text.horizontalAlignment = alignment;
+            }
         }
     }
 }

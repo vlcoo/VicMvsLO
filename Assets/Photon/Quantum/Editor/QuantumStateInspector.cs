@@ -757,9 +757,14 @@ namespace Quantum.Editor {
 
       public int GetTreeNodeIdForDynamicAsset(int dynamicDBNodeId, AssetGuid guid) {
         Debug.Assert(guid.IsDynamic);
-        long rawId = guid.Value & (~AssetGuid.DynamicBit);
-        Debug.Assert(rawId <= MaxDynamicAssetsPerRunner);
-        return dynamicDBNodeId + 1 + ((int)rawId % MaxDynamicAssetsPerRunner);
+        var relativeId = (int)((guid.Value & ~AssetGuid.ReservedBits) % MaxDynamicAssetsPerRunner);
+        
+        if (guid.Type == AssetGuidType.DynamicExplicit) {
+          // invert it
+          relativeId = MaxDynamicAssetsPerRunner - relativeId - 1;
+        }
+
+        return dynamicDBNodeId + 1 + relativeId;
       }
 
       public int GetTreeNodeIdForEntity(int entitiesNodeId, EntityRef entity) {

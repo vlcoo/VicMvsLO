@@ -13,7 +13,7 @@ using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 namespace NSMB.UI.Game {
-    public unsafe class UIUpdater : MonoBehaviour {
+    public unsafe class UIUpdater : QuantumSceneViewComponent<StageContext> {
 
         //---Properties
         public EntityRef Target => playerElements.Entity;
@@ -41,13 +41,13 @@ namespace NSMB.UI.Game {
         //private TeamManager teamManager;
         private int cachedCoins = -1, cachedTeamStars = -1, cachedStars = -1, cachedLives = -1, cachedTimer = -1, cachedLaps = -1;
         private PowerupAsset previousPowerup;
-        private VersusStageData stage;
         private EntityRef previousTarget;
         private bool previousMarioExists;
 
         private Coroutine endGameSequenceCoroutine, reserveSummonCoroutine;
 
-        public void OnEnable() {
+        public override void OnEnable() {
+            base.OnEnable();
             MarioPlayerAnimator.MarioPlayerInitialized += OnMarioInitialized;
             MarioPlayerAnimator.MarioPlayerDestroyed += OnMarioDestroyed;
             BigStarAnimator.BigStarInitialized += OnBigStarInitialized;
@@ -57,7 +57,8 @@ namespace NSMB.UI.Game {
             OnLanguageChanged(GlobalController.Instance.translationManager);
         }
 
-        public void OnDisable() {
+        public override void OnDisable() {
+            base.OnDisable();
             MarioPlayerAnimator.MarioPlayerInitialized -= OnMarioInitialized;
             MarioPlayerAnimator.MarioPlayerDestroyed -= OnMarioDestroyed;
             BigStarAnimator.BigStarInitialized -= OnBigStarInitialized;
@@ -253,12 +254,13 @@ namespace NSMB.UI.Game {
 
             // TEAMS
             if (teamsEnabled) {
-                byte teamIndex = mario->GetTeam(f);
-                int teamStars = QuantumUtils.GetTeamStars(f, teamIndex);
-                if (cachedTeamStars != teamStars) {
-                    cachedTeamStars = teamStars;
-                    TeamAsset team = f.FindAsset(f.SimulationConfig.Teams[teamIndex]);
-                    uiTeamStars.text = (Settings.Instance.GraphicsColorblind ? team.textSpriteColorblind : team.textSpriteNormal) + Utils.Utils.GetSymbolString("x" + cachedTeamStars + (starsEnabled ? "/" + starRequirement : ""));
+                if (mario->GetTeam(f) is byte teamIndex) {
+                    int teamStars = QuantumUtils.GetTeamStars(f, teamIndex);
+                    if (cachedTeamStars != teamStars) {
+                        cachedTeamStars = teamStars;
+                        TeamAsset team = f.FindAsset(f.SimulationConfig.Teams[teamIndex]);
+                        uiTeamStars.text = (Settings.Instance.GraphicsColorblind ? team.textSpriteColorblind : team.textSpriteNormal) + Utils.Utils.GetSymbolString("x" + cachedTeamStars + (starsEnabled ? "/" + starRequirement : ""));
+                    }
                 }
             }
 
@@ -320,7 +322,7 @@ namespace NSMB.UI.Game {
                 icon = Instantiate(playerTrackTemplate, playerTrackTemplate.transform.parent);
             }
 
-            icon.Initialize(playerElements, entity, target, stage);
+            icon.Initialize(playerElements, entity, target, ViewContext.Stage);
             icon.gameObject.SetActive(true);
             return icon;
         }
@@ -344,7 +346,7 @@ namespace NSMB.UI.Game {
         }
 
         private unsafe void ApplyUIColor(Frame f, MarioPlayer* mario) {
-            Color color = f.Global->Rules.TeamsEnabled ? Utils.Utils.GetTeamColor(f, mario->GetTeam(f), 0.8f, 1f) : stage.UIColor.AsColor;
+            Color color = (f.Global->Rules.TeamsEnabled && mario->GetTeam(f) is byte team) ? Utils.Utils.GetTeamColor(f, team, 0.8f, 1f) : ViewContext.Stage.UIColor.AsColor;
 
             foreach (Image bg in backgrounds) {
                 bg.color = color;
@@ -407,7 +409,8 @@ namespace NSMB.UI.Game {
             } else if (hasWinner) {
                 if (teamMode) {
                     // Winning team
-                    winner = tm.GetTranslation(f.FindAsset(f.SimulationConfig.Teams[e.WinningTeam]).nameTranslationKey);
+                    var teams = f.SimulationConfig.Teams;
+                    winner = tm.GetTranslation(f.FindAsset(teams[e.WinningTeam % teams.Length]).nameTranslationKey);
                     resultText = tm.GetTranslationWithReplacements("ui.result.teamwin", "team", winner);
                     ChatManager.Instance.AddSystemMessage("ui.inroom.chat.server.ended.team", color: ChatManager.Red, "team", winner);
                 } else {
