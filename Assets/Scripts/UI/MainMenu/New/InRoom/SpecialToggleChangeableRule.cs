@@ -97,21 +97,21 @@ public class SpecialToggleChangeableRule : ChangeableRule {
         case CommandChangeRules.Rules.HIceCubes:
             cmd.HIceCubes = (bool) value;
             break;
-        case CommandChangeRules.Rules.HStarCount:
-            cmd.HStarCount = (bool) value;
-            break;
-        case CommandChangeRules.Rules.HLifeCount:
-            cmd.HLifeCount = (bool) value;
-            break;
-        case CommandChangeRules.Rules.HLapCount:
-            cmd.HLapCount = (bool) value;
-            break;
-        case CommandChangeRules.Rules.HCoinCount:
-            cmd.HCoinCount = (bool) value;
-            break;
-        case CommandChangeRules.Rules.HNicknames:
-            cmd.HNicknames = (bool) value;
-            break;
+        // case CommandChangeRules.Rules.HStarCount:
+        //     cmd.HStarCount = (bool) value;
+        //     break;
+        // case CommandChangeRules.Rules.HLifeCount:
+        //     cmd.HLifeCount = (bool) value;
+        //     break;
+        // case CommandChangeRules.Rules.HLapCount:
+        //     cmd.HLapCount = (bool) value;
+        //     break;
+        // case CommandChangeRules.Rules.HCoinCount:
+        //     cmd.HCoinCount = (bool) value;
+        //     break;
+        // case CommandChangeRules.Rules.HNicknames:
+        //     cmd.HNicknames = (bool) value;
+        //     break;
         }
 
         QuantumGame game = NetworkHandler.Game;

@@ -955,9 +955,9 @@ namespace Quantum {
   }
   [StructLayout(LayoutKind.Explicit)]
   public unsafe partial struct GameRules {
-    public const Int32 SIZE = 184;
+    public const Int32 SIZE = 160;
     public const Int32 ALIGNMENT = 8;
-    [FieldOffset(176)]
+    [FieldOffset(152)]
     public AssetRef<Map> Stage;
     [FieldOffset(52)]
     public Int32 StarsToWin;
@@ -967,7 +967,7 @@ namespace Quantum {
     public Int32 Lives;
     [FieldOffset(56)]
     public Int32 TimerSeconds;
-    [FieldOffset(164)]
+    [FieldOffset(144)]
     public QBoolean TeamsEnabled;
     [FieldOffset(60)]
     public QBoolean CustomPowerupsEnabled;
@@ -975,37 +975,37 @@ namespace Quantum {
     public QBoolean DrawOnTimeUp;
     [FieldOffset(44)]
     public Int32 Laps;
-    [FieldOffset(168)]
-    public QListPtr<MatchConditionerTrigger> Triggers;
-    [FieldOffset(152)]
-    public QBoolean SNoReserve;
-    [FieldOffset(132)]
-    public QBoolean SNoDroppedStars;
-    [FieldOffset(112)]
-    public QBoolean SInstantDeath;
-    [FieldOffset(128)]
-    public QBoolean SNoDefrost;
-    [FieldOffset(124)]
-    public QBoolean SNoCollisions;
-    [FieldOffset(140)]
-    public QBoolean SNoIframes;
-    [FieldOffset(108)]
-    public QBoolean SHideSeek;
-    [FieldOffset(136)]
-    public QBoolean SNoEnemies;
-    [FieldOffset(116)]
-    public QBoolean SNoBahs;
-    [FieldOffset(156)]
-    public QBoolean SPitWrap;
-    [FieldOffset(104)]
-    public QBoolean SAllBricks;
-    [FieldOffset(144)]
-    public QBoolean SNoLooping;
-    [FieldOffset(120)]
-    public QBoolean SNoCoins;
     [FieldOffset(148)]
+    public QListPtr<MatchConditionerTrigger> Triggers;
+    [FieldOffset(132)]
+    public QBoolean SNoReserve;
+    [FieldOffset(112)]
+    public QBoolean SNoDroppedStars;
+    [FieldOffset(92)]
+    public QBoolean SInstantDeath;
+    [FieldOffset(108)]
+    public QBoolean SNoDefrost;
+    [FieldOffset(104)]
+    public QBoolean SNoCollisions;
+    [FieldOffset(120)]
+    public QBoolean SNoIframes;
+    [FieldOffset(88)]
+    public QBoolean SHideSeek;
+    [FieldOffset(116)]
+    public QBoolean SNoEnemies;
+    [FieldOffset(96)]
+    public QBoolean SNoBahs;
+    [FieldOffset(136)]
+    public QBoolean SPitWrap;
+    [FieldOffset(84)]
+    public QBoolean SAllBricks;
+    [FieldOffset(124)]
+    public QBoolean SNoLooping;
+    [FieldOffset(100)]
+    public QBoolean SNoCoins;
+    [FieldOffset(128)]
     public QBoolean SNoPowerups;
-    [FieldOffset(160)]
+    [FieldOffset(140)]
     public QBoolean SShowCoinCount;
     [FieldOffset(24)]
     public Int32 ChanceMushroom;
@@ -1025,26 +1025,16 @@ namespace Quantum {
     public Int32 ChanceMegaMushroom;
     [FieldOffset(32)]
     public Int32 ChanceStarman;
-    [FieldOffset(100)]
+    [FieldOffset(80)]
     public QBoolean HStars;
-    [FieldOffset(92)]
-    public QBoolean HPlayers;
-    [FieldOffset(72)]
-    public QBoolean HHost;
     [FieldOffset(76)]
+    public QBoolean HPlayers;
+    [FieldOffset(68)]
+    public QBoolean HHost;
+    [FieldOffset(72)]
     public QBoolean HIceCubes;
     [FieldOffset(40)]
     public Int32 HTeamTarget;
-    [FieldOffset(96)]
-    public QBoolean HStarCount;
-    [FieldOffset(84)]
-    public QBoolean HLifeCount;
-    [FieldOffset(80)]
-    public QBoolean HLapCount;
-    [FieldOffset(68)]
-    public QBoolean HCoinCount;
-    [FieldOffset(88)]
-    public QBoolean HNicknames;
     public override Int32 GetHashCode() {
       unchecked { 
         var hash = 443;
@@ -1087,11 +1077,6 @@ namespace Quantum {
         hash = hash * 31 + HHost.GetHashCode();
         hash = hash * 31 + HIceCubes.GetHashCode();
         hash = hash * 31 + HTeamTarget.GetHashCode();
-        hash = hash * 31 + HStarCount.GetHashCode();
-        hash = hash * 31 + HLifeCount.GetHashCode();
-        hash = hash * 31 + HLapCount.GetHashCode();
-        hash = hash * 31 + HCoinCount.GetHashCode();
-        hash = hash * 31 + HNicknames.GetHashCode();
         return hash;
       }
     }
@@ -1117,14 +1102,9 @@ namespace Quantum {
         serializer.Stream.Serialize(&p->TimerSeconds);
         QBoolean.Serialize(&p->CustomPowerupsEnabled, serializer);
         QBoolean.Serialize(&p->DrawOnTimeUp, serializer);
-        QBoolean.Serialize(&p->HCoinCount, serializer);
         QBoolean.Serialize(&p->HHost, serializer);
         QBoolean.Serialize(&p->HIceCubes, serializer);
-        QBoolean.Serialize(&p->HLapCount, serializer);
-        QBoolean.Serialize(&p->HLifeCount, serializer);
-        QBoolean.Serialize(&p->HNicknames, serializer);
         QBoolean.Serialize(&p->HPlayers, serializer);
-        QBoolean.Serialize(&p->HStarCount, serializer);
         QBoolean.Serialize(&p->HStars, serializer);
         QBoolean.Serialize(&p->SAllBricks, serializer);
         QBoolean.Serialize(&p->SHideSeek, serializer);
@@ -1459,7 +1439,7 @@ namespace Quantum {
   }
   [StructLayout(LayoutKind.Explicit)]
   public unsafe partial struct _globals_ {
-    public const Int32 SIZE = 2696;
+    public const Int32 SIZE = 2672;
     public const Int32 ALIGNMENT = 8;
     [FieldOffset(0)]
     public AssetRef<Map> Map;

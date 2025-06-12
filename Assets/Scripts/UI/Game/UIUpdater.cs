@@ -196,7 +196,7 @@ namespace NSMB.UI.Game {
             livesParent.SetActive(marioExists && f.Global->Rules.IsLivesEnabled);
             coinsParent.SetActive(marioExists);
             timerParent.SetActive(f.Global->Rules.IsTimerEnabled);
-            reserveItemBox.SetActive(marioExists);
+            // reserveItemBox.SetActive(marioExists);
         }
 
         private IEnumerator ReserveSummonCoroutine() {

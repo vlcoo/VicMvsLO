@@ -201,11 +201,11 @@ public class ChangeableRule : Selectable, ISubmitHandler, IPointerClickHandler, 
             CommandChangeRules.Rules.HHost => (bool) rules.HHost,
             CommandChangeRules.Rules.HIceCubes => (bool) rules.HIceCubes,
             CommandChangeRules.Rules.HTeamTarget => rules.HTeamTarget,
-            CommandChangeRules.Rules.HStarCount => (bool) rules.HStarCount,
-            CommandChangeRules.Rules.HLifeCount => (bool) rules.HLifeCount,
-            CommandChangeRules.Rules.HLapCount => (bool) rules.HLapCount,
-            CommandChangeRules.Rules.HCoinCount => (bool) rules.HCoinCount,
-            CommandChangeRules.Rules.HNicknames => (bool) rules.HNicknames,
+            // CommandChangeRules.Rules.HStarCount => (bool) rules.HStarCount,
+            // CommandChangeRules.Rules.HLifeCount => (bool) rules.HLifeCount,
+            // CommandChangeRules.Rules.HLapCount => (bool) rules.HLapCount,
+            // CommandChangeRules.Rules.HCoinCount => (bool) rules.HCoinCount,
+            // CommandChangeRules.Rules.HNicknames => (bool) rules.HNicknames,
             _ => null
         };
 

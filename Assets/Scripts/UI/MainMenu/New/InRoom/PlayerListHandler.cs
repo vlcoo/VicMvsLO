@@ -164,7 +164,7 @@ namespace NSMB.UI.MainMenu {
 
             int maxPlayers = NetworkHandler.Client.CurrentRoom.MaxPlayers;
             for (int i = 0; i < playerListEntries.Count; i++) {
-                playerListEntries[i].lockImage.gameObject.SetActive(i >= maxPlayers);
+                // playerListEntries[i].lockImage.gameObject.SetActive(i >= maxPlayers);
             }
         }
 

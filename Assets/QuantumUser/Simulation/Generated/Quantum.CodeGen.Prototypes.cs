@@ -411,11 +411,6 @@ namespace Quantum.Prototypes {
     public QBoolean HHost;
     public QBoolean HIceCubes;
     public Int32 HTeamTarget;
-    public QBoolean HStarCount;
-    public QBoolean HLifeCount;
-    public QBoolean HLapCount;
-    public QBoolean HCoinCount;
-    public QBoolean HNicknames;
     partial void MaterializeUser(Frame frame, ref Quantum.GameRules result, in PrototypeMaterializationContext context);
     public void Materialize(Frame frame, ref Quantum.GameRules result, in PrototypeMaterializationContext context = default) {
         result.Stage = this.Stage;
@@ -466,11 +461,6 @@ namespace Quantum.Prototypes {
         result.HHost = this.HHost;
         result.HIceCubes = this.HIceCubes;
         result.HTeamTarget = this.HTeamTarget;
-        result.HStarCount = this.HStarCount;
-        result.HLifeCount = this.HLifeCount;
-        result.HLapCount = this.HLapCount;
-        result.HCoinCount = this.HCoinCount;
-        result.HNicknames = this.HNicknames;
         MaterializeUser(frame, ref result, in context);
     }
   }

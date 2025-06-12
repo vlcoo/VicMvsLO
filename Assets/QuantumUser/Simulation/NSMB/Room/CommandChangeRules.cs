@@ -36,11 +36,11 @@ namespace Quantum {
         public bool HHost;
         public bool HIceCubes;
         public int HTeamTarget;
-        public bool HStarCount;
-        public bool HLifeCount;
-        public bool HLapCount;
-        public bool HCoinCount;
-        public bool HNicknames;
+        // public bool HStarCount;
+        // public bool HLifeCount;
+        // public bool HLapCount;
+        // public bool HCoinCount;
+        // public bool HNicknames;
 
         public override void Serialize(BitStream stream) {
             uint changes = (uint) EnabledChanges;
@@ -78,11 +78,11 @@ namespace Quantum {
             stream.Serialize(ref HHost);
             stream.Serialize(ref HIceCubes);
             stream.Serialize(ref HTeamTarget);
-            stream.Serialize(ref HStarCount);
-            stream.Serialize(ref HLifeCount);
-            stream.Serialize(ref HLapCount);
-            stream.Serialize(ref HCoinCount);
-            stream.Serialize(ref HNicknames);
+            // stream.Serialize(ref HStarCount);
+            // stream.Serialize(ref HLifeCount);
+            // stream.Serialize(ref HLapCount);
+            // stream.Serialize(ref HCoinCount);
+            // stream.Serialize(ref HNicknames);
         }
 
         public unsafe void Execute(Frame f, PlayerRef sender, PlayerData* playerData) {
@@ -130,11 +130,11 @@ namespace Quantum {
             if (rulesChanges.HasFlag(Rules.HHost)) { rules.HHost = HHost; }
             if (rulesChanges.HasFlag(Rules.HIceCubes)) { rules.HIceCubes = HIceCubes; }
             if (rulesChanges.HasFlag(Rules.HTeamTarget)) { rules.HTeamTarget = HTeamTarget; }
-            if (rulesChanges.HasFlag(Rules.HStarCount)) { rules.HStarCount = HStarCount; }
-            if (rulesChanges.HasFlag(Rules.HLifeCount)) { rules.HLifeCount = HLifeCount; }
-            if (rulesChanges.HasFlag(Rules.HLapCount)) { rules.HLapCount = HLapCount; }
-            if (rulesChanges.HasFlag(Rules.HCoinCount)) { rules.HCoinCount = HCoinCount; }
-            if (rulesChanges.HasFlag(Rules.HNicknames)) { rules.HNicknames = HNicknames; }
+            // if (rulesChanges.HasFlag(Rules.HStarCount)) { rules.HStarCount = HStarCount; }
+            // if (rulesChanges.HasFlag(Rules.HLifeCount)) { rules.HLifeCount = HLifeCount; }
+            // if (rulesChanges.HasFlag(Rules.HLapCount)) { rules.HLapCount = HLapCount; }
+            // if (rulesChanges.HasFlag(Rules.HCoinCount)) { rules.HCoinCount = HCoinCount; }
+            // if (rulesChanges.HasFlag(Rules.HNicknames)) { rules.HNicknames = HNicknames; }
             
             f.Global->Rules = rules;
             f.Events.RulesChanged(levelChanged);
@@ -144,7 +144,7 @@ namespace Quantum {
             }
         }
 
-        public enum Rules : ulong {
+        public enum Rules : uint {
             Stage = 1 << 0,
             StarsToWin = 1 << 1,
             CoinsForPowerup = 1 << 2,
@@ -175,11 +175,11 @@ namespace Quantum {
             HHost = 1 << 27,
             HIceCubes = 1 << 28,
             HTeamTarget = 1 << 29,
-            HStarCount = 1 << 30,
-            HLifeCount = 1L << 31,
-            HLapCount = 1L << 32,
-            HCoinCount = 1L << 33,
-            HNicknames = 1L << 34,
+            // HStarCount = 1 << 30,
+            // HLifeCount = 1L << 31,
+            // HLapCount = 1L << 32,
+            // HCoinCount = 1L << 33,
+            // HNicknames = 1L << 34,
         }
     }
 }
