@@ -43,6 +43,8 @@ namespace NSMB {
         [NonSerialized] public bool checkedForVersion = false, firstConnection = true;
         [NonSerialized] public int windowWidth = 1280, windowHeight = 720;
 
+        public string cmdReplayFilePath, cmdReplayName, cmdTargetSize;
+
         //---Serialized Variables
         [SerializeField] private AudioMixer mixer;
 
@@ -86,16 +88,18 @@ namespace NSMB {
             QuantumCallback.Subscribe<CallbackUnitySceneLoadDone>(this, OnUnitySceneLoadDone);
             loadingCanvas.Startup();
             
-            var commandLineArgs = Environment.GetCommandLineArgs();
-            for (int i = 0; i < commandLineArgs.Length; i++) {
-                if (commandLineArgs[i] == "-replay" && commandLineArgs.Length > i + 1)
-                    StartReplayFromArgs(commandLineArgs[i + 1]);
+            var args = Environment.GetCommandLineArgs();
+            for (int i = 0; i < args.Length; i++) {
+                if (args[i] == "-replay" && args.Length > i + 1) cmdReplayFilePath = args[i + 1];
+                if (args[i] == "-name" && args.Length > i + 1) cmdReplayName = args[i + 1];
+                if (args[i] == "-size" && args.Length > i + 1) cmdTargetSize = args[i + 1];
             }
+            if (!string.IsNullOrEmpty(cmdReplayFilePath)) StartReplayFromArgs();
         }
         
-        private void StartReplayFromArgs(string argReplayPath)
+        private void StartReplayFromArgs()
         {
-            using FileStream input = new(argReplayPath, FileMode.Open);
+            using FileStream input = new(cmdReplayFilePath, FileMode.Open);
             if (BinaryReplayFile.TryLoadNewFromStream(input, true, out var result) != ReplayParseResult.Success)
             {
                 Debug.LogError("Failed to parse replay file when booting with cmdline args...");

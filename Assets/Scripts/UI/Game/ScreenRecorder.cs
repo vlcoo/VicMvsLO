@@ -1,3 +1,5 @@
+using NSMB;
+using NSMB.Replay;
 using Quantum;
 using System;
 using System.Collections.Generic;
@@ -16,9 +18,10 @@ public class ScreenRecorder : MonoBehaviour {
     public bool isRecording;
     private Process _ffmpeg;
     private BinaryWriter _ffmpegInput;
-    private readonly List<byte[]> _frameBuffers = new();
     public int w, h;
     public bool frameLatch;
+    public string outPath = "C:\\Users\\Victor\\Projects\\mvlo stuff\\record\\out.mp4";
+    public int maxSize = 100;
     
     public void Start()
     {
@@ -53,6 +56,10 @@ public class ScreenRecorder : MonoBehaviour {
         if (isRecording) return;
         
         out2d = new Texture2D(w, h, TextureFormat.RGB24, false);
+        if (!string.IsNullOrEmpty(GlobalController.Instance.cmdTargetSize))
+            maxSize = int.Parse(GlobalController.Instance.cmdTargetSize);
+        if (!string.IsNullOrEmpty(GlobalController.Instance.cmdReplayName))
+            outPath = $"{Path.Combine(Path.GetTempPath(), GlobalController.Instance.cmdReplayName)}.mp4";
         CreateFfmpeg();
         
         isRecording = true;
@@ -66,31 +73,13 @@ public class ScreenRecorder : MonoBehaviour {
         cam.Render();
         AsyncGPUReadback.Request(outTexture, 0, GraphicsFormat.R8G8B8_UNorm, request => {
             var data = request.GetData<byte>();
-            // var copy = new byte[data.Length];
-            // data.CopyTo(copy);
             _ffmpegInput.Write(data.ToArray());
         });
-        // RenderTexture.active = null;
-        // out2d.Apply();
-        // byte[] raw = new byte[w * h * 3];
-        // Buffer.BlockCopy(out2d.GetRawTextureData(), 0, raw, 0, raw.Length);
-        // out2d.ReadPixels(new Rect(0, 0, out2d.width, out2d.height), 0, 0);
-        // out2d.Apply();
-        // _ffmpegInput.Write(out2d.GetRawTextureData());
-
-        // _frameBuffers.Add(raw);
     }
 
     private void StopRecording() {
         if (!isRecording) return;
         isRecording = false;
-        
-        // CreateFfmpeg();
-
-        // foreach (var frameBuffer in _frameBuffers.Where(frameBuffer => frameBuffer.Length == w * h * 3))
-        // {
-        //     _ffmpegInput.Write(frameBuffer);
-        // }
         
         _ffmpegInput.Flush();
         _ffmpegInput.Close();
@@ -101,10 +90,19 @@ public class ScreenRecorder : MonoBehaviour {
     }
 
     private void CreateFfmpeg() {
+        double maxBits = maxSize * 1024.0 * 1024.0 * 8.0 * 0.95;
+        float replayDuration = ActiveReplayManager.Instance.CurrentReplay.Header.ReplayLengthInFrames / 60.0f;
+        double targetBitrate = (int) (maxBits / replayDuration / 1000.0);
+        var args = $"-y -f rawvideo -pix_fmt rgb24 -video_size {w}x{h} -framerate 30 -i - " +
+                   $"-vf vflip -c:v libx264 -pix_fmt yuv420p -threads auto -preset ultrafast " +
+                   $"-b:v {targetBitrate}k " +
+                   $"\"{outPath}\"";
+        UnityEngine.Debug.Log(args);
+        
         var startInfo = new ProcessStartInfo
         {
             FileName = "ffmpeg",
-            Arguments = $"-y -f rawvideo -pix_fmt rgb24 -video_size {w}x{h} -framerate 30 -i - -vf vflip -c:v libx264 -pix_fmt yuv420p -preset ultrafast -crf 32 -tune zerolatency -threads auto \"C:\\Users\\Victor\\Desktop\\mvlo stuff\\record\\out.mp4\"",
+            Arguments = args,
             UseShellExecute = false,
             RedirectStandardInput = true,
             RedirectStandardError = true,
