@@ -1,4 +1,4 @@
-<p align="center"><img src="Assets/Sprites/UI/Menu/TitleAll.png" alt="vic's Custom Match-inator" width="400px"></p>
+<p align="center"><img src="Assets/Resources/Sprites/UI/Menu/TitleAll.png" alt="vic's Custom Match-inator" width="400px"></p>
 
 A **standalone mod** of the 2-10 player remake of the Mario vs. Luigi gamemode from New Super Mario Bros. DS.
 
@@ -21,3 +21,4 @@ Go to the repository's releases or use these shortcuts to the latest builds:
 
 ## For developers...
 This is the **dev** branch of vcmi, which has unfinished features and is generally unstable so beware! Want to use vcmi as a base for your own creations? I recommend you use the [**v17 Cleansed**](https://github.com/vlcoo/VicMvsLO/archive/refs/heads/cleansed-17.zip) branch, which is super clean and stable - ready for modding further! Please credit properly.
+
