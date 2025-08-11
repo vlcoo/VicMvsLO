@@ -233,6 +233,10 @@ namespace NSMB.Replay {
             ReplayFrameCache.Add(arguments.FrameData);
 
             NetworkHandler.Runner = await QuantumRunner.StartGameAsync(arguments);
+            // IsReplayFastForwarding = true;
+            // Time.timeScale = 8;
+            Time.captureDeltaTime = 1 / 60f;
+            AudioListener.volume = 0f;
         }
 
         private void OnSimulateFinished(CallbackSimulateFinished e) {

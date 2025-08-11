@@ -42,7 +42,7 @@ namespace NSMB.UI.Game {
             UpdateCachedNickname(f, mario);
 
             arrow.color = parent.GlowColor;
-            text.color = nicknameColor.Sample();
+            // text.color = nicknameColor.Sample();
             gameObject.SetActive(true);
 
             UpdateText(f);
@@ -75,7 +75,7 @@ namespace NSMB.UI.Game {
                 return;
             }
 
-            nametag.SetActive(elements.Entity != Entity && !(mario->IsDead && (mario->IsRespawning || transform.position.y <= stage.StageWorldMin.Y.AsFloat + 0.1f)) && f.Global->GameState >= GameState.Playing);
+            nametag.SetActive(f.Global->GameState >= GameState.Playing);
             if (!nametag.activeInHierarchy) {
                 return;
             }
@@ -104,6 +104,9 @@ namespace NSMB.UI.Game {
 
         private static readonly StringBuilder stringBuilder = new();
         public unsafe void UpdateText(Frame f) {
+            if (parent == null || !Entity.IsValid) {
+                return;
+            }
             if (!f.Unsafe.TryGetPointer(Entity, out MarioPlayer* mario)) {
                 return;
             }
@@ -119,10 +122,10 @@ namespace NSMB.UI.Game {
             stringBuilder.AppendLine(cachedNickname);
 
             if (f.Global->Rules.IsLivesEnabled) {
-                stringBuilder.Append(character.UiString).Append(Utils.GetSymbolString("x" + mario->Lives)).Append(' ');
+                stringBuilder.Append(character.UiString).Append(mario->Lives).Append(' ');
             }
 
-            stringBuilder.Append(Utils.GetSymbolString(gamemode.ObjectiveSymbolPrefix + "x" + Mathf.Max(0, gamemode.GetObjectiveCount(f, mario))));
+            stringBuilder.Append(Utils.GetSymbolString(gamemode.ObjectiveSymbolPrefix) + Mathf.Max(0, gamemode.GetObjectiveCount(f, mario)));
 
             text.text = stringBuilder.ToString();
         }
@@ -131,7 +134,7 @@ namespace NSMB.UI.Game {
             RuntimePlayer runtimePlayer = f.GetPlayerData(mario->PlayerRef);
             if (runtimePlayer != null) {
                 cachedNickname = runtimePlayer.PlayerNickname.ToValidNickname(f, mario->PlayerRef);
-                nicknameColor = NicknameColor.Parse(runtimePlayer.NicknameColor);
+                // nicknameColor = NicknameColor.Parse(runtimePlayer.NicknameColor);
             }
         }
 

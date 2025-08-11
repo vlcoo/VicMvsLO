@@ -1,5 +1,6 @@
 ﻿using NSMB.Networking;
 using NSMB.Quantum;
+using NSMB.Replay;
 using NSMB.UI.Loading;
 using NSMB.UI.MainMenu;
 using NSMB.UI.MainMenu.Submenus.Replays;
@@ -9,6 +10,7 @@ using NSMB.Utilities.Extensions;
 using Quantum;
 using System;
 using System.Collections;
+using System.IO;
 using UnityEngine;
 using UnityEngine.Audio;
 using UnityEngine.InputSystem;
@@ -83,6 +85,23 @@ namespace NSMB {
             QuantumEvent.Subscribe<EventStartGameEndFade>(this, OnStartGameEndFade);
             QuantumCallback.Subscribe<CallbackUnitySceneLoadDone>(this, OnUnitySceneLoadDone);
             loadingCanvas.Startup();
+            
+            var commandLineArgs = Environment.GetCommandLineArgs();
+            for (int i = 0; i < commandLineArgs.Length; i++) {
+                if (commandLineArgs[i] == "-replay" && commandLineArgs.Length > i + 1)
+                    StartReplayFromArgs(commandLineArgs[i + 1]);
+            }
+        }
+        
+        private void StartReplayFromArgs(string argReplayPath)
+        {
+            using FileStream input = new(argReplayPath, FileMode.Open);
+            if (BinaryReplayFile.TryLoadNewFromStream(input, true, out var result) != ReplayParseResult.Success)
+            {
+                Debug.LogError("Failed to parse replay file when booting with cmdline args...");
+                return;
+            }
+            ActiveReplayManager.Instance.StartReplayPlayback(result);
         }
 
         public void OnDestroy() {

@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyCopyrightAttribute("Copyright (c) Exit Games GmbH 2024")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+856a05934e31ff55a617161bf980ad264d5c25b0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+4b0460e87d0c876e6d5548589043d1b4aeaf4a87")]
 [assembly: System.Reflection.AssemblyProductAttribute("Quantum Simulation Dotnet")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Quantum.Simulation")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

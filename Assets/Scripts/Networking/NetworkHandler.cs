@@ -281,6 +281,9 @@ namespace NSMB.Networking {
                 GameMode = DeterministicGameMode.Multiplayer,
                 PlayerCount = Constants.MaxPlayers,
                 Communicator = new QuantumNetworkCommunicator(Client),
+                CallbackDispatcher = new CallbackDispatcher(),
+                EventDispatcher = new EventDispatcher(),
+                DeltaTimeType = SimulationUpdateTime.EngineDeltaTime,
             };
 
             try {

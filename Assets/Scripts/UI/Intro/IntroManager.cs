@@ -26,15 +26,16 @@ namespace NSMB.UI.Intro {
         private Coroutine logoBounceRoutine;
 
         public void Start() {
-            StartCoroutine(IntroSequence());
-            possibleSfx = ((SoundEffect[]) Enum.GetValues(typeof(SoundEffect)))
-                .Where(se => !excludedSounds.Contains(se))
-                .Select(se => se.GetSoundData())
-                .Where(sd => sd.Sound.Contains("{char}"))
-                .ToArray();
-            possibleCharacters = GlobalController.Instance.config.CharacterDatas
-                .Select(ar => QuantumUnityDB.GetGlobalAsset(ar))
-                .ToArray();
+            // StartCoroutine(IntroSequence());
+            gameObject.SetActive(false);
+            // possibleSfx = ((SoundEffect[]) Enum.GetValues(typeof(SoundEffect)))
+            //     .Where(se => !excludedSounds.Contains(se))
+            //     .Select(se => se.GetSoundData())
+            //     .Where(sd => sd.Sound.Contains("{char}"))
+            //     .ToArray();
+            // possibleCharacters = GlobalController.Instance.config.CharacterDatas
+            //     .Select(ar => QuantumUnityDB.GetGlobalAsset(ar))
+            //     .ToArray();
         }
 
         public void PlayRandomCharacterSound() {

@@ -1,3 +1,4 @@
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -38,6 +39,11 @@ namespace NSMB.UI.Game {
                 fitterTransform.sizeDelta = Vector2.zero;
                 return;
             }
+
+            var a = new Texture2D(1920, 1080);
+            RenderTexture.active = texture;
+            a.ReadPixels(new Rect(0, 0, 1920, 1080), 0, 0);
+            a.Apply();
 
             // NDS res enabled.
             int width = Screen.width;

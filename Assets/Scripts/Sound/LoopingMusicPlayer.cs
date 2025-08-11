@@ -34,6 +34,8 @@ namespace NSMB.Sound {
                     audioSource.time = AudioStart + (time - AudioEnd);
                 }
             }
+            
+            audioSource.pitch = Time.timeScale;
         }
 
         public void Restart() {
