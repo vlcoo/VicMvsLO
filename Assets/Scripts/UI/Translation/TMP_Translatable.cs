@@ -36,13 +36,14 @@ namespace NSMB.UI.Translation {
         }
 
         private void OnLanguageChanged(TranslationManager tm) {
-            text.text = tm.GetTranslation(key);
-
-            if (originalTextAlignment == HorizontalAlignmentOptions.Left) {
-                text.horizontalAlignment = tm.RightToLeft ? HorizontalAlignmentOptions.Right : HorizontalAlignmentOptions.Left;
-            } else if (originalTextAlignment == HorizontalAlignmentOptions.Right) {
-                text.horizontalAlignment = tm.RightToLeft ? HorizontalAlignmentOptions.Left : HorizontalAlignmentOptions.Right;
-            }
+            // TODO: temporarily disabling translations globally.
+            // text.text = tm.GetTranslation(key);
+            //
+            // if (originalTextAlignment == HorizontalAlignmentOptions.Left) {
+            //     text.horizontalAlignment = tm.RightToLeft ? HorizontalAlignmentOptions.Right : HorizontalAlignmentOptions.Left;
+            // } else if (originalTextAlignment == HorizontalAlignmentOptions.Right) {
+            //     text.horizontalAlignment = tm.RightToLeft ? HorizontalAlignmentOptions.Left : HorizontalAlignmentOptions.Right;
+            // }
         }
     }
 }

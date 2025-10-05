@@ -41,6 +41,8 @@ namespace NSMB.UI.Translation {
         }
 
         public void ChangeLanguage(string newLocale) {
+            // TODO: temporarily disabling translations globally.
+            newLocale = "en";
             if (!instantiated) {
                 Instantiate();
             }
