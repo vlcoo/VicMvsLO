@@ -22,7 +22,7 @@ namespace NSMB.UI.MainMenu.Submenus.RoomList {
         [SerializeField] private RoomListManager roomManager;
         [SerializeField] private GameObject reconnectBtn, createRoomBtn, joinPrivateRoomBtn;
         [SerializeField] private TMP_InputField usernameField;
-        [SerializeField] private SpriteChangingToggle filterInProgressRooms, filterFullRooms;
+        [SerializeField] private Toggle filterInProgressRooms, filterFullRooms;
         [SerializeField] private MainMenuSubmenu inRoomSubmenu;
         [SerializeField] private ErrorPromptSubmenu errorSubmenu;
         [SerializeField] private RectTransform sideMenu;
@@ -233,9 +233,9 @@ namespace NSMB.UI.MainMenu.Submenus.RoomList {
                     }
 
                     if (tm.RightToLeft) {
-                        text = "<align=right>" + translation + "<line-height=0>\n<align=left><font=\"PauseFont\">" + _ping + "ms " + Utilities.Utils.GetPingSymbol(_ping);
+                        text = "<align=right>" + translation + "<line-height=0>\n<align=left>" + _ping + "ms " + Utilities.Utils.GetPingSymbol(_ping);
                     } else {
-                        text = "<align=left>" + translation + "<line-height=0>\n<align=right><font=\"PauseFont\">" + _ping + "ms " + Utilities.Utils.GetPingSymbol(_ping);
+                        text = "<align=left>" + translation + "<line-height=0>\n<align=right>" + _ping + "ms " + Utilities.Utils.GetPingSymbol(_ping);
                     }
                 }
             }

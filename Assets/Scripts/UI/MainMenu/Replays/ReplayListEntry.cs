@@ -107,7 +107,7 @@ namespace NSMB.UI.MainMenu.Submenus.Replays {
                 }
                 showHideButtonsCoroutine = StartCoroutine(SmoothResize(48, 0));
                 */
-                dropDownRectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, 48);
+                dropDownRectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, 56);
                 Canvas.ForceUpdateCanvases();
             }
             canvasGroup.interactable = false;
@@ -127,7 +127,7 @@ namespace NSMB.UI.MainMenu.Submenus.Replays {
                 }
                 showHideButtonsCoroutine = StartCoroutine(SmoothResize(86, 0));
                 */
-                dropDownRectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, 86);
+                dropDownRectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, 96);
                 Canvas.ForceUpdateCanvases();
                 
                 canvasGroup.interactable = true;

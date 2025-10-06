@@ -13,7 +13,7 @@ namespace NSMB.UI.MainMenu.Submenus.Replays {
                 return base.DefaultSelection;
             }
         }
-        public override float BackHoldTime => replayList.Selected && replayList.Selected.IsOpen ? 0 : 1;
+        public override float BackHoldTime => replayList.Selected && replayList.Selected.IsOpen ? 0 : 0.5f;
 
         //---Serialized Variables
         [SerializeField] private ReplayListManager replayList;
