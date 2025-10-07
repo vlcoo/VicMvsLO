@@ -16,6 +16,7 @@ public unsafe class VersusStageData : AssetObject {
     public string StageAuthor;
     public string MusicComposer;
     public string TranslationKey;
+    public string LegalEnglishName;
     public string GroupingTranslationKey;
     public string DiscordStageImage;
 #if QUANTUM_UNITY
@@ -36,6 +37,8 @@ public unsafe class VersusStageData : AssetObject {
 
     [Header("-- Camera")]
     public bool OverrideAutomaticCameraSettings;
+    public bool ForceOneScreenCameraHeight;
+    public bool NoHorizontalCameraMovement;
     public FPVector2 CameraMinPosition;
     public FPVector2 CameraMaxPosition;
 
@@ -43,22 +46,25 @@ public unsafe class VersusStageData : AssetObject {
     public ColorRGBA UIColor = new(24, 178, 170);
     public bool HidePlayersOnMinimap;
 
-    [Header("-- Powerups")]
+    [Header("-- Modifiers")]
     public bool SpawnBigPowerups = true;
     public bool SpawnVerticalPowerups = true;
+    public bool ReverbSfx = false;
+    public bool VerticalMap = false;
 
-    [Header("-- Music")]
-    public AssetRef<LoopingMusicData>[] MainMusic;
-    public AssetRef<LoopingMusicData> InvincibleMusic;
-    public AssetRef<LoopingMusicData> MegaMushroomMusic;
+    // [Header("-- Music")]
+    // public AssetRef<LoopingMusicData>[] MainMusic;
+    // public AssetRef<LoopingMusicData> InvincibleMusic;
+    // public AssetRef<LoopingMusicData> MegaMushroomMusic;
 
 
     [HideInInspector] public StageTileInstance[] TileData;
     [HideInInspector] public FPVector2[] BigStarSpawnpoints;
+    [HideInInspector] public bool IsCampaignMap = false;
 
-    public AssetRef<LoopingMusicData> GetCurrentMusic(Frame f) {
-        return MainMusic[f.Global->TotalGamesPlayed % MainMusic.Length];
-    }
+    // public AssetRef<LoopingMusicData> GetCurrentMusic(Frame f) {
+    //     return MainMusic[f.Global->TotalGamesPlayed % MainMusic.Length];
+    // }
 
     public FPVector2 GetWorldSpawnpointForPlayer(int playerIndex, int totalPlayers) {
         FP comp = ((FP) playerIndex / totalPlayers) * 2 * FP.Pi + FP.PiOver2 + (FP.Pi / (2 * totalPlayers));

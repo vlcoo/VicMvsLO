@@ -6,7 +6,7 @@ using UnityEngine.Networking;
 namespace NSMB.Networking {
     public class UpdateChecker {
 
-        private static readonly string ApiURL = "https://api.github.com/repos/ipodtouch0218/NSMB-MarioVsLuigi/releases/latest";
+        private static readonly string ApiURL = "http://api.github.com/repos/vlcoo/VicMvsLO/releases/latest";
 
         /// <summary>
         /// Returns if we're up to date, OR newer, compared to the latest GitHub release version number
@@ -15,7 +15,7 @@ namespace NSMB.Networking {
             // Get http results from the GitHub API
             using UnityWebRequest request = UnityWebRequest.Get(ApiURL);
             request.SetRequestHeader("Accept", "application/json");
-            request.SetRequestHeader("UserAgent", "ipodtouch0218/NSMB-MarioVsLuigi");
+            request.SetRequestHeader("UserAgent", "vlcoo/VicMvsLO");
 
             await request.SendWebRequest();
             

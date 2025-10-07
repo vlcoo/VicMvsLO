@@ -1,4 +1,5 @@
 using Photon.Deterministic;
+using Quantum.Collections;
 
 namespace Quantum {
     [UnityEngine.Scripting.Preserve]
@@ -18,13 +19,14 @@ namespace Quantum {
             var platform = filter.Platform;
             var genericMover = filter.GenericMover;
             var transform = filter.Transform;
-            var asset = f.FindAsset(genericMover->MoverAsset);
+            // var asset = f.FindAsset(genericMover->MoverAsset);
+            var moverPathList = f.ResolveList(genericMover->Path);
 
             FP currentTime = ((f.Number - f.Global->StartFrame) * f.DeltaTime) + genericMover->StartOffset;
             FP nextTime = ((f.Number - f.Global->StartFrame + 1) * f.DeltaTime) + genericMover->StartOffset;
 
-            FPVector2 currentPos = SamplePosition(asset.ObjectPath, currentTime, asset.LoopMode);
-            FPVector2 nextPos = SamplePosition(asset.ObjectPath, nextTime, asset.LoopMode);
+            FPVector2 currentPos = SamplePosition(moverPathList, currentTime, genericMover->LoopingMode, genericMover->DurationIsSpeedInstead);
+            FPVector2 nextPos = SamplePosition(moverPathList, nextTime, genericMover->LoopingMode, genericMover->DurationIsSpeedInstead);
             FPVector2 velocity = nextPos - currentPos;
 
             // This doesnt work.
@@ -36,26 +38,26 @@ namespace Quantum {
             platform->Velocity = velocity * f.UpdateRate;
         }
 
-        private static FPVector2 SamplePosition(GenericMoverAsset.PathNode[] positions, FP sample, GenericMoverAsset.LoopingMode loopMode) {
+        private static FPVector2 SamplePosition(QList<PathNode> positions, FP sample, LoopingMode loopMode, bool durationIsSpeed = false) {
             FP totalDuration = 0;
-            for (int i = 0; i < positions.Length; i++) {
+            for (int i = 0; i < positions.Count; i++) {
                 totalDuration += positions[i].TravelDuration;
             }
 
-            if (loopMode == GenericMoverAsset.LoopingMode.Loop) {
+            if (loopMode == LoopingMode.Loop) {
                 sample %= totalDuration;
-            } else if (loopMode == GenericMoverAsset.LoopingMode.Clamp) {
+            } else if (loopMode == LoopingMode.Clamp) {
                 sample = FPMath.Clamp(sample, 0, totalDuration);
-            } else if (loopMode == GenericMoverAsset.LoopingMode.PingPong) {
+            } else if (loopMode == LoopingMode.PingPong) {
                 sample %= (totalDuration * 2); 
                 if (sample > totalDuration) {
                     sample = (totalDuration * 2) - sample;
                 }
             }
 
-            for (int i = 0; i < positions.Length; i++) {
-                GenericMoverAsset.PathNode current = positions[i];
-                GenericMoverAsset.PathNode next = positions[(i + 1) % positions.Length];
+            for (int i = 0; i < positions.Count; i++) {
+                PathNode current = positions[i];
+                PathNode next = positions[(i + 1) % positions.Count];
 
                 if (sample > current.TravelDuration) {
                     sample -= current.TravelDuration;

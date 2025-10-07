@@ -20,6 +20,7 @@ MonoBehaviour:
   StageAuthor: Nintendo
   MusicComposer: Nintendo
   TranslationKey: level.default.pipes
+  LegalEnglishName: 
   GroupingTranslationKey: level.header.default
   DiscordStageImage: level-pipes
   Icon: {fileID: 21300000, guid: c82b36c5c4874c44d9e79480880ddc16, type: 3}
@@ -48,6 +49,8 @@ MonoBehaviour:
     Y:
       RawValue: 52429
   OverrideAutomaticCameraSettings: 1
+  ForceOneScreenCameraHeight: 0
+  NoHorizontalCameraMovement: 0
   CameraMinPosition:
     X:
       RawValue: -1048576
@@ -66,17 +69,8 @@ MonoBehaviour:
   HidePlayersOnMinimap: 0
   SpawnBigPowerups: 1
   SpawnVerticalPowerups: 1
-  MainMusic:
-  - Id:
-      Value: 369157696319829885
-  - Id:
-      Value: 386427822095829515
-  InvincibleMusic:
-    Id:
-      Value: 289056355789154037
-  MegaMushroomMusic:
-    Id:
-      Value: 451321131049702687
+  ReverbSfx: 0
+  VerticalMap: 0
   TileData:
   - Tile:
       Id:
@@ -8751,3 +8745,4 @@ MonoBehaviour:
       RawValue: -163840
     Y:
       RawValue: -98304
+  IsCampaignMap: 0

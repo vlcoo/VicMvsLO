@@ -42,7 +42,7 @@ namespace NSMB.UI.Translation {
 
         public void ChangeLanguage(string newLocale) {
             // TODO: temporarily disabling translations globally.
-            newLocale = "en";
+            newLocale = "en-US";
             if (!instantiated) {
                 Instantiate();
             }

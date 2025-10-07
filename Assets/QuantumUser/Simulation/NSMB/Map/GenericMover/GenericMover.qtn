@@ -1,4 +1,20 @@
 component GenericMover {
-	AssetRef<GenericMoverAsset> MoverAsset;
+	list<PathNode> Path;
+	LoopingMode LoopingMode;
+	
 	FP StartOffset;
+	bool DurationIsSpeedInstead;
+}
+
+struct PathNode {
+    FPVector2 Position;
+    FP TravelDuration;
+    bool EaseIn;
+    bool EaseOut;
+}
+
+enum LoopingMode {
+    Clamp,
+    Loop,
+    PingPong,
 }

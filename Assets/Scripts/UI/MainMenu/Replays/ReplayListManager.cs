@@ -196,7 +196,7 @@ namespace NSMB.UI.MainMenu.Submenus.Replays {
                 return;
             }
             if (!replay.ReplayFile.Header.IsCompatible) {
-                replayInformation.text = tm.GetTranslationWithReplacements("ui.extras.replays.incompatible", "version", replay.ReplayFile.Header.Version.ToStringIgnoreHotfix() + ".X");
+                replayInformation.text = tm.GetTranslationWithReplacements("ui.extras.replays.incompatible", "version", replay.ReplayFile.Header.Version.ToString());
                 replayInformation.horizontalAlignment = HorizontalAlignmentOptions.Center;
                 return;
             }

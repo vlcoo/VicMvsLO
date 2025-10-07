@@ -439,8 +439,11 @@ namespace Quantum.Prototypes {
   [System.SerializableAttribute()]
   [Quantum.Prototypes.Prototype(typeof(Quantum.GenericMover))]
   public unsafe partial class GenericMoverPrototype : ComponentPrototype<Quantum.GenericMover> {
-    public AssetRef<GenericMoverAsset> MoverAsset;
+    [DynamicCollectionAttribute()]
+    public Quantum.Prototypes.PathNodePrototype[] Path = {};
+    public Quantum.QEnum32<LoopingMode> LoopingMode;
     public FP StartOffset;
+    public QBoolean DurationIsSpeedInstead;
     partial void MaterializeUser(Frame frame, ref Quantum.GenericMover result, in PrototypeMaterializationContext context);
     public override Boolean AddToEntity(FrameBase f, EntityRef entity, in PrototypeMaterializationContext context) {
         Quantum.GenericMover component = default;
@@ -448,8 +451,34 @@ namespace Quantum.Prototypes {
         return f.Set(entity, component) == SetResult.ComponentAdded;
     }
     public void Materialize(Frame frame, ref Quantum.GenericMover result, in PrototypeMaterializationContext context = default) {
-        result.MoverAsset = this.MoverAsset;
+        if (this.Path.Length == 0) {
+          result.Path = default;
+        } else {
+          var list = frame.AllocateList(out result.Path, this.Path.Length);
+          for (int i = 0; i < this.Path.Length; ++i) {
+            Quantum.PathNode tmp = default;
+            this.Path[i].Materialize(frame, ref tmp, in context);
+            list.Add(tmp);
+          }
+        }
+        result.LoopingMode = this.LoopingMode;
         result.StartOffset = this.StartOffset;
+        result.DurationIsSpeedInstead = this.DurationIsSpeedInstead;
+        MaterializeUser(frame, ref result, in context);
+    }
+  }
+  [System.SerializableAttribute()]
+  [Quantum.Prototypes.Prototype(typeof(Quantum.Goal))]
+  public unsafe partial class GoalPrototype : ComponentPrototype<Quantum.Goal> {
+    public QBoolean IsOrb;
+    partial void MaterializeUser(Frame frame, ref Quantum.Goal result, in PrototypeMaterializationContext context);
+    public override Boolean AddToEntity(FrameBase f, EntityRef entity, in PrototypeMaterializationContext context) {
+        Quantum.Goal component = default;
+        Materialize((Frame)f, ref component, in context);
+        return f.Set(entity, component) == SetResult.ComponentAdded;
+    }
+    public void Materialize(Frame frame, ref Quantum.Goal result, in PrototypeMaterializationContext context = default) {
+        result.IsOrb = this.IsOrb;
         MaterializeUser(frame, ref result, in context);
     }
   }
@@ -512,6 +541,23 @@ namespace Quantum.Prototypes {
     }
     public void Materialize(Frame frame, ref Quantum.IceBlock result, in PrototypeMaterializationContext context = default) {
         result.SlidingSpeed = this.SlidingSpeed;
+        MaterializeUser(frame, ref result, in context);
+    }
+  }
+  [System.SerializableAttribute()]
+  [Quantum.Prototypes.Prototype(typeof(Quantum.IndividualSquishy))]
+  public unsafe partial class IndividualSquishyPrototype : ComponentPrototype<Quantum.IndividualSquishy> {
+    public FP OriginalHeight;
+    public FP OriginalWidth;
+    partial void MaterializeUser(Frame frame, ref Quantum.IndividualSquishy result, in PrototypeMaterializationContext context);
+    public override Boolean AddToEntity(FrameBase f, EntityRef entity, in PrototypeMaterializationContext context) {
+        Quantum.IndividualSquishy component = default;
+        Materialize((Frame)f, ref component, in context);
+        return f.Set(entity, component) == SetResult.ComponentAdded;
+    }
+    public void Materialize(Frame frame, ref Quantum.IndividualSquishy result, in PrototypeMaterializationContext context = default) {
+        result.OriginalHeight = this.OriginalHeight;
+        result.OriginalWidth = this.OriginalWidth;
         MaterializeUser(frame, ref result, in context);
     }
   }
@@ -697,6 +743,22 @@ namespace Quantum.Prototypes {
         return f.Set(entity, component) == SetResult.ComponentAdded;
     }
     public void Materialize(Frame frame, ref Quantum.ObjectiveCoin result, in PrototypeMaterializationContext context = default) {
+        MaterializeUser(frame, ref result, in context);
+    }
+  }
+  [System.SerializableAttribute()]
+  [Quantum.Prototypes.Prototype(typeof(Quantum.PathNode))]
+  public unsafe partial class PathNodePrototype : StructPrototype {
+    public FPVector2 Position;
+    public FP TravelDuration;
+    public QBoolean EaseIn;
+    public QBoolean EaseOut;
+    partial void MaterializeUser(Frame frame, ref Quantum.PathNode result, in PrototypeMaterializationContext context);
+    public void Materialize(Frame frame, ref Quantum.PathNode result, in PrototypeMaterializationContext context = default) {
+        result.Position = this.Position;
+        result.TravelDuration = this.TravelDuration;
+        result.EaseIn = this.EaseIn;
+        result.EaseOut = this.EaseOut;
         MaterializeUser(frame, ref result, in context);
     }
   }

@@ -20,6 +20,7 @@ MonoBehaviour:
   StageAuthor: Nintendo
   MusicComposer: Nintendo
   TranslationKey: level.default.grass
+  LegalEnglishName: 
   GroupingTranslationKey: level.header.default
   DiscordStageImage: level-grassland
   Icon: {fileID: 21300000, guid: e65b552347cbc084fae4f7174a2f115e, type: 3}
@@ -48,6 +49,8 @@ MonoBehaviour:
     Y:
       RawValue: 52429
   OverrideAutomaticCameraSettings: 1
+  ForceOneScreenCameraHeight: 0
+  NoHorizontalCameraMovement: 0
   CameraMinPosition:
     X:
       RawValue: -6553600
@@ -66,17 +69,8 @@ MonoBehaviour:
   HidePlayersOnMinimap: 0
   SpawnBigPowerups: 1
   SpawnVerticalPowerups: 1
-  MainMusic:
-  - Id:
-      Value: 369157696319829885
-  - Id:
-      Value: 386427822095829515
-  InvincibleMusic:
-    Id:
-      Value: 289056355789154037
-  MegaMushroomMusic:
-    Id:
-      Value: 451321131049702687
+  ReverbSfx: 0
+  VerticalMap: 0
   TileData:
   - Tile:
       Id:
@@ -3955,3 +3949,4 @@ MonoBehaviour:
       RawValue: -950272
     Y:
       RawValue: 229376
+  IsCampaignMap: 0

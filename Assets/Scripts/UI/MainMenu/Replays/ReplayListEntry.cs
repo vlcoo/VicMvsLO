@@ -239,7 +239,7 @@ namespace NSMB.UI.MainMenu.Submenus.Replays {
 
             string finalWarningText;
             if (!header.IsCompatible) {
-                finalWarningText = tm.GetTranslationWithReplacements("ui.extras.replays.incompatible", "version", header.Version.ToStringIgnoreHotfix() + ".X");
+                finalWarningText = tm.GetTranslationWithReplacements("ui.extras.replays.incompatible", "version", header.Version.ToString());
                 warningText.color = criticalColor;
                 foreach (var button in compatibleButtons) {
                     button.interactable = false;

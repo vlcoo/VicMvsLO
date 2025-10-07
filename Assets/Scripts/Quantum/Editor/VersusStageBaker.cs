@@ -79,7 +79,14 @@ namespace NSMB.Quantum {
                 // Adjust so we don't see the absolute bottom of the stage.
                 stage.CameraMinPosition += FPVector2.Up * FP._1_50;
                 LogInfo($"Automatically found camera bounds: min={stage.CameraMinPosition} max={stage.CameraMaxPosition}");
+                if (stage.ForceOneScreenCameraHeight) stage.CameraMaxPosition.Y = stage.CameraMinPosition.Y;
+                if (!stage.IsWrappingLevel && !stage.VerticalMap) {
+                    // add a one-tile margin to the left and right bounds.
+                    stage.CameraMinPosition.X += FP._0_50;
+                    stage.CameraMaxPosition.X -= FP._0_50;
+                }
             }
+            else if (stage.ForceOneScreenCameraHeight) Debug.LogWarning("ForceOneScreenCameraHeight will have no effect because the camera bounds are being manually set (OverrideAutomaticCameraSettings is true).");
 
             // --- Bake Tilemap
             HashSet<AssetRef<StageTile>> uniqueTiles = new();
@@ -130,6 +137,11 @@ namespace NSMB.Quantum {
             }
             LogInfo($"Baked {breakables.Length} breakable objects");
             */
+            
+            // --- Try finding a Goal object to determine if map is Campaign (race) or Versus.
+            QPrototypeGoal[] goals =
+                GameObject.FindObjectsByType<QPrototypeGoal>(FindObjectsInactive.Exclude, FindObjectsSortMode.None);
+            stage.IsCampaignMap = goals.Length > 0;
 
             EditorUtility.SetDirty(stage);
         }

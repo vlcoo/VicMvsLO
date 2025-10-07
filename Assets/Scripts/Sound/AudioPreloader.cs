@@ -39,9 +39,9 @@ namespace NSMB.Sound {
             }
 
             // Main music
-            PreloadMusic(f.FindAsset(stage.GetCurrentMusic(f)));
-            PreloadMusic(f.FindAsset(stage.MegaMushroomMusic));
-            PreloadMusic(f.FindAsset(stage.InvincibleMusic));
+            // PreloadMusic(f.FindAsset(stage.GetCurrentMusic(f)));
+            // PreloadMusic(f.FindAsset(stage.MegaMushroomMusic));
+            // PreloadMusic(f.FindAsset(stage.InvincibleMusic));
         }
 
         private void PreloadMusic(LoopingMusicData musicData) {
