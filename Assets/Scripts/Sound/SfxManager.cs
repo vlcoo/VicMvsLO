@@ -69,7 +69,7 @@ namespace NSMB.Sound {
             Frame f = PredictedFrame;
             var mario = f.Unsafe.GetPointer<MarioPlayer>(e.Entity);
 
-            if (Game.PlayerIsLocal(mario->PlayerRef) && !musicPlayer.IsPlaying) {
+            if (Game.PlayerIsLocal(mario->PlayerRef)) {
                 sfx.PlayOneShot(SoundEffect.UI_StartGame);
             }
         }

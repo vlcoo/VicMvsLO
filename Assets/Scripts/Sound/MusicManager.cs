@@ -9,12 +9,25 @@ using static NSMB.Utilities.QuantumViewUtils;
 
 namespace NSMB.Sound {
     public unsafe class MusicManager : QuantumSceneViewComponent<StageContext> {
+        private enum MusicType {
+            Normal,
+            Mega,
+            Invincibility,
+            Silence
+        }
 
         //---Serialized Variables
-        [SerializeField] private LoopingMusicPlayer musicPlayer;
+        // [SerializeField] private LoopingMusicPlayer musicPlayer;
+        [SerializeField] private Songinator musicPlayerNormal;
+        [SerializeField] private Songinator musicPlayerMega;
+        [SerializeField] private Songinator musicPlayerInvincibility;
+        
+        private MusicType currentMusicType = MusicType.Silence;
 
         public void OnValidate() {
-            this.SetIfNull(ref musicPlayer);
+            this.SetIfNull(ref musicPlayerNormal);
+            this.SetIfNull(ref musicPlayerMega);
+            this.SetIfNull(ref musicPlayerInvincibility);
         }
 
         public unsafe void Start() {
@@ -54,7 +67,7 @@ namespace NSMB.Sound {
             Frame f = game.Frames.Predicted;
             var rules = f.Global->Rules;
 
-            if (!force && !musicPlayer.IsPlaying) {
+            if (!force && !AnyMusicPlaying()) {
                 return;
             }
 
@@ -107,29 +120,29 @@ namespace NSMB.Sound {
 
             VersusStageData stage = ViewContext.Stage;
             if (mega) {
-                musicPlayer.Play(f.FindAsset(stage.MegaMushroomMusic));
+                SetMusicType(MusicType.Mega);
             } else if (invincible) {
-                musicPlayer.Play(f.FindAsset(stage.InvincibleMusic));
+                SetMusicType(MusicType.Invincibility);
             } else {
-                musicPlayer.Play(f.FindAsset(stage.GetCurrentMusic(f)));
+                SetMusicType(MusicType.Normal);
             }
 
-            musicPlayer.FastMusic = speedup;
+            // musicPlayer.FastMusic = speedup;
         }
 
         private void OnGameEnded(EventGameEnded e) {
-            musicPlayer.Stop();
+            SetMusicType(MusicType.Silence);
         }
 
         private void OnMarioPlayerRespawned(EventMarioPlayerRespawned e) {
-            if (IsMarioLocal(e.Entity) && !musicPlayer.IsPlaying) {
+            if (IsMarioLocal(e.Entity) && !AnyMusicPlaying()) {
                 HandleMusic(e.Game, true);
             }
         }
 
         private void OnMarioPlayerDied(EventMarioPlayerDied e) {
             if (IsMarioLocal(e.Entity) && Settings.Instance.audioRestartMusicOnDeath) {
-                musicPlayer.Stop();
+                SetMusicType(MusicType.Silence);
             }
         }
 
@@ -155,6 +168,42 @@ namespace NSMB.Sound {
             if (Game.Frames.Predicted.Global->GameState == GameState.Playing) {
                 HandleMusic(Game, true);
             }
+        }
+        
+        private bool AnyMusicPlaying() {
+            return musicPlayerNormal.state == Songinator.PlaybackState.PLAYING ||
+                   musicPlayerMega.state == Songinator.PlaybackState.PLAYING ||
+                   musicPlayerInvincibility.state == Songinator.PlaybackState.PLAYING;
+        }
+
+        private void SetMusicType(MusicType type) {
+            if (currentMusicType == type) return;
+        
+            switch (type) {
+            case MusicType.Normal:
+                musicPlayerMega.SetPlaybackState(Songinator.PlaybackState.STOPPED);
+                musicPlayerInvincibility.SetPlaybackState(Songinator.PlaybackState.STOPPED);
+                musicPlayerNormal.SetPlaybackState(Songinator.PlaybackState.PLAYING);
+                break;
+            case MusicType.Mega:
+                musicPlayerNormal.SetPlaybackState(Songinator.PlaybackState.STOPPED);
+                musicPlayerInvincibility.SetPlaybackState(Songinator.PlaybackState.STOPPED);
+                musicPlayerMega.SetPlaybackState(Songinator.PlaybackState.PLAYING);
+                break;
+            case MusicType.Invincibility:
+                musicPlayerNormal.SetPlaybackState(Songinator.PlaybackState.STOPPED);
+                musicPlayerMega.SetPlaybackState(Songinator.PlaybackState.STOPPED);
+                musicPlayerInvincibility.SetPlaybackState(Songinator.PlaybackState.PLAYING);
+                break;
+            case MusicType.Silence:
+            default:
+                musicPlayerNormal.SetPlaybackState(Songinator.PlaybackState.STOPPED);
+                musicPlayerMega.SetPlaybackState(Songinator.PlaybackState.STOPPED);
+                musicPlayerInvincibility.SetPlaybackState(Songinator.PlaybackState.STOPPED);
+                break;
+            }
+        
+            currentMusicType = type;
         }
     }
 }

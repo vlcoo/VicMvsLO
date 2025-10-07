@@ -46,7 +46,7 @@ namespace NSMB.UI.MainMenu.Submenus.Replays {
         [SerializeField] private ScrollRect scrollRect;
         [SerializeField] internal VerticalLayoutGroup layout;
         [SerializeField] private TMP_Dropdown sortDropdown;
-        [SerializeField] private SpriteChangingToggle ascendingToggle;
+        [SerializeField] private Toggle ascendingToggle;
         [SerializeField] private TMP_InputField searchField;
         [SerializeField] private TMP_Text replayInformation;
         [SerializeField] private GameObject importButton, loadingIcon;

@@ -101,36 +101,34 @@ namespace NSMB.UI.MainMenu {
         }
 
         public void UpdateHeader() {
-            StringBuilder builder = new();
+            // bool rtl = GlobalController.Instance.translationManager.RightToLeft;
+            // IEnumerable<MainMenuSubmenu> submenus = rtl ? submenuStack.Reverse<MainMenuSubmenu>() : submenuStack;
+            // string headerSeparation = rtl ? " < " : " > ";
+            // foreach (var menu in submenus) {
+            //     showHeader |= menu.ShowHeader;
+            //     if (!string.IsNullOrEmpty(menu.Header)) {
+            //         builder.Append(menu.Header).Append(headerSeparation);
+            //     }
+            //     if (menu.HeaderColor.HasValue) {
+            //         newHeaderColor = menu.HeaderColor;
+            //     }
+            // }
+            //
+            // if (builder.Length > 0) {
+            //     builder.Remove(builder.Length - headerSeparation.Length, headerSeparation.Length);
+            //     headerPath.text = builder.ToString();
+            //     headerPath.horizontalAlignment = rtl ? HorizontalAlignmentOptions.Right : HorizontalAlignmentOptions.Left;
+            // }
 
-            bool showHeader = false;
-            Color? newHeaderColor = null;
+            var currentSubmenu = submenuStack.Last();
+            headerPath.text = currentSubmenu.Header;
 
-            bool rtl = GlobalController.Instance.translationManager.RightToLeft;
-            IEnumerable<MainMenuSubmenu> submenus = rtl ? submenuStack.Reverse<MainMenuSubmenu>() : submenuStack;
-            string headerSeparation = rtl ? " < " : " > ";
-            foreach (var menu in submenus) {
-                showHeader |= menu.ShowHeader;
-                if (!string.IsNullOrEmpty(menu.Header)) {
-                    builder.Append(menu.Header).Append(headerSeparation);
-                }
-                if (menu.HeaderColor.HasValue) {
-                    newHeaderColor = menu.HeaderColor;
-                }
-            }
-
-            if (builder.Length > 0) {
-                builder.Remove(builder.Length - headerSeparation.Length, headerSeparation.Length);
-                headerPath.text = builder.ToString();
-                headerPath.horizontalAlignment = rtl ? HorizontalAlignmentOptions.Right : HorizontalAlignmentOptions.Left;
-            }
-
-            Color newColor = newHeaderColor ?? defaultHeaderColor;
+            Color newColor = currentSubmenu.HeaderColor ?? defaultHeaderColor;
             if (HeaderColor != newColor) {
                 headerImage.color = newColor;
                 HeaderColorChanged?.Invoke(newColor);
             }
-            header.SetActive(showHeader);
+            header.SetActive(currentSubmenu.ShowHeader);
         }
 
         public bool IsSubmenuOpen(MainMenuSubmenu menu) {

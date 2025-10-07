@@ -50,6 +50,7 @@ namespace NSMB.UI.Game {
         private EntityRef previousTarget;
         private bool previousMarioExists;
         private bool justResynced;
+        private float fpsSample;
 
         private Coroutine endGameSequenceCoroutine, reserveSummonCoroutine;
 
@@ -326,6 +327,8 @@ namespace NSMB.UI.Game {
                     uiLives.text = QuantumUnityDB.GetGlobalAsset(mario->CharacterAsset).UiString + Utils.GetSymbolString("x" + cachedLives);
                 }
             }
+            
+            fpsSample = Mathf.Lerp(fpsSample, 1f / Time.unscaledDeltaTime, Mathf.Clamp01(Time.unscaledDeltaTime * 0.75f));
         }
 
         public TrackIcon CreateTrackIcon(QuantumEntityViewUpdater evu, Frame f, EntityRef entity, Transform target) {
@@ -379,9 +382,11 @@ namespace NSMB.UI.Game {
         }
 
         private void UpdatePingText() {
+            if (float.IsNaN(fpsSample)) fpsSample = 0;
+            
             if (NetworkHandler.Client.InRoom) {
                 int ping = (int) NetworkHandler.Ping.Value;
-                uiDebug.text = "<mark=#000000b0 padding=\"16,16,10,10\"><font=\"MarioFont\">" + Utils.GetPingSymbol(ping) + ping;
+                uiDebug.text = $"{fpsSample:0} FPS\n{ping}ms {Utils.GetPingSymbol(ping)}";
                 //uiDebug.isRightToLeftText = GlobalController.Instance.translationManager.RightToLeft;
             } else {
                 uiDebug.enabled = false;

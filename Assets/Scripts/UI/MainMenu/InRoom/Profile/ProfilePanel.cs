@@ -17,7 +17,7 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
         [SerializeField] private Image paletteBackground;
         [SerializeField] private PaletteChooser paletteChooser;
         [SerializeField] private TeamChooser teamChooser;
-        [SerializeField] private SpriteChangingToggle spectateToggle;
+        [SerializeField] private Toggle spectateToggle;
 
         //---Private Variables
         private int currentCharacterIndex;
