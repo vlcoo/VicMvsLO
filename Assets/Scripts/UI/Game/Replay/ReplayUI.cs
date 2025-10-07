@@ -267,17 +267,17 @@ namespace NSMB.UI.Game.Replay {
             replayPaused = !replayPaused;
             if (replayPaused) {
                 Time.timeScale = 0;
-                replayPauseButton.text = "►";
+                replayPauseButton.text = "~";
             } else {
                 Time.timeScale = replaySpeed;
-                replayPauseButton.text = "II";
+                replayPauseButton.text = "||";
             }
         }
 
         public void FrameAdvance() {
             replayPaused = true;
             Time.timeScale = 0;
-            replayPauseButton.text = "►";
+            replayPauseButton.text = "~";
 
             StartCoroutine(FrameAdvanceCoroutine());
         }

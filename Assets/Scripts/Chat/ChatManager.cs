@@ -155,7 +155,8 @@ namespace NSMB.Chat {
             // Add username
             Frame f = e.Game.Frames.Verified;
             RuntimePlayer runtimeData = f.GetPlayerData(e.Player);
-            message = runtimeData.PlayerNickname.ToValidNickname(f, e.Player) + ": " + message.Filter();
+            message =
+                $"<line-height=30><size=16><i>{runtimeData.PlayerNickname.ToValidNickname(f, e.Player)}\n</i></size></line-height>{message.Filter()}";
 
             AddChatMessage(message, e.Player, f);
         }
