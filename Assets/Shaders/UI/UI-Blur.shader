@@ -113,7 +113,7 @@ Shader "Custom/UISh"
                 half4 color = half4(0.0, 0.0, 0.0, 0.0);
                 half kernelSum = 0.0;
 
-                int upper = ((_Iterations * 2) + 1) / 2;
+                int upper = ((_Iterations * 2) + 1) / 2.0;
                 int lower = -upper;
 
                 for (int x = lower; x <= upper; x++)

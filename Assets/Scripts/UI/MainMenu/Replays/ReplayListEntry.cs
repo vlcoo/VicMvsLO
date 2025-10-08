@@ -2,7 +2,6 @@ using NSMB.Replay;
 using NSMB.UI.Translation;
 using NSMB.Utilities;
 using NSMB.Utilities.Extensions;
-using SFB;
 using System;
 using System.Collections;
 using System.IO;
@@ -196,16 +195,12 @@ namespace NSMB.UI.MainMenu.Submenus.Replays {
             }
 #else
             TranslationManager tm = GlobalController.Instance.translationManager;
-            StandaloneFileBrowser.SaveFilePanelAsync(tm.GetTranslation("ui.extras.replays.actions.export.prompt"), null, ReplayFile.Header.GetDisplayName(), "mvlreplay", (file) => {
-                if (string.IsNullOrWhiteSpace(file)) {
-                    return;
-                }
-
-                if (ReplayFile.LoadAllIfNeeded() == ReplayParseResult.Success) {
-                    using FileStream stream = new(file, FileMode.OpenOrCreate);
-                    ReplayFile.WriteToStream(stream);
-                }
-            });
+            var path = DialogModule.SaveFileBrowser("vcmi Replay files|*.mvlreplay", "vcmiReplay.mvlreplay");
+            if (string.IsNullOrWhiteSpace(path)) return;
+            if (ReplayFile.LoadAllIfNeeded() == ReplayParseResult.Success) {
+                using FileStream stream = new(path, FileMode.OpenOrCreate);
+                ReplayFile.WriteToStream(stream);
+            }
 #endif
         }
 

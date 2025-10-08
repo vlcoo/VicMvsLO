@@ -204,7 +204,7 @@ namespace Quantum {
             
             f.Global->GameState = GameState.Ended;
             f.Events.GameStateChanged(GameState.Ended);
-            f.Global->GameStartFrames = (ushort) ((endedByHost ? Constants._3_50 : 21) * f.UpdateRate);
+            f.Global->GameStartFrames = (ushort) ((endedByHost ? Constants._3_50 : Constants._5_50) * f.UpdateRate);
             f.SystemDisable<StartDisabledSystemGroup>();
 
             var gamemode = f.FindAsset(f.Global->Rules.Gamemode);

@@ -5,7 +5,6 @@ using NSMB.UI.Translation;
 using NSMB.Utilities;
 using NSMB.Utilities.Extensions;
 using Quantum;
-using SFB;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -421,10 +420,10 @@ namespace NSMB.UI.MainMenu.Submenus.Replays {
 #if UNITY_WEBGL && !UNITY_EDITOR
             UploadFile(name, nameof(ImportFile), ".mvlreplay", false);
 #else
-            string[] selected = StandaloneFileBrowser.OpenFilePanel(tm.GetTranslation("ui.extras.replays.actions.import"), "", "mvlreplay", false);
-            if (selected != null && selected.Length > 0) {
-                StartCoroutine(ImportFile(selected[0], true));
-            }
+            // string[] selected = StandaloneFileBrowser.OpenFilePanel(tm.GetTranslation("ui.extras.replays.actions.import"), "", "mvlreplay", false);
+            var path = DialogModule.OpenFileBrowser("vcmi Replay files|*.mvlreplay");
+            if (string.IsNullOrWhiteSpace(path)) return;
+            StartCoroutine(ImportFile(path, true));
 #endif
         }
 

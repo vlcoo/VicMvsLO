@@ -65,7 +65,7 @@ namespace NSMB.UI.Intro {
         }
 
         private IEnumerator IntroSequence() {
-            yield return new WaitForSeconds(0.75f);
+            // yield return new WaitForSeconds(0.75f);
             sfx.Play();
             yield return FadeImageToValue(fullscreenImage, 0, 0.33f);
             yield return new WaitForSeconds(0.5f);
