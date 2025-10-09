@@ -405,6 +405,38 @@ namespace Quantum.Prototypes {
     public QBoolean TeamsEnabled;
     public QBoolean CustomPowerupsEnabled;
     public QBoolean DrawOnTimeUp;
+    public Int32 Laps;
+    [DynamicCollectionAttribute()]
+    public Quantum.Prototypes.MatchConditionerTriggerPrototype[] Triggers = {};
+    public QBoolean SNoReserve;
+    public QBoolean SNoDroppedStars;
+    public QBoolean SInstantDeath;
+    public QBoolean SNoDefrost;
+    public QBoolean SNoCollisions;
+    public QBoolean SNoIframes;
+    public QBoolean SHideSeek;
+    public QBoolean SNoEnemies;
+    public QBoolean SNoBahs;
+    public QBoolean SPitWrap;
+    public QBoolean SAllBricks;
+    public QBoolean SNoLooping;
+    public QBoolean SNoCoins;
+    public QBoolean SNoPowerups;
+    public QBoolean SShowCoinCount;
+    public Int32 ChanceMushroom;
+    public Int32 ChanceFireFlower;
+    public Int32 ChanceIceFlower;
+    public Int32 ChancePropellerMushroom;
+    public Int32 ChanceBlueShell;
+    public Int32 ChanceHammerSuit;
+    public Int32 ChanceMiniMushroom;
+    public Int32 ChanceMegaMushroom;
+    public Int32 ChanceStarman;
+    public QBoolean HStars;
+    public QBoolean HPlayers;
+    public QBoolean HHost;
+    public QBoolean HIceCubes;
+    public Int32 HTeamTarget;
     partial void MaterializeUser(Frame frame, ref Quantum.GameRules result, in PrototypeMaterializationContext context);
     public void Materialize(Frame frame, ref Quantum.GameRules result, in PrototypeMaterializationContext context = default) {
         result.Stage = this.Stage;
@@ -416,6 +448,46 @@ namespace Quantum.Prototypes {
         result.TeamsEnabled = this.TeamsEnabled;
         result.CustomPowerupsEnabled = this.CustomPowerupsEnabled;
         result.DrawOnTimeUp = this.DrawOnTimeUp;
+        result.Laps = this.Laps;
+        if (this.Triggers.Length == 0) {
+          result.Triggers = default;
+        } else {
+          var list = frame.AllocateList(out result.Triggers, this.Triggers.Length);
+          for (int i = 0; i < this.Triggers.Length; ++i) {
+            Quantum.MatchConditionerTrigger tmp = default;
+            this.Triggers[i].Materialize(frame, ref tmp, in context);
+            list.Add(tmp);
+          }
+        }
+        result.SNoReserve = this.SNoReserve;
+        result.SNoDroppedStars = this.SNoDroppedStars;
+        result.SInstantDeath = this.SInstantDeath;
+        result.SNoDefrost = this.SNoDefrost;
+        result.SNoCollisions = this.SNoCollisions;
+        result.SNoIframes = this.SNoIframes;
+        result.SHideSeek = this.SHideSeek;
+        result.SNoEnemies = this.SNoEnemies;
+        result.SNoBahs = this.SNoBahs;
+        result.SPitWrap = this.SPitWrap;
+        result.SAllBricks = this.SAllBricks;
+        result.SNoLooping = this.SNoLooping;
+        result.SNoCoins = this.SNoCoins;
+        result.SNoPowerups = this.SNoPowerups;
+        result.SShowCoinCount = this.SShowCoinCount;
+        result.ChanceMushroom = this.ChanceMushroom;
+        result.ChanceFireFlower = this.ChanceFireFlower;
+        result.ChanceIceFlower = this.ChanceIceFlower;
+        result.ChancePropellerMushroom = this.ChancePropellerMushroom;
+        result.ChanceBlueShell = this.ChanceBlueShell;
+        result.ChanceHammerSuit = this.ChanceHammerSuit;
+        result.ChanceMiniMushroom = this.ChanceMiniMushroom;
+        result.ChanceMegaMushroom = this.ChanceMegaMushroom;
+        result.ChanceStarman = this.ChanceStarman;
+        result.HStars = this.HStars;
+        result.HPlayers = this.HPlayers;
+        result.HHost = this.HHost;
+        result.HIceCubes = this.HIceCubes;
+        result.HTeamTarget = this.HTeamTarget;
         MaterializeUser(frame, ref result, in context);
     }
   }
@@ -709,6 +781,35 @@ namespace Quantum.Prototypes {
     public void Materialize(Frame frame, ref Quantum.MarioPlayer result, in PrototypeMaterializationContext context = default) {
         result.PhysicsAsset = this.PhysicsAsset;
         result.CharacterAsset = this.CharacterAsset;
+        MaterializeUser(frame, ref result, in context);
+    }
+  }
+  [System.SerializableAttribute()]
+  [Quantum.Prototypes.Prototype(typeof(Quantum.MatchConditionerTrigger))]
+  public unsafe partial class MatchConditionerTriggerPrototype : StructPrototype {
+    public Quantum.QEnum32<TriggerCondition> Condition;
+    [MaxStringByteCount(62, "Unicode")]
+    public string ConditionParameter;
+    public Quantum.QEnum32<TriggerTarget> ConditionTarget;
+    public Quantum.QEnum32<TriggerAction> Action;
+    [MaxStringByteCount(62, "Unicode")]
+    public string ActionParameter;
+    public Quantum.QEnum32<TriggerTarget> ActionTarget;
+    public Quantum.QEnum32<TriggerConstraint> Constraint;
+    [MaxStringByteCount(62, "Unicode")]
+    public string ConstraintParameter;
+    public Quantum.QEnum32<TriggerTarget> ConstraintTarget;
+    partial void MaterializeUser(Frame frame, ref Quantum.MatchConditionerTrigger result, in PrototypeMaterializationContext context);
+    public void Materialize(Frame frame, ref Quantum.MatchConditionerTrigger result, in PrototypeMaterializationContext context = default) {
+        result.Condition = this.Condition;
+        PrototypeValidator.AssignQString(this.ConditionParameter, 64, in context, out result.ConditionParameter);
+        result.ConditionTarget = this.ConditionTarget;
+        result.Action = this.Action;
+        PrototypeValidator.AssignQString(this.ActionParameter, 64, in context, out result.ActionParameter);
+        result.ActionTarget = this.ActionTarget;
+        result.Constraint = this.Constraint;
+        PrototypeValidator.AssignQString(this.ConstraintParameter, 64, in context, out result.ConstraintParameter);
+        result.ConstraintTarget = this.ConstraintTarget;
         MaterializeUser(frame, ref result, in context);
     }
   }

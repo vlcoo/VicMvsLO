@@ -113,6 +113,136 @@ namespace Quantum {
     MirrorX = 1,
     MirrorY = 2,
   }
+  public enum TriggerAction : int {
+    GiveStar,
+    GiveCoin,
+    Kill,
+    RemoveStar,
+    RemoveCoin,
+    GiveXPowerup,
+    Win,
+    DrawMatch,
+    Disqualify,
+    Stun,
+    Freeze,
+    Harm,
+    SpawnXPowerup,
+    RespawnLevel,
+    RemoveReserve,
+    GiveXReserve,
+    GiveIFrames,
+    SpawnLooseCoin,
+    SpawnLooseStar,
+    ZeroCoins,
+    ZeroStars,
+    MaxCoins,
+  }
+  public enum TriggerCondition : int {
+    GotStar,
+    GotCoin,
+    Spawned,
+    MatchStarted,
+    GotPowerup,
+    LostPowerup,
+    Stunned,
+    Frozen,
+    Died,
+    Jumped,
+    ReachedCoinLimit,
+    Disqualified,
+    ReachedZeroCoins,
+    ReachedZeroStars,
+    FinishedLap,
+  }
+  public enum TriggerConstraint : int {
+    Always,
+    IsMoving,
+    IsStationary,
+    IsAirborne,
+    IsGrounded,
+    IsXPowerup,
+    IsNotXPowerup,
+    IsFrozen,
+    IsNotFrozen,
+    IsUnderwater,
+    IsNotUnderwater,
+    HasXCoins,
+    HasXStars,
+    HasXLives,
+    HasLessThanXCoins,
+    HasLessThanXStars,
+    HasLessThanXLives,
+    HasMoreThanXCoins,
+    HasMoreThanXStars,
+    HasMoreThanXLives,
+    TimerIsLessThanX,
+    TimerIsMoreThanX,
+    StarsExist,
+    StarsNotExist,
+    EnemiesExist,
+    EnemiesNotExist,
+    CoinsExist,
+    CoinsNotExist,
+    XPlayersRemaining,
+    LessThanXPlayersRemaining,
+    MoreThanXPlayersRemaining,
+  }
+  public enum TriggerParameter : int {
+    Random,
+    Mushroom,
+    Fire,
+    Ice,
+    Propeller,
+    Shell,
+    Hammer,
+    Starman,
+    Mega,
+    Mini,
+    Goomba,
+    GreenKoopa,
+    RedKoopa,
+    BlueKoopa,
+    BulletBill,
+    Boo,
+    Spiny,
+    Bobomb,
+    Buzzy,
+    A,
+    B,
+    C,
+    D,
+    E,
+    Bump,
+    Knockback,
+    HardKnockback,
+    Force,
+  }
+  public enum TriggerTarget : int {
+    Everyone,
+    Any,
+    OneRandom,
+    Randoms,
+    Conditioner,
+    ConditionerTeam,
+    NonConditioner,
+    NonConditionerTeam,
+    Actioner,
+    ActionerTeam,
+    NonActioner,
+    NonActionerTeam,
+    Host,
+    NonHost,
+    TeamA,
+    NonTeamA,
+    TeamB,
+    NonTeamB,
+    TeamC,
+    NonTeamC,
+    TeamD,
+    NonTeamD,
+    TeamE,
+    NonTeamE,
+  }
   [System.FlagsAttribute()]
   public enum InputButtons : int {
     Up = 1 << 0,
@@ -596,6 +726,72 @@ namespace Quantum {
   }
   [StructLayout(LayoutKind.Explicit)]
   [System.SerializableAttribute()]
+  public unsafe partial struct QString64 : IQString, System.IEquatable<QString64> {
+    public const Int32 SIZE = 64;
+    public const Int32 ALIGNMENT = 4;
+    [FieldOffset(0)]
+    public UInt16 ByteCount;
+    [FieldOffset(2)]
+    [FixedBufferDynamicLength("ByteCount")]
+    public fixed Byte Bytes[62];
+    public const int MaxByteCount = 62;
+    public QString64(String str) {
+      QString.ConstructFrom(str, MaxByteCount, out this);
+    }
+    public int Length {
+      get {
+        return QString.GetLength(ref this);
+      }
+    }
+    public override System.String ToString() {
+      return QString.GetString(ref this);
+    }
+    public static Boolean CanHold(String str) {
+      return QString.CanHold(str, MaxByteCount);
+    }
+    Int32 IQString.CompareOrdinal(byte* bytes, UInt16 byteCount) {
+      return QString.CompareOrdinal(ref this, bytes, byteCount);
+    }
+    public Int32 CompareOrdinal(String str) {
+      return QString.CompareOrdinal(ref this, str);
+    }
+    public static implicit operator QString64(String str) {
+      return new QString64(str);
+    }
+    public static implicit operator String(QString64 str) {
+      return str.ToString();
+    }
+    public override Boolean Equals(Object obj) {
+      return QString.AreEqual(ref this, obj);
+    }
+    public Boolean Equals(QString64 str) {
+      return QString.CompareOrdinal(ref this, str.Bytes, str.ByteCount) == 0;
+    }
+    public Boolean Equals<T>(ref T str)
+      where T : unmanaged, IQString {
+      return QString.CompareOrdinal(ref this, ref str) == 0;
+    }
+    public Int32 CompareOrdinal<T>(ref T str)
+      where T : unmanaged, IQString {
+      return QString.CompareOrdinal(ref this, ref str);
+    }
+    public override Int32 GetHashCode() {
+      unchecked { 
+        var hash = 13649;
+        hash = hash * 31 + ByteCount.GetHashCode();
+        fixed (Byte* p = Bytes) hash = hash * 31 + HashCodeUtils.GetArrayHashCode(p, this.ByteCount);
+        return hash;
+      }
+    }
+    public static void Serialize(void* ptr, FrameSerializer serializer) {
+        var p = (QString64*)ptr;
+        serializer.Stream.Serialize(&p->ByteCount);
+        Assert.Always(p->ByteCount <= 62, p->ByteCount);
+        serializer.Stream.SerializeBuffer(&p->Bytes[0], p->ByteCount);
+    }
+  }
+  [StructLayout(LayoutKind.Explicit)]
+  [System.SerializableAttribute()]
   public unsafe partial struct QStringUtf8_40 : IQStringUtf8, System.IEquatable<QStringUtf8_40> {
     public const Int32 SIZE = 40;
     public const Int32 ALIGNMENT = 4;
@@ -790,26 +986,88 @@ namespace Quantum {
   }
   [StructLayout(LayoutKind.Explicit)]
   public unsafe partial struct GameRules {
-    public const Int32 SIZE = 48;
+    public const Int32 SIZE = 168;
     public const Int32 ALIGNMENT = 8;
-    [FieldOffset(40)]
+    [FieldOffset(160)]
     public AssetRef<Map> Stage;
-    [FieldOffset(32)]
+    [FieldOffset(152)]
     public AssetRef<GamemodeAsset> Gamemode;
-    [FieldOffset(8)]
+    [FieldOffset(52)]
     public Int32 StarsToWin;
-    [FieldOffset(0)]
+    [FieldOffset(36)]
     public Int32 CoinsForPowerup;
-    [FieldOffset(4)]
+    [FieldOffset(48)]
     public Int32 Lives;
-    [FieldOffset(12)]
+    [FieldOffset(56)]
     public Int32 TimerMinutes;
-    [FieldOffset(24)]
+    [FieldOffset(144)]
     public QBoolean TeamsEnabled;
-    [FieldOffset(16)]
+    [FieldOffset(60)]
     public QBoolean CustomPowerupsEnabled;
-    [FieldOffset(20)]
+    [FieldOffset(64)]
     public QBoolean DrawOnTimeUp;
+    [FieldOffset(44)]
+    public Int32 Laps;
+    [FieldOffset(148)]
+    public QListPtr<MatchConditionerTrigger> Triggers;
+    [FieldOffset(132)]
+    public QBoolean SNoReserve;
+    [FieldOffset(112)]
+    public QBoolean SNoDroppedStars;
+    [FieldOffset(92)]
+    public QBoolean SInstantDeath;
+    [FieldOffset(108)]
+    public QBoolean SNoDefrost;
+    [FieldOffset(104)]
+    public QBoolean SNoCollisions;
+    [FieldOffset(120)]
+    public QBoolean SNoIframes;
+    [FieldOffset(88)]
+    public QBoolean SHideSeek;
+    [FieldOffset(116)]
+    public QBoolean SNoEnemies;
+    [FieldOffset(96)]
+    public QBoolean SNoBahs;
+    [FieldOffset(136)]
+    public QBoolean SPitWrap;
+    [FieldOffset(84)]
+    public QBoolean SAllBricks;
+    [FieldOffset(124)]
+    public QBoolean SNoLooping;
+    [FieldOffset(100)]
+    public QBoolean SNoCoins;
+    [FieldOffset(128)]
+    public QBoolean SNoPowerups;
+    [FieldOffset(140)]
+    public QBoolean SShowCoinCount;
+    [FieldOffset(24)]
+    public Int32 ChanceMushroom;
+    [FieldOffset(4)]
+    public Int32 ChanceFireFlower;
+    [FieldOffset(12)]
+    public Int32 ChanceIceFlower;
+    [FieldOffset(28)]
+    public Int32 ChancePropellerMushroom;
+    [FieldOffset(0)]
+    public Int32 ChanceBlueShell;
+    [FieldOffset(8)]
+    public Int32 ChanceHammerSuit;
+    [FieldOffset(20)]
+    public Int32 ChanceMiniMushroom;
+    [FieldOffset(16)]
+    public Int32 ChanceMegaMushroom;
+    [FieldOffset(32)]
+    public Int32 ChanceStarman;
+    [FieldOffset(80)]
+    public QBoolean HStars;
+    [FieldOffset(76)]
+    public QBoolean HPlayers;
+    [FieldOffset(68)]
+    public QBoolean HHost;
+    [FieldOffset(72)]
+    public QBoolean HIceCubes;
+    [FieldOffset(40)]
+    public Int32 HTeamTarget;
     public override Int32 GetHashCode() {
       unchecked { 
         var hash = 443;
@@ -822,18 +1080,83 @@ namespace Quantum {
         hash = hash * 31 + TeamsEnabled.GetHashCode();
         hash = hash * 31 + CustomPowerupsEnabled.GetHashCode();
         hash = hash * 31 + DrawOnTimeUp.GetHashCode();
+        hash = hash * 31 + Laps.GetHashCode();
+        hash = hash * 31 + Triggers.GetHashCode();
+        hash = hash * 31 + SNoReserve.GetHashCode();
+        hash = hash * 31 + SNoDroppedStars.GetHashCode();
+        hash = hash * 31 + SInstantDeath.GetHashCode();
+        hash = hash * 31 + SNoDefrost.GetHashCode();
+        hash = hash * 31 + SNoCollisions.GetHashCode();
+        hash = hash * 31 + SNoIframes.GetHashCode();
+        hash = hash * 31 + SHideSeek.GetHashCode();
+        hash = hash * 31 + SNoEnemies.GetHashCode();
+        hash = hash * 31 + SNoBahs.GetHashCode();
+        hash = hash * 31 + SPitWrap.GetHashCode();
+        hash = hash * 31 + SAllBricks.GetHashCode();
+        hash = hash * 31 + SNoLooping.GetHashCode();
+        hash = hash * 31 + SNoCoins.GetHashCode();
+        hash = hash * 31 + SNoPowerups.GetHashCode();
+        hash = hash * 31 + SShowCoinCount.GetHashCode();
+        hash = hash * 31 + ChanceMushroom.GetHashCode();
+        hash = hash * 31 + ChanceFireFlower.GetHashCode();
+        hash = hash * 31 + ChanceIceFlower.GetHashCode();
+        hash = hash * 31 + ChancePropellerMushroom.GetHashCode();
+        hash = hash * 31 + ChanceBlueShell.GetHashCode();
+        hash = hash * 31 + ChanceHammerSuit.GetHashCode();
+        hash = hash * 31 + ChanceMiniMushroom.GetHashCode();
+        hash = hash * 31 + ChanceMegaMushroom.GetHashCode();
+        hash = hash * 31 + ChanceStarman.GetHashCode();
+        hash = hash * 31 + HStars.GetHashCode();
+        hash = hash * 31 + HPlayers.GetHashCode();
+        hash = hash * 31 + HHost.GetHashCode();
+        hash = hash * 31 + HIceCubes.GetHashCode();
+        hash = hash * 31 + HTeamTarget.GetHashCode();
         return hash;
       }
     }
+    public void ClearPointers(FrameBase f, EntityRef entity) {
+      Triggers = default;
+    }
     public static void Serialize(void* ptr, FrameSerializer serializer) {
         var p = (GameRules*)ptr;
+        serializer.Stream.Serialize(&p->ChanceBlueShell);
+        serializer.Stream.Serialize(&p->ChanceFireFlower);
+        serializer.Stream.Serialize(&p->ChanceHammerSuit);
+        serializer.Stream.Serialize(&p->ChanceIceFlower);
+        serializer.Stream.Serialize(&p->ChanceMegaMushroom);
+        serializer.Stream.Serialize(&p->ChanceMiniMushroom);
+        serializer.Stream.Serialize(&p->ChanceMushroom);
+        serializer.Stream.Serialize(&p->ChancePropellerMushroom);
+        serializer.Stream.Serialize(&p->ChanceStarman);
         serializer.Stream.Serialize(&p->CoinsForPowerup);
+        serializer.Stream.Serialize(&p->HTeamTarget);
+        serializer.Stream.Serialize(&p->Laps);
         serializer.Stream.Serialize(&p->Lives);
         serializer.Stream.Serialize(&p->StarsToWin);
         serializer.Stream.Serialize(&p->TimerMinutes);
         QBoolean.Serialize(&p->CustomPowerupsEnabled, serializer);
         QBoolean.Serialize(&p->DrawOnTimeUp, serializer);
+        QBoolean.Serialize(&p->HHost, serializer);
+        QBoolean.Serialize(&p->HIceCubes, serializer);
+        QBoolean.Serialize(&p->HPlayers, serializer);
+        QBoolean.Serialize(&p->HStars, serializer);
+        QBoolean.Serialize(&p->SAllBricks, serializer);
+        QBoolean.Serialize(&p->SHideSeek, serializer);
+        QBoolean.Serialize(&p->SInstantDeath, serializer);
+        QBoolean.Serialize(&p->SNoBahs, serializer);
+        QBoolean.Serialize(&p->SNoCoins, serializer);
+        QBoolean.Serialize(&p->SNoCollisions, serializer);
+        QBoolean.Serialize(&p->SNoDefrost, serializer);
+        QBoolean.Serialize(&p->SNoDroppedStars, serializer);
+        QBoolean.Serialize(&p->SNoEnemies, serializer);
+        QBoolean.Serialize(&p->SNoIframes, serializer);
+        QBoolean.Serialize(&p->SNoLooping, serializer);
+        QBoolean.Serialize(&p->SNoPowerups, serializer);
+        QBoolean.Serialize(&p->SNoReserve, serializer);
+        QBoolean.Serialize(&p->SPitWrap, serializer);
+        QBoolean.Serialize(&p->SShowCoinCount, serializer);
         QBoolean.Serialize(&p->TeamsEnabled, serializer);
+        QList.Serialize(&p->Triggers, serializer, Statics.SerializeMatchConditionerTrigger);
         AssetRef.Serialize(&p->Gamemode, serializer);
         AssetRef.Serialize(&p->Stage, serializer);
     }
@@ -917,6 +1240,56 @@ namespace Quantum {
         Button.Serialize(&p->Right, serializer);
         Button.Serialize(&p->Sprint, serializer);
         Button.Serialize(&p->Up, serializer);
+    }
+  }
+  [StructLayout(LayoutKind.Explicit)]
+  public unsafe partial struct MatchConditionerTrigger {
+    public const Int32 SIZE = 216;
+    public const Int32 ALIGNMENT = 4;
+    [FieldOffset(4)]
+    public TriggerCondition Condition;
+    [FieldOffset(88)]
+    public QString64 ConditionParameter;
+    [FieldOffset(16)]
+    public TriggerTarget ConditionTarget;
+    [FieldOffset(0)]
+    public TriggerAction Action;
+    [FieldOffset(24)]
+    public QString64 ActionParameter;
+    [FieldOffset(12)]
+    public TriggerTarget ActionTarget;
+    [FieldOffset(8)]
+    public TriggerConstraint Constraint;
+    [FieldOffset(152)]
+    public QString64 ConstraintParameter;
+    [FieldOffset(20)]
+    public TriggerTarget ConstraintTarget;
+    public override Int32 GetHashCode() {
+      unchecked { 
+        var hash = 7481;
+        hash = hash * 31 + (Int32)Condition;
+        hash = hash * 31 + ConditionParameter.GetHashCode();
+        hash = hash * 31 + (Int32)ConditionTarget;
+        hash = hash * 31 + (Int32)Action;
+        hash = hash * 31 + ActionParameter.GetHashCode();
+        hash = hash * 31 + (Int32)ActionTarget;
+        hash = hash * 31 + (Int32)Constraint;
+        hash = hash * 31 + ConstraintParameter.GetHashCode();
+        hash = hash * 31 + (Int32)ConstraintTarget;
+        return hash;
+      }
+    }
+    public static void Serialize(void* ptr, FrameSerializer serializer) {
+        var p = (MatchConditionerTrigger*)ptr;
+        serializer.Stream.Serialize((Int32*)&p->Action);
+        serializer.Stream.Serialize((Int32*)&p->Condition);
+        serializer.Stream.Serialize((Int32*)&p->Constraint);
+        serializer.Stream.Serialize((Int32*)&p->ActionTarget);
+        serializer.Stream.Serialize((Int32*)&p->ConditionTarget);
+        serializer.Stream.Serialize((Int32*)&p->ConstraintTarget);
+        Quantum.QString64.Serialize(&p->ActionParameter, serializer);
+        Quantum.QString64.Serialize(&p->ConditionParameter, serializer);
+        Quantum.QString64.Serialize(&p->ConstraintParameter, serializer);
     }
   }
   [StructLayout(LayoutKind.Explicit)]
@@ -1099,7 +1472,7 @@ namespace Quantum {
   }
   [StructLayout(LayoutKind.Explicit)]
   public unsafe partial struct _globals_ {
-    public const Int32 SIZE = 2888;
+    public const Int32 SIZE = 3008;
     public const Int32 ALIGNMENT = 8;
     [FieldOffset(0)]
     public AssetRef<Map> Map;
@@ -1134,7 +1507,7 @@ namespace Quantum {
     public BitSet64 UsedStarSpawns;
     [FieldOffset(1672)]
     public Int32 UsedStarSpawnCount;
-    [FieldOffset(1720)]
+    [FieldOffset(2840)]
     public GameRules Rules;
     [FieldOffset(1650)]
     public GameState GameState;
@@ -1150,7 +1523,7 @@ namespace Quantum {
     public UInt16 AutomaticStageRefreshInterval;
     [FieldOffset(1654)]
     public UInt16 AutomaticStageRefreshTimer;
-    [FieldOffset(1768)]
+    [FieldOffset(1720)]
     [FramePrinter.FixedArrayAttribute(typeof(PlayerInformation), 10)]
     private fixed Byte _PlayerInfo_[1120];
     [FieldOffset(1648)]
@@ -1221,6 +1594,7 @@ namespace Quantum {
       }
     }
     partial void ClearPointersPartial(FrameBase f, EntityRef entity) {
+      Rules.ClearPointers(f, entity);
       PlayerDatas = default;
       BannedPlayerIds = default;
     }
@@ -1261,8 +1635,8 @@ namespace Quantum {
         Quantum.BitSet64.Serialize(&p->UsedStarSpawns, serializer);
         EntityRef.Serialize(&p->MainBigStar, serializer);
         FP.Serialize(&p->Timer, serializer);
-        Quantum.GameRules.Serialize(&p->Rules, serializer);
         FixedArray.Serialize(p->PlayerInfo, serializer, Statics.SerializePlayerInformation);
+        Quantum.GameRules.Serialize(&p->Rules, serializer);
     }
   }
   [StructLayout(LayoutKind.Explicit)]
@@ -4238,6 +4612,7 @@ namespace Quantum {
   }
   public unsafe partial class Statics {
     public static FrameSerializer.Delegate SerializeBetterPhysicsContact;
+    public static FrameSerializer.Delegate SerializeMatchConditionerTrigger;
     public static FrameSerializer.Delegate SerializePathNode;
     public static FrameSerializer.Delegate SerializeEntityRef;
     public static FrameSerializer.Delegate SerializePhysicsQueryRef;
@@ -4248,6 +4623,7 @@ namespace Quantum {
     public static FrameSerializer.Delegate SerializeInput;
     static partial void InitStaticDelegatesGen() {
       SerializeBetterPhysicsContact = Quantum.BetterPhysicsContact.Serialize;
+      SerializeMatchConditionerTrigger = Quantum.MatchConditionerTrigger.Serialize;
       SerializePathNode = Quantum.PathNode.Serialize;
       SerializeEntityRef = EntityRef.Serialize;
       SerializePhysicsQueryRef = PhysicsQueryRef.Serialize;
@@ -4346,6 +4722,7 @@ namespace Quantum {
       typeRegistry.Register(typeof(MapEntityLink), MapEntityLink.SIZE);
       typeRegistry.Register(typeof(Quantum.MarioBrosPlatform), Quantum.MarioBrosPlatform.SIZE);
       typeRegistry.Register(typeof(Quantum.MarioPlayer), Quantum.MarioPlayer.SIZE);
+      typeRegistry.Register(typeof(Quantum.MatchConditionerTrigger), Quantum.MatchConditionerTrigger.SIZE);
       typeRegistry.Register(typeof(Quantum.MovingPlatform), Quantum.MovingPlatform.SIZE);
       typeRegistry.Register(typeof(NavMeshAvoidanceAgent), NavMeshAvoidanceAgent.SIZE);
       typeRegistry.Register(typeof(NavMeshAvoidanceObstacle), NavMeshAvoidanceObstacle.SIZE);
@@ -4386,6 +4763,7 @@ namespace Quantum {
       typeRegistry.Register(typeof(Ptr), Ptr.SIZE);
       typeRegistry.Register(typeof(QBoolean), QBoolean.SIZE);
       typeRegistry.Register(typeof(Quantum.QString48), Quantum.QString48.SIZE);
+      typeRegistry.Register(typeof(Quantum.QString64), Quantum.QString64.SIZE);
       typeRegistry.Register(typeof(Quantum.QStringUtf8_40), Quantum.QStringUtf8_40.SIZE);
       typeRegistry.Register(typeof(Quantum.QStringUtf8_48), Quantum.QStringUtf8_48.SIZE);
       typeRegistry.Register(typeof(Quantum.Ptr), Quantum.Ptr.SIZE);
@@ -4403,6 +4781,11 @@ namespace Quantum {
       typeRegistry.Register(typeof(Transform2D), Transform2D.SIZE);
       typeRegistry.Register(typeof(Transform2DVertical), Transform2DVertical.SIZE);
       typeRegistry.Register(typeof(Transform3D), Transform3D.SIZE);
+      typeRegistry.Register(typeof(Quantum.TriggerAction), 4);
+      typeRegistry.Register(typeof(Quantum.TriggerCondition), 4);
+      typeRegistry.Register(typeof(Quantum.TriggerConstraint), 4);
+      typeRegistry.Register(typeof(Quantum.TriggerParameter), 4);
+      typeRegistry.Register(typeof(Quantum.TriggerTarget), 4);
       typeRegistry.Register(typeof(View), View.SIZE);
       typeRegistry.Register(typeof(Quantum.WrappingObject), Quantum.WrappingObject.SIZE);
       typeRegistry.Register(typeof(Quantum._globals_), Quantum._globals_.SIZE);
@@ -4471,10 +4854,16 @@ namespace Quantum {
       FramePrinter.EnsurePrimitiveNotStripped<Quantum.PowerupSpawnReason>();
       FramePrinter.EnsurePrimitiveNotStripped<Quantum.PowerupState>();
       FramePrinter.EnsurePrimitiveNotStripped<Quantum.QString48>();
+      FramePrinter.EnsurePrimitiveNotStripped<Quantum.QString64>();
       FramePrinter.EnsurePrimitiveNotStripped<Quantum.QStringUtf8_40>();
       FramePrinter.EnsurePrimitiveNotStripped<Quantum.QStringUtf8_48>();
       FramePrinter.EnsurePrimitiveNotStripped<QueryOptions>();
       FramePrinter.EnsurePrimitiveNotStripped<Quantum.StageTileFlags>();
+      FramePrinter.EnsurePrimitiveNotStripped<Quantum.TriggerAction>();
+      FramePrinter.EnsurePrimitiveNotStripped<Quantum.TriggerCondition>();
+      FramePrinter.EnsurePrimitiveNotStripped<Quantum.TriggerConstraint>();
+      FramePrinter.EnsurePrimitiveNotStripped<Quantum.TriggerParameter>();
+      FramePrinter.EnsurePrimitiveNotStripped<Quantum.TriggerTarget>();
     }
   }
 }

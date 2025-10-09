@@ -8,6 +8,7 @@ public class CharacterAsset : AssetObject {
     public string SoundFolder;
     public string UiString;
     public string TranslationString;
+    public string LegalEnglishName;
 
 #if QUANTUM_UNITY
     public Sprite LoadingSmallSprite;

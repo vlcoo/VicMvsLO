@@ -499,7 +499,7 @@ namespace NSMB.UI.Game {
                 resultAnimationTrigger = "startNegative";
             }
 
-            endGameSequenceCoroutine = StartCoroutine(EndGameSequence(resultMusic, resultAnimationTrigger, e.EndedByHost ? 0.5f : 1f));
+            endGameSequenceCoroutine = StartCoroutine(EndGameSequence(resultMusic, resultAnimationTrigger, e.EndedByHost ? 0f : 0f));
         }
 
         private void OnLanguageChanged(TranslationManager tm) {

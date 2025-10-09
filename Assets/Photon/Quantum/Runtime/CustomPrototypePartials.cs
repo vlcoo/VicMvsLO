@@ -36,6 +36,23 @@ namespace Quantum {
     }
     // For more details, see this forum thread: https://discussions.unity.com/t/705805
   }
+  
+  public partial class QPrototypeIndividualSquishy {
+    public void OnValidate() {
+      ValidationUtility.SafeOnValidate(() => {
+        if (!this) {
+          return;
+        }
+        SpriteRenderer sRenderer = GetComponentInChildren<SpriteRenderer>();
+        sRenderer.size = new Vector2(Prototype.OriginalWidth.AsFloat, Prototype.OriginalHeight.AsFloat);
+      });
+
+      QuantumEntityPrototype entityPrototype = GetComponent<QuantumEntityPrototype>();
+      Shape2DConfig shape = entityPrototype.PhysicsCollider.Shape2D;
+      shape.PositionOffset = new FPVector2(Prototype.OriginalWidth / 4, Prototype.OriginalHeight / 4) - new FPVector2(Prototype.OriginalWidth / 4, Prototype.OriginalHeight / 4);
+      shape.BoxExtents = new FPVector2(Prototype.OriginalWidth / 4, Prototype.OriginalHeight / 4);
+    }
+  }
 
   public partial class QPrototypeLiquid {
     public void OnValidate() {

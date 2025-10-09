@@ -40,6 +40,45 @@ struct GameRules {
 	bool TeamsEnabled;
 	bool CustomPowerupsEnabled;
 	bool DrawOnTimeUp;
+	int Laps;
+	list<MatchConditionerTrigger> Triggers;
+	
+	bool SNoReserve;
+    	bool SNoDroppedStars;
+    	bool SInstantDeath;
+    	bool SNoDefrost;
+    	bool SNoCollisions;
+    	bool SNoIframes;
+    	bool SHideSeek;
+    	bool SNoEnemies;
+    	bool SNoBahs;
+    	bool SPitWrap;
+    	bool SAllBricks;
+    	bool SNoLooping;
+    	bool SNoCoins;
+    	bool SNoPowerups;
+    	bool SShowCoinCount;
+    	
+    	int ChanceMushroom;
+        int ChanceFireFlower;
+        int ChanceIceFlower;
+        int ChancePropellerMushroom;
+        int ChanceBlueShell;
+        int ChanceHammerSuit;
+        int ChanceMiniMushroom;
+        int ChanceMegaMushroom;
+        int ChanceStarman;
+        
+        bool HStars;
+        bool HPlayers;
+        bool HHost;
+        bool HIceCubes;
+        int HTeamTarget;
+    //    bool HStarCount;
+    //    bool HLifeCount;
+    //    bool HLapCount;
+    //    bool HCoinCount;
+    //    bool HNicknames;
 }
 
 enum GameState : Byte {
@@ -48,6 +87,183 @@ enum GameState : Byte {
     Starting,
     Playing,
     Ended
+}
+
+struct MatchConditionerTrigger {
+    TriggerCondition Condition;
+    QString<64> ConditionParameter;
+    TriggerTarget ConditionTarget;
+    TriggerAction Action;
+    QString<64> ActionParameter;
+    TriggerTarget ActionTarget;
+    TriggerConstraint Constraint;
+    QString<64> ConstraintParameter;
+    TriggerTarget ConstraintTarget;
+}
+
+enum TriggerCondition {
+    GotStar,
+    GotCoin,
+    Spawned,
+    MatchStarted,
+//    GotCheckpoint,
+    GotPowerup,
+    LostPowerup,
+//    HitBlock,
+    Stunned,
+    Frozen,
+//    Thawed,
+//    StunnedSomeone,
+//    SteppedOnEnemy,
+//    TriggeredPowerup,
+    Died,
+    Jumped,
+//    LookedXDirection,   // any, up, right, down, left
+//    Ran,
+    ReachedCoinLimit,
+    Disqualified,
+//    XSecondRemaining,   // 60, 10
+//    EveryXSecond, // 1, 5, 10, 15, 30, 60
+//    SongBahd,
+    ReachedZeroCoins,
+    ReachedZeroStars,
+//    GotStarcoin,
+//    EnteredPipe,
+//    GrabbedSomething,
+    FinishedLap,
+//    TouchedGround,
+//    StoppedMoving,
+//    KilledSomeone,
+//    HarmedSomeone,
+}
+
+enum TriggerAction {
+    GiveStar,
+    GiveCoin,
+    Kill,
+    RemoveStar,
+    RemoveCoin,
+    GiveXPowerup,   // random, mushroom, fire, ice, propeller, shell, hammer, starman, mega, mini
+//    GiveLife,
+    Win,
+    DrawMatch,
+    Disqualify,
+    Stun,    // bump, knockback, hardknockback
+//    Dive,
+//    Launch,
+    Freeze,
+    Harm,
+    SpawnXPowerup,   // random, mushroom, fire, ice, propeller, shell, hammer, starman, mega, mini
+//    SpawnXEnemy,    // random, goomba, Gkoopa, Rkoopa, Bkoopa, bulletbill, boo, spiny, bobomb
+    RespawnLevel,
+//    ExplodeLevel,
+//    RandomTeleport,
+    RemoveReserve,
+    GiveXReserve,   // random, mushroom, fire, ice, propeller, shell, hammer, starman, mega, mini
+    GiveIFrames,
+    SpawnLooseCoin,
+    SpawnLooseStar,
+    ZeroCoins,
+    ZeroStars,
+    MaxCoins,
+//    SpawnStar,
+//    BecomeXTeam,    // random, A, B, C, D, E
+}
+
+enum TriggerConstraint {
+    Always,
+    IsMoving,
+    IsStationary,
+    IsAirborne,
+    IsGrounded,
+    IsXPowerup,   // small, mushroom, fire, ice, propeller, shell, hammer, starman, mega, mini
+    IsNotXPowerup,   // small, mushroom, fire, ice, propeller, shell, hammer, starman, mega, mini
+    IsFrozen,
+    IsNotFrozen,
+    IsUnderwater,
+    IsNotUnderwater,
+    HasXCoins,  // any X in valid range vvv
+    HasXStars,
+    HasXLives,
+    HasLessThanXCoins,
+    HasLessThanXStars,
+    HasLessThanXLives,
+    HasMoreThanXCoins,
+    HasMoreThanXStars,
+    HasMoreThanXLives,
+    TimerIsLessThanX,
+    TimerIsMoreThanX,
+    StarsExist,
+    StarsNotExist,
+    EnemiesExist,
+    EnemiesNotExist,
+    CoinsExist,
+    CoinsNotExist,
+    XPlayersRemaining,
+    LessThanXPlayersRemaining,
+    MoreThanXPlayersRemaining,
+}
+
+enum TriggerTarget {
+    Everyone,
+    Any,
+    OneRandom,
+    Randoms,
+    Conditioner,
+    ConditionerTeam,
+    NonConditioner,
+    NonConditionerTeam,
+    Actioner,
+    ActionerTeam,
+    NonActioner,
+    NonActionerTeam,
+    Host,
+    NonHost,
+//    FirstPlace,
+//    NonFirstPlace,
+//    LastPlace,
+//    NonLastPlace,
+    TeamA,
+    NonTeamA,
+    TeamB,
+    NonTeamB,
+    TeamC,
+    NonTeamC,
+    TeamD,
+    NonTeamD,
+    TeamE,
+    NonTeamE,
+}
+
+enum TriggerParameter {
+    Random,
+    Mushroom,
+    Fire,
+    Ice,
+    Propeller,
+    Shell,
+    Hammer,
+    Starman,
+    Mega,
+    Mini,
+    Goomba,
+    GreenKoopa,
+    RedKoopa,
+    BlueKoopa,
+    BulletBill,
+    Boo,
+    Spiny,
+    Bobomb,
+    Buzzy,
+    A,
+    B,
+    C,
+    D,
+    E,
+    Bump,
+    Knockback,
+    HardKnockback,
+    Force,
 }
 
 signal OnLoadingComplete();
@@ -86,6 +302,14 @@ synced event HostChanged {
 synced event RulesChanged {
 	bool GamemodeChanged;
 	bool MapChanged;
+}
+
+synced event TriggersChanged {
+    Frame Frame;
+}
+
+synced event PowerupChancesChanged {
+    Frame Frame;
 }
 
 synced event HostCloseRulesPanel {

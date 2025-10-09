@@ -22,6 +22,7 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
         }
         public virtual bool CanIncreaseValue => true;
         public virtual bool CanDecreaseValue => true;
+        public object Value => value;
 
         //---Serialized Variables
         [SerializeField] protected MainMenuCanvas canvas;
@@ -56,7 +57,7 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
             TranslationManager.OnLanguageChanged -= OnLanguageChanged;
         }
 
-        public unsafe void OnSubmit(BaseEventData eventData) {
+        public virtual unsafe void OnSubmit(BaseEventData eventData) {
             if (clickToEdit && Editing) {
                 Editing = false;
                 canvas.PlaySound(SoundEffect.UI_Back);
@@ -95,7 +96,7 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
             }
         }
 
-        public unsafe void OnPointerClick(PointerEventData eventData) {
+        public virtual unsafe void OnPointerClick(PointerEventData eventData) {
             if (!interactable) {
                 return;
             }
@@ -189,7 +190,7 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
             label.text = labelPrefix + value.ToString();
         }
 
-        private void FindValue(in GameRules rules) {
+        protected virtual void FindValue(in GameRules rules) {
             value = ruleType switch {
                 CommandChangeRules.Rules.Stage => rules.Stage,
                 CommandChangeRules.Rules.Gamemode => rules.Gamemode,

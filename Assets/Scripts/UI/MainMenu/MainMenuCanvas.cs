@@ -120,7 +120,7 @@ namespace NSMB.UI.MainMenu {
             //     headerPath.horizontalAlignment = rtl ? HorizontalAlignmentOptions.Right : HorizontalAlignmentOptions.Left;
             // }
 
-            var currentSubmenu = submenuStack.Last();
+            var currentSubmenu = submenuStack.Last(submenu => submenu.ShowHeader);
             headerPath.text = currentSubmenu.Header;
 
             Color newColor = currentSubmenu.HeaderColor ?? defaultHeaderColor;
