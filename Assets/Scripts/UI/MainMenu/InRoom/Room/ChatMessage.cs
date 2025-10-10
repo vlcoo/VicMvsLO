@@ -35,7 +35,7 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
                 TranslationManager.OnLanguageChanged += OnLanguageChanged;
                 OnLanguageChanged(GlobalController.Instance.translationManager);
             } else {
-                chatText.richText = false;
+                // chatText.richText = false;
                 chatText.text = data.message;
             }
 

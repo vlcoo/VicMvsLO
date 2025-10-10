@@ -1,6 +1,7 @@
 using Photon.Deterministic;
 using Quantum.Prototypes;
 using System;
+using UnityEngine;
 
 namespace Quantum {
     public abstract unsafe class GamemodeAsset : AssetObject {
@@ -10,6 +11,7 @@ namespace Quantum {
         public AssetRef<CoinItemAsset>[] AllCoinItems;
         public AssetRef<CoinItemAsset> FallbackCoinItem;
         public AssetRef<EntityPrototype> LooseCoinPrototype;
+        public Sprite Icon;
 
         public GameRulesPrototype DefaultRules;
 

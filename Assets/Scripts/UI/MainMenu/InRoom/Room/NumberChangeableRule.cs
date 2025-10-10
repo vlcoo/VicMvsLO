@@ -1,36 +1,37 @@
 using NSMB.UI.Translation;
 using Quantum;
+using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace NSMB.UI.MainMenu.Submenus.InRoom {
-    public class NumberChangeableRule : ChangeableRule {
-
-        //---Properties
-        public override bool CanIncreaseValue => (int) value < maxValue;
-        public override bool CanDecreaseValue => (int) value > minValue;
-
+    public class NumberChangeableRule : MonoBehaviour {
         //---Serialized Variables
-        [SerializeField] protected int minValue = 0, maxValue = 20, step = 1;
+        [SerializeField] protected int minValue = 1, maxValue = 99;
         [SerializeField] protected bool minimumValueIsOff;
 
-        protected override void IncreaseValueInternal() {
-            int intValue = (int) value;
-            value = Mathf.Clamp(intValue + step, minValue, maxValue);
-
-            if (intValue != (int) value) {
-                cursorSfx.Play();
-                SendCommand();
-            }
+        public Toggle toggle;
+        public TMP_InputField inputField;
+        
+        public void Start() {
+            QuantumEvent.Subscribe<EventRulesChanged>(this, OnRulesChanged);
+            QuantumCallback.Subscribe<CallbackGameStarted>(this, OnGameStarted);
         }
 
-        protected override void DecreaseValueInternal() {
-            int intValue = (int) value;
-            value = Mathf.Clamp(intValue - step, minValue, maxValue);
+        private unsafe void OnRulesChanged(EventRulesChanged e) {
+            
+        }
+    
+        private unsafe void OnGameStarted(CallbackGameStarted e) {
+            
+        }
+        
+        public void OnToggleChanged(bool how) {
+            
+        }
 
-            if (intValue != (int) value) {
-                cursorSfx.Play();
-                SendCommand();
-            }
+        public void OnInputFieldChanged(string value) {
+            
         }
 
         private unsafe void SendCommand() {
@@ -58,7 +59,7 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
             game.SendCommand(slot, cmd);
         }
 
-        protected override void UpdateLabel() {
+        protected void UpdateLabel() {
             TranslationManager tm = GlobalController.Instance.translationManager;
             if (value is int intValue) {
                 label.text = labelPrefix + ((minimumValueIsOff && intValue == minValue) ? tm.GetTranslation("ui.generic.off") : intValue);

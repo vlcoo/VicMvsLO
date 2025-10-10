@@ -31,6 +31,7 @@ namespace Quantum {
             f.Context.Interactions.Register<MarioPlayer, Projectile>(f, OnMarioProjectileInteraction);
             f.Context.Interactions.Register<MarioPlayer, Coin>(f, OnMarioCoinInteraction);
             f.Context.Interactions.Register<MarioPlayer, InvisibleBlock>(f, OnMarioInvisibleBlockInteraction);
+            f.Context.Interactions.Register<MarioPlayer, Goal>(f, OnMarioGoalInteraction);
             PhysicsObjectSystemFilterGetter = f.Unsafe.ComponentGetter<PhysicsObjectSystem.Filter>();
         }
 
@@ -1986,6 +1987,35 @@ namespace Quantum {
         }
 
         #region Interactions
+        public static void OnMarioGoalInteraction(Frame f, EntityRef marioEntity, EntityRef goalEntity) {
+            if (!f.Exists(goalEntity) || f.DestroyPending(goalEntity)) {
+                return;
+            }
+            
+            var goal = f.Unsafe.GetPointer<Goal>(goalEntity);
+            var mario = f.Unsafe.GetPointer<MarioPlayer>(marioEntity);
+            if (mario->IsDead) {
+                return;
+            }
+            
+            mario->Laps++;
+            var lastLap = true;
+            if (mario->Laps < f.Global->Rules.Laps) {
+                var stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
+                var transform = f.Unsafe.GetPointer<Transform2D>(marioEntity);
+                var spawnpoint = stage.GetWorldSpawnpointForPlayer(mario->SpawnpointIndex, f.Global->TotalMarios);
+                transform->Position = spawnpoint;
+                f.Unsafe.GetPointer<CameraController>(marioEntity)->Recenter(stage, spawnpoint);
+                mario->DamageInvincibilityFrames = 2 * 60;
+                lastLap = false;
+            }
+            
+            f.Signals.OnMarioTouchedGoal(marioEntity, goalEntity, lastLap);
+            f.Events.MarioTouchedGoal(f, marioEntity, *mario, lastLap, f.Unsafe.GetPointer<Transform2D>(goalEntity)->Position, goal->IsOrb);
+            
+            if (lastLap && goal->IsOrb) f.Destroy(goalEntity);
+        }
+        
         public static bool OnMarioInvisibleBlockInteraction(Frame f, EntityRef marioEntity, EntityRef invisibleBlockEntity, PhysicsContact contact) {
             var mario = f.Unsafe.GetPointer<MarioPlayer>(marioEntity);
             var invisibleBlock = f.Unsafe.GetPointer<InvisibleBlock>(invisibleBlockEntity);

@@ -179,6 +179,7 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
             }
 #endif
 
+            Debug.Log("update state");
             UpdateLabel();
             try {
                 leftArrow.enabled = Editing && CanDecreaseValue;
@@ -187,6 +188,7 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
         }
 
         protected virtual void UpdateLabel() {
+            Debug.Log("update label");
             label.text = labelPrefix + value.ToString();
         }
 
@@ -203,11 +205,13 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
                 CommandChangeRules.Rules.TeamsEnabled => (bool) rules.TeamsEnabled,
                 _ => null
             };
+            Debug.Log("find value: " + ruleType + " = " + value);
 
             UpdateState();
         }
 
         private unsafe void OnRulesChanged(EventRulesChanged e) {
+            Debug.Log("rules changed");
             FindValue(e.Game.Frames.Predicted.Global->Rules);
         }
 

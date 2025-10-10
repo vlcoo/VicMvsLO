@@ -95,7 +95,7 @@ namespace NSMB.Entities.Player {
         //---Serialized Variables
         [SerializeField] private CharacterAsset character;
         [SerializeField] private PlayerElements playerElementsPrefab;
-        [SerializeField] private GameObject coinNumberParticle, coinFromBlockParticle, respawnParticle, starCollectParticle;
+        [SerializeField] private GameObject coinNumberParticle, coinFromBlockParticle, respawnParticle, starCollectParticle, goalOrbParticle;
         [SerializeField] private Animator animator;
         [SerializeField] private Avatar smallAvatar, largeAvatar;
         [SerializeField] private Shader normalShader, rainbowShader;
@@ -192,6 +192,7 @@ namespace NSMB.Entities.Player {
             QuantumEvent.Subscribe<EventPhysicsObjectLanded>(this, OnPhysicsObjectLanded, FilterOutReplayFastForward);
             QuantumEvent.Subscribe<EventMarioPlayerLandedWithAnimation>(this, OnMarioPlayerLandedWithAnimation, FilterOutReplayFastForward);
             QuantumEvent.Subscribe<EventEnemyKicked>(this, OnEnemyKicked, FilterOutReplayFastForward);
+            QuantumEvent.Subscribe<EventMarioTouchedGoal>(this, OnMarioTouchedGoal, FilterOutReplayFastForward);
         }
 
         public override void OnActivate(Frame f) {
@@ -1238,6 +1239,15 @@ namespace NSMB.Entities.Player {
             if (animator.GetCurrentAnimatorStateInfo(0).shortNameHash == StateFalling) {
                 animator.Play(StateJumplanding);
             }
+        }
+        
+        private void OnMarioTouchedGoal(EventMarioTouchedGoal e) {
+            if (e.Entity != EntityRef) {
+                return;
+            }
+
+            PlaySound(e.LastLap ? SoundEffect.World_Goal_Last : SoundEffect.World_Goal_Non_Last);
+            if (e.LastLap && e.IsOrb) Instantiate(goalOrbParticle, e.Position.ToUnityVector3(), Quaternion.identity);
         }
 
         private void OnEnemyKicked(EventEnemyKicked e) {

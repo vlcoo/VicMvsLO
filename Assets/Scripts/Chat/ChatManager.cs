@@ -51,33 +51,33 @@ namespace NSMB.Chat {
         }
 
         private void OnUpdateView(CallbackUpdateView e) {
-            Frame f = e.Game.Frames.Predicted;
-            ref var rules = ref f.Global->Rules;
-
-            TranslationManager tm = GlobalController.Instance.translationManager;
-            if (rules.Gamemode != currentGamemode) {
-                RemoveChatMessage(changeGamemodeMessage);
-                string gamemodeName;
-                if (f.TryFindAsset(rules.Gamemode, out GamemodeAsset gamemode)) {
-                    gamemodeName = tm.GetTranslation(gamemode.TranslationKey);
-                } else {
-                    gamemodeName = "???";
-                }
-                changeGamemodeMessage = AddSystemMessage("ui.inroom.chat.server.gamemode", Red, "gamemode", gamemodeName);
-                currentGamemode = rules.Gamemode;
-            }
-            if (rules.Stage != currentMap) {
-                RemoveChatMessage(changeMapMessage);
-                string stageName;
-                if (f.TryFindAsset(rules.Stage, out Map map)
-                    && f.TryFindAsset(map.UserAsset, out VersusStageData stageData)) {
-                    stageName = tm.GetTranslation(stageData.TranslationKey);
-                } else {
-                    stageName = "???";
-                }
-                changeMapMessage = AddSystemMessage("ui.inroom.chat.server.map", Red, "map", stageName);
-                currentMap = rules.Stage;
-            }
+            // Frame f = e.Game.Frames.Predicted;
+            // ref var rules = ref f.Global->Rules;
+            //
+            // TranslationManager tm = GlobalController.Instance.translationManager;
+            // if (rules.Gamemode != currentGamemode) {
+            //     RemoveChatMessage(changeGamemodeMessage);
+            //     string gamemodeName;
+            //     if (f.TryFindAsset(rules.Gamemode, out GamemodeAsset gamemode)) {
+            //         gamemodeName = tm.GetTranslation(gamemode.TranslationKey);
+            //     } else {
+            //         gamemodeName = "???";
+            //     }
+            //     changeGamemodeMessage = AddSystemMessage("ui.inroom.chat.server.gamemode", Red, "gamemode", gamemodeName);
+            //     currentGamemode = rules.Gamemode;
+            // }
+            // if (rules.Stage != currentMap) {
+            //     RemoveChatMessage(changeMapMessage);
+            //     string stageName;
+            //     if (f.TryFindAsset(rules.Stage, out Map map)
+            //         && f.TryFindAsset(map.UserAsset, out VersusStageData stageData)) {
+            //         stageName = tm.GetTranslation(stageData.TranslationKey);
+            //     } else {
+            //         stageName = "???";
+            //     }
+            //     changeMapMessage = AddSystemMessage("ui.inroom.chat.server.map", Red, "map", stageName);
+            //     currentMap = rules.Stage;
+            // }
         }
 
         public ChatMessageData AddChatMessage(string message, PlayerRef player, Frame f, Color? color = null, bool filter = false) {
@@ -150,13 +150,13 @@ namespace NSMB.Chat {
             // Format message, in case we can't trust the host to do it for us.
             string message = e.Message;
             message = message[..Mathf.Min(128, message.Length)];
-            message = message.Replace("\n", " ").Trim();
+            message = message.Replace("\n", " ").Trim().Replace("</noparse>", "");
 
             // Add username
             Frame f = e.Game.Frames.Verified;
             RuntimePlayer runtimeData = f.GetPlayerData(e.Player);
             message =
-                $"<line-height=30><size=16><i>{runtimeData.PlayerNickname.ToValidNickname(f, e.Player)}\n</i></size></line-height>{message.Filter()}";
+                $"<line-height=30><size=16><i>{runtimeData.PlayerNickname.ToValidNickname(f, e.Player)}\n</i></size></line-height><noparse>{message.Filter()}</noparse>";
 
             AddChatMessage(message, e.Player, f);
         }
@@ -191,9 +191,9 @@ namespace NSMB.Chat {
         }
 
         private void OnHostChanged(EventHostChanged e) {
-            if (e.Game.PlayerIsLocal(e.NewHost)) {
-                AddSystemMessage("ui.inroom.chat.hostreminder", Red);
-            }
+            // if (e.Game.PlayerIsLocal(e.NewHost)) {
+            //     AddSystemMessage("ui.inroom.chat.hostreminder", Red);
+            // }
         }
     }
 }
