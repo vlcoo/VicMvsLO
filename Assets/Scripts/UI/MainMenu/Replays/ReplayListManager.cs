@@ -250,7 +250,7 @@ namespace NSMB.UI.MainMenu.Submenus.Replays {
             builder.AppendLine(gamemodeName);
 
             if (gamemode is CoinRunnersGamemode) {
-                builder.Append("<sprite name=room_timer> ").Append(Utils.SecondsToMinuteSeconds(rules.TimerMinutes * 60)).Append("    ");
+                builder.Append("<sprite name=room_timer> ").Append(Utils.SecondsToMinuteSeconds(rules.TimerSeconds)).Append("    ");
                 builder.Append("<sprite name=room_coins> ").Append(rules.CoinsForPowerup).Append("    ");
                 builder.Append("<sprite name=room_lives> ").Append(rules.Lives > 0 ? rules.Lives : off).Append("    ");
                 builder.Append("<sprite name=room_powerups>").Append(rules.CustomPowerupsEnabled ? on : off).Append("    ");
@@ -260,7 +260,7 @@ namespace NSMB.UI.MainMenu.Submenus.Replays {
                 builder.Append("<sprite name=room_stars> ").Append(rules.StarsToWin).Append("    ");
                 builder.Append("<sprite name=room_coins> ").Append(rules.CoinsForPowerup).Append("    ");
                 builder.Append("<sprite name=room_lives> ").Append(rules.Lives > 0 ? rules.Lives : off).Append("    ");
-                builder.Append("<sprite name=room_timer> ").Append(rules.TimerMinutes > 0 ? Utils.SecondsToMinuteSeconds(rules.TimerMinutes * 60) : off).Append("    ");
+                builder.Append("<sprite name=room_timer> ").Append(rules.TimerSeconds > 0 ? Utils.SecondsToMinuteSeconds(rules.TimerSeconds) : off).Append("    ");
                 builder.Append("<sprite name=room_powerups>").Append(rules.CustomPowerupsEnabled ? on : off).Append("    ");
                 builder.Append("<sprite name=room_teams>").AppendLine(rules.TeamsEnabled ? on : off);
             } 

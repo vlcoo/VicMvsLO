@@ -7,7 +7,7 @@ using UnityEngine.UI;
 namespace NSMB.UI.MainMenu.Submenus.InRoom {
     public class NumberChangeableRule : MonoBehaviour {
         //---Serialized Variables
-        [SerializeField] protected int minValue = 1, maxValue = 99;
+        [SerializeField] protected int minValue = 1, maxValue = 1000;
         [SerializeField] protected bool minimumValueIsOff;
 
         public Toggle toggle;
@@ -34,36 +34,36 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
             
         }
 
-        private unsafe void SendCommand() {
-            CommandChangeRules cmd = new CommandChangeRules {
-                EnabledChanges = ruleType,
-            };
-
-            switch (ruleType) {
-            case CommandChangeRules.Rules.StarsToWin:
-                cmd.StarsToWin = (int) value;
-                break;
-            case CommandChangeRules.Rules.CoinsForPowerup:
-                cmd.CoinsForPowerup = (int) value;
-                break;
-            case CommandChangeRules.Rules.Lives:
-                cmd.Lives = (int) value;
-                break;
-            case CommandChangeRules.Rules.TimerMinutes:
-                cmd.TimerMinutes = (int) value;
-                break;
-            }
-
-            QuantumGame game = QuantumRunner.DefaultGame;
-            int slot = game.GetLocalPlayerSlots()[game.GetLocalPlayers().IndexOf(game.Frames.Predicted.Global->Host)];
-            game.SendCommand(slot, cmd);
-        }
-
-        protected void UpdateLabel() {
-            TranslationManager tm = GlobalController.Instance.translationManager;
-            if (value is int intValue) {
-                label.text = labelPrefix + ((minimumValueIsOff && intValue == minValue) ? tm.GetTranslation("ui.generic.off") : intValue);
-            }
-        }
+        // private unsafe void SendCommand() {
+        //     CommandChangeRules cmd = new CommandChangeRules {
+        //         EnabledChanges = ruleType,
+        //     };
+        //
+        //     switch (ruleType) {
+        //     case CommandChangeRules.Rules.StarsToWin:
+        //         cmd.StarsToWin = (int) value;
+        //         break;
+        //     case CommandChangeRules.Rules.CoinsForPowerup:
+        //         cmd.CoinsForPowerup = (int) value;
+        //         break;
+        //     case CommandChangeRules.Rules.Lives:
+        //         cmd.Lives = (int) value;
+        //         break;
+        //     case CommandChangeRules.Rules.TimerSeconds:
+        //         cmd.TimerSeconds = (int) value;
+        //         break;
+        //     }
+        //
+        //     QuantumGame game = QuantumRunner.DefaultGame;
+        //     int slot = game.GetLocalPlayerSlots()[game.GetLocalPlayers().IndexOf(game.Frames.Predicted.Global->Host)];
+        //     game.SendCommand(slot, cmd);
+        // }
+        //
+        // protected void UpdateLabel() {
+        //     TranslationManager tm = GlobalController.Instance.translationManager;
+        //     if (value is int intValue) {
+        //         label.text = labelPrefix + ((minimumValueIsOff && intValue == minValue) ? tm.GetTranslation("ui.generic.off") : intValue);
+        //     }
+        // }
     }
 }

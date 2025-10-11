@@ -36,7 +36,7 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
             foreach (var hide in hideWhenNotSelected) {
                 hide.SetActive(false);
             }
-            header.color = deselectedColor;
+            // header.color = deselectedColor;
         }
 
         public virtual bool TryGoBack(out bool playSound) {

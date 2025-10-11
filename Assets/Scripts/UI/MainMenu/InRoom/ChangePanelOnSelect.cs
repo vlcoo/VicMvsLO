@@ -14,7 +14,7 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
         }
 
         public void OnSelect(BaseEventData eventData) {
-            roomMenu.SelectPanel(panelToSelect, false);
+            // roomMenu.SelectPanel(panelToSelect, false);
         }
     }
 }

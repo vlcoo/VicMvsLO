@@ -54,14 +54,14 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
         }
 
         //---Serialized Variables
-        [SerializeField] private InRoomSubmenuPanel defaultSelectedPanel;
+        // [SerializeField] private InRoomSubmenuPanel defaultSelectedPanel;
         [SerializeField] private AudioSource sfx, musicSource;
         [SerializeField] private List<InRoomSubmenuPanel> allPanels;
         [SerializeField] private TMP_Text startGameButtonText;
         [SerializeField] private UnityEngine.UI.Button startGameButton;
 
         //---Private Variables
-        private InRoomSubmenuPanel selectedPanel;
+        // private InRoomSubmenuPanel selectedPanel;
         private int lastCountdownStartFrame;
         private bool countdownStarted;
         private Coroutine fadeMusicCoroutine;
@@ -93,8 +93,8 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
             foreach (var panel in allPanels) {
                 panel.Deselect();
             }
-            selectedPanel = defaultSelectedPanel;
-            selectedPanel.Select(true);
+            // selectedPanel = defaultSelectedPanel;
+            // selectedPanel.Select(true);
         }
 
         public void OnDisable() {
@@ -138,29 +138,29 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
         }
 
         public void SelectPanel(InRoomSubmenuPanel panel, bool setDefault) {
-            if (panel == selectedPanel) {
-                return;
-            }
-
-            if (selectedPanel) {
-                selectedPanel.Deselect();
-            }
-            selectedPanel = panel;
-            selectedPanel.Select(setDefault);
-
-            sfx.Play();
+            // if (panel == selectedPanel) {
+            //     return;
+            // }
+            //
+            // if (selectedPanel) {
+            //     selectedPanel.Deselect();
+            // }
+            // selectedPanel = panel;
+            // selectedPanel.Select(setDefault);
+            //
+            // sfx.Play();
         }
 
         public void SelectPreviousPanel() {
-            if (selectedPanel && selectedPanel.leftPanel) {
-                SelectPanel(selectedPanel.leftPanel, true);
-            }
+            // if (selectedPanel && selectedPanel.leftPanel) {
+            //     SelectPanel(selectedPanel.leftPanel, true);
+            // }
         }
 
         public void SelectNextPanel() {
-            if (selectedPanel && selectedPanel.rightPanel) {
-                SelectPanel(selectedPanel.rightPanel, true);
-            }
+            // if (selectedPanel && selectedPanel.rightPanel) {
+            //     SelectPanel(selectedPanel.rightPanel, true);
+            // }
         }
 
         //---Helpers

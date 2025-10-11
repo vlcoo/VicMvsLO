@@ -232,7 +232,7 @@ namespace NSMB.Networking {
                 StarRequirement = rules.StarsToWin,
                 CoinRequirement = rules.CoinsForPowerup,
                 Lives = rules.Lives,
-                Timer = rules.TimerMinutes,
+                Timer = rules.TimerSeconds,
             };
             BooleanProperties boolProperties = new BooleanProperties {
                 GameStarted = f.Global->GameState != GameState.PreGameRoom,

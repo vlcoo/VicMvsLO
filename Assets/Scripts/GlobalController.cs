@@ -115,13 +115,13 @@ namespace NSMB {
                     }
                 }
 
-                if (UnityEngine.Input.GetKeyDown(KeyCode.Alpha9)) {
-                    var canvas = FindFirstObjectByType<MainMenuCanvas>();
-                    if (canvas) {
-                        var blur = canvas.transform.Find("MainMenu").Find("Blur").gameObject;
-                        blur.SetActive(!blur.activeSelf);
-                    }
-                }
+                // if (UnityEngine.Input.GetKeyDown(KeyCode.Alpha9)) {
+                //     var canvas = FindFirstObjectByType<MainMenuCanvas>();
+                //     if (canvas) {
+                //         var blur = canvas.transform.Find("MainMenu").Find("Blur").gameObject;
+                //         blur.SetActive(!blur.activeSelf);
+                //     }
+                // }
 
             }
 

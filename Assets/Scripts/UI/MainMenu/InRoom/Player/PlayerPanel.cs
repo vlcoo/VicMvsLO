@@ -26,7 +26,7 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
         }
 
         public override void Initialize() {
-            playerList.Initialize();
+            // playerList.Initialize();
         }
 
         public override bool TryGoBack(out bool playSound) {

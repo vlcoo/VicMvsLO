@@ -268,7 +268,7 @@ namespace NSMB.UI.Game {
             int coinRequirement = rules.CoinsForPowerup;
             bool teamsEnabled = rules.TeamsEnabled;
             bool livesEnabled = rules.IsLivesEnabled;
-            bool timerEnabled = rules.TimerMinutes > 0;
+            bool timerEnabled = rules.TimerSeconds > 0;
 
             // TIMER
             if (timerEnabled) {

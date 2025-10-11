@@ -11,7 +11,7 @@ namespace Quantum {
         public int StarsToWin;
         public int CoinsForPowerup;
         public int Lives;
-        public int TimerMinutes;
+        public int TimerSeconds;
         public bool TeamsEnabled;
         public bool CustomPowerupsEnabled;
         public bool DrawOnTimeUp;
@@ -56,7 +56,7 @@ namespace Quantum {
             stream.Serialize(ref StarsToWin);
             stream.Serialize(ref CoinsForPowerup);
             stream.Serialize(ref Lives);
-            stream.Serialize(ref TimerMinutes);
+            stream.Serialize(ref TimerSeconds);
             stream.Serialize(ref TeamsEnabled);
             stream.Serialize(ref CustomPowerupsEnabled);
             stream.Serialize(ref DrawOnTimeUp);
@@ -111,7 +111,7 @@ namespace Quantum {
                 rules = tempRules;
             }
             if (rulesChanges.HasFlag(Rules.Stage)) {
-                // levelChanged = rules.Stage != Stage;
+                levelChanged = rules.Stage != Stage;
                 rules.Stage = Stage;
             }
             if (rulesChanges.HasFlag(Rules.StarsToWin)) {
@@ -123,8 +123,11 @@ namespace Quantum {
             if (rulesChanges.HasFlag(Rules.Lives)) {
                 rules.Lives = Lives;
             }
-            if (rulesChanges.HasFlag(Rules.TimerMinutes)) {
-                rules.TimerMinutes = TimerMinutes;
+            if (rulesChanges.HasFlag(Rules.Laps)) {
+                rules.Laps = Laps;
+            }
+            if (rulesChanges.HasFlag(Rules.TimerSeconds)) {
+                rules.TimerSeconds = TimerSeconds;
             }
             if (rulesChanges.HasFlag(Rules.TeamsEnabled)) {
                 rules.TeamsEnabled = TeamsEnabled;
@@ -152,7 +155,7 @@ namespace Quantum {
             StarsToWin = 1 << 2,
             CoinsForPowerup = 1 << 3,
             Lives = 1 << 4,
-            TimerMinutes = 1 << 5,
+            TimerSeconds = 1 << 5,
             TeamsEnabled = 1 << 6,
             CustomPowerupsEnabled = 1 << 7,
             DrawOnTimeUp = 1 << 8,

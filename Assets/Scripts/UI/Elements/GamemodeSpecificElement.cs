@@ -8,10 +8,10 @@ namespace NSMB.UI.Elements {
 
         //---Serialized Variables
         [SerializeField] private List<AssetRef<GamemodeAsset>> gamemodes;
-        private Selectable selectable;
+        private List<Selectable> selectables = new();
 
         public void Awake() {
-            selectable = GetComponent<Selectable>();
+            GetComponentsInChildren(selectables);
             QuantumCallback.Subscribe<CallbackGameStarted>(this, OnGameStarted);
             QuantumEvent.Subscribe<EventRulesChanged>(this, OnRulesChanged);
 
@@ -24,7 +24,10 @@ namespace NSMB.UI.Elements {
         public unsafe void Apply(QuantumGame game) {
             Frame f = game.Frames.Predicted;
             // gameObject.SetActive(gamemodes.Contains(f.Global->Rules.Gamemode));
-            selectable.interactable = gamemodes.Contains(f.Global->Rules.Gamemode);
+            var active = gamemodes.Contains(f.Global->Rules.Gamemode);
+            foreach (var selectable in selectables) {
+                selectable.interactable = active;
+            }
         }
 
         private void OnGameStarted(CallbackGameStarted e) {

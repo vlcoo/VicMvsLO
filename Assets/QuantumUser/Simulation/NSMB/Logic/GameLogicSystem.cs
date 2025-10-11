@@ -85,7 +85,7 @@ namespace Quantum {
                     f.Global->RealPlayers = (byte) loadedPlayers;
                     f.Global->GameState = GameState.Starting;
                     f.Global->GameStartFrames = (ushort) (6 * f.UpdateRate);
-                    f.Global->Timer = f.Global->Rules.TimerMinutes * 60;
+                    f.Global->Timer = f.Global->Rules.TimerSeconds;
 
                     f.Signals.OnLoadingComplete();
                     f.Events.GameStateChanged(GameState.Starting);
@@ -124,7 +124,7 @@ namespace Quantum {
                 break;
 
             case GameState.Playing:
-                if (f.Global->Rules.TimerMinutes > 0 && f.Global->Timer > 0) {
+                if (f.Global->Rules.TimerSeconds > 0 && f.Global->Timer > 0) {
                     if ((f.Global->Timer -= f.DeltaTime) <= 0) {
                         f.Global->Timer = 0;
                         CheckForGameEnd(f);

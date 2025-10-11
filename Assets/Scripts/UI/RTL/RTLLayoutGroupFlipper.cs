@@ -19,6 +19,7 @@ namespace NSMB.UI.RTL {
         }
 
         protected override void ApplyDirection(bool rtl) {
+            return;
             bool newValue = rtl ? !isFlippedByDefault : isFlippedByDefault;
             if (component.reverseArrangement == newValue) {
                 return;

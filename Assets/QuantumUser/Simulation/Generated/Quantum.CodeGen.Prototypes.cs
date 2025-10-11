@@ -401,7 +401,7 @@ namespace Quantum.Prototypes {
     public Int32 StarsToWin;
     public Int32 CoinsForPowerup;
     public Int32 Lives;
-    public Int32 TimerMinutes;
+    public Int32 TimerSeconds;
     public QBoolean TeamsEnabled;
     public QBoolean CustomPowerupsEnabled;
     public QBoolean DrawOnTimeUp;
@@ -444,7 +444,7 @@ namespace Quantum.Prototypes {
         result.StarsToWin = this.StarsToWin;
         result.CoinsForPowerup = this.CoinsForPowerup;
         result.Lives = this.Lives;
-        result.TimerMinutes = this.TimerMinutes;
+        result.TimerSeconds = this.TimerSeconds;
         result.TeamsEnabled = this.TeamsEnabled;
         result.CustomPowerupsEnabled = this.CustomPowerupsEnabled;
         result.DrawOnTimeUp = this.DrawOnTimeUp;

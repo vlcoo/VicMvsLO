@@ -141,7 +141,7 @@ namespace NSMB {
                     };
 
                     long now = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
-                    if (f.Global->Rules.TimerMinutes > 0) {
+                    if (f.Global->Rules.TimerSeconds > 0) {
                         activity.Timestamps = new() { End = now + (f.Global->Timer * 1000).AsLong };
                     } else {
                         activity.Timestamps = new() { Start = now - ((f.Number - f.Global->StartFrame) * f.DeltaTime * 1000).AsLong };

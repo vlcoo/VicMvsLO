@@ -29,7 +29,7 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
         private Coroutine autoRefreshCoroutine;
         private readonly List<PlayerListEntry> playerListEntries = new(Constants.MaxPlayers);
 
-        public void Initialize() {
+        public void Start() {
             playerListEntries.Add(template);
             for (int i = 1; i < Constants.MaxPlayers; i++) {
                 playerListEntries.Add(Instantiate(template, template.transform.parent));
