@@ -68,7 +68,7 @@ namespace NSMB.Tiles {
 
                     tilemap.SetTile(coords, unityTile);
                     Matrix4x4 mat = Matrix4x4.TRS(Vector3.zero, Quaternion.Euler(0, 0, tileInstance.Rotation / (float) (ushort.MaxValue / 360f)), scale);
-                    tilemap.SetTransformMatrix(coords, mat);
+                    // tilemap.SetTransformMatrix(coords, mat);
                     tilemap.RefreshTile(coords);
                     if (unityTile is AnimatedTile at) {
                         tilemap.SetAnimationTime(coords, (float) (Time.timeAsDouble - startTime) * at.m_MaxSpeed % at.m_AnimatedSprites.Length);
@@ -95,7 +95,7 @@ namespace NSMB.Tiles {
             if (undoData.Count == 1) {
                 // This is a cancelled tile change event.
                 tilemap.SetTile(coords, undoData[0].tile);
-                tilemap.SetTransformMatrix(coords, undoData[0].transform);
+                // tilemap.SetTransformMatrix(coords, undoData[0].transform);
                 tilemap.RefreshTile(coords);
                 if (undoData[0].tile is AnimatedTile at) {
                     tilemap.SetAnimationTime(coords, (float) (Time.timeAsDouble - startTime) * at.m_MaxSpeed % at.m_AnimatedSprites.Length);

@@ -28,7 +28,7 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
             foreach (var rule in rules) {
                 rule.Initialize();
             }
-            chat.Initialize();
+            // chat.Initialize();
         }
 
         public unsafe void Start() {

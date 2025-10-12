@@ -7,7 +7,7 @@ public class CompanyNameGenerator : MonoBehaviour {
 
     void Start() {
         companyName = GenerateCompanyName();
-        label.text = $"{companyName}<space=-6><font=\"BiosFont\"><size=40><voffset=28>\u00ae";
+        label.text = $"{companyName}<space=-6><font=\"BiosFont\"><size=26><voffset=30>\u00ae";
     }
 
     private static string GenerateCompanyName() {

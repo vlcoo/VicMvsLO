@@ -25,7 +25,7 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
         private readonly List<ChatMessage> chatMessages = new();
         private int previousTextLength;
 
-        public void Initialize() {
+        public void Start() {
             ChatManager.OnChatMessage += OnChatMessage;
             ChatManager.OnChatMessageRemoved += OnChatMessageRemoved;
             Settings.OnDisableChatChanged += OnDisableChatChanged;

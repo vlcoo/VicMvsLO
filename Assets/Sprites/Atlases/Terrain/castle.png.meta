@@ -198,7 +198,7 @@ TextureImporter:
       213: 8270874794024937302
     second: Castle_64
   externalObjects: {}
-  serializedVersion: 11
+  serializedVersion: 13
   mipmaps:
     mipMapMode: 0
     enableMipMap: 0
@@ -220,7 +220,7 @@ TextureImporter:
   streamingMipmaps: 0
   streamingMipmapsPriority: 0
   vTOnly: 0
-  ignoreMasterTextureLimit: 0
+  ignoreMipmapLimit: 0
   grayScaleToAlpha: 0
   generateCubemap: 6
   cubemapConvolution: 0
@@ -260,6 +260,7 @@ TextureImporter:
   ignorePngGamma: 0
   applyGammaDecoding: 0
   swizzle: 50462976
+  cookieLightType: 1
   platformSettings:
   - serializedVersion: 3
     buildTarget: DefaultTexturePlatform
@@ -271,6 +272,7 @@ TextureImporter:
     crunchedCompression: 0
     allowsAlphaSplitting: 0
     overridden: 0
+    ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
   - serializedVersion: 3
@@ -283,6 +285,7 @@ TextureImporter:
     crunchedCompression: 0
     allowsAlphaSplitting: 0
     overridden: 0
+    ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
   - serializedVersion: 3
@@ -295,6 +298,7 @@ TextureImporter:
     crunchedCompression: 0
     allowsAlphaSplitting: 0
     overridden: 0
+    ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
   - serializedVersion: 3
@@ -307,6 +311,7 @@ TextureImporter:
     crunchedCompression: 0
     allowsAlphaSplitting: 0
     overridden: 0
+    ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
   - serializedVersion: 3
@@ -319,6 +324,7 @@ TextureImporter:
     crunchedCompression: 0
     allowsAlphaSplitting: 0
     overridden: 0
+    ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
   - serializedVersion: 3
@@ -331,13 +337,27 @@ TextureImporter:
     crunchedCompression: 0
     allowsAlphaSplitting: 0
     overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: Windows Store Apps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Castle_0
+      name: Castle_0a
       rect:
         serializedVersion: 2
         x: 0
@@ -358,7 +378,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Castle_1
+      name: Castle_1a
       rect:
         serializedVersion: 2
         x: 16
@@ -379,7 +399,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Castle_2
+      name: Castle_2a
       rect:
         serializedVersion: 2
         x: 32
@@ -400,7 +420,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Castle_3
+      name: Castle_3a
       rect:
         serializedVersion: 2
         x: 48
@@ -421,7 +441,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Castle_4
+      name: Castle_4a
       rect:
         serializedVersion: 2
         x: 64
@@ -442,7 +462,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Castle_5
+      name: Castle_5a
       rect:
         serializedVersion: 2
         x: 80
@@ -995,6 +1015,48 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
+    - serializedVersion: 2
+      name: castle_5
+      rect:
+        serializedVersion: 2
+        x: 208
+        y: 32
+        width: 32
+        height: 64
+      alignment: 9
+      pivot: {x: 0.25, y: 0.125}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 65eb1e61b2432544b98a3ec6bd356ed2
+      internalID: -1255597767
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: castle_6
+      rect:
+        serializedVersion: 2
+        x: 240
+        y: 32
+        width: 32
+        height: 64
+      alignment: 9
+      pivot: {x: 0.25, y: 0.125}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d86ce3abf09b51d4d867ad07815986c0
+      internalID: 1870773535
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     physicsShape: []
     bones: []
@@ -1006,76 +1068,78 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      castle_2: 351871636
-      Castle_17: 6343830652352565948
-      Castle_8: 2996507498748529137
-      Castle_1: 6906767639317418099
-      Castle_32: 7500674364360254742
-      Castle_46: 6028529178368418858
-      Castle_59: -7328405571476808372
-      Castle_19: -3795720944560346708
-      Castle_56: -4199315538776546006
-      Castle_39: 6420436966992209846
-      Castle_58: -3604267399344534220
-      Castle_42: 486490966371258953
-      Castle_23: -779453562325441068
-      Castle_3: -1682882690250861636
-      Castle_33: -4552862586666163744
-      Castle_53: 5437258813707126935
-      Castle_55: 3242677930577182872
-      Castle_29: 7542390983593812097
-      Castle_36: 4560019785069071703
-      Castle_21: -1609143546227108842
-      Castle_15: -5185617447438664962
-      Castle_48: 6916266795080129722
-      castle_4: 804450432
-      Castle_12: -8683591605262331235
-      Castle_4: -77001387259621195
-      Castle_9: -5426138607464267151
-      Castle_64: 8270874794024937302
-      Castle_43: -6683359125106404616
-      Castle_6: -6935640475148911074
-      Castle_5: -5260175630729947354
-      Castle_27: 4989960586259013592
-      Castle_34: 859878449597269465
-      Castle_26: 781807726365533499
-      Castle_57: 6870441859917194535
-      Castle_14: 5427314472495278648
-      Castle_60: -6284112915086630200
-      Castle_37: 6001507995699417439
-      Castle_24: 430629103723400450
-      castle_0: -1017462376
-      Castle_31: 464114312144006252
-      Castle_40: -3566987879499669825
-      Castle_22: -1404115098925430142
+      Castle_0a: -6754239384357436178
       Castle_10: -1736760709017178869
       Castle_11: 7967668750229459883
-      Castle_28: -5531943321464528205
-      Castle_44: -3358560969665278325
-      Castle_35: 7059331026632700240
-      Castle_38: -1814156446696734081
-      Castle_54: 3432221342330111596
-      Castle_51: 149684267516264902
-      Castle_25: 9038399123823508952
-      Castle_45: 5460344302616670002
-      Castle_52: 2101685002360993593
-      Castle_7: 4606979011566258888
-      Castle_61: -7001453643676648389
-      castle_3: 1910207137
-      Castle_41: 4961209322784281664
-      Castle_62: 3430523394678212364
-      Castle_16: 6838273695970949187
-      castle_1: -367851974
-      Castle_47: -7764965814929053642
-      Castle_50: 5779847599501987850
-      Castle_18: 4391814738428255192
-      Castle_49: 1237387034656485791
-      Castle_2: 7803579835838553921
+      Castle_12: -8683591605262331235
       Castle_13: 5773388809163530335
+      Castle_14: 5427314472495278648
+      Castle_15: -5185617447438664962
+      Castle_16: 6838273695970949187
+      Castle_17: 6343830652352565948
+      Castle_18: 4391814738428255192
+      Castle_19: -3795720944560346708
+      Castle_1a: 6906767639317418099
       Castle_20: 6819683084161425668
-      Castle_0: -6754239384357436178
+      Castle_21: -1609143546227108842
+      Castle_22: -1404115098925430142
+      Castle_23: -779453562325441068
+      Castle_24: 430629103723400450
+      Castle_25: 9038399123823508952
+      Castle_26: 781807726365533499
+      Castle_27: 4989960586259013592
+      Castle_28: -5531943321464528205
+      Castle_29: 7542390983593812097
+      Castle_2a: 7803579835838553921
       Castle_30: -2204218097580962714
-  spritePackingTag: 
+      Castle_31: 464114312144006252
+      Castle_32: 7500674364360254742
+      Castle_33: -4552862586666163744
+      Castle_34: 859878449597269465
+      Castle_35: 7059331026632700240
+      Castle_36: 4560019785069071703
+      Castle_37: 6001507995699417439
+      Castle_38: -1814156446696734081
+      Castle_39: 6420436966992209846
+      Castle_3a: -1682882690250861636
+      Castle_40: -3566987879499669825
+      Castle_41: 4961209322784281664
+      Castle_42: 486490966371258953
+      Castle_43: -6683359125106404616
+      Castle_44: -3358560969665278325
+      Castle_45: 5460344302616670002
+      Castle_46: 6028529178368418858
+      Castle_47: -7764965814929053642
+      Castle_48: 6916266795080129722
+      Castle_49: 1237387034656485791
+      Castle_4a: -77001387259621195
+      Castle_50: 5779847599501987850
+      Castle_51: 149684267516264902
+      Castle_52: 2101685002360993593
+      Castle_53: 5437258813707126935
+      Castle_54: 3432221342330111596
+      Castle_55: 3242677930577182872
+      Castle_56: -4199315538776546006
+      Castle_57: 6870441859917194535
+      Castle_58: -3604267399344534220
+      Castle_59: -7328405571476808372
+      Castle_5a: -5260175630729947354
+      Castle_6: -6935640475148911074
+      Castle_60: -6284112915086630200
+      Castle_61: -7001453643676648389
+      Castle_62: 3430523394678212364
+      Castle_64: 8270874794024937302
+      Castle_7: 4606979011566258888
+      Castle_8: 2996507498748529137
+      Castle_9: -5426138607464267151
+      castle_0: -1017462376
+      castle_1: -367851974
+      castle_2: 351871636
+      castle_3: 1910207137
+      castle_4: 804450432
+      castle_5: -1255597767
+      castle_6: 1870773535
+  mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
   assetBundleName: 
