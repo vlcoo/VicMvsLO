@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace Quantum {
     [UnityEngine.Scripting.Preserve]
-    public unsafe class GameLogicSystem : SystemMainThread, ISignalOnPlayerAdded, ISignalOnPlayerRemoved, ISignalOnMarioPlayerDied,
+    public unsafe class GameLogicSystem : SystemMainThread, ISignalOnPlayerAdded, ISignalOnPlayerRemoved, ISignalOnMarioPlayerDied, ISignalOnMarioTouchedGoal,
         ISignalOnLoadingComplete, ISignalOnReturnToRoom, ISignalOnComponentRemoved<MarioPlayer> {
 
         public override void OnInit(Frame f) {
@@ -178,6 +178,15 @@ namespace Quantum {
         }
 
         public static void CheckForGameEnd(Frame f) {
+            // End Condition: a player has enough laps
+            var marioFilter = f.Filter<MarioPlayer>();
+            while (marioFilter.NextUnsafe(out _, out MarioPlayer* mario)) {
+                if (mario->CurrentLap > f.Global->Rules.Laps) {
+                    EndGame(f, false, mario->GetTeam(f));
+                    return;
+                }
+            }
+            
             var gamemode = f.FindAsset(f.Global->Rules.Gamemode);
             gamemode.CheckForGameEnd(f);
         }
@@ -212,6 +221,10 @@ namespace Quantum {
         }
 
         public void OnMarioPlayerDied(Frame f, EntityRef entity) {
+            CheckForGameEnd(f);
+        }
+        
+        public void OnMarioTouchedGoal(Frame f, EntityRef marioEntity, EntityRef goalEntity, QBoolean isLastLap) {
             CheckForGameEnd(f);
         }
 

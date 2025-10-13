@@ -12,6 +12,7 @@ namespace NSMB.Sound {
         [SerializeField] private LoopingMusicPlayer musicPlayer;
 
         //---Private Variables
+        private VersusStageData stage;
         private bool playedHurryUp;
         private int previousTimer;
 
@@ -22,8 +23,12 @@ namespace NSMB.Sound {
         public void Start() {
             QuantumCallback.Subscribe<CallbackGameResynced>(this, OnGameResynced);
             QuantumEvent.Subscribe<EventTimerExpired>(this, OnTimerExpired, FilterOutReplayFastForward);
+            QuantumEvent.Subscribe<EventGameStarted>(this, OnGameStarted);
+            QuantumEvent.Subscribe<EventGameEnded>(this, OnGameEnded);
             QuantumEvent.Subscribe<EventMarioPlayerPreRespawned>(this, OnMarioPlayerPreRespawned, FilterOutReplayFastForward);
             QuantumEvent.Subscribe<EventStageAutoRefresh>(this, OnStageAutoRefresh, FilterOutReplayFastForward);
+            
+            stage = (VersusStageData) QuantumUnityDB.GetGlobalAsset(FindObjectOfType<QuantumMapData>().Asset.UserAsset);
         }
 
         public override void OnUpdateView() {
@@ -51,6 +56,14 @@ namespace NSMB.Sound {
                     previousTimer = timerHalfSeconds;
                 }
             }
+        }
+        
+        private void OnGameStarted(EventGameStarted e) {
+            if (stage.ReverbSfx) sfx.outputAudioMixerGroup.audioMixer.SetFloat("SFXReverb", 0.4f);
+        }
+    
+        private void OnGameEnded(EventGameEnded e) {
+            sfx.outputAudioMixerGroup.audioMixer.SetFloat("SFXReverb", 0.0f);
         }
 
         private void OnGameResynced(CallbackGameResynced e) {

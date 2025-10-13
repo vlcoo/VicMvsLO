@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 public class MatchSettings : MonoBehaviour {
-    public Toggle lapsToggle, starsToggle, coinsToggle, livesToggle, timerToggle, teamsToggle;
+    public Toggle starsToggle, coinsToggle, livesToggle, timerToggle, teamsToggle;
     public TMP_InputField lapsInput, starsInput, coinsInput, livesInput, timerInput;
     public GameRules rules;
     
@@ -28,8 +28,11 @@ public class MatchSettings : MonoBehaviour {
     }
 
     public void RefreshValues() {
-        lapsToggle.SetIsOnWithoutNotify(rules.Laps > 0);
-        lapsInput.interactable = rules.Laps > 0;
+        var isCampaignMap = false;
+        if (QuantumUnityDB.TryGetGlobalAsset(rules.Stage, out Map map)
+            && QuantumUnityDB.TryGetGlobalAsset(map.UserAsset, out VersusStageData stage))
+            isCampaignMap = stage.IsCampaignMap;
+        lapsInput.interactable = isCampaignMap;
         if (rules.Laps > 0 || lapsInput.text.Length == 0) lapsInput.SetTextWithoutNotify(rules.Laps.ToString());
         starsToggle.SetIsOnWithoutNotify(rules.StarsToWin > 0);
         starsInput.interactable = rules.StarsToWin > 0;
@@ -58,7 +61,7 @@ public class MatchSettings : MonoBehaviour {
                            | CommandChangeRules.Rules.Lives
                            | CommandChangeRules.Rules.TimerSeconds
                            | CommandChangeRules.Rules.TeamsEnabled,
-            Laps = lapsToggle.isOn ? int.Parse(lapsInput.text) : 0,
+            Laps = int.Parse(lapsInput.text),
             StarsToWin = starsToggle.isOn ? int.Parse(starsInput.text) : 0,
             CoinsForPowerup = coinsToggle.isOn ? int.Parse(coinsInput.text) : 0,
             Lives = livesToggle.isOn ? int.Parse(livesInput.text) : 0,

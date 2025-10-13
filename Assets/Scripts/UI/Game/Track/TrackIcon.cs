@@ -17,7 +17,9 @@ namespace NSMB.UI.Game.Track {
         protected VersusStageData stage;
 
         private float levelWidthReciprocal;
+        private float levelHeightReciprocal;
         private float levelMinX;
+        private float levelMinY;
         private float trackWidth;
 
         public virtual void OnValidate() {
@@ -33,8 +35,10 @@ namespace NSMB.UI.Game.Track {
             stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
             
             levelMinX = stage.StageWorldMin.X.AsFloat;
+            levelMinY = stage.StageWorldMin.Y.AsFloat;
             trackWidth = trackMaxX - trackMinX;
             levelWidthReciprocal = 2f / stage.TileDimensions.X;
+            levelHeightReciprocal = 2f / stage.TileDimensions.Y;
 
             name = $"TrackIcon ({targetEntity})";
             OnLateUpdateView();
@@ -45,7 +49,9 @@ namespace NSMB.UI.Game.Track {
                 return;
             }
 
-            float percentage = (targetTransform.position.x - levelMinX) * levelWidthReciprocal;
+            float percentage;
+            if (stage.VerticalMap) percentage = (targetTransform.position.y - levelMinY) * levelHeightReciprocal;
+            else percentage = (targetTransform.position.x - levelMinX) * levelWidthReciprocal;
             transform.localPosition = new(percentage * trackWidth - trackMaxX, transform.localPosition.y, transform.localPosition.z);
 
             if (upArrow && downArrow) {

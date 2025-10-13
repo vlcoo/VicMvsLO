@@ -1,4 +1,5 @@
 using Photon.Deterministic;
+using UnityEngine;
 
 namespace Quantum {
     [UnityEngine.Scripting.Preserve]
@@ -55,8 +56,16 @@ namespace Quantum {
             FP change = (chomping ? 2 : -2) * f.DeltaTime;
             piranhaPlant->PopupAnimationTime = FPMath.Clamp01(piranhaPlant->PopupAnimationTime + change);
             filter.Interactable->ColliderDisabled = piranhaPlant->PopupAnimationTime < FP._0_10;
-            FPVector2 offset = FPVector2.Up * (FP._0_25 + (piranhaPlant->PopupAnimationTime - 1) * FP._0_75);
-            transform->Position = enemy->Spawnpoint + offset;
+            var offset = (FP._0_25 + (piranhaPlant->PopupAnimationTime - 1) * FP._0_75);
+            var rotatedOffset = (Mathf.Rad2Deg * transform->Rotation.AsFloat) switch {
+                // up, left, down, right
+                <= 315 and <= 45 => offset * FPVector2.Up,
+                >= 45 and <= 135 => offset * FPVector2.Left,
+                >= 135 and <= 225 => offset * FPVector2.Down,
+                >= 225 and <= 315 => offset * FPVector2.Right,
+                _ => default
+            };
+            transform->Position = enemy->Spawnpoint + rotatedOffset;
 
             freezable->IceBlockSize.Y = Constants._1_10 * piranhaPlant->PopupAnimationTime; 
         }

@@ -79,6 +79,7 @@ namespace NSMB.Utilities {
             ['C'] = "hudnumber_coin",
             ['c'] = "hudnumber_objectivecoin",
             ['S'] = "hudnumber_star",
+            ['L'] = "hudnumber_laps",
             ['T'] = "hudnumber_timer",
             ['/'] = "hudnumber_slash",
             [':'] = "hudnumber_colon",

@@ -10,6 +10,7 @@ namespace Quantum {
         public readonly bool IsDamageable => !IsStarmanInvincible && DamageInvincibilityFrames == 0;
         public readonly bool IsInKnockback => CurrentKnockback != KnockbackStrength.None;
         public readonly bool CanCollectOwnTeamsObjectiveCoins => !IsInKnockback && DamageInvincibilityFrames == 0;
+        public readonly int CurrentLap => Laps + 1;
 
         public readonly byte? GetTeam(Frame f) {
             var data = QuantumUtils.GetPlayerData(f, PlayerRef);

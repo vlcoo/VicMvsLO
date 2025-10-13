@@ -68,7 +68,7 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
                     Spectating = spectateToggle.isOn,
                 });
             }
-            menu.Canvas.PlayConfirmSound();
+            menu.Canvas.PlayCursorSound();
         }
 
         // private void SetCharacterButtonState(Frame f, int index, bool sound) {

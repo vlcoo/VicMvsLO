@@ -143,7 +143,7 @@ namespace NSMB.Tiles {
             });
 
             tilemap.SetTile(coords, unityTile);
-            tilemap.SetTransformMatrix(coords, mat);
+            // tilemap.SetTransformMatrix(coords, mat);
             tilemap.RefreshTile(coords);
             if (unityTile is AnimatedTile at) {
                 tilemap.SetAnimationTime(coords, (float) (Time.timeAsDouble - startTime) * at.m_MaxSpeed % at.m_AnimatedSprites.Length);

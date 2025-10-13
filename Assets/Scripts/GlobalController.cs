@@ -144,6 +144,8 @@ namespace NSMB {
                 // Update discord every second
                 discordController.UpdateActivity();
             }
+            
+            mixer.SetFloat("MasterPitch", 1 + Mathf.PingPong(Time.time / 5600f, 0.02f) - 0.01f);
         }
 
         public void OnApplicationFocus(bool focus) {

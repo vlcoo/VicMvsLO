@@ -28,7 +28,7 @@ namespace NSMB.UI.Game {
         [SerializeField] private CanvasGroup toggler;
         [SerializeField] private TrackIcon playerTrackTemplate, starTrackTemplate, starCoinTrackTemplate, objectiveCoinTrackTemplate;
         [SerializeField] private Sprite storedItemNull;
-        [SerializeField] private TMP_Text uiTeamObjective, uiMainObjective, uiCoins, uiDebug, uiLives, uiCountdown;
+        [SerializeField] private TMP_Text uiTeamObjective, uiMainObjective, uiCoins, uiDebug, uiLives, uiCountdown, uiLaps;
         [SerializeField] private Image itemReserve, itemColor, deathFade;
         [SerializeField] private GameObject boos, reserveItemBox;
         [SerializeField] private Animation reserveAnimation;
@@ -41,16 +41,17 @@ namespace NSMB.UI.Game {
         private readonly Dictionary<MonoBehaviour, TrackIcon> entityTrackIcons = new();
         private readonly Dictionary<Type, List<TrackIcon>> availablePooledTrackIcons = new();
         private readonly List<Image> backgrounds = new();
-        private GameObject teamsParent, starsParent, coinsParent, livesParent, timerParent;
+        private GameObject teamsParent, starsParent, coinsParent, livesParent, timerParent, lapsParent;
         private Material timerMaterial;
 
         //private TeamManager teamManager;
-        private int cachedCoins = -1, cachedTeamObjective = -1, cachedObjective = -1, cachedLives = -1, cachedTimer = -1;
+        private int cachedCoins = -1, cachedTeamObjective = -1, cachedObjective = -1, cachedLives = -1, cachedTimer = -1, cachedLaps = -1;
         private PowerupAsset previousPowerup;
         private EntityRef previousTarget;
         private bool previousMarioExists;
         private bool justResynced;
         private float fpsSample;
+        private VersusStageData stage;
 
         private Coroutine endGameSequenceCoroutine, reserveSummonCoroutine;
 
@@ -98,19 +99,22 @@ namespace NSMB.UI.Game {
             coinsParent = uiCoins.transform.parent.gameObject;
             livesParent = uiLives.transform.parent.gameObject;
             timerParent = uiCountdown.transform.parent.gameObject;
+            lapsParent = uiLaps.transform.parent.gameObject;
 
             backgrounds.Add(teamsParent.GetComponentInChildren<Image>());
             backgrounds.Add(starsParent.GetComponentInChildren<Image>());
             backgrounds.Add(coinsParent.GetComponentInChildren<Image>());
             backgrounds.Add(livesParent.GetComponentInChildren<Image>());
             backgrounds.Add(timerParent.GetComponentInChildren<Image>());
+            backgrounds.Add(lapsParent.GetComponentInChildren<Image>());
         }
 
         public void Start() {
-            VersusStageData stage = ViewContext.Stage;
-
-            PlayerTrackIcon.HideAllPlayerIcons = stage.HidePlayersOnMinimap;
-            boos.SetActive(stage.HidePlayersOnMinimap);
+            stage = ViewContext.Stage;
+            
+            bool minimapBoosEnabled = false;    // stage.HidePlayersOnMinimap TODO: temporarily disabled. maybe make boos appear when all Ms are off.
+            PlayerTrackIcon.HideAllPlayerIcons = minimapBoosEnabled;
+            boos.SetActive(minimapBoosEnabled);
             StartCoroutine(UpdatePingTextCoroutine());
 
             QuantumCallback.Subscribe<CallbackUpdateView>(this, OnUpdateView);
@@ -216,9 +220,10 @@ namespace NSMB.UI.Game {
 
         private void UpdateElementVisibility(Frame f, bool marioExists) {
             teamsParent.SetActive(marioExists && f.Global->Rules.TeamsEnabled);
-            starsParent.SetActive(marioExists);
+            starsParent.SetActive(marioExists && f.Global->Rules.IsStarsEnabled);
+            lapsParent.SetActive(marioExists && f.Global->Rules.IsLapsEnabled && stage.IsCampaignMap);
             livesParent.SetActive(marioExists && f.Global->Rules.IsLivesEnabled);
-            coinsParent.SetActive(marioExists);
+            coinsParent.SetActive(marioExists && f.Global->Rules.IsCoinsEnabled);
             timerParent.SetActive(f.Global->Rules.IsTimerEnabled);
             reserveItemBox.SetActive(marioExists);
         }
@@ -264,11 +269,13 @@ namespace NSMB.UI.Game {
             var gamemode = f.FindAsset(f.Global->Rules.Gamemode);
             var rules = f.Global->Rules;
 
-            //int starRequirement = rules.StarsToWin;
+            int starRequirement = rules.StarsToWin;
             int coinRequirement = rules.CoinsForPowerup;
             bool teamsEnabled = rules.TeamsEnabled;
             bool livesEnabled = rules.IsLivesEnabled;
             bool timerEnabled = rules.TimerSeconds > 0;
+            bool minimapBoosEnabled = false;    // TODO: temporarily disabled. maybe make boos appear when all Ms are off.
+            int lapsRequirement = rules.Laps;
 
             // TIMER
             if (timerEnabled) {
@@ -277,7 +284,7 @@ namespace NSMB.UI.Game {
 
                 if (secondsRemaining != cachedTimer) {
                     cachedTimer = secondsRemaining;
-                    uiCountdown.text = Utils.GetSymbolString("Tx" + Utils.SecondsToMinuteSeconds(secondsRemaining));
+                    uiCountdown.text = Utils.GetSymbolString("Tx" + secondsRemaining);
                     timerParent.SetActive(true);
                 }
             }
@@ -308,7 +315,7 @@ namespace NSMB.UI.Game {
                 cachedObjective = objective;
                 string objectiveString = gamemode.ObjectiveSymbolPrefix + "x" + cachedObjective;
                 if (gamemode is StarChasersGamemode && !teamsEnabled) {
-                    objectiveString += "/" + rules.StarsToWin;
+                    objectiveString += "/" + starRequirement;
                 }
 
                 uiMainObjective.text = Utils.GetSymbolString(objectiveString);
@@ -318,6 +325,12 @@ namespace NSMB.UI.Game {
             if (mario->Coins != cachedCoins) {
                 cachedCoins = mario->Coins;
                 uiCoins.text = Utils.GetSymbolString("Cx" + cachedCoins + "/" + coinRequirement);
+            }
+            
+            // LAPS
+            if (mario->CurrentLap != cachedLaps) {
+                cachedLaps = mario->CurrentLap;
+                uiLaps.text = Utils.GetSymbolString("Lx" + Math.Min(cachedLaps, lapsRequirement) + "/" + lapsRequirement);
             }
 
             // LIVES

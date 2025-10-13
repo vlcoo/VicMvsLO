@@ -2000,7 +2000,7 @@ namespace Quantum {
             
             mario->Laps++;
             var lastLap = true;
-            if (mario->Laps < f.Global->Rules.Laps) {
+            if (mario->CurrentLap <= f.Global->Rules.Laps) {
                 var stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
                 var transform = f.Unsafe.GetPointer<Transform2D>(marioEntity);
                 var spawnpoint = stage.GetWorldSpawnpointForPlayer(mario->SpawnpointIndex, f.Global->TotalMarios);

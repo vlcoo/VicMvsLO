@@ -22,7 +22,8 @@ namespace Quantum {
 
 #if MULTITHREADED
         public override void Update(FrameThreadSafe f, ref Filter filter) {
-            UpdateCameraSize(f, ref filter);
+            var stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
+            UpdateCameraSize(f, ref filter, stage);
             if (!filter.Mario->IsDead) {
                 filter.Camera->CurrentPosition = CalculateNewPosition(f, ref filter, f.FindAsset<VersusStageData>(f.Map.UserAsset));
             }
@@ -36,12 +37,12 @@ namespace Quantum {
         }
 #endif
 
-        private void UpdateCameraSize(FrameThreadSafe f, ref Filter filter) {
+        private void UpdateCameraSize(FrameThreadSafe f, ref Filter filter, VersusStageData stage) {
             var mario = filter.Mario;
             var camera = filter.Camera;
 
             FP targetSize;
-            if (mario->IsPropellerFlying || mario->IsSpinnerFlying) {
+            if (!stage.NoHorizontalCameraMovement && (mario->IsPropellerFlying || mario->IsSpinnerFlying)) {
                 targetSize = 8;
             } else {
                 targetSize = 7;
@@ -107,17 +108,21 @@ namespace Quantum {
 
             camera->LastPlayerPosition = QuantumUtils.WrapWorld(stage, camera->LastPlayerPosition, out _);
 
-            FP xDifference = FPVector2.Distance(FPVector2.Right * newCameraPosition.X, FPVector2.Right * camera->LastPlayerPosition.X);
-            bool right = newCameraPosition.X > camera->LastPlayerPosition.X;
+            if (!stage.NoHorizontalCameraMovement) {
+                FP xDifference = FPVector2.Distance(FPVector2.Right * newCameraPosition.X,
+                    FPVector2.Right * camera->LastPlayerPosition.X);
+                bool right = newCameraPosition.X > camera->LastPlayerPosition.X;
 
-            if (xDifference >= 2) {
-                newCameraPosition.X += (right ? -1 : 1) * stage.TileDimensions.X * FP._0_50;
-                xDifference = FPVector2.Distance(FPVector2.Right * newCameraPosition.X, FPVector2.Right * camera->LastPlayerPosition.X);
-                right = newCameraPosition.X > camera->LastPlayerPosition.X;
-            }
+                if (xDifference >= 2) {
+                    newCameraPosition.X += (right ? -1 : 1) * stage.TileDimensions.X * FP._0_50;
+                    xDifference = FPVector2.Distance(FPVector2.Right * newCameraPosition.X,
+                        FPVector2.Right * camera->LastPlayerPosition.X);
+                    right = newCameraPosition.X > camera->LastPlayerPosition.X;
+                }
 
-            if (xDifference > FP._0_25) {
-                newCameraPosition.X += (FP._0_25 - xDifference - FP._0_01) * (right ? 1 : -1);
+                if (xDifference > FP._0_25) {
+                    newCameraPosition.X += (FP._0_25 - xDifference - FP._0_01) * (right ? 1 : -1);
+                }
             }
 
             FPVector2 cameraMin = stage.CameraMinPosition;
