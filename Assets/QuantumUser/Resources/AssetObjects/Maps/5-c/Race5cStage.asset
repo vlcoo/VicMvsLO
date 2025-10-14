@@ -814,7 +814,7 @@ MonoBehaviour:
           X:
             RawValue: -360448
           Y:
-            RawValue: -688128
+            RawValue: -753664
         Rotation:
           RawValue: 0
     - rid: 983669524362428417
@@ -889,11 +889,33 @@ MonoBehaviour:
     - rid: 983669524362428419
       type: {class: GenericMoverPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
-        Path: []
+        Path:
+        - Position:
+            X:
+              RawValue: 0
+            Y:
+              RawValue: 0
+          TravelDuration:
+            RawValue: 131072
+          EaseIn:
+            Value: 1
+          EaseOut:
+            Value: 1
+        - Position:
+            X:
+              RawValue: 0
+            Y:
+              RawValue: 229376
+          TravelDuration:
+            RawValue: 131072
+          EaseIn:
+            Value: 1
+          EaseOut:
+            Value: 1
         LoopingMode:
-          Value: 0
+          Value: 1
         StartOffset:
-          RawValue: 229376
+          RawValue: 0
         DurationIsSpeedInstead:
           Value: 0
     - rid: 983669524362428420
@@ -3369,7 +3391,7 @@ MonoBehaviour:
           X:
             RawValue: -32768
           Y:
-            RawValue: -458752
+            RawValue: -524288
         Rotation:
           RawValue: 0
     - rid: 6280140867856498689
@@ -3444,11 +3466,33 @@ MonoBehaviour:
     - rid: 6280140867856498691
       type: {class: GenericMoverPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
-        Path: []
+        Path:
+        - Position:
+            X:
+              RawValue: 0
+            Y:
+              RawValue: 0
+          TravelDuration:
+            RawValue: 131072
+          EaseIn:
+            Value: 1
+          EaseOut:
+            Value: 1
+        - Position:
+            X:
+              RawValue: 0
+            Y:
+              RawValue: -229376
+          TravelDuration:
+            RawValue: 131072
+          EaseIn:
+            Value: 1
+          EaseOut:
+            Value: 1
         LoopingMode:
-          Value: 0
+          Value: 1
         StartOffset:
-          RawValue: 229376
+          RawValue: 0
         DurationIsSpeedInstead:
           Value: 0
     - rid: 6280140867856498692
