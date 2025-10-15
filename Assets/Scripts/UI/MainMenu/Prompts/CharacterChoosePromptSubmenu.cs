@@ -69,11 +69,11 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
             Frame f = e.Game.Frames.Predicted;
             SimulationConfig config = f.SimulationConfig;
             PlayerData* data = QuantumUtils.GetPlayerData(f, e.Player);
-            // var skins = ScriptableManager.Instance.skins;
-            // int skinIndex = Mathf.Clamp(data != null ? data->Palette : 0, 0, skins.Length - 1);
+            var skins = f.SimulationConfig.Palettes;
+            int skinIndex = Mathf.Clamp(data != null ? data->Palette : 0, 0, skins.Length - 1);
             CharacterAsset characterAsset = f.FindAsset(config.CharacterDatas[Mathf.Clamp(data->Character, 0, config.CharacterDatas.Length)]);
             currentCharacterPreview = GetCharacterPreview(characterAsset);
-            // currentPalette = skins[skinIndex];
+            currentPalette = f.FindAsset(skins[skinIndex]);
             currentCharacterPreview.SetVisible(true);
             currentCharacterPreview.SetPalette(currentPalette, characterAsset);
         }

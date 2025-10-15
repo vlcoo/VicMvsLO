@@ -1,3 +1,4 @@
+using DG.Tweening;
 using NSMB.Quantum;
 using NSMB.Replay;
 using NSMB.UI.Game;
@@ -37,6 +38,7 @@ namespace NSMB.Sound {
             QuantumEvent.Subscribe<EventMarioPlayerRespawned>(this, OnMarioPlayerRespawned, FilterOutReplayFastForward);
             QuantumEvent.Subscribe<EventGameEnded>(this, OnGameEnded);
             QuantumEvent.Subscribe<EventGameStateChanged>(this, OnGameStateChanged);
+            QuantumEvent.Subscribe<EventMarioPlayerNextGoalAnimation>(this, OnMarioFlagpoleAnimationProgressed, FilterOutReplayFastForward);
 
             ActiveReplayManager.OnReplayFastForwardEnded += OnReplayFastForwardEnded;
             LoadingCanvas.OnLoadingEnded += OnLoadingEnded;
@@ -169,6 +171,12 @@ namespace NSMB.Sound {
                 HandleMusic(Game, true);
             }
         }
+
+        private void OnMarioFlagpoleAnimationProgressed(EventMarioPlayerNextGoalAnimation e) {
+            if (e.AnimationState == GoalAnimationState.Grabbed) {
+                SetMusicType(MusicType.Silence, 0.5f);
+            }
+        }
         
         private bool AnyMusicPlaying() {
             return musicPlayerNormal.state == Songinator.PlaybackState.PLAYING ||
@@ -176,30 +184,30 @@ namespace NSMB.Sound {
                    musicPlayerInvincibility.state == Songinator.PlaybackState.PLAYING;
         }
 
-        private void SetMusicType(MusicType type) {
+        private void SetMusicType(MusicType type, float secondsFading = 0f) {
             if (currentMusicType == type) return;
         
             switch (type) {
             case MusicType.Normal:
-                musicPlayerMega.SetPlaybackState(Songinator.PlaybackState.STOPPED);
-                musicPlayerInvincibility.SetPlaybackState(Songinator.PlaybackState.STOPPED);
+                musicPlayerMega.SetPlaybackState(Songinator.PlaybackState.STOPPED, secondsFading);
+                musicPlayerInvincibility.SetPlaybackState(Songinator.PlaybackState.STOPPED, secondsFading);
                 musicPlayerNormal.SetPlaybackState(Songinator.PlaybackState.PLAYING);
                 break;
             case MusicType.Mega:
-                musicPlayerNormal.SetPlaybackState(Songinator.PlaybackState.STOPPED);
-                musicPlayerInvincibility.SetPlaybackState(Songinator.PlaybackState.STOPPED);
+                musicPlayerNormal.SetPlaybackState(Songinator.PlaybackState.STOPPED, secondsFading);
+                musicPlayerInvincibility.SetPlaybackState(Songinator.PlaybackState.STOPPED, secondsFading);
                 musicPlayerMega.SetPlaybackState(Songinator.PlaybackState.PLAYING);
                 break;
             case MusicType.Invincibility:
-                musicPlayerNormal.SetPlaybackState(Songinator.PlaybackState.STOPPED);
-                musicPlayerMega.SetPlaybackState(Songinator.PlaybackState.STOPPED);
+                musicPlayerNormal.SetPlaybackState(Songinator.PlaybackState.STOPPED, secondsFading);
+                musicPlayerMega.SetPlaybackState(Songinator.PlaybackState.STOPPED, secondsFading);
                 musicPlayerInvincibility.SetPlaybackState(Songinator.PlaybackState.PLAYING);
                 break;
             case MusicType.Silence:
             default:
-                musicPlayerNormal.SetPlaybackState(Songinator.PlaybackState.STOPPED);
-                musicPlayerMega.SetPlaybackState(Songinator.PlaybackState.STOPPED);
-                musicPlayerInvincibility.SetPlaybackState(Songinator.PlaybackState.STOPPED);
+                musicPlayerNormal.SetPlaybackState(Songinator.PlaybackState.STOPPED, secondsFading);
+                musicPlayerMega.SetPlaybackState(Songinator.PlaybackState.STOPPED, secondsFading);
+                musicPlayerInvincibility.SetPlaybackState(Songinator.PlaybackState.STOPPED, secondsFading);
                 break;
             }
         

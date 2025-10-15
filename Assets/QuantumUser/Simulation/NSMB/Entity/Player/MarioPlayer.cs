@@ -546,5 +546,36 @@ namespace Quantum {
 
             f.Events.MarioPlayerEnteredPipe(mario, CurrentPipe);
         }
+
+        public void ResetAndFreeze(Frame f, EntityRef mario) {
+            CurrentPipe = default;
+            IsInShell = false;
+            IsPropellerFlying = false;
+            PropellerLaunchFrames = 0;
+            PropellerSpinFrames = 0;
+            IsSpinnerFlying = false;
+            IsDrilling = false;
+            IsSliding = false;
+            IsCrouching = false;
+            IsSkidding = false;
+            IsTurnaround = false;
+            IsGroundpounding = false;
+            CurrentKnockback = KnockbackStrength.None;
+            WallslideRight = false;
+            WallslideLeft = false;
+            ForceJumpTimer = 0;
+            DamageInvincibilityFrames = 0;
+            InvincibilityFrames = 0;
+            
+            var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(mario);
+            physicsObject->IsFrozen = true;
+            physicsObject->DisableCollision = true;
+            physicsObject->CurrentData = default;
+            physicsObject->Velocity = FPVector2.Zero;
+            
+            if (f.Exists(HeldEntity) && f.Unsafe.TryGetPointer(HeldEntity, out Holdable* holdable)) {
+                holdable->Throw(f, HeldEntity);
+            }
+        }
     }
 }

@@ -1,3 +1,4 @@
+using DG.Tweening;
 using NSMB.Cameras;
 using NSMB.Particles;
 using NSMB.Quantum;
@@ -86,6 +87,8 @@ namespace NSMB.Entities.Player {
         private static readonly int ParamThrow = Animator.StringToHash("throw");
         private static readonly int ParamHeadPickup = Animator.StringToHash("head-pickup");
         private static readonly int ParamFireball = Animator.StringToHash("fireball");
+        private static readonly int ParamGoalGrab = Animator.StringToHash("goalGrab");
+        private static readonly int ParamGoalJump = Animator.StringToHash("goalJump");
         #endregion
 
         //---Public Variables
@@ -137,7 +140,7 @@ namespace NSMB.Entities.Player {
         private GameObject activeRespawnParticle;
         private SkinnedMeshRenderer largeMesh;
         private Material[] rememberedMaterialsLarge, rememberedMaterialsSmall;
-        private bool useSpecialSmall;
+        private bool useSpecialSmall, goalReachedBottom;
 
         public void OnValidate() {
             this.SetIfNull(ref animator);
@@ -197,6 +200,7 @@ namespace NSMB.Entities.Player {
             QuantumEvent.Subscribe<EventMarioPlayerLandedWithAnimation>(this, OnMarioPlayerLandedWithAnimation, FilterOutReplayFastForward);
             QuantumEvent.Subscribe<EventEnemyKicked>(this, OnEnemyKicked, FilterOutReplayFastForward);
             QuantumEvent.Subscribe<EventMarioTouchedGoal>(this, OnMarioTouchedGoal, FilterOutReplayFastForward);
+            QuantumEvent.Subscribe<EventMarioPlayerNextGoalAnimation>(this, OnMarioFlagpoleAnimationProgressed, FilterOutReplayFastForward);
         }
 
         public override void OnActivate(Frame f) {
@@ -284,7 +288,7 @@ namespace NSMB.Entities.Player {
                 }
             }
 
-            SetFacingDirection(f, mario, physicsObject);
+            if (!goalReachedBottom) SetFacingDirection(f, mario, physicsObject);
             InterpolateFacingDirection(mario);
             UpdateAnimatorVariables(f, mario, physicsObject, freezable, ref inputs);
 
@@ -1270,7 +1274,35 @@ namespace NSMB.Entities.Player {
             }
 
             PlaySound(e.LastLap ? SoundEffect.World_Goal_Last : SoundEffect.World_Goal_Non_Last);
-            if (e.LastLap && e.IsOrb) Instantiate(goalOrbParticle, e.Position.ToUnityVector3(), Quaternion.identity);
+            if (e.LastLap) {
+                if (e.IsOrb) Instantiate(goalOrbParticle, e.Position.ToUnityVector3(), Quaternion.identity);
+                else animator.SetTrigger(ParamGoalGrab);
+            }
+        }
+
+        private void OnMarioFlagpoleAnimationProgressed(EventMarioPlayerNextGoalAnimation e) {
+            switch (e.AnimationState) {
+            case GoalAnimationState.Grabbed:
+                break;
+            case GoalAnimationState.StartSliding:
+                PlaySound(SoundEffect.World_Goal_Down);
+                return;
+            case GoalAnimationState.FinishSliding:
+                DOTween.To(() => sfx.volume, x => sfx.volume = x, 0, 0.2f)
+                        .onComplete +=
+                    () =>
+                    {
+                        sfx.Stop();
+                        sfx.volume = 1;
+                    };
+                break;
+            case GoalAnimationState.Celebration:
+                animator.SetTrigger(ParamGoalJump);
+                goalReachedBottom = true;
+                modelRotationTarget = Quaternion.Euler(0, 180, 0);
+                PlaySound(SoundEffect.Player_Voice_GoalCeleb);
+                break;
+            }
         }
 
         private void OnEnemyKicked(EventEnemyKicked e) {

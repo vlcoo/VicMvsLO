@@ -2,10 +2,11 @@ using Photon.Deterministic;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 
 namespace Quantum {
     [UnityEngine.Scripting.Preserve]
-    public unsafe class GameLogicSystem : SystemMainThread, ISignalOnPlayerAdded, ISignalOnPlayerRemoved, ISignalOnMarioPlayerDied, ISignalOnMarioTouchedGoal,
+    public unsafe class GameLogicSystem : SystemMainThread, ISignalOnPlayerAdded, ISignalOnPlayerRemoved, ISignalOnMarioPlayerDied, ISignalOnMarioTouchedGoal, ISignalOnMarioPlayerFinishedFlagpoleAnimation,
         ISignalOnLoadingComplete, ISignalOnReturnToRoom, ISignalOnComponentRemoved<MarioPlayer> {
 
         public override void OnInit(Frame f) {
@@ -178,6 +179,7 @@ namespace Quantum {
         }
 
         public static void CheckForGameEnd(Frame f) {
+            Debug.Log("checking for game end");
             // End Condition: a player has enough laps
             var marioFilter = f.Filter<MarioPlayer>();
             while (marioFilter.NextUnsafe(out _, out MarioPlayer* mario)) {
@@ -225,6 +227,17 @@ namespace Quantum {
         }
         
         public void OnMarioTouchedGoal(Frame f, EntityRef marioEntity, EntityRef goalEntity, QBoolean isLastLap) {
+            if (!isLastLap) return;
+            // destroy everyone else but the player
+            var marioFilter = f.Filter<MarioPlayer>();
+            while (marioFilter.NextUnsafe(out EntityRef otherEntity, out MarioPlayer* mario)) {
+                if (otherEntity != marioEntity) {
+                    f.Destroy(otherEntity);
+                }
+            }
+        }
+
+        public void OnMarioPlayerFinishedFlagpoleAnimation(Frame f, EntityRef marioEntity) {
             CheckForGameEnd(f);
         }
 

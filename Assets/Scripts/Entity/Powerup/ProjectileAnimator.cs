@@ -68,7 +68,7 @@ namespace NSMB.Entities.Player {
             */
             try {
                 if (sRenderer) {
-                    sRenderer.color = IsCameraTeamFocus(camera) ? sameTeamColor : differentTeamColor;
+                    sRenderer.color = differentTeamColor;
                 }
             } catch {
                 // Debug.LogWarning("The bug happened");

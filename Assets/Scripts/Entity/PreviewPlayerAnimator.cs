@@ -32,7 +32,8 @@ public class PreviewPlayerAnimator : MonoBehaviour {
     }
 
     public void SetSelected() {
-        if (!_isVisible) SetVisible(true);
+        if (_isVisible) return;
+        SetVisible(true);
         animator.SetTrigger(AnimGoalJump);
         sfx.Play();
     }
@@ -41,9 +42,9 @@ public class PreviewPlayerAnimator : MonoBehaviour {
         var materialBlock = new MaterialPropertyBlock();
         if (palette != null) {
             var skin = palette.GetPaletteForCharacter(character);
-            // materialBlock.SetVector(ParamOverallsColor, skin.overallsColor.linear);
-            // materialBlock.SetVector(ParamShirtColor, skin.shirtColor.linear);
-            // materialBlock.SetFloat(ParamHatUsesOverallsColor, skin.hatUsesOverallsColor ? 1 : 0);
+            materialBlock.SetVector(ParamOverallsColor, skin.OverallsColor.AsColor.linear);
+            materialBlock.SetVector(ParamShirtColor, skin.ShirtColor.AsColor.linear);
+            materialBlock.SetFloat(ParamHatUsesOverallsColor, skin.HatUsesOverallsColor ? 1 : 0);
         }
         foreach (Renderer r in _renderers) {
             r.SetPropertyBlock(materialBlock);

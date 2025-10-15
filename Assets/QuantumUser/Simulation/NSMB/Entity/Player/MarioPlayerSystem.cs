@@ -1,7 +1,9 @@
 using Photon.Deterministic;
 using Quantum.Collections;
 using Quantum.Profiling;
+using Quantum.Prototypes;
 using System;
+using UnityEngine;
 using static IInteractableTile;
 
 namespace Quantum {
@@ -54,6 +56,8 @@ namespace Quantum {
                 HandleTerminalVelocity(f, ref filter, physics);
                 return;
             }
+
+            if (HandleFlagpoleAnimation(f, ref filter, stage)) return;
 
             if (f.GetPlayerCommand(player) is CommandSpawnReserveItem) {
                 SpawnReserveItem(f, ref filter);
@@ -1960,6 +1964,47 @@ namespace Quantum {
             return true;
         }
 
+        private bool HandleFlagpoleAnimation(Frame f, ref Filter filter, VersusStageData stage) {
+            var mario = filter.MarioPlayer;
+            if (mario->FlagpoleAnimationFrames > 0) {
+                var entity = filter.Entity;
+                var transform = filter.Transform;
+                QuantumUtils.Decrement(ref mario->FlagpoleAnimationFrames);
+                Debug.Log(mario->FlagpoleAnimationFrames);
+                if (mario->FlagpoleAnimationFrames == 249) {
+                    // grab onto pole
+                    f.Events.MarioPlayerNextGoalAnimation(entity, GoalAnimationState.Grabbed);
+                    mario->ResetAndFreeze(f, entity);
+                    var flagpoleTransform = f.Unsafe.GetPointer<Transform2D>(mario->CurrentFlagpole);
+                    transform->Position.X = flagpoleTransform->Position.X;
+                    return false;
+                }
+                if (mario->FlagpoleAnimationFrames == 210) {
+                    f.Events.MarioPlayerNextGoalAnimation(entity, GoalAnimationState.StartSliding);
+                }
+                if (mario->FlagpoleAnimationFrames < 210 && mario->FlagpoleAnimationFrames > 90) {
+                    // slide down after wait. if reached flagpole bottom before we're at 90, we continue to the next phase.
+                    transform->Position.Y -= 3 * f.DeltaTime;
+                    var flagpoleTransform = f.Unsafe.GetPointer<Transform2D>(mario->CurrentFlagpole);
+                    if (transform->Position.Y <= flagpoleTransform->Position.Y + FP._0_50) {
+                        mario->FlagpoleAnimationFrames = 90;
+                    }
+                }
+                if (mario->FlagpoleAnimationFrames == 90) {
+                    f.Events.MarioPlayerNextGoalAnimation(entity, GoalAnimationState.FinishSliding);
+                }
+                if (mario->FlagpoleAnimationFrames == 60) {
+                    f.Events.MarioPlayerNextGoalAnimation(entity, GoalAnimationState.Celebration);
+                }
+                if (mario->FlagpoleAnimationFrames == 1) {
+                    f.Signals.OnMarioPlayerFinishedFlagpoleAnimation(entity);
+                }
+                return true;
+            }
+            
+            return false;
+        }
+
         public static void SpawnItem(Frame f, EntityRef marioEntity, MarioPlayer* mario, AssetRef<EntityPrototype> prefab, bool fromBlock) {
             var gamemode = f.FindAsset(f.Global->Rules.Gamemode);
             if (!prefab.IsValid) {
@@ -1994,7 +2039,7 @@ namespace Quantum {
             
             var goal = f.Unsafe.GetPointer<Goal>(goalEntity);
             var mario = f.Unsafe.GetPointer<MarioPlayer>(marioEntity);
-            if (mario->IsDead) {
+            if (mario->IsDead || f.Exists(mario->CurrentFlagpole)) {
                 return;
             }
             
@@ -2014,6 +2059,10 @@ namespace Quantum {
             f.Events.MarioTouchedGoal(f, marioEntity, *mario, lastLap, f.Unsafe.GetPointer<Transform2D>(goalEntity)->Position, goal->IsOrb);
             
             if (lastLap && goal->IsOrb) f.Destroy(goalEntity);
+            if (lastLap) {
+                mario->FlagpoleAnimationFrames = (byte)(goal->IsOrb ? 2 : 250);
+                mario->CurrentFlagpole = goalEntity;
+            }
         }
         
         public static bool OnMarioInvisibleBlockInteraction(Frame f, EntityRef marioEntity, EntityRef invisibleBlockEntity, PhysicsContact contact) {

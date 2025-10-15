@@ -79,12 +79,12 @@ namespace NSMB.Sound {
         }
 
         private void OnMarioPlayerPreRespawned(EventMarioPlayerPreRespawned e) {
-            Frame f = PredictedFrame;
-            var mario = f.Unsafe.GetPointer<MarioPlayer>(e.Entity);
+            // Frame f = PredictedFrame;
+            // var mario = f.Unsafe.GetPointer<MarioPlayer>(e.Entity);
 
-            if (Game.PlayerIsLocal(mario->PlayerRef)) {
-                sfx.PlayOneShot(SoundEffect.UI_StartGame);
-            }
+            // if (Game.PlayerIsLocal(mario->PlayerRef)) {
+            //     sfx.PlayOneShot(SoundEffect.UI_StartGame);
+            // }
         }
 
         private void OnStageAutoRefresh(EventStageAutoRefresh e) {

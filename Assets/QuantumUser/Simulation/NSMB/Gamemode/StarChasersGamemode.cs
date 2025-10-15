@@ -96,6 +96,7 @@ namespace Quantum {
 
         public override FP GetItemSpawnWeight(Frame f, CoinItemAsset item, int leaderStars, int ourStars) {
             int starsToWin = f.Global->Rules.StarsToWin;
+            if (starsToWin == 0) return item.SpawnChance;
             int starDifference = leaderStars - ourStars;
             FP bonus = item.LosingSpawnBonus * FPMath.Log(starDifference + 1, FP.E) * (FP._1 - ((FP) (starsToWin - leaderStars) / starsToWin));
             return FPMath.Max(0, item.SpawnChance + bonus);

@@ -4,7 +4,7 @@ using System.Reflection;
 using UnityEngine;
 
 public enum SoundEffect : byte {
-    //CURRENT HIGHEST NUMBER: 116 (use 117 next)
+    //CURRENT HIGHEST NUMBER: 118 (use 119 next)
     //Enemy
     [SoundEffectData("enemy/freeze")] Enemy_Generic_Freeze = 0,
     [SoundEffectData("enemy/freeze_shatter")] Enemy_Generic_FreezeShatter = 1,
@@ -59,6 +59,7 @@ public enum SoundEffect : byte {
     [SoundEffectData("character/{char}/triplejump")] Player_Voice_TripleJump = 38,
     [SoundEffectData("character/{char}/walljump", 2)] Player_Voice_WallJump = 39,
     [SoundEffectData("character/{char}/mega_mushroom_collect")] Player_Sound_MegaMushroom_Collect = 40, //HARDCODED: DO NOT CHANGE WITHOUT CHANGING POWERUPS SCRIPTABLES
+    [SoundEffectData("character/{char}/goal_celeb")] Player_Voice_GoalCeleb = 117,
 
     //Powerup
     [SoundEffectData("powerup/1-up")] Powerup_1UP_Collect = 78, //HARDCODED: DO NOT CHANGE WITHOUT CHANGING POWERUPS SCRIPTABLES
@@ -133,6 +134,7 @@ public enum SoundEffect : byte {
     [SoundEffectData("world/water_splash")] World_Water_Splash = 77,
     [SoundEffectData("world/goal_touched_short")] World_Goal_Non_Last = 115,
     [SoundEffectData("world/goal_touched_long")] World_Goal_Last = 116,
+    [SoundEffectData("world/goal_down")] World_Goal_Down = 118,
 }
 
 public class SoundEffectDataAttribute : Attribute {

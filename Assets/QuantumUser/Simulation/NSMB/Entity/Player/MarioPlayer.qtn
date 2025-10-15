@@ -30,6 +30,13 @@ enum JumpState : Byte {
     TripleJump,
 }
 
+enum GoalAnimationState : Byte {
+    Grabbed,
+    StartSliding,
+    FinishSliding,
+    Celebration,
+}
+
 component MarioPlayer {
 	AssetRef<MarioPlayerPhysicsInfo> PhysicsAsset;
 	AssetRef<CharacterAsset> CharacterAsset;
@@ -54,6 +61,7 @@ component MarioPlayer {
 	[ExcludeFromPrototype] byte DeathAnimationFrames;
 	[ExcludeFromPrototype] byte PreRespawnFrames;
 	[ExcludeFromPrototype] byte RespawnFrames;
+	[ExcludeFromPrototype] byte FlagpoleAnimationFrames;
 	[ExcludeFromPrototype] byte NoLivesStarDirection;
 
 	// Walk/Running
@@ -142,6 +150,7 @@ component MarioPlayer {
 	[ExcludeFromPrototype] byte PipeCooldownFrames;
 
 	[ExcludeFromPrototype] EntityRef CurrentSpinner;
+	[ExcludeFromPrototype] EntityRef CurrentFlagpole;
 }
 
 struct StarChasersData {
@@ -172,6 +181,7 @@ signal OnMarioPlayerTakeDamage(EntityRef entity, ref bool keepDamage);
 signal OnMarioPlayerGroundpoundedSolid(EntityRef mario, PhysicsContact contact, ref bool continueGroundpound);
 signal OnMarioPlayerGroundpoundEnded(EntityRef mario);
 signal OnMarioPlayerMegaMushroomFootstep();
+signal OnMarioPlayerFinishedFlagpoleAnimation(EntityRef entity);
 
 event MarioPlayerJumped {
 	EntityRef Entity;
@@ -295,6 +305,11 @@ synced event MarioPlayerDestroyed {
 
 event MarioPlayerLandedWithAnimation {
 	EntityRef Entity;
+}
+
+event MarioPlayerNextGoalAnimation {
+    EntityRef Entity;
+    GoalAnimationState AnimationState;
 }
 
 event PlayKnockbackEffect {

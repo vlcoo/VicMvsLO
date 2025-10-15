@@ -31,7 +31,7 @@ namespace Quantum {
             factories.Add(new CommandKickPlayer());
             factories.Add(new CommandUnbanPlayer());
 
-#if MVL_DEBUG
+#if UNITY_EDITOR
             factories.Add(new CommandMvLDebugCmd());
 #endif
         }

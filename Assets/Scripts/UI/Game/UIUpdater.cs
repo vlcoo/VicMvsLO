@@ -284,7 +284,7 @@ namespace NSMB.UI.Game {
 
                 if (secondsRemaining != cachedTimer) {
                     cachedTimer = secondsRemaining;
-                    uiCountdown.text = Utils.GetSymbolString("Tx" + secondsRemaining);
+                    uiCountdown.text = Utils.GetSymbolString("T" + secondsRemaining);
                     timerParent.SetActive(true);
                 }
             }
