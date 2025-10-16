@@ -1968,10 +1968,12 @@ namespace Quantum {
             var mario = filter.MarioPlayer;
             var entity = filter.Entity;
 
-            if (!mario->HasCheckpoint && filter.Transform->Position.X > stage.Checkpoint.X) {
-                mario->HasCheckpoint = true;
-                stage.ResetStage(f, false);
-                f.Events.MarioPlayerGotCheckpoint(entity);
+            if (!mario->HasCheckpoint && stage.IsCampaignMap) {
+                if ((stage.VerticalMap && filter.Transform->Position.Y > stage.Checkpoint.Y) || (!stage.VerticalMap && filter.Transform->Position.X > stage.Checkpoint.X)) {
+                    mario->HasCheckpoint = true;
+                    stage.ResetStage(f, false);
+                    f.Events.MarioPlayerGotCheckpoint(entity);
+                }
             }
             
             if (mario->FlagpoleAnimationFrames > 0) {

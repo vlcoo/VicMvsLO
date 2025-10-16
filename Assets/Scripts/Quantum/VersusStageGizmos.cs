@@ -103,9 +103,19 @@ namespace NSMB.Quantum {
                     }
                 }
 
+                if (!stage.IsCampaignMap) return;
                 Gizmos.color = Color.yellow;
-                Gizmos.DrawLine(new Vector3(stage.Checkpoint.X.AsFloat, stage.StageWorldMax.Y.AsFloat + 0.5f), new Vector3(stage.Checkpoint.X.AsFloat, stage.StageWorldMin.Y.AsFloat - 0.5f));
-                Gizmos.DrawLine(new Vector3(stage.Checkpoint.X.AsFloat - 1f, stage.Checkpoint.Y.AsFloat), new Vector3(stage.Checkpoint.X.AsFloat + 1f, stage.Checkpoint.Y.AsFloat));
+                if (stage.VerticalMap) {
+                    Gizmos.DrawLine(new Vector3(stage.StageWorldMin.X.AsFloat - 0.5f, stage.Checkpoint.Y.AsFloat),
+                        new Vector3(stage.StageWorldMax.X.AsFloat + 0.5f, stage.Checkpoint.Y.AsFloat));
+                    Gizmos.DrawLine(new Vector3(stage.Checkpoint.X.AsFloat, stage.Checkpoint.Y.AsFloat - 1f),
+                        new Vector3(stage.Checkpoint.X.AsFloat, stage.Checkpoint.Y.AsFloat + 1f));
+                } else {
+                    Gizmos.DrawLine(new Vector3(stage.Checkpoint.X.AsFloat, stage.StageWorldMax.Y.AsFloat + 0.5f),
+                        new Vector3(stage.Checkpoint.X.AsFloat, stage.StageWorldMin.Y.AsFloat - 0.5f));
+                    Gizmos.DrawLine(new Vector3(stage.Checkpoint.X.AsFloat - 1f, stage.Checkpoint.Y.AsFloat),
+                        new Vector3(stage.Checkpoint.X.AsFloat + 1f, stage.Checkpoint.Y.AsFloat));
+                }
             }
 
             var game = QuantumRunner.DefaultGame;
