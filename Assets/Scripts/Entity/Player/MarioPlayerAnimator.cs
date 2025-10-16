@@ -12,6 +12,7 @@ using Quantum.Profiling;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Scripting;
@@ -158,7 +159,7 @@ namespace NSMB.Entities.Player {
                 r.SetMaterials(matList);
                 matList.Clear();
                 r.GetMaterials(matList);
-                materials[r] = matList;
+                materials[r] = matList.Where(material => material.shader == normalShader).ToList(); // don't touch built in shaders
             }
 
             modelRotationTarget = models.transform.rotation;

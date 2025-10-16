@@ -10,6 +10,7 @@ namespace NSMB.Entities.Enemies {
 
         //---Serialized Variables
         [SerializeField] private SpriteRenderer sRenderer;
+        [SerializeField] private GameObject mesh;
         [SerializeField] private ParticleSystem trailParticles;
         [SerializeField] private AudioSource sfx;
         [SerializeField] private LegacyAnimateSpriteRenderer legacyAnimation;
@@ -52,7 +53,8 @@ namespace NSMB.Entities.Enemies {
             var freezable = f.Unsafe.GetPointer<Freezable>(EntityRef);
             bool frozen = freezable->IsFrozen(f);
 
-            sRenderer.enabled = enemy->IsActive;
+            // sRenderer.enabled = enemy->IsActive;
+            mesh.SetActive(enemy->IsActive);
 
             var emission = trailParticles.emission;
             emission.enabled = enemy->IsActive && !frozen;
@@ -68,7 +70,8 @@ namespace NSMB.Entities.Enemies {
             transform.localScale = Vector3.one * scale;
             fireballScaleTimer = Mathf.Max(0, fireballScaleTimer - Time.deltaTime);
 
-            sRenderer.flipX = enemy->FacingRight;
+            // sRenderer.flipX = enemy->FacingRight;
+            mesh.FlipX(enemy->FacingRight, false);
             Vector2 pos = trailParticles.transform.localPosition;
             pos.x = Mathf.Abs(pos.x) * (enemy->FacingRight ? -1 : 1);
             trailParticles.transform.localPosition = pos;
@@ -77,9 +80,12 @@ namespace NSMB.Entities.Enemies {
         private static WaitForSeconds wait = new(0.33f);
         private IEnumerator ChangeSpriteSortingOrder() {
             int originalSortingOrder = sRenderer.sortingOrder;
+            var originalTransform = mesh.transform.localPosition;
             sRenderer.sortingOrder = -1001;
+            mesh.transform.localPosition = originalTransform + new Vector3(0, 0, 1);
             yield return wait;
             sRenderer.sortingOrder = originalSortingOrder;
+            mesh.transform.localPosition = originalTransform;
         }
 
         private void OnBulletBillHitByProjectile(EventBulletBillHitByProjectile e) {

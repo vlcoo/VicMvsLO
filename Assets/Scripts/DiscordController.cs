@@ -13,7 +13,7 @@ namespace NSMB {
 #pragma warning disable CS0162
 
         //---Static Variables
-        private static readonly long DiscordAppId = 962073502469459999;
+        private static readonly long DiscordAppId = 1059213852950143147;
 
         //---Private Variables
         private Discord.Discord discord;
@@ -134,7 +134,7 @@ namespace NSMB {
                     var gamemode = f.FindAsset<GamemodeAsset>(f.Global->Rules.Gamemode);
 
                     activity.Assets = new ActivityAssets {
-                        LargeImage = !string.IsNullOrWhiteSpace(stage.DiscordStageImage) ? stage.DiscordStageImage : "mainmenu",
+                        LargeImage = !string.IsNullOrWhiteSpace(stage.DiscordStageImage) ? stage.DiscordStageImage : "logo",
                         LargeText = tm.GetTranslation(stage.TranslationKey),
                         SmallImage = gamemode.DiscordRpcKey,
                         SmallText = tm.GetTranslation(gamemode.TranslationKey),

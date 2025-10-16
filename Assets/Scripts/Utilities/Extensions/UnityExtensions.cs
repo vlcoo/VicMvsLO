@@ -29,6 +29,17 @@ namespace NSMB.Utilities.Extensions {
             return bounds;
         }
 
+        public static void FlipX(this GameObject mesh, bool flip, bool includeRotation) {
+            Vector3 localScale = mesh.transform.localScale;
+            localScale.x = Mathf.Abs(localScale.x) * (flip ? 1 : -1);
+            mesh.transform.localScale = localScale;
+            if (includeRotation) {
+                Quaternion localRotation = mesh.transform.localRotation;
+                localRotation.y = Mathf.Abs(localRotation.y) * (flip ? 1 : -1);
+                mesh.transform.localRotation = localRotation;
+            }
+        }
+
         public static float NormalizeScrollDistance(this ScrollRect scrollRect, int axis, float distance) {
             // Based on code in ScrollRect's internal SetNormalizedPosition method
             var viewport = scrollRect.viewport;
