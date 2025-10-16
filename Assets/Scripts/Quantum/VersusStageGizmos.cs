@@ -102,6 +102,10 @@ namespace NSMB.Quantum {
                         Gizmos.DrawLine(worldPos.ToUnityVector3(), QuantumUtils.RelativeTileToWorldRounded(stage, tir2.RelocateTo).ToUnityVector3());
                     }
                 }
+
+                Gizmos.color = Color.yellow;
+                Gizmos.DrawLine(new Vector3(stage.Checkpoint.X.AsFloat, stage.StageWorldMax.Y.AsFloat + 0.5f), new Vector3(stage.Checkpoint.X.AsFloat, stage.StageWorldMin.Y.AsFloat - 0.5f));
+                Gizmos.DrawLine(new Vector3(stage.Checkpoint.X.AsFloat - 1f, stage.Checkpoint.Y.AsFloat), new Vector3(stage.Checkpoint.X.AsFloat + 1f, stage.Checkpoint.Y.AsFloat));
             }
 
             var game = QuantumRunner.DefaultGame;

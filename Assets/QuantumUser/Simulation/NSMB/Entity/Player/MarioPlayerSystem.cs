@@ -1966,8 +1966,15 @@ namespace Quantum {
 
         private bool HandleFlagpoleAnimation(Frame f, ref Filter filter, VersusStageData stage) {
             var mario = filter.MarioPlayer;
+            var entity = filter.Entity;
+
+            if (!mario->HasCheckpoint && filter.Transform->Position.X > stage.Checkpoint.X) {
+                mario->HasCheckpoint = true;
+                stage.ResetStage(f, false);
+                f.Events.MarioPlayerGotCheckpoint(entity);
+            }
+            
             if (mario->FlagpoleAnimationFrames > 0) {
-                var entity = filter.Entity;
                 var transform = filter.Transform;
                 QuantumUtils.Decrement(ref mario->FlagpoleAnimationFrames);
                 Debug.Log(mario->FlagpoleAnimationFrames);
@@ -2045,16 +2052,17 @@ namespace Quantum {
             
             mario->Laps++;
             var lastLap = true;
+            var stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
             if (mario->CurrentLap <= f.Global->Rules.Laps) {
-                var stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
                 var transform = f.Unsafe.GetPointer<Transform2D>(marioEntity);
-                var spawnpoint = stage.GetWorldSpawnpointForPlayer(mario->SpawnpointIndex, f.Global->TotalMarios);
+                var spawnpoint = mario->HasCheckpoint ? stage.Checkpoint : stage.GetWorldSpawnpointForPlayer(mario->SpawnpointIndex, f.Global->TotalMarios);
                 transform->Position = spawnpoint;
                 f.Unsafe.GetPointer<CameraController>(marioEntity)->Recenter(stage, spawnpoint);
                 mario->DamageInvincibilityFrames = 2 * 60;
                 lastLap = false;
             }
             
+            stage.ResetStage(f, false);
             f.Signals.OnMarioTouchedGoal(marioEntity, goalEntity, lastLap);
             f.Events.MarioTouchedGoal(f, marioEntity, *mario, lastLap, f.Unsafe.GetPointer<Transform2D>(goalEntity)->Position, goal->IsOrb);
             

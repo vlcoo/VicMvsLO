@@ -56,6 +56,7 @@ component MarioPlayer {
 
 	[ExcludeFromPrototype] bool Disconnected;
 	[ExcludeFromPrototype] bool IsDead;
+	[ExcludeFromPrototype] bool HasCheckpoint;
 	[ExcludeFromPrototype] bool FireDeath;
 	[ExcludeFromPrototype] bool IsRespawning;
 	[ExcludeFromPrototype] byte DeathAnimationFrames;
@@ -310,6 +311,10 @@ event MarioPlayerLandedWithAnimation {
 event MarioPlayerNextGoalAnimation {
     EntityRef Entity;
     GoalAnimationState AnimationState;
+}
+
+event MarioPlayerGotCheckpoint {
+    EntityRef Entity;
 }
 
 event PlayKnockbackEffect {

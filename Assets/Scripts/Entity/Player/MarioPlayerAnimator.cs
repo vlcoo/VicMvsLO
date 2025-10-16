@@ -98,7 +98,7 @@ namespace NSMB.Entities.Player {
         //---Serialized Variables
         [SerializeField] private CharacterAsset character;
         [SerializeField] private PlayerElements playerElementsPrefab;
-        [SerializeField] private GameObject coinNumberParticle, coinFromBlockParticle, respawnParticle, starCollectParticle, goalOrbParticle;
+        [SerializeField] private GameObject coinNumberParticle, coinFromBlockParticle, respawnParticle, starCollectParticle, goalOrbParticle, checkpointParticle;
         [SerializeField] private Animator animator;
         [SerializeField] private Avatar smallAvatar, largeAvatar;
         [SerializeField] private Shader normalShader, rainbowShader;
@@ -201,6 +201,7 @@ namespace NSMB.Entities.Player {
             QuantumEvent.Subscribe<EventEnemyKicked>(this, OnEnemyKicked, FilterOutReplayFastForward);
             QuantumEvent.Subscribe<EventMarioTouchedGoal>(this, OnMarioTouchedGoal, FilterOutReplayFastForward);
             QuantumEvent.Subscribe<EventMarioPlayerNextGoalAnimation>(this, OnMarioFlagpoleAnimationProgressed, FilterOutReplayFastForward);
+            QuantumEvent.Subscribe<EventMarioPlayerGotCheckpoint>(this, OnMarioPlayerGotCheckpoint, FilterOutReplayFastForward);
         }
 
         public override void OnActivate(Frame f) {
@@ -1303,6 +1304,11 @@ namespace NSMB.Entities.Player {
                 PlaySound(SoundEffect.Player_Voice_GoalCeleb);
                 break;
             }
+        }
+
+        private void OnMarioPlayerGotCheckpoint(EventMarioPlayerGotCheckpoint e) {
+            PlaySoundEverywhere(SoundEffect.World_Checkpoint);
+            Instantiate(checkpointParticle, transform.position, Quaternion.identity);
         }
 
         private void OnEnemyKicked(EventEnemyKicked e) {

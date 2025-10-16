@@ -330,7 +330,7 @@ namespace Quantum {
                 return;
             }
 
-            FPVector2 spawnpoint = stage.GetWorldSpawnpointForPlayer(SpawnpointIndex, f.Global->TotalMarios);
+            FPVector2 spawnpoint = HasCheckpoint ? stage.Checkpoint : stage.GetWorldSpawnpointForPlayer(SpawnpointIndex, f.Global->TotalMarios);
             transform->Position = spawnpoint;
             f.Unsafe.GetPointer<CameraController>(entity)->Recenter(stage, spawnpoint);
             

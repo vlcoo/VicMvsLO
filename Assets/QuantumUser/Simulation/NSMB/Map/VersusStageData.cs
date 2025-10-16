@@ -31,9 +31,10 @@ public unsafe class VersusStageData : AssetObject {
     public bool IsWrappingLevel = true;
     public bool ExtendCeilingHitboxes = false;
 
-    [Header("-- Spawnpoint")]
+    [Header("-- Spawnpoints")]
     public FPVector2 Spawnpoint;
     public FPVector2 SpawnpointArea;
+    public FPVector2 Checkpoint;
 
     [Header("-- Camera")]
     public bool OverrideAutomaticCameraSettings;
