@@ -26,7 +26,7 @@ namespace NSMB.UI.Game {
         //---Serialized Variables
         [SerializeField] private PlayerElements playerElements;
         [SerializeField] private CanvasGroup toggler;
-        [SerializeField] private TrackIcon playerTrackTemplate, starTrackTemplate, starCoinTrackTemplate, objectiveCoinTrackTemplate;
+        [SerializeField] private TrackIcon playerTrackTemplate, starTrackTemplate, starCoinTrackTemplate, objectiveCoinTrackTemplate, goalTrackTemplate, checkpointTrackTemplate;
         [SerializeField] private Sprite storedItemNull;
         [SerializeField] private TMP_Text uiTeamObjective, uiMainObjective, uiCoins, uiDebug, uiLives, uiCountdown, uiLaps;
         [SerializeField] private Image itemReserve, itemColor, deathFade;
@@ -123,6 +123,8 @@ namespace NSMB.UI.Game {
             QuantumEvent.Subscribe<EventGameEnded>(this, OnGameEnded);
             QuantumEvent.Subscribe<EventTimerExpired>(this, OnTimerExpired);
             QuantumEvent.Subscribe<EventStartCameraFadeOut>(this, OnStartCameraFadeOut);
+
+            goalTrackTemplate.gameObject.SetActive(stage.IsCampaignMap);
         }
 
         public void OnDestroy() {
@@ -154,6 +156,14 @@ namespace NSMB.UI.Game {
             previousTarget = Target;
             previousMarioExists = marioExists;
             justResynced = false;
+
+            if (mario->HasCheckpoint && !checkpointTrackTemplate.gameObject.activeSelf) {
+                checkpointTrackTemplate.gameObject.SetActive(true);
+                // checkpoint is a Vector3 position in the stage, we have to convert it to a Transform
+                var checkpointTransform = new GameObject("CheckpointTransform").transform;
+                checkpointTransform.position = stage.Checkpoint.ToUnityVector3();
+                checkpointTrackTemplate.Initialize(playerElements, Target, checkpointTransform);
+            }
         }
 
         private void OnMarioInitialized(QuantumGame game, Frame f, MarioPlayerAnimator mario) {
