@@ -183,6 +183,10 @@ signal OnMarioPlayerGroundpoundedSolid(EntityRef mario, PhysicsContact contact, 
 signal OnMarioPlayerGroundpoundEnded(EntityRef mario);
 signal OnMarioPlayerMegaMushroomFootstep();
 signal OnMarioPlayerFinishedFlagpoleAnimation(EntityRef entity);
+signal OnMarioPlayerJumped(EntityRef entity);
+signal OnMarioPlayerDisqualified(EntityRef entity);
+signal OnMarioPlayerRespawned(EntityRef entity);
+signal OnMarioPlayerReceivedKnockback(EntityRef entity, EntityRef attacker, KnockbackStrength strength);
 
 event MarioPlayerJumped {
 	EntityRef Entity;

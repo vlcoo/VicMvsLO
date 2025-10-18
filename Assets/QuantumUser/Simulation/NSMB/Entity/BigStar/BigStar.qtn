@@ -18,6 +18,7 @@ component BigStar {
 }
 
 signal OnMarioPlayerCollectedStar(EntityRef entity);
+signal OnMarioPlayerZeroedStars(EntityRef entity);
 
 synced event MarioPlayerCollectedStar {
 	EntityRef Entity;

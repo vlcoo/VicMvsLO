@@ -48,8 +48,9 @@ namespace Quantum {
                     new LiquidSystem(),
                     new BreakableObjectSystem(),
                     new MarioBrosPlatformSystem(),
-                    new EnterablePipeSystem()
-                    // new BetterPhysicsObjectSystem()
+                    new EnterablePipeSystem(),
+                    // new BetterPhysicsObjectSystem(),
+                    new MatchConditionerSystem()
                 )
             );
             systems.Add(new StageSystem());

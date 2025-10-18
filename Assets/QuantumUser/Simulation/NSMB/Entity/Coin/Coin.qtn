@@ -16,6 +16,8 @@ enum CoinType : Byte {
 }
 
 signal OnMarioPlayerCollectedCoin(EntityRef marioEntity, EntityRef coinEntity, FPVector2 worldLocation, bool fromBlock, bool downwards);
+signal OnMarioPlayerReachedCoinLimit(EntityRef marioEntity, MarioPlayer* mario);
+signal OnMarioPlayerZeroedCoins(EntityRef marioEntity, MarioPlayer* mario);
 
 synced event MarioPlayerCollectedCoin {
 	EntityRef Entity;

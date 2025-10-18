@@ -3701,6 +3701,9 @@ namespace Quantum {
   public unsafe partial interface ISignalOnMarioPlayerCollectedStar : ISignal {
     void OnMarioPlayerCollectedStar(Frame f, EntityRef entity);
   }
+  public unsafe partial interface ISignalOnMarioPlayerZeroedStars : ISignal {
+    void OnMarioPlayerZeroedStars(Frame f, EntityRef entity);
+  }
   public unsafe partial interface ISignalOnEntityBumped : ISignal {
     void OnEntityBumped(Frame f, EntityRef entity, FPVector2 tileWorldPosition, EntityRef blockBump, QBoolean fromBelow);
   }
@@ -3712,6 +3715,12 @@ namespace Quantum {
   }
   public unsafe partial interface ISignalOnMarioPlayerCollectedCoin : ISignal {
     void OnMarioPlayerCollectedCoin(Frame f, EntityRef marioEntity, EntityRef coinEntity, FPVector2 worldLocation, QBoolean fromBlock, QBoolean downwards);
+  }
+  public unsafe partial interface ISignalOnMarioPlayerReachedCoinLimit : ISignal {
+    void OnMarioPlayerReachedCoinLimit(Frame f, EntityRef marioEntity, MarioPlayer* mario);
+  }
+  public unsafe partial interface ISignalOnMarioPlayerZeroedCoins : ISignal {
+    void OnMarioPlayerZeroedCoins(Frame f, EntityRef marioEntity, MarioPlayer* mario);
   }
   public unsafe partial interface ISignalOnCoinItemSpawnEnded : ISignal {
     void OnCoinItemSpawnEnded(Frame f, EntityRef entity);
@@ -3787,6 +3796,18 @@ namespace Quantum {
   }
   public unsafe partial interface ISignalOnMarioPlayerFinishedFlagpoleAnimation : ISignal {
     void OnMarioPlayerFinishedFlagpoleAnimation(Frame f, EntityRef entity);
+  }
+  public unsafe partial interface ISignalOnMarioPlayerJumped : ISignal {
+    void OnMarioPlayerJumped(Frame f, EntityRef entity);
+  }
+  public unsafe partial interface ISignalOnMarioPlayerDisqualified : ISignal {
+    void OnMarioPlayerDisqualified(Frame f, EntityRef entity);
+  }
+  public unsafe partial interface ISignalOnMarioPlayerRespawned : ISignal {
+    void OnMarioPlayerRespawned(Frame f, EntityRef entity);
+  }
+  public unsafe partial interface ISignalOnMarioPlayerReceivedKnockback : ISignal {
+    void OnMarioPlayerReceivedKnockback(Frame f, EntityRef entity, EntityRef attacker, KnockbackStrength strength);
   }
   public unsafe partial interface ISignalOnEntityChangeUnderwaterState : ISignal {
     void OnEntityChangeUnderwaterState(Frame f, EntityRef entity, EntityRef liquid, QBoolean underwater);
@@ -4094,10 +4115,13 @@ namespace Quantum {
   }
   public unsafe partial class Frame {
     private ISignalOnMarioPlayerCollectedStar[] _ISignalOnMarioPlayerCollectedStarSystems;
+    private ISignalOnMarioPlayerZeroedStars[] _ISignalOnMarioPlayerZeroedStarsSystems;
     private ISignalOnEntityBumped[] _ISignalOnEntityBumpedSystems;
     private ISignalOnBobombExplodeEntity[] _ISignalOnBobombExplodeEntitySystems;
     private ISignalOnBreakableObjectChangedHeight[] _ISignalOnBreakableObjectChangedHeightSystems;
     private ISignalOnMarioPlayerCollectedCoin[] _ISignalOnMarioPlayerCollectedCoinSystems;
+    private ISignalOnMarioPlayerReachedCoinLimit[] _ISignalOnMarioPlayerReachedCoinLimitSystems;
+    private ISignalOnMarioPlayerZeroedCoins[] _ISignalOnMarioPlayerZeroedCoinsSystems;
     private ISignalOnCoinItemSpawnEnded[] _ISignalOnCoinItemSpawnEndedSystems;
     private ISignalOnEnemyDespawned[] _ISignalOnEnemyDespawnedSystems;
     private ISignalOnEnemyRespawned[] _ISignalOnEnemyRespawnedSystems;
@@ -4123,6 +4147,10 @@ namespace Quantum {
     private ISignalOnMarioPlayerGroundpoundEnded[] _ISignalOnMarioPlayerGroundpoundEndedSystems;
     private ISignalOnMarioPlayerMegaMushroomFootstep[] _ISignalOnMarioPlayerMegaMushroomFootstepSystems;
     private ISignalOnMarioPlayerFinishedFlagpoleAnimation[] _ISignalOnMarioPlayerFinishedFlagpoleAnimationSystems;
+    private ISignalOnMarioPlayerJumped[] _ISignalOnMarioPlayerJumpedSystems;
+    private ISignalOnMarioPlayerDisqualified[] _ISignalOnMarioPlayerDisqualifiedSystems;
+    private ISignalOnMarioPlayerRespawned[] _ISignalOnMarioPlayerRespawnedSystems;
+    private ISignalOnMarioPlayerReceivedKnockback[] _ISignalOnMarioPlayerReceivedKnockbackSystems;
     private ISignalOnEntityChangeUnderwaterState[] _ISignalOnEntityChangeUnderwaterStateSystems;
     private ISignalOnEntityCrushed[] _ISignalOnEntityCrushedSystems;
     private ISignalOnMarioPlayerCollectedPowerup[] _ISignalOnMarioPlayerCollectedPowerupSystems;
@@ -4141,10 +4169,13 @@ namespace Quantum {
     partial void InitGen() {
       Initialize(this, this.SimulationConfig.Entities, 256);
       _ISignalOnMarioPlayerCollectedStarSystems = BuildSignalsArray<ISignalOnMarioPlayerCollectedStar>();
+      _ISignalOnMarioPlayerZeroedStarsSystems = BuildSignalsArray<ISignalOnMarioPlayerZeroedStars>();
       _ISignalOnEntityBumpedSystems = BuildSignalsArray<ISignalOnEntityBumped>();
       _ISignalOnBobombExplodeEntitySystems = BuildSignalsArray<ISignalOnBobombExplodeEntity>();
       _ISignalOnBreakableObjectChangedHeightSystems = BuildSignalsArray<ISignalOnBreakableObjectChangedHeight>();
       _ISignalOnMarioPlayerCollectedCoinSystems = BuildSignalsArray<ISignalOnMarioPlayerCollectedCoin>();
+      _ISignalOnMarioPlayerReachedCoinLimitSystems = BuildSignalsArray<ISignalOnMarioPlayerReachedCoinLimit>();
+      _ISignalOnMarioPlayerZeroedCoinsSystems = BuildSignalsArray<ISignalOnMarioPlayerZeroedCoins>();
       _ISignalOnCoinItemSpawnEndedSystems = BuildSignalsArray<ISignalOnCoinItemSpawnEnded>();
       _ISignalOnEnemyDespawnedSystems = BuildSignalsArray<ISignalOnEnemyDespawned>();
       _ISignalOnEnemyRespawnedSystems = BuildSignalsArray<ISignalOnEnemyRespawned>();
@@ -4170,6 +4201,10 @@ namespace Quantum {
       _ISignalOnMarioPlayerGroundpoundEndedSystems = BuildSignalsArray<ISignalOnMarioPlayerGroundpoundEnded>();
       _ISignalOnMarioPlayerMegaMushroomFootstepSystems = BuildSignalsArray<ISignalOnMarioPlayerMegaMushroomFootstep>();
       _ISignalOnMarioPlayerFinishedFlagpoleAnimationSystems = BuildSignalsArray<ISignalOnMarioPlayerFinishedFlagpoleAnimation>();
+      _ISignalOnMarioPlayerJumpedSystems = BuildSignalsArray<ISignalOnMarioPlayerJumped>();
+      _ISignalOnMarioPlayerDisqualifiedSystems = BuildSignalsArray<ISignalOnMarioPlayerDisqualified>();
+      _ISignalOnMarioPlayerRespawnedSystems = BuildSignalsArray<ISignalOnMarioPlayerRespawned>();
+      _ISignalOnMarioPlayerReceivedKnockbackSystems = BuildSignalsArray<ISignalOnMarioPlayerReceivedKnockback>();
       _ISignalOnEntityChangeUnderwaterStateSystems = BuildSignalsArray<ISignalOnEntityChangeUnderwaterState>();
       _ISignalOnEntityCrushedSystems = BuildSignalsArray<ISignalOnEntityCrushed>();
       _ISignalOnMarioPlayerCollectedPowerupSystems = BuildSignalsArray<ISignalOnMarioPlayerCollectedPowerup>();
@@ -4333,6 +4368,15 @@ namespace Quantum {
           }
         }
       }
+      public void OnMarioPlayerZeroedStars(EntityRef entity) {
+        var array = _f._ISignalOnMarioPlayerZeroedStarsSystems;
+        for (Int32 i = 0; i < array.Length; ++i) {
+          var s = array[i];
+          if (_f.SystemIsEnabledInHierarchy((SystemBase)s)) {
+            s.OnMarioPlayerZeroedStars(_f, entity);
+          }
+        }
+      }
       public void OnEntityBumped(EntityRef entity, FPVector2 tileWorldPosition, EntityRef blockBump, QBoolean fromBelow) {
         var array = _f._ISignalOnEntityBumpedSystems;
         for (Int32 i = 0; i < array.Length; ++i) {
@@ -4366,6 +4410,24 @@ namespace Quantum {
           var s = array[i];
           if (_f.SystemIsEnabledInHierarchy((SystemBase)s)) {
             s.OnMarioPlayerCollectedCoin(_f, marioEntity, coinEntity, worldLocation, fromBlock, downwards);
+          }
+        }
+      }
+      public void OnMarioPlayerReachedCoinLimit(EntityRef marioEntity, MarioPlayer* mario) {
+        var array = _f._ISignalOnMarioPlayerReachedCoinLimitSystems;
+        for (Int32 i = 0; i < array.Length; ++i) {
+          var s = array[i];
+          if (_f.SystemIsEnabledInHierarchy((SystemBase)s)) {
+            s.OnMarioPlayerReachedCoinLimit(_f, marioEntity, mario);
+          }
+        }
+      }
+      public void OnMarioPlayerZeroedCoins(EntityRef marioEntity, MarioPlayer* mario) {
+        var array = _f._ISignalOnMarioPlayerZeroedCoinsSystems;
+        for (Int32 i = 0; i < array.Length; ++i) {
+          var s = array[i];
+          if (_f.SystemIsEnabledInHierarchy((SystemBase)s)) {
+            s.OnMarioPlayerZeroedCoins(_f, marioEntity, mario);
           }
         }
       }
@@ -4591,6 +4653,42 @@ namespace Quantum {
           var s = array[i];
           if (_f.SystemIsEnabledInHierarchy((SystemBase)s)) {
             s.OnMarioPlayerFinishedFlagpoleAnimation(_f, entity);
+          }
+        }
+      }
+      public void OnMarioPlayerJumped(EntityRef entity) {
+        var array = _f._ISignalOnMarioPlayerJumpedSystems;
+        for (Int32 i = 0; i < array.Length; ++i) {
+          var s = array[i];
+          if (_f.SystemIsEnabledInHierarchy((SystemBase)s)) {
+            s.OnMarioPlayerJumped(_f, entity);
+          }
+        }
+      }
+      public void OnMarioPlayerDisqualified(EntityRef entity) {
+        var array = _f._ISignalOnMarioPlayerDisqualifiedSystems;
+        for (Int32 i = 0; i < array.Length; ++i) {
+          var s = array[i];
+          if (_f.SystemIsEnabledInHierarchy((SystemBase)s)) {
+            s.OnMarioPlayerDisqualified(_f, entity);
+          }
+        }
+      }
+      public void OnMarioPlayerRespawned(EntityRef entity) {
+        var array = _f._ISignalOnMarioPlayerRespawnedSystems;
+        for (Int32 i = 0; i < array.Length; ++i) {
+          var s = array[i];
+          if (_f.SystemIsEnabledInHierarchy((SystemBase)s)) {
+            s.OnMarioPlayerRespawned(_f, entity);
+          }
+        }
+      }
+      public void OnMarioPlayerReceivedKnockback(EntityRef entity, EntityRef attacker, KnockbackStrength strength) {
+        var array = _f._ISignalOnMarioPlayerReceivedKnockbackSystems;
+        for (Int32 i = 0; i < array.Length; ++i) {
+          var s = array[i];
+          if (_f.SystemIsEnabledInHierarchy((SystemBase)s)) {
+            s.OnMarioPlayerReceivedKnockback(_f, entity, attacker, strength);
           }
         }
       }
