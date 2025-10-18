@@ -12,12 +12,11 @@ namespace NSMB.Entities.Enemies {
 
         //---Serialized Variables
         [SerializeField] private AudioSource sfx;
-        [SerializeField] private SpriteRenderer sRenderer;
         [SerializeField] private Animator animator;
+        [SerializeField] private GameObject mesh;
 
         public void OnValidate() {
             this.SetIfNull(ref sfx);
-            this.SetIfNull(ref sRenderer, UnityExtensions.GetComponentType.Children);
             this.SetIfNull(ref animator, UnityExtensions.GetComponentType.Children);
         }
 
@@ -43,7 +42,7 @@ namespace NSMB.Entities.Enemies {
             var piranhaPlant = f.Unsafe.GetPointer<PiranhaPlant>(EntityRef);
             animator.SetBool(ParamActive, piranhaPlant->ChompFrames > 0);
             animator.SetBool(ParamChomping, piranhaPlant->PopupAnimationTime == 1);
-            sRenderer.enabled = piranhaPlant->PopupAnimationTime != 0;
+            mesh.SetActive(piranhaPlant->PopupAnimationTime != 0);
         }
 
         public void PlayChompSound() {

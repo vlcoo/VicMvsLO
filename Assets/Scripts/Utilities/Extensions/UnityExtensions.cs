@@ -1,3 +1,4 @@
+using DG.Tweening;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -29,14 +30,25 @@ namespace NSMB.Utilities.Extensions {
             return bounds;
         }
 
-        public static void FlipX(this GameObject mesh, bool flip, bool includeRotation) {
-            Vector3 localScale = mesh.transform.localScale;
-            localScale.x = Mathf.Abs(localScale.x) * (flip ? 1 : -1);
-            mesh.transform.localScale = localScale;
-            if (includeRotation) {
-                Quaternion localRotation = mesh.transform.localRotation;
-                localRotation.y = Mathf.Abs(localRotation.y) * (flip ? 1 : -1);
-                mesh.transform.localRotation = localRotation;
+        public static void FlipX(this GameObject mesh, bool flip, bool includeRotation, bool tween = false, float offsetRotation = 0) {
+            if (tween) {
+                // only rotation needs to be changed for tweened flip. "includeRotation" is unused in this branch.
+                // "offsetRotation" is required here so the mesh always faces the correct way...
+                var newRotation = flip ? -offsetRotation + 360 : offsetRotation;
+                DOTween.To(() => mesh.transform.rotation.eulerAngles.y, x => {
+                    var currentRotation = mesh.transform.rotation.eulerAngles;
+                    currentRotation.y = x;
+                    mesh.transform.rotation = Quaternion.Euler(currentRotation);
+                }, newRotation, 0.2f).SetEase(Ease.Linear);
+            } else {
+                Vector3 localScale = mesh.transform.localScale;
+                localScale.x = Mathf.Abs(localScale.x) * (flip ? 1 : -1);
+                mesh.transform.localScale = localScale;
+                if (includeRotation) {
+                    Quaternion localRotation = mesh.transform.localRotation;
+                    localRotation.y = Mathf.Abs(localRotation.y) * (flip ? 1 : -1);
+                    mesh.transform.localRotation = localRotation;
+                }
             }
         }
 

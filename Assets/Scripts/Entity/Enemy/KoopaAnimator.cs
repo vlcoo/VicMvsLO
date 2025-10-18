@@ -17,12 +17,14 @@ namespace NSMB.Entities.Enemies {
         [SerializeField] private Animator animator;
         [SerializeField] private AudioSource sfx;
         [SerializeField] private SpriteRenderer sRenderer;
+        [SerializeField] private GameObject mesh;
         [SerializeField] private Transform rotation;
         [SerializeField] private bool mirrorSprite, dontFlip;
 
         //---Private Variables
         private float dampVelocity;
         private bool facingRight;
+        private float offsetRotation = 0f;
 
         public void OnValidate() {
             this.SetIfNull(ref animator, UnityExtensions.GetComponentType.Children);
@@ -33,6 +35,8 @@ namespace NSMB.Entities.Enemies {
         public void Start() {
             QuantumEvent.Subscribe<EventPlayComboSound>(this, OnPlayComboSound, FilterOutReplayFastForward);
             QuantumEvent.Subscribe<EventPlayBumpSound>(this, OnPlayBumpSound, FilterOutReplayFastForward);
+            
+            if (mesh) offsetRotation = mesh.transform.rotation.eulerAngles.y;
         }
 
         public override unsafe void OnUpdateView() {
@@ -63,37 +67,47 @@ namespace NSMB.Entities.Enemies {
 
             if (enemy->FacingRight != facingRight && !isShell && koopa->TurnaroundWaitFrames < 12) {
                 animator.SetTrigger(ParamTurnaround);
+                if (mesh) mesh.FlipX(facingRight ^ mirrorSprite, false, true, offsetRotation);
             }
             facingRight = enemy->FacingRight;
 
             // "Flip" rotation
+            Transform graphicsTransform;
+            if (sRenderer) {
+                sRenderer.enabled = enemy->IsActive;
+                sRenderer.flipX = enemy->FacingRight ^ mirrorSprite;
+                graphicsTransform = sRenderer.transform;
+            }
+            else if (mesh) {
+                mesh.SetActive(enemy->IsActive);
+                graphicsTransform = transform;
+                if (isShell) mesh.FlipX(enemy->FacingRight ^ mirrorSprite, false);
+            } else return;
+            
             float remainingWakeupTimer = koopa->IsKicked ? 0 : (koopa->WakeupFrames / 60f);
-            if (enemy->IsDead) {
-                sRenderer.transform.rotation *= Quaternion.Euler(0, 0, 400f * (enemy->FacingRight ? -1 : 1) * Time.deltaTime);
-
+            if (enemy->IsDead && !mesh) {
+                graphicsTransform.rotation *= Quaternion.Euler(0, 0, 400f * (enemy->FacingRight ? -1 : 1) * Time.deltaTime);
             } else if (koopa->IsInShell) {
                 if (!freezable->IsFrozen(f)) {
                     if (koopa->IsFlipped && !dontFlip) {
                         dampVelocity = Mathf.Min(dampVelocity + Time.deltaTime * 3, 1);
-                        sRenderer.transform.eulerAngles = new Vector3(
+                        graphicsTransform.eulerAngles = new Vector3(
                             rotation.eulerAngles.x,
                             rotation.eulerAngles.y,
                             Mathf.Lerp(rotation.eulerAngles.z, 180f, dampVelocity) + (remainingWakeupTimer < 3 && remainingWakeupTimer > 0 ? (Mathf.Sin(remainingWakeupTimer * 120f) * 15f) : 0));
 
                     } else {
                         dampVelocity = 0;
-                        sRenderer.transform.eulerAngles = new Vector3(
+                        graphicsTransform.eulerAngles = new Vector3(
                             rotation.eulerAngles.x,
                             rotation.eulerAngles.y,
                             remainingWakeupTimer < 3 && remainingWakeupTimer > 0 ? (Mathf.Sin(remainingWakeupTimer * 120f) * 15f) : 0);
                     }
                 }
             } else {
-                sRenderer.transform.rotation = Quaternion.identity;
+                graphicsTransform.rotation = Quaternion.identity;
             }
 
-            sRenderer.enabled = enemy->IsActive;
-            sRenderer.flipX = enemy->FacingRight ^ mirrorSprite;
 
             Vector3 modifiedZ = transform.position;
             if (f.Exists(holdable->Holder)) {

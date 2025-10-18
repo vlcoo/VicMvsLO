@@ -9,11 +9,10 @@ namespace NSMB.Entities.Enemies {
     public unsafe class BulletBillAnimator : QuantumEntityViewComponent {
 
         //---Serialized Variables
-        [SerializeField] private SpriteRenderer sRenderer;
         [SerializeField] private GameObject mesh;
         [SerializeField] private ParticleSystem trailParticles;
         [SerializeField] private AudioSource sfx;
-        [SerializeField] private LegacyAnimateSpriteRenderer legacyAnimation;
+        [SerializeField] private Animator animator;
         [SerializeField] private GameObject specialKillParticles;
 
         [SerializeField] private float fireballScaleSize = 0.075f;
@@ -23,8 +22,7 @@ namespace NSMB.Entities.Enemies {
 
         public void OnValidate() {
             this.SetIfNull(ref sfx);
-            this.SetIfNull(ref sRenderer, UnityExtensions.GetComponentType.Children);
-            this.SetIfNull(ref legacyAnimation, UnityExtensions.GetComponentType.Children);
+            this.SetIfNull(ref animator, UnityExtensions.GetComponentType.Children);
         }
 
         public void Start() {
@@ -37,7 +35,7 @@ namespace NSMB.Entities.Enemies {
             if (!IsReplayFastForwarding) {
                 sfx.Play();
             }
-            legacyAnimation.enabled = true;
+            animator.enabled = true;
             StartCoroutine(ChangeSpriteSortingOrder());
             trailParticles.Play();
         }
@@ -58,7 +56,7 @@ namespace NSMB.Entities.Enemies {
 
             var emission = trailParticles.emission;
             emission.enabled = enemy->IsActive && !frozen;
-            legacyAnimation.enabled = !frozen;
+            animator.enabled = !frozen;
 
             if (enemy->IsDead) {
                 transform.rotation *= Quaternion.Euler(0, 0, 400f * (enemy->FacingRight ? -1 : 1) * Time.deltaTime);
@@ -70,7 +68,6 @@ namespace NSMB.Entities.Enemies {
             transform.localScale = Vector3.one * scale;
             fireballScaleTimer = Mathf.Max(0, fireballScaleTimer - Time.deltaTime);
 
-            // sRenderer.flipX = enemy->FacingRight;
             mesh.FlipX(enemy->FacingRight, false);
             Vector2 pos = trailParticles.transform.localPosition;
             pos.x = Mathf.Abs(pos.x) * (enemy->FacingRight ? -1 : 1);
@@ -79,12 +76,9 @@ namespace NSMB.Entities.Enemies {
 
         private static WaitForSeconds wait = new(0.33f);
         private IEnumerator ChangeSpriteSortingOrder() {
-            int originalSortingOrder = sRenderer.sortingOrder;
             var originalTransform = mesh.transform.localPosition;
-            sRenderer.sortingOrder = -1001;
             mesh.transform.localPosition = originalTransform + new Vector3(0, 0, 1);
             yield return wait;
-            sRenderer.sortingOrder = originalSortingOrder;
             mesh.transform.localPosition = originalTransform;
         }
 

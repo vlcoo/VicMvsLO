@@ -65,7 +65,7 @@ namespace Quantum {
                 >= 225 and <= 315 => offset * FPVector2.Right,
                 _ => default
             };
-            transform->Position = enemy->Spawnpoint + rotatedOffset;
+            // transform->Position = enemy->Spawnpoint + rotatedOffset;
 
             freezable->IceBlockSize.Y = Constants._1_10 * piranhaPlant->PopupAnimationTime; 
         }
