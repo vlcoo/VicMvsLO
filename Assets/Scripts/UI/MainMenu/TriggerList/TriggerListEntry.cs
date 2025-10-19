@@ -24,10 +24,8 @@ public class TriggerListEntry : MonoBehaviour {
         txtConstraint,
         txtConstraintParameter,
         txtConstraintTarget;
-    public TMP_Dropdown ddCondition,
-        ddConditionParameter,
+    public TMP_Dropdown ddConditionParameter,
         ddConditionTarget,
-        ddAction,
         ddActionParameter,
         ddActionTarget,
         ddConstraint,
@@ -116,21 +114,11 @@ public class TriggerListEntry : MonoBehaviour {
     };
     
     void OnEnable() {
-        if (ddCondition.options.Count != 0 && ddAction.options.Count != 0 && ddConstraint.options.Count != 0) {
+        if (ddConstraint.options.Count != 0) {
             return;
         }
         
         var i = 0;
-        foreach (var condition in Enum.GetValues(typeof(TriggerCondition))) {
-            ddCondition.options.Add(new DropdownTriggerOption(i++, condition.ToString(), (int) condition));
-        }
-        txtCondition.text = ((DropdownTriggerOption)ddCondition.options[ddCondition.value]).OptionName;
-        i = 0;
-        foreach (var action in Enum.GetValues(typeof(TriggerAction))) {
-            ddAction.options.Add(new DropdownTriggerOption(i++, action.ToString(), (int) action));
-        }
-        txtAction.text = ((DropdownTriggerOption)ddAction.options[ddAction.value]).OptionName;
-        i = 0;
         foreach (var constraint in Enum.GetValues(typeof(TriggerConstraint))) {
             ddConstraint.options.Add(new DropdownTriggerOption(i++, constraint.ToString(), (int) constraint));
         }
@@ -150,10 +138,8 @@ public class TriggerListEntry : MonoBehaviour {
     public void SetTrigger(MatchConditionerTrigger newTrigger) {
         _trigger = newTrigger;
         // try to find the index of the correct option in the dropdown, that corresponds to the fields of the given new trigger.
-        ddCondition.SetValueWithoutNotify(ddCondition.options.FindIndex(o =>
-            ((DropdownTriggerOption) o).EnumValue == (int) newTrigger.Condition));
-        ddAction.SetValueWithoutNotify(ddAction.options.FindIndex(o =>
-            ((DropdownTriggerOption) o).EnumValue == (int) newTrigger.Action));
+        txtCondition.text = newTrigger.Condition.ToString();
+        txtAction.text = newTrigger.Action.ToString();
         ddConstraint.SetValueWithoutNotify(ddConstraint.options.FindIndex(o =>
             ((DropdownTriggerOption) o).EnumValue == (int) newTrigger.Constraint));
         RecalculateConditionParameters();
@@ -176,9 +162,8 @@ public class TriggerListEntry : MonoBehaviour {
             ((DropdownTriggerOption) o).EnumValue == (int) newTrigger.ConstraintTarget));
     }
     
-    public void OnConditionChanged() {
-        var value = (DropdownTriggerOption) ddCondition.options[ddCondition.value];
-        _trigger.Condition = (TriggerCondition) value.EnumValue;
+    public void OnConditionChanged(TriggerCondition condition) {
+        _trigger.Condition = condition;
         RecalculateConditionParameters();
         RecalculateConditionTargets();
         Parent.TriggerEdited(this);
@@ -195,9 +180,8 @@ public class TriggerListEntry : MonoBehaviour {
         Parent.TriggerEdited(this);
     }
     
-    public void OnActionChanged() {
-        var value = (DropdownTriggerOption) ddAction.options[ddAction.value];
-        _trigger.Action = (TriggerAction) value.EnumValue;
+    public void OnActionChanged(TriggerAction action) {
+        _trigger.Action = action;
         RecalculateActionParameters();
         RecalculateActionTargets();
         Parent.TriggerEdited(this);

@@ -143,11 +143,13 @@ namespace Quantum {
     ZeroStars,
     MaxCoins,
   }
+  [Serializable]
   public enum TriggerCondition : int {
     GotStar,
     GotCoin,
     Spawned,
     MatchStarted,
+    GotCheckpoint,
     GotPowerup,
     LostPowerup,
     Stunned,
@@ -3809,6 +3811,9 @@ namespace Quantum {
   public unsafe partial interface ISignalOnMarioPlayerReceivedKnockback : ISignal {
     void OnMarioPlayerReceivedKnockback(Frame f, EntityRef entity, EntityRef attacker, KnockbackStrength strength);
   }
+  public unsafe partial interface ISignalOnMarioPlayerGotCheckpoint : ISignal {
+    void OnMarioPlayerGotCheckpoint(Frame f, EntityRef entity);
+  }
   public unsafe partial interface ISignalOnEntityChangeUnderwaterState : ISignal {
     void OnEntityChangeUnderwaterState(Frame f, EntityRef entity, EntityRef liquid, QBoolean underwater);
   }
@@ -4151,6 +4156,7 @@ namespace Quantum {
     private ISignalOnMarioPlayerDisqualified[] _ISignalOnMarioPlayerDisqualifiedSystems;
     private ISignalOnMarioPlayerRespawned[] _ISignalOnMarioPlayerRespawnedSystems;
     private ISignalOnMarioPlayerReceivedKnockback[] _ISignalOnMarioPlayerReceivedKnockbackSystems;
+    private ISignalOnMarioPlayerGotCheckpoint[] _ISignalOnMarioPlayerGotCheckpointSystems;
     private ISignalOnEntityChangeUnderwaterState[] _ISignalOnEntityChangeUnderwaterStateSystems;
     private ISignalOnEntityCrushed[] _ISignalOnEntityCrushedSystems;
     private ISignalOnMarioPlayerCollectedPowerup[] _ISignalOnMarioPlayerCollectedPowerupSystems;
@@ -4205,6 +4211,7 @@ namespace Quantum {
       _ISignalOnMarioPlayerDisqualifiedSystems = BuildSignalsArray<ISignalOnMarioPlayerDisqualified>();
       _ISignalOnMarioPlayerRespawnedSystems = BuildSignalsArray<ISignalOnMarioPlayerRespawned>();
       _ISignalOnMarioPlayerReceivedKnockbackSystems = BuildSignalsArray<ISignalOnMarioPlayerReceivedKnockback>();
+      _ISignalOnMarioPlayerGotCheckpointSystems = BuildSignalsArray<ISignalOnMarioPlayerGotCheckpoint>();
       _ISignalOnEntityChangeUnderwaterStateSystems = BuildSignalsArray<ISignalOnEntityChangeUnderwaterState>();
       _ISignalOnEntityCrushedSystems = BuildSignalsArray<ISignalOnEntityCrushed>();
       _ISignalOnMarioPlayerCollectedPowerupSystems = BuildSignalsArray<ISignalOnMarioPlayerCollectedPowerup>();
@@ -4689,6 +4696,15 @@ namespace Quantum {
           var s = array[i];
           if (_f.SystemIsEnabledInHierarchy((SystemBase)s)) {
             s.OnMarioPlayerReceivedKnockback(_f, entity, attacker, strength);
+          }
+        }
+      }
+      public void OnMarioPlayerGotCheckpoint(EntityRef entity) {
+        var array = _f._ISignalOnMarioPlayerGotCheckpointSystems;
+        for (Int32 i = 0; i < array.Length; ++i) {
+          var s = array[i];
+          if (_f.SystemIsEnabledInHierarchy((SystemBase)s)) {
+            s.OnMarioPlayerGotCheckpoint(_f, entity);
           }
         }
       }

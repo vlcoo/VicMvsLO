@@ -187,6 +187,7 @@ signal OnMarioPlayerJumped(EntityRef entity);
 signal OnMarioPlayerDisqualified(EntityRef entity);
 signal OnMarioPlayerRespawned(EntityRef entity);
 signal OnMarioPlayerReceivedKnockback(EntityRef entity, EntityRef attacker, KnockbackStrength strength);
+signal OnMarioPlayerGotCheckpoint(EntityRef entity);
 
 event MarioPlayerJumped {
 	EntityRef Entity;

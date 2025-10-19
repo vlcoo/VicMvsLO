@@ -8,23 +8,23 @@ using Int32 = System.Int32;
 
 namespace Quantum
 {
-    public class MatchConditionerSystem : SystemSignalsOnly, ISignalOnMarioPlayerCollectedStar, ISignalOnMarioPlayerCollectedCoin, ISignalOnMarioPlayerDied, ISignalOnEntityFreeze, ISignalOnGameStarting, ISignalOnMarioPlayerDisqualified, ISignalOnMarioPlayerJumped, ISignalOnMarioPlayerRespawned, ISignalOnMarioPlayerReceivedKnockback, ISignalOnMarioPlayerCollectedPowerup, ISignalOnMarioPlayerTakeDamage, ISignalOnMarioPlayerReachedCoinLimit, ISignalOnMarioPlayerZeroedStars, ISignalOnMarioPlayerZeroedCoins, ISignalOnMarioTouchedGoal {
+    public class MatchConditionerSystem : SystemSignalsOnly, ISignalOnMarioPlayerCollectedStar, ISignalOnMarioPlayerCollectedCoin, ISignalOnMarioPlayerDied, ISignalOnEntityFreeze, ISignalOnGameStarting, ISignalOnMarioPlayerDisqualified, ISignalOnMarioPlayerJumped, ISignalOnMarioPlayerRespawned, ISignalOnMarioPlayerReceivedKnockback, ISignalOnMarioPlayerCollectedPowerup, ISignalOnMarioPlayerTakeDamage, ISignalOnMarioPlayerReachedCoinLimit, ISignalOnMarioPlayerZeroedStars, ISignalOnMarioPlayerZeroedCoins, ISignalOnMarioTouchedGoal, ISignalOnMarioPlayerGotCheckpoint {
         public override unsafe void OnInit(Frame f) {
             // MOCK TRIGGER LIST for testing purposes...
             f.Global->Rules.Triggers = f.AllocateList<MatchConditionerTrigger>(20);
             var triggerMap = f.ResolveList(f.Global->Rules.Triggers);
             
-            triggerMap.Add(new MatchConditionerTrigger {
-                Condition = TriggerCondition.GotCoin,
-                ConditionParameter = "",
-                ConditionTarget = TriggerTarget.Any,
-                Action = TriggerAction.Kill,
-                ActionParameter = "",
-                ActionTarget = TriggerTarget.Conditioner,
-                Constraint = TriggerConstraint.Always,
-                ConstraintParameter = "",
-                ConstraintTarget = TriggerTarget.Any,
-            });
+            // triggerMap.Add(new MatchConditionerTrigger {
+            //     Condition = TriggerCondition.GotCoin,
+            //     ConditionParameter = "",
+            //     ConditionTarget = TriggerTarget.Any,
+            //     Action = TriggerAction.Kill,
+            //     ActionParameter = "",
+            //     ActionTarget = TriggerTarget.Conditioner,
+            //     Constraint = TriggerConstraint.Always,
+            //     ConstraintParameter = "",
+            //     ConstraintTarget = TriggerTarget.Any,
+            // });
         }
 
         private unsafe void ConditionActioned(TriggerCondition condition, Frame f, EntityRef conditionerEntity, string parameter = "") {
@@ -186,7 +186,6 @@ namespace Quantum
         }
 
         public void a() {
-            // ConditionActioned(TriggerCondition.GotCheckpoint, f, entity);
             // ConditionActioned(TriggerCondition.HitBlock, f, entity);
             // ConditionActioned(TriggerCondition.StunnedSomeone, f, entity);
             // ConditionActioned(TriggerCondition.SteppedOnEnemy, f, entity);
@@ -265,6 +264,11 @@ namespace Quantum
         public void OnMarioPlayerTakeDamage(Frame f, EntityRef entity, ref QBoolean keepDamage) {
             ConditionActioned(TriggerCondition.LostPowerup, f, entity);
         }
+
+        public void OnMarioPlayerGotCheckpoint(Frame f, EntityRef entity) {
+            ConditionActioned(TriggerCondition.GotCheckpoint, f, entity);
+        }
+
         #endregion
 
         #region Actions

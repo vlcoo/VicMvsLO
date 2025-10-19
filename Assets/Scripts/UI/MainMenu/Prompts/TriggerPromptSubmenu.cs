@@ -9,9 +9,11 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
     public class TriggerPromptSubmenu : PromptSubmenu {
         public GameObject triggerTemplate;
         public GameObject triggersParent;
+        public GameObject popupCondition, popupAction;
         public CounterTip counterTip;
         public bool success = true;
         public List<TriggerListEntry> triggers = new();
+        public TriggerListEntry currentEditingEntry = null;
 
         public void Start() {
             QuantumEvent.Subscribe<EventTriggersChanged>(this, OnTriggersChanged);
@@ -104,6 +106,32 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
 
             var slot = game.GetLocalPlayerSlots()[game.GetLocalPlayers().IndexOf(game.Frames.Predicted.Global->Host)];
             game.SendCommand(slot, cmd);
+        }
+
+        public void OnConditionClicked(TriggerListEntry entry) {
+            currentEditingEntry = entry;
+            popupCondition.SetActive(true);
+        }
+
+        public void OnConditionSelected(string condition) {
+            currentEditingEntry.OnConditionChanged(Enum.Parse<TriggerCondition>(condition));
+            ClosePopups();
+        }
+        
+        public void OnActionClicked(TriggerListEntry entry) {
+            currentEditingEntry = entry;
+            popupAction.SetActive(true);
+        }
+        
+        public void OnActionSelected(string action) {
+            currentEditingEntry.OnActionChanged(Enum.Parse<TriggerAction>(action));
+            ClosePopups();
+        }
+        
+        public void ClosePopups() {
+            popupCondition.SetActive(false);
+            popupAction.SetActive(false);
+            currentEditingEntry = null;
         }
         
         public void OnGameDestroyed(CallbackGameDestroyed e) {

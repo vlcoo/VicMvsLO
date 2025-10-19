@@ -114,8 +114,8 @@ namespace NSMB {
                     },
                     Id = realtimeRoom.Name + "1",
                 };
-                activity.State = realtimeRoom.IsVisible ? tm.GetTranslation("discord.public") : tm.GetTranslation("discord.private");
-                activity.Details = tm.GetTranslation("discord.online");
+                activity.State = realtimeRoom.IsVisible ? "public" : "private";
+                activity.Details = "playing";
                 activity.Secrets = new() { Join = realtimeRoom.Name };
             }
             if (game != null) {
@@ -125,9 +125,9 @@ namespace NSMB {
                     // In a level
                     if (activity.Details == null) {
                         if (runner.Session.IsReplay) {
-                            activity.Details = tm.GetTranslation("discord.replay");
+                            activity.Details = "replay";
                         } else {
-                            activity.Details = tm.GetTranslation("discord.offline");
+                            activity.Details = "playing";
                         }
                     }
                     var stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
@@ -135,7 +135,7 @@ namespace NSMB {
 
                     activity.Assets = new ActivityAssets {
                         LargeImage = !string.IsNullOrWhiteSpace(stage.DiscordStageImage) ? stage.DiscordStageImage : "logo",
-                        LargeText = tm.GetTranslation(stage.TranslationKey),
+                        LargeText = stage.LegalEnglishName,
                         SmallImage = gamemode.DiscordRpcKey,
                         SmallText = tm.GetTranslation(gamemode.TranslationKey),
                     };
@@ -149,8 +149,8 @@ namespace NSMB {
                 }
             } else {
                 // In the main menu, not in a room
-                activity.Details = tm.GetTranslation("discord.mainmenu");
-                activity.Assets = new() { LargeImage = "mainmenu" };
+                activity.Details = "main menu";
+                activity.Assets = new() { LargeImage = "logo" };
             }
 
             activityManager.UpdateActivity(activity, (res) => { });

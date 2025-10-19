@@ -509,6 +509,8 @@ namespace Quantum {
             physicsObject->Velocity.Y = newY;
 
             f.Events.MarioPlayerJumped(filter.Entity, mario->CurrentPowerupState, mario->JumpState, mario->DoEntityBounce, false);
+            f.Signals.OnMarioPlayerJumped(filter.Entity);
+            
             if (mario->DoEntityBounce) {
                 mario->IsCrouching = false;
                 mario->PropellerDrillCooldown = 30;

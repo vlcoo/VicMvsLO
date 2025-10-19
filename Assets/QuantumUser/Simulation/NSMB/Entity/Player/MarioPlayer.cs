@@ -326,6 +326,7 @@ namespace Quantum {
             RespawnFrames = 78;
 
             if ((f.Global->Rules.IsLivesEnabled && Lives == 0) || Disconnected) {
+                f.Signals.OnMarioPlayerDisqualified(entity);
                 f.Destroy(entity);
                 return;
             }
@@ -386,6 +387,7 @@ namespace Quantum {
             physicsObject->DisableCollision = false;
 
             f.Events.MarioPlayerRespawned(entity);
+            f.Signals.OnMarioPlayerRespawned(entity);
 
             if (Disconnected) {
                 // Disconnected while respawning
@@ -481,6 +483,7 @@ namespace Quantum {
             WallslideLeft = WallslideRight = false;
             
             f.Signals.OnMarioPlayerDropObjective(entity, starsToDrop, attacker);
+            f.Signals.OnMarioPlayerReceivedKnockback(entity, attacker, strength);
             return true;
         }
 
