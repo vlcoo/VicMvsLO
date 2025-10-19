@@ -97,6 +97,8 @@ namespace Quantum {
         }
 
         public static void TryCollectCoin(Frame f, EntityRef coinEntity, EntityRef marioEntity) {
+            if (f.Global->Rules.SNoCoins) return;
+            
             if (!f.Unsafe.TryGetPointer(coinEntity, out Coin* coin)
                 || coin->IsCollected
                 || coin->UncollectableFrames > 0

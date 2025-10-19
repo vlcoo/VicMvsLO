@@ -33,22 +33,11 @@ namespace Quantum {
         public bool SNoPowerups;
         public bool SShowCoinCount;
 
-        public bool HStars;
-        public bool HPlayers;
-        public bool HHost;
-        public bool HIceCubes;
-        public int HTeamTarget;
-        // public bool HStarCount;
-        // public bool HLifeCount;
-        // public bool HLapCount;
-        // public bool HCoinCount;
-        // public bool HNicknames;
-
         public override void Serialize(BitStream stream) {
             if (stream.Writing) {
-                stream.WriteUShort((ushort) EnabledChanges);
+                stream.WriteUInt((uint) EnabledChanges);
             } else {
-                EnabledChanges = (Rules) stream.ReadUShort();
+                EnabledChanges = (Rules) stream.ReadUInt();
             }
 
             stream.Serialize(ref Stage);
@@ -77,17 +66,6 @@ namespace Quantum {
             stream.Serialize(ref SNoCoins);
             stream.Serialize(ref SNoPowerups);
             stream.Serialize(ref SShowCoinCount);
-            
-            stream.Serialize(ref HStars);
-            stream.Serialize(ref HPlayers);
-            stream.Serialize(ref HHost);
-            stream.Serialize(ref HIceCubes);
-            stream.Serialize(ref HTeamTarget);
-            // stream.Serialize(ref HStarCount);
-            // stream.Serialize(ref HLifeCount);
-            // stream.Serialize(ref HLapCount);
-            // stream.Serialize(ref HCoinCount);
-            // stream.Serialize(ref HNicknames);
         }
 
         public unsafe void Execute(Frame f, PlayerRef sender, PlayerData* playerData) {
@@ -114,30 +92,29 @@ namespace Quantum {
                 levelChanged = rules.Stage != Stage;
                 rules.Stage = Stage;
             }
-            if (rulesChanges.HasFlag(Rules.StarsToWin)) {
-                rules.StarsToWin = StarsToWin;
-            }
-            if (rulesChanges.HasFlag(Rules.CoinsForPowerup)) {
-                rules.CoinsForPowerup = CoinsForPowerup;
-            }
-            if (rulesChanges.HasFlag(Rules.Lives)) {
-                rules.Lives = Lives;
-            }
-            if (rulesChanges.HasFlag(Rules.Laps)) {
-                rules.Laps = Laps;
-            }
-            if (rulesChanges.HasFlag(Rules.TimerSeconds)) {
-                rules.TimerSeconds = TimerSeconds;
-            }
-            if (rulesChanges.HasFlag(Rules.TeamsEnabled)) {
-                rules.TeamsEnabled = TeamsEnabled;
-            }
-            if (rulesChanges.HasFlag(Rules.CustomPowerupsEnabled)) {
-                rules.CustomPowerupsEnabled = CustomPowerupsEnabled;
-            }
-            if (rulesChanges.HasFlag(Rules.DrawOnTimeUp)) {
-                rules.DrawOnTimeUp = DrawOnTimeUp;
-            }
+            if (rulesChanges.HasFlag(Rules.StarsToWin)) rules.StarsToWin = StarsToWin;
+            if (rulesChanges.HasFlag(Rules.CoinsForPowerup)) rules.CoinsForPowerup = CoinsForPowerup;
+            if (rulesChanges.HasFlag(Rules.Lives)) rules.Lives = Lives;
+            if (rulesChanges.HasFlag(Rules.Laps)) rules.Laps = Laps;
+            if (rulesChanges.HasFlag(Rules.TimerSeconds)) rules.TimerSeconds = TimerSeconds;
+            if (rulesChanges.HasFlag(Rules.TeamsEnabled)) rules.TeamsEnabled = TeamsEnabled;
+            if (rulesChanges.HasFlag(Rules.CustomPowerupsEnabled)) rules.CustomPowerupsEnabled = CustomPowerupsEnabled;
+            if (rulesChanges.HasFlag(Rules.DrawOnTimeUp)) rules.DrawOnTimeUp = DrawOnTimeUp;
+            if (rulesChanges.HasFlag(Rules.SNoReserve)) rules.SNoReserve = SNoReserve;
+            if (rulesChanges.HasFlag(Rules.SNoDroppedStars)) rules.SNoDroppedStars = SNoDroppedStars;
+            if (rulesChanges.HasFlag(Rules.SInstantDeath)) rules.SInstantDeath = SInstantDeath;
+            if (rulesChanges.HasFlag(Rules.SNoDefrost)) rules.SNoDefrost = SNoDefrost;
+            if (rulesChanges.HasFlag(Rules.SNoCollisions)) rules.SNoCollisions = SNoCollisions;
+            if (rulesChanges.HasFlag(Rules.SNoIframes)) rules.SNoIframes = SNoIframes;
+            if (rulesChanges.HasFlag(Rules.SHideSeek)) rules.SHideSeek = SHideSeek;
+            if (rulesChanges.HasFlag(Rules.SNoEnemies)) rules.SNoEnemies = SNoEnemies;
+            if (rulesChanges.HasFlag(Rules.SNoBahs)) rules.SNoBahs = SNoBahs;
+            if (rulesChanges.HasFlag(Rules.SPitWrap)) rules.SPitWrap = SPitWrap;
+            if (rulesChanges.HasFlag(Rules.SAllBricks)) rules.SAllBricks = SAllBricks;
+            if (rulesChanges.HasFlag(Rules.SNoLooping)) rules.SNoLooping = SNoLooping;
+            if (rulesChanges.HasFlag(Rules.SNoCoins)) rules.SNoCoins = SNoCoins;
+            if (rulesChanges.HasFlag(Rules.SNoPowerups)) rules.SNoPowerups = SNoPowerups;
+            if (rulesChanges.HasFlag(Rules.SShowCoinCount)) rules.SShowCoinCount = SShowCoinCount;
 
             f.Global->Rules = rules;
             f.Events.RulesChanged(gamemodeChanged, levelChanged);
@@ -160,7 +137,6 @@ namespace Quantum {
             CustomPowerupsEnabled = 1 << 7,
             DrawOnTimeUp = 1 << 8,
             Laps = 1 << 9,
-            PowerupChances = 1 << 10,
             SNoReserve = 1 << 11,
             SNoDroppedStars = 1 << 12,
             SInstantDeath = 1 << 13,
@@ -176,16 +152,6 @@ namespace Quantum {
             SNoCoins = 1 << 23,
             SNoPowerups = 1 << 24,
             SShowCoinCount = 1 << 25,
-            HStars = 1 << 26,
-            HPlayers = 1 << 27,
-            HHost = 1 << 28,
-            HIceCubes = 1 << 29,
-            HTeamTarget = 1 << 30,
-            // HStarCount = 1 << 30,
-            // HLifeCount = 1L << 31,
-            // HLapCount = 1L << 32,
-            // HCoinCount = 1L << 33,
-            // HNicknames = 1L << 34,
         }
     }
 }

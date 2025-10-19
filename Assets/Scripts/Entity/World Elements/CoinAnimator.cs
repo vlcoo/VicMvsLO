@@ -77,7 +77,8 @@ namespace NSMB.Entities.World {
         public override void OnUpdateView() {
             using var profilerScope = HostProfiler.Start("CoinAnimator.OnUpdateView");
             Frame f = PredictedFrame;
-            if (!f.Exists(EntityRef)) {
+            if (!f.Exists(EntityRef) || f.Global->Rules.SNoCoins) {
+                sRenderer.enabled = false;
                 return;
             }
 

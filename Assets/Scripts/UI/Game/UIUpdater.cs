@@ -157,7 +157,7 @@ namespace NSMB.UI.Game {
             previousMarioExists = marioExists;
             justResynced = false;
 
-            if (mario->HasCheckpoint && !checkpointTrackTemplate.gameObject.activeSelf) {
+            if (mario->HasCheckpoint && checkpointTrackTemplate.gameObject && !checkpointTrackTemplate.gameObject.activeSelf) {
                 checkpointTrackTemplate.gameObject.SetActive(true);
                 // checkpoint is a Vector3 position in the stage, we have to convert it to a Transform
                 var checkpointTransform = new GameObject("CheckpointTransform").transform;
@@ -235,7 +235,7 @@ namespace NSMB.UI.Game {
             livesParent.SetActive(marioExists && f.Global->Rules.IsLivesEnabled);
             coinsParent.SetActive(marioExists && f.Global->Rules.IsCoinsEnabled);
             timerParent.SetActive(f.Global->Rules.IsTimerEnabled);
-            reserveItemBox.SetActive(marioExists);
+            reserveItemBox.SetActive(marioExists && !f.Global->Rules.SNoReserve);
         }
 
         private IEnumerator ReserveSummonCoroutine() {

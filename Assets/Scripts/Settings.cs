@@ -166,10 +166,10 @@ namespace NSMB {
             set => Application.targetFrameRate = (value <= 0 ? -1 : value);
         }
 
-        public bool GraphicsPlayerOutlines {
-            get => GlobalController.Instance.outlineFeature.isActive;
-            set => GlobalController.Instance.outlineFeature.SetActive(value);
-        }
+        // public bool GraphicsPlayerOutlines {
+        //     get => GlobalController.Instance.outlineFeature.isActive;
+        //     set => GlobalController.Instance.outlineFeature.SetActive(value);
+        // }
 
         private bool _graphicsPlayerNametags;
         public bool GraphicsPlayerNametags {
@@ -269,7 +269,7 @@ namespace NSMB {
             PlayerPrefs.SetInt("Graphics_NDS_PixelPerfect", GraphicsNdsPixelPerfect ? 1 : 0);
             PlayerPrefs.SetInt("Graphics_VSync", GraphicsVsync ? 1 : 0);
             PlayerPrefs.SetInt("Graphics_MaxFPS", GraphicsMaxFps);
-            PlayerPrefs.SetInt("Graphics_PlayerOutlines", GraphicsPlayerOutlines ? 1 : 0);
+            // PlayerPrefs.SetInt("Graphics_PlayerOutlines", GraphicsPlayerOutlines ? 1 : 0);
             PlayerPrefs.SetInt("Graphics_PlayerNametags", GraphicsPlayerNametags ? 1 : 0);
             PlayerPrefs.SetInt("Graphics_Colorblind", GraphicsColorblind ? 1 : 0);
             PlayerPrefs.SetInt("Graphics_InputDisplay", GraphicsInputDisplay ? 1 : 0);
@@ -347,7 +347,7 @@ namespace NSMB {
             GraphicsNdsPixelPerfect = false;
             GraphicsVsync = PlayerPrefs.GetInt("VSync", 1) != 0;
             GraphicsMaxFps = 0;
-            GraphicsPlayerOutlines = true;
+            // GraphicsPlayerOutlines = true;
             GraphicsPlayerNametags = true;
             GraphicsColorblind = false;
             GraphicsInputDisplay = false;
@@ -400,7 +400,7 @@ namespace NSMB {
             TryGetSetting<bool>("Graphics_NDS_PixelPerfect", nameof(GraphicsNdsPixelPerfect));
             TryGetSetting<int>("Graphics_MaxFPS", nameof(GraphicsMaxFps));
             TryGetSetting<bool>("Graphics_VSync", nameof(GraphicsVsync));
-            TryGetSetting<bool>("Graphics_PlayerOutlines", nameof(GraphicsPlayerOutlines));
+            // TryGetSetting<bool>("Graphics_PlayerOutlines", nameof(GraphicsPlayerOutlines));
             TryGetSetting<bool>("Graphics_PlayerNametags", nameof(GraphicsPlayerNametags));
             TryGetSetting<bool>("Graphics_Colorblind", nameof(GraphicsColorblind));
             TryGetSetting<bool>("Graphics_InputDisplay", nameof(GraphicsInputDisplay));

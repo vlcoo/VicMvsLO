@@ -1090,7 +1090,8 @@ namespace Quantum {
                 mario->IsCrouching = false;
                 mario->IsInShell = false;
             } else {
-                QuantumUtils.Decrement(ref mario->DamageInvincibilityFrames);
+                if (f.Global->Rules.SNoIframes) mario->DamageInvincibilityFrames = 0;
+                else QuantumUtils.Decrement(ref mario->DamageInvincibilityFrames);
             }
         }
 
@@ -1981,7 +1982,6 @@ namespace Quantum {
             if (mario->FlagpoleAnimationFrames > 0) {
                 var transform = filter.Transform;
                 QuantumUtils.Decrement(ref mario->FlagpoleAnimationFrames);
-                Debug.Log(mario->FlagpoleAnimationFrames);
                 if (mario->FlagpoleAnimationFrames == 249) {
                     // grab onto pole
                     f.Events.MarioPlayerNextGoalAnimation(entity, GoalAnimationState.Grabbed);
@@ -2029,6 +2029,7 @@ namespace Quantum {
         }
 
         public void SpawnReserveItem(Frame f, ref Filter filter) {
+            if (f.Global->Rules.SNoReserve) return;
             var mario = filter.MarioPlayer;
             var reserveItem = f.FindAsset(mario->ReserveItem);
 
@@ -2163,6 +2164,7 @@ namespace Quantum {
         }
 
         public void OnMarioMarioInteraction(Frame f, EntityRef marioAEntity, EntityRef marioBEntity) {
+            if (f.Global->Rules.SNoCollisions) return;
             var marioA = f.Unsafe.GetPointer<MarioPlayer>(marioAEntity);
             var marioB = f.Unsafe.GetPointer<MarioPlayer>(marioBEntity);
 

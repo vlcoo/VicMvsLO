@@ -32,7 +32,6 @@ namespace NSMB {
 
         public PauseOptionMenuManager optionsManager;
 
-        public ScriptableRendererFeature outlineFeature;
         public GameObject graphy, connecting;
         public LoadingCanvas loadingCanvas;
         public Image fullscreenFadeImage;

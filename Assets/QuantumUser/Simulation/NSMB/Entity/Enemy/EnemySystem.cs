@@ -1,4 +1,5 @@
 using Photon.Deterministic;
+using UnityEngine;
 
 namespace Quantum {
 
@@ -65,6 +66,14 @@ namespace Quantum {
         }
 
         public void OnStageReset(Frame f, QBoolean full) {
+            if (f.Global->Rules.SNoEnemies) {
+                var enemyFilter = f.Filter<Enemy>();
+                while (enemyFilter.NextUnsafe(out EntityRef entity, out Enemy* _)) {
+                    f.Destroy(entity);
+                }
+                return;
+            }
+            
             var filter = f.Filter<Enemy, Transform2D>();
 
             while (filter.NextUnsafe(out EntityRef entity, out Enemy* enemy, out Transform2D* transform)) {

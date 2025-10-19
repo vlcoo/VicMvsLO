@@ -3,6 +3,7 @@ using Photon.Deterministic;
 namespace Quantum {
     public unsafe partial struct IceBlock {
         public readonly bool TimerEnabled(Frame f, EntityRef iceBlockEntity) {
+            if (f.Global->Rules.SNoDefrost) return false;
             var childFreezable = f.Unsafe.GetPointer<Freezable>(Entity);
             var holdable = f.Unsafe.GetPointer<Holdable>(iceBlockEntity);
             var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(iceBlockEntity);

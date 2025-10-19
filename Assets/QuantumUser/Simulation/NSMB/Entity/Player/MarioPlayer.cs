@@ -126,6 +126,7 @@ namespace Quantum {
         }
 
         public void SetReserveItem(Frame f, PowerupAsset newItem) {
+            if (f.Global->Rules.SNoReserve) return;
             var currentItem = f.FindAsset(ReserveItem);
 
             if (currentItem == null) {
@@ -268,6 +269,7 @@ namespace Quantum {
         }
 
         public void SpawnStars(Frame f, EntityRef entity, int amount) {
+            if (f.Global->Rules.SNoDroppedStars) return;
             var stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
             var transform = f.Unsafe.GetPointer<Transform2D>(entity);
             bool fastStars = amount > 2 && GamemodeData.StarChasers->Stars > 2;

@@ -11,6 +11,17 @@ namespace Quantum {
         public int ChanceMiniMushroom;
         public int ChanceMegaMushroom;
         public int ChanceStarman;
+        
+        public bool HStars;
+        public bool HPlayers;
+        public bool HHost;
+        public bool HIceCubes;
+        public int HTeamTarget;
+        public bool HStarCount;
+        public bool HLifeCount;
+        public bool HLapCount;
+        public bool HCoinCount;
+        public bool HNicknames;
 
         public override void Serialize(BitStream stream) {
             stream.Serialize(ref ChanceMushroom);
@@ -22,6 +33,17 @@ namespace Quantum {
             stream.Serialize(ref ChanceMiniMushroom);
             stream.Serialize(ref ChanceMegaMushroom);
             stream.Serialize(ref ChanceStarman);
+            
+            stream.Serialize(ref HStars);
+            stream.Serialize(ref HPlayers);
+            stream.Serialize(ref HHost);
+            stream.Serialize(ref HIceCubes);
+            stream.Serialize(ref HTeamTarget);
+            stream.Serialize(ref HStarCount);
+            stream.Serialize(ref HLifeCount);
+            stream.Serialize(ref HLapCount);
+            stream.Serialize(ref HCoinCount);
+            stream.Serialize(ref HNicknames);
         }
 
         public unsafe void Execute(Frame f, PlayerRef sender, PlayerData* playerData) {
@@ -41,6 +63,16 @@ namespace Quantum {
             rules.ChanceMiniMushroom = ChanceMiniMushroom;
             rules.ChanceMegaMushroom = ChanceMegaMushroom;
             rules.ChanceStarman = ChanceStarman;
+            rules.HStars = HStars;
+            rules.HPlayers = HPlayers;
+            rules.HHost = HHost;
+            rules.HIceCubes = HIceCubes;
+            rules.HTeamTarget = HTeamTarget;
+            rules.HStarCount = HStarCount;
+            rules.HLifeCount = HLifeCount;
+            rules.HLapCount = HLapCount;
+            rules.HCoinCount = HCoinCount;
+            rules.HNicknames = HNicknames;
             
             f.Global->Rules = rules;
             f.Events.PowerupChancesChanged(f);
@@ -60,6 +92,16 @@ namespace Quantum {
             MiniMushroom = 1 << 6,
             MegaMushroom = 1 << 7,
             Starman = 1 << 8,
+            HStars = 1 << 9,
+            HPlayers = 1 << 10,
+            HHost = 1 << 11,
+            HIceCubes = 1 << 12,
+            HTeamTarget = 1 << 13,
+            HStarCount = 1 << 14,
+            HLifeCount = 1 << 15,
+            HLapCount = 1 << 16,
+            HCoinCount = 1 << 17,
+            HNicknames = 1 << 18,
         }
     }
 }

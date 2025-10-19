@@ -52,7 +52,7 @@ namespace Quantum {
 
             stage.SetTileRelative(f, blockBump->Tile, blockBump->ResultTile);
 
-            if (blockBump->Powerup.IsValid) {
+            if (blockBump->Powerup.IsValid && !f.Global->Rules.SNoPowerups) {
                 EntityRef newPowerup = f.Create(blockBump->Powerup);
                 if (f.Unsafe.TryGetPointer(newPowerup, out CoinItem* coinItem)) {
                     // Launch if downwards bump and theres a (solid) block below us

@@ -179,7 +179,6 @@ namespace Quantum {
         }
 
         public static void CheckForGameEnd(Frame f) {
-            Debug.Log("checking for game end");
             // End Condition: a player has enough laps
             var marioFilter = f.Filter<MarioPlayer>();
             while (marioFilter.NextUnsafe(out _, out MarioPlayer* mario)) {
