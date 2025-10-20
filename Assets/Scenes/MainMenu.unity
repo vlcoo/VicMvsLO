@@ -37975,7 +37975,7 @@ RectTransform:
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 561132514}
   - {fileID: 1216270302}
@@ -38031,12 +38031,14 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 1885872616}
-        m_TargetAssemblyTypeName: NSMB.UI.MainMenu.PaletteChooser, Assembly-CSharp
+        m_TargetAssemblyTypeName: NSMB.UI.MainMenu.Submenus.InRoom.PaletteChooser,
+          Assembly-CSharp
         m_MethodName: SelectPalette
         m_Mode: 2
         m_Arguments:
-          m_ObjectArgument: {fileID: 425527736}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.UI.Button, UnityEngine.UI
+          m_ObjectArgument: {fileID: 425527739}
+          m_ObjectArgumentAssemblyTypeName: NSMB.UI.MainMenu.Submenus.InRoom.PaletteButton,
+            Assembly-CSharp
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -38062,16 +38064,16 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: -265121226, guid: 7a1faa7275d22a548ba71177bba5eee2, type: 3}
+  m_Sprite: {fileID: -1713447182, guid: 70672da71d9d71a4daaf5f3fc58531e6, type: 3}
   m_Type: 0
-  m_PreserveAspect: 0
+  m_PreserveAspect: 1
   m_FillCenter: 1
-  m_FillMethod: 4
+  m_FillMethod: 0
   m_FillAmount: 1
   m_FillClockwise: 1
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
-  m_PixelsPerUnitMultiplier: 1
+  m_PixelsPerUnitMultiplier: 0.65
 --- !u!222 &425527738
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -38092,8 +38094,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5e32e006fa8a11e4cb0915e52064404e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  shirt: {fileID: 561132515}
-  overalls: {fileID: 1216270303}
+  Index: 0
+  shirt: {fileID: 1216270303}
+  overalls: {fileID: 561132515}
 --- !u!114 &425527740
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -131377,7 +131380,7 @@ MonoBehaviour:
   m_FillClockwise: 1
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
-  m_PixelsPerUnitMultiplier: 0.5
+  m_PixelsPerUnitMultiplier: 0.6
 --- !u!222 &1472937427
 CanvasRenderer:
   m_ObjectHideFlags: 0

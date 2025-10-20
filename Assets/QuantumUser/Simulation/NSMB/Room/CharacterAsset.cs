@@ -20,7 +20,17 @@ public class CharacterAsset : AssetObject {
 
     public RuntimeAnimatorController SmallOverrides;
     public RuntimeAnimatorController LargeOverrides;
-#endif 
+#endif
+
+    // public void OnValidate() {
+    //     if (Palettes.Length == 0 || Palettes[0] != null) {
+    //         // we add default palette (null on first index)
+    //         var newPalettes = new CharacterPalette[Palettes.Length + 1];
+    //         newPalettes[0] = null;
+    //         Array.Copy(Palettes, 0, newPalettes, 1, Palettes.Length);
+    //         Palettes = newPalettes;
+    //     }
+    // }
 }
 
 [Serializable]

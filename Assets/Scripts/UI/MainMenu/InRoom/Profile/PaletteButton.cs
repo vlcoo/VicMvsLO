@@ -6,6 +6,7 @@ using TMPro;
 namespace NSMB.UI.MainMenu.Submenus.InRoom {
     public class PaletteButton : MonoBehaviour {
         //---Public Variables
+        public byte Index;
         public CharacterPalette Palette {
             get => _palette;
             set {
@@ -15,6 +16,7 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
                         Destroy(shirt.gameObject);
                         Destroy(overalls.gameObject);
                     }
+                    
                     return;
                 }
                 shirt.color = _palette.ShirtColor.AsColor;

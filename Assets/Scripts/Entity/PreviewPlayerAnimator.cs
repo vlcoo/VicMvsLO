@@ -38,7 +38,7 @@ public class PreviewPlayerAnimator : MonoBehaviour {
         sfx.Play();
     }
     
-    public void SetPalette(CharacterPalette palette, CharacterAsset character) {
+    public void SetPalette(CharacterPalette palette) {
         var materialBlock = new MaterialPropertyBlock();
         if (palette != null) {
             materialBlock.SetVector(ParamOverallsColor, palette.OverallsColor.AsColor.linear);

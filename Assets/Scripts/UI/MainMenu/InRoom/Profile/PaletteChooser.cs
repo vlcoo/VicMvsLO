@@ -23,10 +23,8 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
 
         //---Private Variables
         private readonly List<PaletteButton> paletteButtons = new();
-        private readonly List<Button> buttons = new();
         private GameObject blocker;
         private CharacterAsset character;
-        private int selected;
         private bool initialized;
 
         public void OnDisable() {
@@ -41,25 +39,20 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
         }
 
         public void PopulatePaletteList() {
-            foreach (var cb in paletteButtons) {
-                Destroy(cb.gameObject);
+            foreach (var b in paletteButtons) {
+                Destroy(b.gameObject);
             }
             paletteButtons.Clear();
-            buttons.Clear();
+            
+            var index = 0;
             foreach (var palette in character.Palettes) {
                 var newButton = Instantiate(template, template.transform.parent);
                 var cb = newButton.GetComponent<PaletteButton>();
                 paletteButtons.Add(cb);
                 cb.Palette = palette;
-
-                Button b = newButton.GetComponent<Button>();
-                // newButton.name = palette ? palette.name : "Reset";
-                // if (!palette) {
-                //     b.image.sprite = clearSprite;
-                // }
-
                 newButton.SetActive(true);
-                buttons.Add(b);
+                cb.Index = (byte) index;
+                index++;
             }
         }
 
@@ -69,41 +62,17 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
             PopulatePaletteList();
         }
 
-        // public void ChangePaletteButton(int index) {
-        //     selected = index;
-        //     AssetRef<PaletteSet>[] palettes = GlobalController.Instance.config.Palettes;
-        //     PaletteSet palette = null;
-        //
-        //     if (index >= 0 && index < palettes.Length) {
-        //         palette = QuantumUnityDB.GetGlobalAsset(palettes[index]);
-        //     }
-        //
-        //     if (palette) {
-        //         overallsImage.enabled = true;
-        //         overallsImage.color = palette.GetPaletteForCharacter(character).OverallsColor.AsColor;
-        //         shirtImage.enabled = true;
-        //         shirtImage.color = palette.GetPaletteForCharacter(character).ShirtColor.AsColor;
-        //         baseImage.sprite = baseSprite;
-        //     } else {
-        //         overallsImage.enabled = false;
-        //         shirtImage.enabled = false;
-        //         baseImage.sprite = clearSprite;
-        //     }
-        // }
-
-        public void SelectPalette(Button button) {
-            int newIndex = buttons.IndexOf(button);
+        public void SelectPalette(PaletteButton button) {
             QuantumGame game = QuantumRunner.DefaultGame;
             foreach (var slot in game.GetLocalPlayerSlots()) {
                 game.SendCommand(slot, new CommandChangePlayerData { 
                     EnabledChanges = CommandChangePlayerData.Changes.Palette,
-                    Palette = (byte) newIndex,
+                    Palette = button.Index,
                 });
             }
             
             Close(false);
-            selected = newIndex;
-            Settings.Instance.generalPalette = selected;
+            Settings.Instance.generalPalette = button.Index;
             Settings.Instance.SaveSettings();
             canvas.PlayConfirmSound();
         }
@@ -115,8 +84,6 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
             blocker.SetActive(true);
             content.SetActive(true);
             canvas.PlayCursorSound();
-
-            EventSystem.current.SetSelectedGameObject(buttons[selected].gameObject);
         }
 
         public void Close(bool playSound) {

@@ -46,7 +46,7 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
             if (currentCharacterPreview != null) currentCharacterPreview.SetVisible(false);
             currentCharacterPreview = GetCharacterPreview(character);
             currentCharacterPreview.SetSelected();
-            currentCharacterPreview.SetPalette(currentPalette, character);
+            currentCharacterPreview.SetPalette(currentPalette);
         }
 
         private PreviewPlayerAnimator GetCharacterPreview(CharacterAsset character) {
@@ -71,11 +71,12 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
             PlayerData* data = QuantumUtils.GetPlayerData(f, e.Player);
             CharacterAsset characterAsset = f.FindAsset(config.CharacterDatas[Mathf.Clamp(data->Character, 0, config.CharacterDatas.Length)]);
             var skins = characterAsset.Palettes;
-            int skinIndex = Mathf.Clamp(data != null ? data->Palette : 0, 0, skins.Length - 1);
+            // int skinIndex = Mathf.Clamp(data != null ? data->Palette : 0, 0, skins.Length - 1);
+            int skinIndex = data->Palette >= skins.Length ? 0 : data->Palette;
             currentCharacterPreview = GetCharacterPreview(characterAsset);
             currentPalette = skins[skinIndex];
             currentCharacterPreview.SetVisible(true);
-            currentCharacterPreview.SetPalette(currentPalette, characterAsset);
+            currentCharacterPreview.SetPalette(currentPalette);
         }
     }
 }
