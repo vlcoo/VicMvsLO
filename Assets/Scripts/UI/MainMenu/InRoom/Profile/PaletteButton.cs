@@ -4,39 +4,27 @@ using UnityEngine.UI;
 using TMPro;
 
 namespace NSMB.UI.MainMenu.Submenus.InRoom {
-    public class PaletteButton : MonoBehaviour, ISelectHandler {
-
+    public class PaletteButton : MonoBehaviour {
         //---Public Variables
-        public PaletteSet palette;
+        public CharacterPalette Palette {
+            get => _palette;
+            set {
+                _palette = value;
+                if (_palette == null) {
+                    if (shirt && overalls) {
+                        Destroy(shirt.gameObject);
+                        Destroy(overalls.gameObject);
+                    }
+                    return;
+                }
+                shirt.color = _palette.ShirtColor.AsColor;
+                overalls.color = _palette.OverallsColor.AsColor;
+            }
+        }
 
         //---Serialized Variables
-        [SerializeField] private TMP_Text colorNameString;
         [SerializeField] private Image shirt, overalls;
-
-        public void Instantiate(CharacterAsset player) {
-            if (palette == null) {
-                if (shirt && overalls) {
-                    Destroy(shirt.gameObject);
-                    Destroy(overalls.gameObject);
-                }
-                return;
-            }
-
-            CharacterSpecificPalette col = palette.GetPaletteForCharacter(player);
-            shirt.color = col.ShirtColor.AsColor;
-            overalls.color = col.OverallsColor.AsColor;
-        }
-
-        public void OnSelect(BaseEventData eventData) {
-            UpdateLabel();
-        }
-
-        public void OnPress() {
-            UpdateLabel();
-        }
-
-        private void UpdateLabel() {
-            colorNameString.text = GlobalController.Instance.translationManager.GetTranslation(palette ? palette.translationKey : "skin.default");
-        }
+        
+        private CharacterPalette _palette;
     }
 }

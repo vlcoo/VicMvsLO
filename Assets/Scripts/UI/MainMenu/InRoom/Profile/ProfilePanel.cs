@@ -87,7 +87,7 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
         }
 
         private void SetPaletteButtonState(int index) {
-            paletteChooser.ChangePaletteButton(index);
+            // paletteChooser.ChangePaletteButton(index);
         }
 
         //---Callbacks

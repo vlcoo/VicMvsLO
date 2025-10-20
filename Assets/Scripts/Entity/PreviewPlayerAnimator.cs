@@ -38,13 +38,12 @@ public class PreviewPlayerAnimator : MonoBehaviour {
         sfx.Play();
     }
     
-    public void SetPalette(PaletteSet palette, CharacterAsset character) {
+    public void SetPalette(CharacterPalette palette, CharacterAsset character) {
         var materialBlock = new MaterialPropertyBlock();
         if (palette != null) {
-            var skin = palette.GetPaletteForCharacter(character);
-            materialBlock.SetVector(ParamOverallsColor, skin.OverallsColor.AsColor.linear);
-            materialBlock.SetVector(ParamShirtColor, skin.ShirtColor.AsColor.linear);
-            materialBlock.SetFloat(ParamHatUsesOverallsColor, skin.HatUsesOverallsColor ? 1 : 0);
+            materialBlock.SetVector(ParamOverallsColor, palette.OverallsColor.AsColor.linear);
+            materialBlock.SetVector(ParamShirtColor, palette.ShirtColor.AsColor.linear);
+            materialBlock.SetFloat(ParamHatUsesOverallsColor, palette.HatUsesOverallsColor ? 1 : 0);
         }
         foreach (Renderer r in _renderers) {
             r.SetPropertyBlock(materialBlock);

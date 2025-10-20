@@ -9,7 +9,7 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
         public GameObject characterPreviews;
         public PreviewPlayerAnimator currentCharacterPreview;
         public Image characterImage;
-        public PaletteSet currentPalette;
+        public CharacterPalette currentPalette;
         
         public override void Show(bool first) {
             base.Show(first);
@@ -69,11 +69,11 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
             Frame f = e.Game.Frames.Predicted;
             SimulationConfig config = f.SimulationConfig;
             PlayerData* data = QuantumUtils.GetPlayerData(f, e.Player);
-            var skins = f.SimulationConfig.Palettes;
-            int skinIndex = Mathf.Clamp(data != null ? data->Palette : 0, 0, skins.Length - 1);
             CharacterAsset characterAsset = f.FindAsset(config.CharacterDatas[Mathf.Clamp(data->Character, 0, config.CharacterDatas.Length)]);
+            var skins = characterAsset.Palettes;
+            int skinIndex = Mathf.Clamp(data != null ? data->Palette : 0, 0, skins.Length - 1);
             currentCharacterPreview = GetCharacterPreview(characterAsset);
-            currentPalette = f.FindAsset(skins[skinIndex]);
+            currentPalette = skins[skinIndex];
             currentCharacterPreview.SetVisible(true);
             currentCharacterPreview.SetPalette(currentPalette, characterAsset);
         }

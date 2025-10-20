@@ -22,6 +22,7 @@ namespace Quantum {
             factories.Add(new CommandUpdatePing());
             factories.Add(new CommandSetInSettings());
             factories.Add(new CommandChangeTriggers());
+            factories.Add(new CommandChangePowerupsHuds());
 
             // Chat
             factories.Add(new CommandSendChatMessage());

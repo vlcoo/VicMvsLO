@@ -29,6 +29,8 @@ namespace NSMB.UI.Game.Track {
                 var teams = f.SimulationConfig.Teams;
                 teamIcon.sprite = f.FindAsset(teams[teamIndex % teams.Length]).spriteColorblind;
             }
+            
+            stage.HidePlayersOnMinimap = !f.Global->Rules.HPlayers;
         }
 
         public override void OnDeactivate() {

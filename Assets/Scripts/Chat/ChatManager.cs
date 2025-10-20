@@ -113,20 +113,6 @@ namespace NSMB.Chat {
             QuantumRunner.DefaultGame.SendCommand(new CommandSendChatMessage {
                 Message = text
             });
-            var cmd = new CommandChangeTriggers {
-                Index = 0,
-                Remove = false,
-                TriggerAction = (int)TriggerAction.Kill,
-                TriggerActionParameter = "",
-                TriggerActionTarget = (int)TriggerTarget.Everyone,
-                TriggerCondition = (int)TriggerCondition.GotCoin,
-                TriggerConditionParameter = "",
-                TriggerConditionTarget = (int)TriggerTarget.Any,
-                TriggerConstraint = (int)TriggerConstraint.Always,
-                TriggerConstraintParameter = "",
-                TriggerConstraintTarget = (int)TriggerTarget.Any,
-            };
-            QuantumRunner.DefaultGame.SendCommand(cmd);
         }
 
         public void RemoveChatMessage(ChatMessageData data) {

@@ -6,9 +6,8 @@ using UnityEngine;
 using UnityEngine.UI;
 
 namespace NSMB.UI.MainMenu.Submenus.Prompts {
-    public class SpecialEffectPromptSubmenu : PromptSubmenu {
+    public class HudPromptSubmenu : PromptSubmenu {
         public bool success = true;
-        public CounterTip counterTip;
         private readonly Dictionary<string, Toggle> _toggles = new();
         [HideInInspector] public GameRules rules;
         
@@ -20,10 +19,9 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
                 _toggles[toggle.gameObject.name] = toggle;
             }
         }
-
+        
         public void Start() {
             QuantumEvent.Subscribe<EventRulesChanged>(this, OnRulesChanged);
-            QuantumCallback.Subscribe<CallbackGameDestroyed>(this, OnGameDestroyed);
             QuantumCallback.Subscribe<CallbackGameStarted>(this, OnGameStarted);
         }
         
@@ -31,7 +29,7 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
             rules = e.Game.Frames.Predicted.Global->Rules;
             RefreshValues();
         }
-        
+
         public override void Show(bool first) {
             base.Show(first);
             success = false;
@@ -46,16 +44,14 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
 
             return base.TryGoBack(out playSound);
         }
-
-        public unsafe void ToggleSpecialEffect(Toggle effect) {
-            var effectName = effect.gameObject.name;
-            CommandChangeRules.Rules effectValue = Enum.Parse<CommandChangeRules.Rules>(effectName);
-            var cmd = new CommandChangeRules {
-                EnabledChanges = effectValue,
-            };
-            var field = cmd.GetType().GetField(effectName);
+        
+        public unsafe void ToggleHudRule(Toggle rule) {
+            var ruleName = rule.gameObject.name;
+            CommandChangePowerupsHuds.PowerupsHuds effectValue = Enum.Parse<CommandChangePowerupsHuds.PowerupsHuds>(ruleName);
+            var cmd = new CommandChangePowerupsHuds();
+            var field = cmd.GetType().GetField(ruleName);
             if (field == null) return;
-            field.SetValue(cmd, effect.isOn);
+            field.SetValue(cmd, rule.isOn);
             QuantumGame game = QuantumRunner.DefaultGame;
             int slot = game.GetLocalPlayerSlots()[game.GetLocalPlayers().IndexOf(game.Frames.Predicted.Global->Host)];
             game.SendCommand(slot, cmd);
@@ -65,17 +61,11 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
             rules = e.Game.Frames.Predicted.Global->Rules;
             RefreshValues();
         }
-        
-        public void OnGameDestroyed(CallbackGameDestroyed e) {
-            // cleanup
-            counterTip.SetCount(0);
-        }
 
         public void RefreshValues() {
             foreach (var toggle in _toggles) {
                 if (rules.GetType().GetField(toggle.Key).GetValue(rules) is bool ruleValue) toggle.Value.SetIsOnWithoutNotify(ruleValue);
             }
-            counterTip.SetCount(_toggles.Count(toggle => toggle.Value.isOn));
         }
     }
 }

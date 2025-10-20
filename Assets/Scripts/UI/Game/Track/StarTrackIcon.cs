@@ -1,5 +1,6 @@
 using NSMB.Utilities.Extensions;
 using Quantum;
+using System;
 using UnityEngine;
 
 namespace NSMB.UI.Game.Track {
@@ -16,10 +17,16 @@ namespace NSMB.UI.Game.Track {
             this.SetIfNull(ref animator);
         }
 
+        public void Start() {
+            Frame f = Updater.ObservedGame.Frames.Predicted;
+            image.enabled = f.Global->Rules.HStars;
+        }
+
         public override void OnUpdateView() {
             base.OnUpdateView();
+            Frame f = Updater.ObservedGame.Frames.Predicted;
 
-            if (PredictedFrame.Unsafe.TryGetPointer(targetEntity, out BigStar* star)) {
+            if (PredictedFrame.Unsafe.TryGetPointer(targetEntity, out BigStar* star) && f.Global->Rules.HStars) {
                 if (star->IsStationary) {
                     animator.enabled = true;
                     transform.localScale = Vector3.zero;

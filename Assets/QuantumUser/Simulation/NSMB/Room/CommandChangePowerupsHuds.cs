@@ -75,7 +75,7 @@ namespace Quantum {
             rules.HNicknames = HNicknames;
             
             f.Global->Rules = rules;
-            f.Events.PowerupChancesChanged(f);
+            f.Events.RulesChanged(false, false);
 
             if (f.Global->GameStartFrames > 0 && !QuantumUtils.IsGameStartable(f)) {
                 GameLogicSystem.StopCountdown(f);
