@@ -82,7 +82,10 @@ public class Songinator : MonoBehaviour
         InitializeMeltySynth();
 
         // All good to go.
-        if (autoStart) SetPlaybackState(PlaybackState.PLAYING);
+        if (autoStart) {
+            Driver.SetVolume(1.0f);
+            SetPlaybackState(PlaybackState.PLAYING);
+        }
     }
 
     private void InitializeMeltySynth()
@@ -140,7 +143,7 @@ public class Songinator : MonoBehaviour
             });
         }
 
-        Driver.SetVolume(1.0f);
+        // Driver.SetVolume(1.0f);
 
         state = newState;
         switch (state)
@@ -208,8 +211,8 @@ public class Songinator : MonoBehaviour
         timeAtPause = TimeSpan.Zero;
         yield return SetPlaybackState(PlaybackState.STOPPED, secondsFading);
         InitializeMeltySynth();
-        autoStart = startPlayback;
-        if (autoStart) yield return SetPlaybackState(PlaybackState.PLAYING, secondsFading);
+        // autoStart = startPlayback;
+        if (startPlayback) yield return SetPlaybackState(PlaybackState.PLAYING, secondsFading);
         switchToSongCoroutine = null;
     }
 

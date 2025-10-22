@@ -19,6 +19,7 @@ public unsafe class VersusStageData : AssetObject {
     public string LegalEnglishName;
     public string GroupingTranslationKey;
     public string DiscordStageImage;
+    public int WorldIndex;
 #if QUANTUM_UNITY
     public Sprite Icon;
     public Sprite GroundSprite;

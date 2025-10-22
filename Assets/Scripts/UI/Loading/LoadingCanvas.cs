@@ -53,6 +53,10 @@ namespace NSMB.UI.Loading {
             CharacterAsset character = defaultCharacterAsset;
             if (game != null) {
                 Frame f = game.Frames.Predicted;
+                
+                f.TryFindAsset(f.Map.UserAsset, out VersusStageData stage);
+                groundImage.sprite = stage.GroundSprite;
+                
                 List<PlayerRef> localPlayers = game.GetLocalPlayers();
                 if (localPlayers.Count > 0) {
                     PlayerRef player = localPlayers[0];
@@ -68,7 +72,7 @@ namespace NSMB.UI.Loading {
                 var characters = f.SimulationConfig.CharacterDatas;
                 character = f.FindAsset(characters[characterIndex % characters.Length]);
             }
-
+            
             var characterScene = character.IsMinion ? bowserScene : marioScene;
             characterScene.SetActive(true);
             mario = characterScene.GetComponentInChildren<MarioLoader>();
@@ -146,6 +150,8 @@ namespace NSMB.UI.Loading {
         }
 
         public void EndAnimation() {
+            marioScene.SetActive(false);
+            bowserScene.SetActive(false);
             gameObject.SetActive(false);
         }
     }

@@ -55,16 +55,16 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
 
         //---Serialized Variables
         // [SerializeField] private InRoomSubmenuPanel defaultSelectedPanel;
-        [SerializeField] private AudioSource sfx, musicSource;
+        [SerializeField] private AudioSource sfx;
         [SerializeField] private List<InRoomSubmenuPanel> allPanels;
         [SerializeField] private TMP_Text startGameButtonText;
         [SerializeField] private UnityEngine.UI.Button startGameButton;
+        [SerializeField] private MenuSongPlayer menuSongManager;
 
         //---Private Variables
         // private InRoomSubmenuPanel selectedPanel;
         private int lastCountdownStartFrame;
         private bool countdownStarted;
-        private Coroutine fadeMusicCoroutine;
 
         public override void OnValidate() {
             base.OnValidate();
@@ -188,12 +188,6 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
                     startGameButtonText.text = tm.GetTranslation(ready ? "ui.inroom.buttons.unready" : "ui.inroom.buttons.readyup");
                     startGameButtonText.horizontalAlignment = tm.RightToLeft ? HorizontalAlignmentOptions.Right : HorizontalAlignmentOptions.Left;
                 }
-
-                if (fadeMusicCoroutine != null) {
-                    StopCoroutine(fadeMusicCoroutine);
-                    fadeMusicCoroutine = null;
-                }
-                musicSource.volume = 1;
             } else {
                 // Starting
                 startGameButton.interactable = isHost;
@@ -202,17 +196,9 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
 
                 if (seconds == 1) {
                     // Start fade
-                    fadeMusicCoroutine = StartCoroutine(FadeMusic());
+                    // fadeMusicCoroutine = StartCoroutine(FadeMusic());
                 }
             }
-        }
-
-        private IEnumerator FadeMusic() {
-            while (musicSource.volume > 0) {
-                musicSource.volume -= Time.deltaTime;
-                yield return null;
-            }
-            fadeMusicCoroutine = null;
         }
 
         //---Buttons
@@ -224,8 +210,12 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
 
             if (game.PlayerIsLocal(host)) {
                 // Start (or cancel) the game countdown
-                int slot = game.GetLocalPlayerSlots()[game.GetLocalPlayers().IndexOf(host)];
-                game.SendCommand(slot, new CommandToggleCountdown());
+                Canvas.PlaySound(SoundEffect.UI_FileSelect);
+                menuSongManager.Stop();
+                GlobalController.Instance.fader.Fade(AnimatedFader.FadeStyle.Circle, AnimatedFader.FadeStyle.Dissolve, () => {
+                    int slot = game.GetLocalPlayerSlots()[game.GetLocalPlayers().IndexOf(host)];
+                    game.SendCommand(slot, new CommandToggleCountdown());
+                });
             } else {
                 // Ready (or unready) up
                 bool ready = false;
@@ -276,11 +266,6 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
         }
 
         private void OnGameDestroyed(CallbackGameDestroyed e) {
-            if (fadeMusicCoroutine != null) {
-                StopCoroutine(fadeMusicCoroutine);
-                fadeMusicCoroutine = null;
-            }
-            musicSource.volume = 1;
             Canvas.CloseSubmenuAndChildren(this);
         }
 
@@ -290,12 +275,6 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
 
         private void OnGameStateChanged(EventGameStateChanged e) {
             UpdateStartButton(e.Game, e.Game.Frames.Predicted);
-
-            if (fadeMusicCoroutine != null) {
-                StopCoroutine(fadeMusicCoroutine);
-                fadeMusicCoroutine = null;
-            }
-            musicSource.volume = 1;
         }
 
         private void OnHostChanged(EventHostChanged e) {
@@ -312,10 +291,10 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
             if (isHost || countdownStarted || (e.IsGameStarting && (f.Number - lastCountdownStartFrame) > (f.UpdateRate * 3))) {
                 Canvas.PlaySound(e.IsGameStarting ? SoundEffect.UI_FileSelect : SoundEffect.UI_Back);
                 if (e.IsGameStarting) {
-                    ChatManager.Instance.AddSystemMessage("ui.inroom.chat.server.starting", ChatManager.Red, "countdown", "3");
+                    // ChatManager.Instance.AddSystemMessage("ui.inroom.chat.server.starting", ChatManager.Red, "countdown", "3");
                     countdownStarted = true;
                 } else {
-                    ChatManager.Instance.AddSystemMessage("ui.inroom.chat.server.startcancelled", ChatManager.Red);
+                    // ChatManager.Instance.AddSystemMessage("ui.inroom.chat.server.startcancelled", ChatManager.Red);
                     countdownStarted = false;
                 }
                 lastCountdownStartFrame = f.Number;

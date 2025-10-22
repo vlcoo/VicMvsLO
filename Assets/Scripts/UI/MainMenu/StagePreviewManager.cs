@@ -15,6 +15,14 @@ namespace NSMB.UI.MainMenu {
             QuantumEvent.Subscribe<EventRulesChanged>(this, OnRulesChanged);
         }
 
+        public void OnValidate() {
+            foreach (var preview in stages) {
+                var c = preview.CameraPosition;
+                if (c.gameObject.name.StartsWith("CameraPosition")) continue;
+                preview.CameraPosition = c.Find($"CameraPosition{c.gameObject.name.Replace(" ", "")}");
+            }
+        }
+
         public void PreviewRandomStage() {
             UnityEngine.Random.InitState((int) DateTimeOffset.UtcNow.ToUnixTimeSeconds());
             PreviewStage(stages[UnityEngine.Random.Range(0, stages.Length)]);

@@ -42,22 +42,22 @@ namespace Quantum {
 
             // Gaem state logic
             switch (f.Global->GameState) {
-            case GameState.PreGameRoom:
-                if (f.Global->GameStartFrames > 0) {
-                    if (QuantumUtils.Decrement(ref f.Global->GameStartFrames)) {
-                        // Start the game!
-                        if (f.IsVerified) {
-                            f.MapAssetRef = f.Global->Rules.Stage;
-                        }
-                        f.Global->PlayerLoadFrames = (ushort) (20 * f.UpdateRate);
-                        f.Global->GameState = GameState.WaitingForPlayers;
-
-                        f.Events.GameStateChanged(GameState.WaitingForPlayers);
-                    } else if (f.Global->GameStartFrames % 60 == 0) {
-                        f.Events.CountdownTick(f.Global->GameStartFrames / 60);
-                    }
-                }
-                break;
+            // case GameState.PreGameRoom:
+            //     if (f.Global->GameStartFrames > 0) {
+            //         if (QuantumUtils.Decrement(ref f.Global->GameStartFrames)) {
+            //             // Start the game!
+            //             if (f.IsVerified) {
+            //                 f.MapAssetRef = f.Global->Rules.Stage;
+            //             }
+            //             f.Global->PlayerLoadFrames = (ushort) (20 * f.UpdateRate);
+            //             f.Global->GameState = GameState.WaitingForPlayers;
+            //
+            //             f.Events.GameStateChanged(GameState.WaitingForPlayers);
+            //         } else if (f.Global->GameStartFrames % 60 == 0) {
+            //             f.Events.CountdownTick(f.Global->GameStartFrames / 60);
+            //         }
+            //     }
+            //     break;
             case GameState.WaitingForPlayers:
                 int validPlayers = 0;
                 int loadedPlayers = 0;
@@ -214,7 +214,7 @@ namespace Quantum {
             
             f.Global->GameState = GameState.Ended;
             f.Events.GameStateChanged(GameState.Ended);
-            f.Global->GameStartFrames = (ushort) ((endedByHost ? Constants._3_50 : Constants._5_50) * f.UpdateRate);
+            f.Global->GameStartFrames = (ushort) ((endedByHost ? FP._1_75 : Constants._4_50) * f.UpdateRate);
             f.SystemDisable<StartDisabledSystemGroup>();
 
             var gamemode = f.FindAsset(f.Global->Rules.Gamemode);

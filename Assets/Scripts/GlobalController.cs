@@ -26,6 +26,7 @@ namespace NSMB {
         public TranslationManager translationManager;
         public DiscordController discordController;
         public RumbleManager rumbleManager;
+        public AnimatedFader fader;
         public Gradient rainbowGradient;
         public Sprite[] pingIndicators;
         public SimulationConfig config;
@@ -34,7 +35,6 @@ namespace NSMB {
 
         public GameObject graphy, connecting;
         public LoadingCanvas loadingCanvas;
-        public Image fullscreenFadeImage;
         public AudioSource sfx;
 
         [NonSerialized] public bool checkedForVersion = false, firstConnection = true;
@@ -208,26 +208,14 @@ namespace NSMB {
         }
 
         private IEnumerator FadeFullscreenImage(float target, float fadeDuration, float delay = 0) {
-            float original = fullscreenFadeImage.color.a;
-            float timer = fadeDuration;
-            if (delay > 0) {
-                yield return new WaitForSeconds(delay);
-            }
-
-            Color color = fullscreenFadeImage.color;
-            while (timer > 0) {
-                timer -= Time.deltaTime;
-                color.a = Mathf.Lerp(original, target, 1 - (timer / fadeDuration));
-                fullscreenFadeImage.color = color;
-                yield return null;
-            }
+            yield return null;
         }
 
         private void OnStartGameEndFade(EventStartGameEndFade e) {
             if (MvLSceneLoader.Instance.CurrentLoadedMap != null) {
                 // In a game scene
                 StartCoroutine(FadeFullscreenImage(1, 1/3f));
-                totalFadeRoutine = StartCoroutine(FadeVolume("OverrideVolume"));
+                // totalFadeRoutine = StartCoroutine(FadeVolume("OverrideVolume"));
             }
         }
 

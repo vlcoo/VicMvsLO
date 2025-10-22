@@ -11,8 +11,8 @@ namespace NSMB.Chat {
     public unsafe class ChatManager : MonoBehaviour {
 
         //---Static Variables
-        public static readonly Color32 Red = new Color32(219, 107, 107, 255);
-        public static readonly Color32 Blue = new Color32(85, 85, 202, 255);
+        // public static readonly Color32 Red = new Color32(219, 107, 107, 255);
+        // public static readonly Color32 Blue = new Color32(85, 85, 202, 255);
 
         public static ChatManager Instance { get; private set; }
         public static event Action<ChatMessageData> OnChatMessage;
@@ -29,6 +29,7 @@ namespace NSMB.Chat {
 
         public void Awake() {
             Instance = this;
+            SystemMessageColor = Perso.GetBool() ? Color.blue : Color.red;
         }
 
         public void OnEnable() {
@@ -97,7 +98,7 @@ namespace NSMB.Chat {
             return data;
         }
 
-        private static readonly Color SystemMessageColor = new(0x55/255f, 0x55/255f, 0x55/255f, 1);
+        private static Color SystemMessageColor;
         public ChatMessageData AddSystemMessage(string key, Color? color = null, params string[] replacements) {
             ChatMessageData data = new() {
                 isSystemMessage = true,
@@ -164,36 +165,36 @@ namespace NSMB.Chat {
 
         private void OnGameStateChanged(EventGameStateChanged e) {
             if (e.NewState == GameState.WaitingForPlayers) {
-                AddSystemMessage("ui.inroom.chat.server.started", Red);
+                AddSystemMessage("ui.inroom.chat.server.started");
             }
         }
 
         private void OnPlayerAdded(EventPlayerAdded e) {
             Frame f = e.Game.Frames.Predicted;
             RuntimePlayer runtimeData = f.GetPlayerData(e.Player);
-            AddSystemMessage("ui.inroom.chat.player.joined", Blue, "playername", runtimeData.PlayerNickname.ToValidNickname(f, e.Player));
+            AddSystemMessage("ui.inroom.chat.player.joined", null, "playername", runtimeData.PlayerNickname.ToValidNickname(f, e.Player));
         }
 
         private void OnPlayerRemoved(EventPlayerRemoved e) {
             Frame f = e.Game.Frames.Predicted;
             RuntimePlayer runtimeData = f.GetPlayerData(e.Player);
-            AddSystemMessage("ui.inroom.chat.player.quit", Blue, "playername", runtimeData.PlayerNickname.ToValidNickname(f, e.Player));
+            AddSystemMessage("ui.inroom.chat.player.quit", null, "playername", runtimeData.PlayerNickname.ToValidNickname(f, e.Player));
         }
 
         private void OnPlayerKickedFromRoom(EventPlayerKickedFromRoom e) {
             Frame f = e.Game.Frames.Predicted;
             RuntimePlayer runtimeData = f.GetPlayerData(e.Player);
-            AddSystemMessage(e.Banned ? "ui.inroom.chat.player.banned" : "ui.inroom.chat.player.kicked", Blue, "playername", runtimeData.PlayerNickname.ToValidNickname(f, e.Player));
+            AddSystemMessage(e.Banned ? "ui.inroom.chat.player.banned" : "ui.inroom.chat.player.kicked", null, "playername", runtimeData.PlayerNickname.ToValidNickname(f, e.Player));
         }
 
         private void OnPlayerUnbanned(EventPlayerUnbanned e) {
             Frame f = e.Game.Frames.Predicted;
-            AddSystemMessage("ui.inroom.chat.player.unbanned", Blue, "playername", e.PlayerInfo.Nickname.ToString().ToValidNickname(f, default));
+            AddSystemMessage("ui.inroom.chat.player.unbanned", null, "playername", e.PlayerInfo.Nickname.ToString().ToValidNickname(f, default));
         }
 
         private void OnHostChanged(EventHostChanged e) {
             // if (e.Game.PlayerIsLocal(e.NewHost)) {
-            //     AddSystemMessage("ui.inroom.chat.hostreminder", Red);
+            //     AddSystemMessage("ui.inroom.chat.hostreminder");
             // }
         }
     }

@@ -79,11 +79,7 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
 
             sfx.PlayOneShot(SoundEffect.UI_Chat_Send);
 
-            if (text.StartsWith('/')) {
-                ChatManager.Instance.AddSystemMessage("ui.inroom.chat.command", ChatManager.Red);
-            } else {
-                ChatManager.Instance.SendChatMessage(text);
-            }
+            ChatManager.Instance.SendChatMessage(text);
             StartCoroutine(SelectTextboxNextFrame());
         }
 

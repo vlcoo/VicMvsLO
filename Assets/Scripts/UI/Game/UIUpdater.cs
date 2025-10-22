@@ -35,6 +35,8 @@ namespace NSMB.UI.Game {
 
         [SerializeField] private TMP_Text winText;
         [SerializeField] private Animator winTextAnimator;
+
+        [SerializeField] private TMP_ColorGradient marioGradient, luigiGradient, negativeGradient, negativeAltGradient;
         //[SerializeField] private RectTransform[] player
 
         //---Private 
@@ -52,6 +54,7 @@ namespace NSMB.UI.Game {
         private bool justResynced;
         private float fpsSample;
         private VersusStageData stage;
+        private bool greenWinText;
 
         private Coroutine endGameSequenceCoroutine, reserveSummonCoroutine;
 
@@ -125,6 +128,7 @@ namespace NSMB.UI.Game {
             QuantumEvent.Subscribe<EventStartCameraFadeOut>(this, OnStartCameraFadeOut);
 
             goalTrackTemplate.gameObject.SetActive(stage.IsCampaignMap);
+            greenWinText = Perso.GetBool();
         }
 
         public void OnDestroy() {
@@ -478,14 +482,14 @@ namespace NSMB.UI.Game {
 
             if (e.EndedByHost) {
                 resultText = tm.GetTranslation("ui.result.nocontest");
-                ChatManager.Instance.AddSystemMessage("ui.inroom.chat.server.ended.nocontest", color: ChatManager.Red);
+                // ChatManager.Instance.AddSystemMessage("ui.inroom.chat.server.ended.nocontest", color: ChatManager.Red);
             } else if (hasWinner) {
                 if (teamMode) {
                     // Winning team
                     var teams = f.SimulationConfig.Teams;
                     winner = tm.GetTranslation(f.FindAsset(teams[e.WinningTeam % teams.Length]).nameTranslationKey);
                     resultText = tm.GetTranslationWithReplacements("ui.result.teamwin", "team", winner);
-                    ChatManager.Instance.AddSystemMessage("ui.inroom.chat.server.ended.team", color: ChatManager.Red, "team", winner);
+                    // ChatManager.Instance.AddSystemMessage("ui.inroom.chat.server.ended.team", color: ChatManager.Red, "team", winner);
                 } else {
                     // Winning player
                     var allPlayers = f.Filter<PlayerData>();
@@ -497,12 +501,12 @@ namespace NSMB.UI.Game {
                         }
                     }
                     resultText = tm.GetTranslationWithReplacements("ui.result.playerwin", "playername", winner);
-                    ChatManager.Instance.AddSystemMessage("ui.inroom.chat.server.ended.player", color: ChatManager.Red, "playername", winner);
+                    // ChatManager.Instance.AddSystemMessage("ui.inroom.chat.server.ended.player", color: ChatManager.Red, "playername", winner);
                 }
                 local = PlayerElements.AllPlayerElements.Any(pe => f.Unsafe.TryGetPointer(pe.Entity, out MarioPlayer* marioPlayer) && marioPlayer->GetTeam(f) == e.WinningTeam);
             } else {
-                resultText = tm.GetTranslation("ui.result.draw");
-                ChatManager.Instance.AddSystemMessage("ui.inroom.chat.server.ended.draw", color: ChatManager.Red);
+                resultText = tm.GetTranslation("Draw...");
+                // ChatManager.Instance.AddSystemMessage("ui.inroom.chat.server.ended.draw", color: ChatManager.Red);
             }
             winText.text = resultText;
 
@@ -511,18 +515,22 @@ namespace NSMB.UI.Game {
             if (e.EndedByHost) {
                 resultMusic = SoundEffect.UI_Match_Cancel;
                 resultAnimationTrigger = "startNoContest";
+                winText.colorGradientPreset = negativeAltGradient;
             } else if (!hasWinner) {
                 resultMusic = SoundEffect.UI_Match_Draw;
                 resultAnimationTrigger = "startNegative";
+                winText.colorGradientPreset = negativeGradient;
             } else if (hasWinner && local) {
                 resultMusic = SoundEffect.UI_Match_Win;
                 resultAnimationTrigger = "start";
+                winText.colorGradientPreset = greenWinText ? luigiGradient : marioGradient;
             } else {
                 resultMusic = SoundEffect.UI_Match_Lose;
                 resultAnimationTrigger = "startNegative";
+                winText.colorGradientPreset = negativeGradient;
             }
 
-            endGameSequenceCoroutine = StartCoroutine(EndGameSequence(resultMusic, resultAnimationTrigger, e.EndedByHost ? 0f : 0f));
+            endGameSequenceCoroutine = StartCoroutine(EndGameSequence(resultMusic, resultAnimationTrigger, e.EndedByHost ? 0f : 0.2f));
         }
 
         private void OnLanguageChanged(TranslationManager tm) {

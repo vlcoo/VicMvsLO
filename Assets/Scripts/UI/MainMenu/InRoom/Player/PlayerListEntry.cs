@@ -302,11 +302,11 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
                 HashSet<string> mutedPlayers = ChatManager.Instance.mutedPlayers;
                 if (mutedPlayers.Contains(userId)) {
                     mutedPlayers.Remove(userId);
-                    ChatManager.Instance.AddSystemMessage("ui.inroom.chat.player.unmuted", ChatManager.Blue, "playername", runtimePlayer.PlayerNickname.ToValidNickname(f, player));
+                    ChatManager.Instance.AddSystemMessage("ui.inroom.chat.player.unmuted", null, "playername", runtimePlayer.PlayerNickname.ToValidNickname(f, player));
                     muteButtonText.text = GlobalController.Instance.translationManager.GetTranslation("ui.inroom.player.mute");
                 } else {
                     mutedPlayers.Add(userId);
-                    ChatManager.Instance.AddSystemMessage("ui.inroom.chat.player.muted", ChatManager.Blue, "playername", runtimePlayer.PlayerNickname.ToValidNickname(f, player));
+                    ChatManager.Instance.AddSystemMessage("ui.inroom.chat.player.muted", null, "playername", runtimePlayer.PlayerNickname.ToValidNickname(f, player));
                     muteButtonText.text = GlobalController.Instance.translationManager.GetTranslation("ui.inroom.player.unmute");
                 }
             }
@@ -323,9 +323,9 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
             });
             Frame f = game.Frames.Predicted;
             RuntimePlayer runtimePlayer = f.GetPlayerData(player);
-            if (runtimePlayer != null) {
-                ChatManager.Instance.AddSystemMessage("ui.inroom.chat.player.promoted", ChatManager.Blue, "playername", runtimePlayer.PlayerNickname.ToValidNickname(f, player));
-            }
+            // if (runtimePlayer != null) {
+            //     ChatManager.Instance.AddSystemMessage("ui.inroom.chat.player.promoted", null, "playername", runtimePlayer.PlayerNickname.ToValidNickname(f, player));
+            // }
             HideDropdown(true);
         }
 

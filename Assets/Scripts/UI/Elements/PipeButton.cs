@@ -1,4 +1,5 @@
-﻿using NSMB.Utilities.Extensions;
+﻿using DG.Tweening;
+using NSMB.Utilities.Extensions;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -43,17 +44,17 @@ namespace NSMB.UI.Elements {
         public void Update() {
             if ((button && !button.IsInteractable())
                 || (clickable && !clickable.Interactable)) {
-                rect.sizeDelta = size - sizeDecreasePixels;
+                SetAnchor(size - sizeDecreasePixels);
                 image.color = disabledColor;
                 label.color = Color.gray;
                 return;
             }
             if (hover || EventSystem.current.currentSelectedGameObject == gameObject) {
-                rect.sizeDelta = size;
+                SetAnchor(size);
                 image.color = selectedColor;
                 label.color = Color.yellow;
             } else {
-                rect.sizeDelta = size - sizeDecreasePixels;
+                SetAnchor(size - sizeDecreasePixels);
                 image.color = deselectedColor;
                 label.color = Color.white;
             }
@@ -65,6 +66,10 @@ namespace NSMB.UI.Elements {
 
         public void OnPointerExit(PointerEventData eventData) {
             hover = false;
+        }
+
+        private void SetAnchor(Vector2 value) {
+            DOTween.To(() => rect.sizeDelta, v => rect.sizeDelta = v, value, 0.15f);
         }
     }
 }
