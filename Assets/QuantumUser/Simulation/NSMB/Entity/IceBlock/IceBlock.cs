@@ -50,6 +50,7 @@ namespace Quantum {
             }
 
             f.Signals.OnEntityFreeze(childEntity, iceBlockEntity);
+            f.Events.EntityFrozen(childEntity, iceBlockEntity);
         }
     }
 }

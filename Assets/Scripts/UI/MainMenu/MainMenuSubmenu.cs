@@ -1,6 +1,8 @@
+using DG.Tweening;
 using NSMB.Utilities.Extensions;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.UI;
 
 namespace NSMB.UI.MainMenu {
     public class MainMenuSubmenu : MonoBehaviour {
@@ -22,6 +24,8 @@ namespace NSMB.UI.MainMenu {
         [SerializeField] private GameObject defaultSelection;
         [SerializeField] private bool useHeaderColor;
         [SerializeField] private Color headerColor;
+        [SerializeField] private Transform scaleParent;
+        [SerializeField] private Image selfBackground;
 
         [Header("Events")]
         [SerializeField] private UnityAction OnInitialize;
@@ -33,6 +37,8 @@ namespace NSMB.UI.MainMenu {
 
         public virtual void OnValidate() {
             this.SetIfNull(ref canvas, UnityExtensions.GetComponentType.Parent);
+            if (!scaleParent) scaleParent = transform.Find("Parent");
+            if (!selfBackground) selfBackground = GetComponent<Image>();
         }
 
         public virtual void Initialize() {
@@ -51,17 +57,27 @@ namespace NSMB.UI.MainMenu {
         public virtual void Show(bool first) {
             gameObject.SetActive(true);
             OnShow?.Invoke(first);
+            if (!IsOverlay || !selfBackground || !scaleParent) return;
+            selfBackground.enabled = true;
+            DOTween.To(() => scaleParent.localScale, s => scaleParent.localScale = s, Vector3.one, 0.17f).SetEase(Ease.OutCubic).From(Vector3.zero);
         }
 
         public virtual void Hide(SubmenuHideReason hideReason) {
             savedSelection = Canvas.EventSystem.currentSelectedGameObject;
-            gameObject.SetActive(hideReason == SubmenuHideReason.Overlayed);
-
             OnHide?.Invoke(hideReason);
+
+            if (IsOverlay && selfBackground && scaleParent) {
+                selfBackground.enabled = false;
+                DOTween.To(() => scaleParent.localScale, s => scaleParent.localScale = s, Vector3.forward, 0.17f)
+                        .SetEase(Ease.InCubic).onComplete +=
+                    () => gameObject.SetActive(hideReason == SubmenuHideReason.Overlayed);
+                return;
+            }
+            gameObject.SetActive(hideReason == SubmenuHideReason.Overlayed);
         }
 
         public virtual bool TryGoBack(out bool playSound) {
-            gameObject.SetActive(false);
+            Hide(SubmenuHideReason.Closed);
             playSound = true;
             return true;
         }

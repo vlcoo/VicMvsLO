@@ -128,7 +128,7 @@ namespace NSMB.UI.Game {
             QuantumEvent.Subscribe<EventStartCameraFadeOut>(this, OnStartCameraFadeOut);
 
             goalTrackTemplate.gameObject.SetActive(stage.IsCampaignMap);
-            greenWinText = Perso.GetBool();
+            greenWinText = Perso.GetBool("winTextColor");
         }
 
         public void OnDestroy() {

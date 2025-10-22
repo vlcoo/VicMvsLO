@@ -16,9 +16,13 @@ namespace NSMB.UI.Game.Track {
         //---Serialized Variables
         [SerializeField] private GameObject allImageParent;
         [SerializeField] private Image teamIcon;
+        [SerializeField] private Image hostIcon;
+        [SerializeField] private Image iceCubeIcon;
+        [SerializeField] private Image targetIcon;
 
         //---Private Variables
         private Coroutine flashRoutine;
+        private bool iceCubeIconEnabled;
 
         public override void OnActivate(Frame f) {
             image.enabled = true;
@@ -31,6 +35,9 @@ namespace NSMB.UI.Game.Track {
             }
             
             stage.HidePlayersOnMinimap = !f.Global->Rules.HPlayers;
+            hostIcon.enabled = f.Global->Rules.HHost && QuantumUtils.GetPlayerData(f, mario->PlayerRef)->IsRoomHost;
+            targetIcon.enabled = f.Global->Rules.TeamsEnabled && f.Global->Rules.HTeamTarget == mario->GetTeam(f);
+            iceCubeIconEnabled = f.Global->Rules.HIceCubes;
         }
 
         public override void OnDeactivate() {
@@ -44,6 +51,8 @@ namespace NSMB.UI.Game.Track {
             QuantumCallback.Subscribe<CallbackGameResynced>(this, OnGameResynced);
             QuantumEvent.Subscribe<EventMarioPlayerDied>(this, OnMarioPlayerDied);
             QuantumEvent.Subscribe<EventMarioPlayerRespawned>(this, OnMarioPlayerRespawned);
+            QuantumEvent.Subscribe<EventEntityFrozen>(this, OnEntityFrozen);
+            QuantumEvent.Subscribe<EventEntityThawed>(this, OnEntityThawed);
         }
 
         public override void OnUpdateView() {
@@ -93,6 +102,16 @@ namespace NSMB.UI.Game.Track {
                 StopCoroutine(flashRoutine);
             }
             flashRoutine = null;
+        }
+        
+        public void OnEntityFrozen(EventEntityFrozen e) {
+            if (!iceCubeIconEnabled || !e.Entity.Equals(targetEntity)) return;
+            iceCubeIcon.enabled = true;
+        }
+        
+        public void OnEntityThawed(EventEntityThawed e) {
+            if (!iceCubeIconEnabled || !e.Entity.Equals(targetEntity)) return;
+            iceCubeIcon.enabled = false;
         }
     }
 }

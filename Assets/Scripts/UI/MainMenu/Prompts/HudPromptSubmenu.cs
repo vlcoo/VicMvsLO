@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -10,12 +11,14 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
         public bool success = true;
         private readonly Dictionary<string, Toggle> _toggles = new();
         [HideInInspector] public GameRules rules;
+        public TMP_Dropdown teamTargetDropdown;
         
         public override void Initialize() {
             base.Initialize();
             var toggles = new List<Toggle>();
             GetComponentsInChildren(true, toggles);
             foreach (var toggle in toggles) {
+                if (toggle.gameObject.name == "Item") continue;
                 _toggles[toggle.gameObject.name] = toggle;
             }
         }
@@ -57,6 +60,14 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
             game.SendCommand(slot, cmd);
         }
 
+        public unsafe void ChangeTeamTargetRule(int value) {
+            var cmd = new CommandChangePowerupsHuds();
+            cmd.HTeamTarget = value;
+            QuantumGame game = QuantumRunner.DefaultGame;
+            int slot = game.GetLocalPlayerSlots()[game.GetLocalPlayers().IndexOf(game.Frames.Predicted.Global->Host)];
+            game.SendCommand(slot, cmd);
+        }
+
         private unsafe void OnRulesChanged(EventRulesChanged e) {
             rules = e.Game.Frames.Predicted.Global->Rules;
             RefreshValues();
@@ -66,6 +77,7 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
             foreach (var toggle in _toggles) {
                 if (rules.GetType().GetField(toggle.Key).GetValue(rules) is bool ruleValue) toggle.Value.SetIsOnWithoutNotify(ruleValue);
             }
+            teamTargetDropdown.SetValueWithoutNotify(rules.HTeamTarget);
         }
     }
 }

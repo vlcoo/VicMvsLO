@@ -29,7 +29,7 @@ namespace NSMB.Chat {
 
         public void Awake() {
             Instance = this;
-            SystemMessageColor = Perso.GetBool() ? Color.blue : Color.red;
+            SystemMessageColor = Perso.GetBool("chatSystemColor") ? Color.blue : Color.red;
         }
 
         public void OnEnable() {
@@ -164,9 +164,9 @@ namespace NSMB.Chat {
         }
 
         private void OnGameStateChanged(EventGameStateChanged e) {
-            if (e.NewState == GameState.WaitingForPlayers) {
-                AddSystemMessage("ui.inroom.chat.server.started");
-            }
+            // if (e.NewState == GameState.WaitingForPlayers) {
+            //     AddSystemMessage("ui.inroom.chat.server.started");
+            // }
         }
 
         private void OnPlayerAdded(EventPlayerAdded e) {

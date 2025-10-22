@@ -1,6 +1,9 @@
+using DG.Tweening;
+using NSMB.Networking;
 using NSMB.Quantum;
 using NSMB.UI.Game;
 using NSMB.UI.Translation;
+using NSMB.Utilities;
 using NSMB.Utilities.Extensions;
 using Quantum;
 using System;
@@ -8,6 +11,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
+using UnityEngine.UI;
 using static NSMB.Utilities.QuantumViewUtils;
 
 namespace NSMB.UI.Pause {
@@ -22,6 +26,8 @@ namespace NSMB.UI.Pause {
         [SerializeField] private PlayerElements playerElements;
         [SerializeField] private InputCollector inputCollector;
         [SerializeField] private GameObject main;
+        [SerializeField] private Transform scaleParent;
+        [SerializeField] private Image selfBackground; 
 
         [SerializeField] private PauseMenuOptionWrapper[] options;
         [SerializeField] private Material enabledMaterial, disabledMaterial;
@@ -50,9 +56,8 @@ namespace NSMB.UI.Pause {
 
         public void Start() {
             Settings.Controls.UI.Pause.performed += OnPause;
-            if (IsReplay) {
-                options[1].translationKey = "ui.pause.replay.hide";
-            }
+            if (IsReplay) options[1].text.text = "Hide replay controls";
+            else options[1].text.text = isHost ? "Return to Room" : "Give Up";
             UpdateLabels();
             QuantumEvent.Subscribe<EventGameEnded>(this, OnGameEnded);
         }
@@ -86,13 +91,15 @@ namespace NSMB.UI.Pause {
 
             QuantumGame game = QuantumRunner.DefaultGame;
             isHost = game == null || game.PlayerIsLocal(game.Frames.Predicted.Global->Host);
-            options[1].text.fontSharedMaterial = isHost || IsReplay ? enabledMaterial : disabledMaterial;
+            // options[1].text.fontSharedMaterial = isHost || IsReplay ? enabledMaterial : disabledMaterial;
             SelectOption(0);
 
             isInConfirmation = false;
             confirmationPrompt.SetActive(false);
 
+            selfBackground.enabled = true;
             main.SetActive(true);
+            DOTween.To(() => scaleParent.localScale, s => scaleParent.localScale = s, Vector3.one, 0.17f).SetEase(Ease.OutCubic).From(Vector3.zero);
             inputCollector.IsPaused = true;
             isPaused = true;
 
@@ -109,7 +116,9 @@ namespace NSMB.UI.Pause {
             Settings.Controls.UI.Cancel.performed -= OnCancel;
             TranslationManager.OnLanguageChanged -= OnLanguageChanged;
 
-            main.SetActive(false);
+            selfBackground.enabled = false;
+            DOTween.To(() => scaleParent.localScale, s => scaleParent.localScale = s, Vector3.zero, 0.17f)
+                .SetEase(Ease.OutCubic).onComplete += () => main.SetActive(false);
             inputCollector.IsPaused = false;
             isPaused = false;
 
@@ -203,7 +212,7 @@ namespace NSMB.UI.Pause {
             }
 
             isInConfirmationYesSelected = true;
-            yesConfirmText.text = "» " + originalYesText + " «";
+            yesConfirmText.text = "ï¿½ " + originalYesText + " ï¿½";
             noConfirmText.text = originalNoText;
         }
 
@@ -214,7 +223,7 @@ namespace NSMB.UI.Pause {
 
             isInConfirmationYesSelected = false;
             yesConfirmText.text = originalYesText;
-            noConfirmText.text = "» " + originalNoText + " «";
+            noConfirmText.text = "ï¿½ " + originalNoText + " ï¿½";
         }
 
         public unsafe void ClickConfirmYes() {
@@ -251,12 +260,14 @@ namespace NSMB.UI.Pause {
             if (IsReplay && !quit) {
                 // Toggle replay UI
                 bool replayNowActive = playerElements.ReplayUi.ToggleReplayControls();
-                options[1].translationKey = replayNowActive ? "ui.pause.replay.hide" : "ui.pause.replay.show";
+                options[1].text.text = replayNowActive ? "Hide replay controls" : "Show replay controls";
                 UpdateLabels();
                 GlobalController.Instance.PlaySound(SoundEffect.UI_Decide);
                 return;
             }
             if (!quit && !isHost) {
+                // give up. disqualify player...
+                Frame f = QuantumRunner.DefaultGame.Frames.Predicted;
                 return;
             }
 
@@ -321,7 +332,7 @@ namespace NSMB.UI.Pause {
 
             for (int i = 0; i < options.Length; i++) {
                 PauseMenuOptionWrapper option = options[i];
-                option.text.text = (selected == i) ? ("» " + option.originalText + " «") : option.originalText;
+                option.text.text = (selected == i) ? ("ï¿½ " + option.originalText + " ï¿½") : option.originalText;
                 //option.text.isRightToLeftText = GlobalController.Instance.translationManager.RightToLeft;
             }
         }
