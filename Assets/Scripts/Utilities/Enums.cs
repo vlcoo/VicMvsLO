@@ -50,6 +50,17 @@ public static class Enums {
         public const string GamemodeGuid = "G";
     }
     #endregion
+    
+    #region CLIENT
+    public enum DeviceType : byte
+    {
+        OTHER,
+        DESKTOP,
+        BROWSER,
+        MOBILE,
+        EDITOR,
+    }
+    #endregion
 }
 
 public class PrefabParticleDataAttribute : Attribute {

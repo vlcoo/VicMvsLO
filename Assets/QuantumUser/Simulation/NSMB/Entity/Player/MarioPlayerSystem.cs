@@ -1975,7 +1975,7 @@ namespace Quantum {
                 if ((stage.VerticalMap && filter.Transform->Position.Y > stage.Checkpoint.Y) || (!stage.VerticalMap && filter.Transform->Position.X > stage.Checkpoint.X)) {
                     mario->HasCheckpoint = true;
                     stage.ResetStage(f, false);
-                    f.Events.MarioPlayerGotCheckpoint(entity);
+                    f.Events.MarioPlayerGotCheckpoint(filter.Transform->Position);
                 }
             }
             

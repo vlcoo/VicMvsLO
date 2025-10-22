@@ -32,8 +32,8 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
         //---Serialized Variables
         [SerializeField] private MainMenuCanvas canvas;
         [SerializeField] private PlayerListHandler handler;
-        [SerializeField] private TMP_Text nameText, winsText, muteButtonText, rawPingText;
-        [SerializeField] private Image colorStrip, pingImage;
+        [SerializeField] private TMP_Text nameText, winsText, muteButtonText, pingText;
+        [SerializeField] private Image colorStrip;
         [SerializeField] private RectTransform background, dropdownBackgroundImage;
         [SerializeField] private GameObject blockerTemplate, dropdownOptions, firstButton, chattingIcon, settingsIcon, readyIcon;
         [SerializeField] private LayoutElement layout;
@@ -142,8 +142,9 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
             }
 
             // Ping text
-            pingImage.sprite = Utils.GetPingSprite(playerData->Ping);
-            rawPingText.text = playerData->Ping.ToString();
+            // pingImage.sprite = Utils.GetPingSprite(playerData->Ping);
+            // rawPingText.text = playerData->Ping.ToString();
+            pingText.text = $"{Utils.GetDeviceString((Enums.DeviceType)playerData->Device)} {playerData->Ping}ms {Utils.GetPingSymbol(playerData->Ping)}";
 
             // Name text
             RuntimePlayer runtimePlayer = f.GetPlayerData(player);

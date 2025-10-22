@@ -1,4 +1,5 @@
 using Quantum;
+using Unity.Mathematics.Geometry;
 using UnityEngine;
 using static NSMB.Utilities.QuantumViewUtils;
 
@@ -7,7 +8,7 @@ namespace NSMB.Entities.World {
 
         //---Serialized Variables
         [SerializeField] private Animation headAnimation;
-        [SerializeField] private SpriteRenderer headRenderer;
+        [SerializeField] private SpriteRenderer headRenderer, columnRenderer;
         [SerializeField] private Transform headOrigin;
         [SerializeField] private ParticleSystem bulletBillShoot;
 
@@ -26,7 +27,7 @@ namespace NSMB.Entities.World {
             }
 
             var breakable = f.Unsafe.GetPointer<BreakableObject>(EntityRef);
-            headRenderer.enabled = breakable->CurrentHeight > 0;
+            columnRenderer.enabled = breakable->CurrentHeight > 1;
             headOrigin.transform.localPosition = Vector3.up * (breakable->CurrentHeight.AsFloat - 1.0f);
         }
 

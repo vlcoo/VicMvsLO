@@ -31,6 +31,8 @@ namespace NSMB.UI.MainMenu {
         [SerializeField] private GameObject mainPanel;
         [SerializeField] private AudioSource sfx;
         [SerializeField] private ErrorPromptSubmenu errorSubmenu;
+        [SerializeField] private Image catImage;
+        [SerializeField] private Sprite[] cats;
 
         [Header("Header")]
         [SerializeField] private GameObject header;
@@ -83,6 +85,8 @@ namespace NSMB.UI.MainMenu {
                     OpenMenu(submenu, null, false);
                 }
             }
+
+            catImage.sprite = Perso.GetItem(cats);
         }
 
         public void OnDestroy() {

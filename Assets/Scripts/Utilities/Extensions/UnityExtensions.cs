@@ -34,7 +34,7 @@ namespace NSMB.Utilities.Extensions {
             if (tween) {
                 // only rotation needs to be changed for tweened flip. "includeRotation" is unused in this branch.
                 // "offsetRotation" is required here so the mesh always faces the correct way...
-                var newRotation = flip ? -offsetRotation + 360 : offsetRotation;
+                var newRotation = flip ? offsetRotation : -offsetRotation + 360;
                 DOTween.To(() => mesh.transform.rotation.eulerAngles.y, x => {
                     var currentRotation = mesh.transform.rotation.eulerAngles;
                     currentRotation.y = x;

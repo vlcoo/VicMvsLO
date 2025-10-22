@@ -6,7 +6,7 @@ namespace Quantum {
     [UnityEngine.Scripting.Preserve]
     public unsafe class KoopaSystem : SystemMainThreadEntityFilter<Koopa, KoopaSystem.Filter>, ISignalOnThrowHoldable, ISignalOnEnemyRespawned, ISignalOnEntityBumped,
         ISignalOnBobombExplodeEntity, ISignalOnIceBlockBroken, ISignalOnEnemyKilledByStageReset, ISignalOnEnemyTurnaround, ISignalOnEntityCrushed,
-        ISignalOnMarioPlayerBecameInvincible {
+        ISignalOnMarioPlayerBecameInvincible, ISignalOnEnemyReturnedHome {
        
         public struct Filter {
             public EntityRef Entity;
@@ -528,6 +528,13 @@ namespace Quantum {
                 koopa->Kill(f, mario->HeldEntity, entity, KillReason.Special);
             }
         }
+
+        public void OnEnemyReturnedHome(Frame f, EntityRef entity) {
+            if (f.Unsafe.TryGetPointer(entity, out Koopa* koopa) && koopa->IsInShell) {
+                koopa->Respawn(f, entity);
+            }
+        }
+
         #endregion
     }
 }

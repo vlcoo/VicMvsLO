@@ -1307,8 +1307,9 @@ namespace NSMB.Entities.Player {
         }
 
         private void OnMarioPlayerGotCheckpoint(EventMarioPlayerGotCheckpoint e) {
+            Debug.Log("checkpoint!!");
             PlaySoundEverywhere(SoundEffect.World_Checkpoint);
-            Instantiate(checkpointParticle, transform.position, Quaternion.identity);
+            Instantiate(checkpointParticle, e.Position.ToUnityVector3(), Quaternion.identity);
         }
 
         private void OnEnemyKicked(EventEnemyKicked e) {

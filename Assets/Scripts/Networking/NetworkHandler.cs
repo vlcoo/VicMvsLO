@@ -1,5 +1,6 @@
 using NSMB.Networking;
 using NSMB.Replay;
+using NSMB.Utilities;
 using Photon.Deterministic;
 using Photon.Realtime;
 using Quantum;
@@ -102,6 +103,7 @@ namespace NSMB.Networking {
                 QuantumGame game;
                 if (Runner && (game = Runner.Game) != null) {
                     pingCommand.PingMs = (int) Ping.Value;
+                    pingCommand.Device = (byte) Utils.GetDeviceType();
                     foreach (int slot in game.GetLocalPlayerSlots()) {
                         game.SendCommand(slot, pingCommand);
                     }

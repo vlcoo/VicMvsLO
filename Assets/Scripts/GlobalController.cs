@@ -144,7 +144,7 @@ namespace NSMB {
                 discordController.UpdateActivity();
             }
             
-            mixer.SetFloat("MasterPitch", 1 + Mathf.PingPong(Time.time / 5600f, 0.02f) - 0.01f);
+            mixer.SetFloat("MasterPitch", 1 + Mathf.PingPong(Time.time / 5600f, 0.025f) - 0.015f);
         }
 
         public void OnApplicationFocus(bool focus) {

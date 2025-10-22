@@ -12,13 +12,13 @@ public class CompanyNameGenerator : MonoBehaviour {
 
     private static string GenerateCompanyName() {
         var c = "N";
-        c += new[] {"i", "l"}[Random.Range(0, 2)];
-        c += new[] {"n", "m"}[Random.Range(0, 2)];
-        c += new[] {"i", "t", "l"}[Random.Range(0, 3)];
-        c += new[] {"e", "a", "o"}[Random.Range(0, 3)];
-        c += new[] {"n", "m"}[Random.Range(0, 2)];
+        c += Perso.GetItem(new[] {"i", "l"});
+        c += Perso.GetItem(new[] {"n", "m"});
+        c += Perso.GetItem(new[] {"i", "t", "l"});
+        c += Perso.GetItem(new[] {"e", "a", "o"});
+        c += Perso.GetItem(new[] {"n", "m"});
         c += c != "Ninten" ? "d" : "t";
-        c += new[] {"e", "a", "o"}[Random.Range(0, 3)];
+        c += Perso.GetItem(new[] {"e", "a", "o"});
         return c;
     }
 }

@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using UnityEngine;
+using DeviceType = Enums.DeviceType;
 
 namespace NSMB.Utilities {
     public class Utils {
@@ -261,6 +262,16 @@ namespace NSMB.Utilities {
             };
             return GlobalController.Instance.pingIndicators[index];
         }
+        
+        public static string GetDeviceString(DeviceType device) {
+            return device switch {
+                DeviceType.EDITOR => "<sprite name=dev_editor>",
+                DeviceType.DESKTOP => "<sprite name=dev_pc>",
+                DeviceType.MOBILE => "<sprite name=dev_mobile>",
+                DeviceType.BROWSER => "<sprite name=dev_web>",
+                _ => "",
+            };
+        }
 
         public static string BytesToString(long byteCount) {
             string[] suf = { "B", "KB", "MB", "GB", "TB", "PB", "EB" }; // Longs run out around EB
@@ -286,6 +297,17 @@ namespace NSMB.Utilities {
         public static float Luminance(Color color) {
             // https://stackoverflow.com/a/596243/19635374
             return 0.2126f * color.r + 0.7152f * color.g + 0.0722f * color.b;
+        }
+        
+        public static DeviceType GetDeviceType() {
+            if (Application.isEditor) return DeviceType.EDITOR;
+            return Application.platform switch {
+                RuntimePlatform.WebGLPlayer => Application.isMobilePlatform ? DeviceType.MOBILE : DeviceType.BROWSER,
+                RuntimePlatform.Android or RuntimePlatform.IPhonePlayer => DeviceType.MOBILE,
+                RuntimePlatform.LinuxPlayer or RuntimePlatform.WindowsPlayer or RuntimePlatform.OSXPlayer => DeviceType
+                    .DESKTOP,
+                _ => DeviceType.OTHER
+            };
         }
     }
 }

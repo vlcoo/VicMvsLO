@@ -38,6 +38,8 @@ namespace Quantum {
                 f.Signals.OnEnemyDespawned(filter.Entity);
                 return;
             }
+
+            if (enemy->StayAtHomeWhenOffscreen) OffscreenCheck(f, filter, stage);
         }
 
         public static void EnemyBumpTurnaround(Frame f, EntityRef entityA, EntityRef entityB) {
@@ -63,6 +65,27 @@ namespace Quantum {
             if (turnBoth) {
                 enemyB->ChangeFacingRight(f, entityB, !right);
             }
+        }
+        
+        public void OffscreenCheck(Frame f, Filter filter, VersusStageData stage) {
+            var allPlayers = f.Filter<MarioPlayer, Transform2D>();
+            var onscreen = false;
+            while (allPlayers.NextUnsafe(out _, out _, out Transform2D* marioTransform)) {
+                QuantumUtils.WrappedDistance(stage, filter.Transform->Position, marioTransform->Position, out FP distance);
+                QuantumUtils.WrappedDistance(stage, filter.Enemy->Spawnpoint, marioTransform->Position, out FP spawnpointDistance);
+                if (FPMath.Abs(distance) < 12 || FPMath.Abs(spawnpointDistance) < 12) {
+                    onscreen = true;
+                    break;
+                }
+            }
+
+            if (onscreen) return;
+            if (filter.PhysicsObject->IsFrozen) return;
+
+            if (filter.Transform->Position != filter.Enemy->Spawnpoint) f.Signals.OnEnemyReturnedHome(filter.Entity);
+            filter.PhysicsObject->Velocity = FPVector2.Zero;
+            filter.Transform->Teleport(f, filter.Enemy->Spawnpoint);
+            filter.Enemy->FacingRight = false;
         }
 
         public void OnStageReset(Frame f, QBoolean full) {
