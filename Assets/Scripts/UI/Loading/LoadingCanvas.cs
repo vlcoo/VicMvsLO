@@ -17,21 +17,23 @@ namespace NSMB.UI.Loading {
         public bool dontHideOnGameDestroy;
 
         //---Serialized Variables
-        [SerializeField] private AudioSource audioSource;
-        [SerializeField] private MarioLoader mario;
-
+        // [SerializeField] private AudioSource audioSource;
+        // [SerializeField] private MarioLoader mario;
+        [SerializeField] private Songinator musicPlayer;
         [SerializeField] private Animator animator;
         [SerializeField] private CanvasGroup loadingGroup, readyGroup;
-        [SerializeField] private Image readyBackground, readyImage;
+        [SerializeField] private Image readyBackground, readyImage, groundImage;
+        [SerializeField] private GameObject marioScene, bowserScene;
 
         [SerializeField] private CharacterAsset defaultCharacterAsset;
 
         //---Private Variables
-        private Coroutine fadeVolumeCoroutine, endCoroutine;
+        private Coroutine endCoroutine;
         private bool running;
+        private MarioLoader mario;
 
         public void OnValidate() {
-            this.SetIfNull(ref mario, UnityExtensions.GetComponentType.Children);
+            // this.SetIfNull(ref mario, UnityExtensions.GetComponentType.Children);
         }
 
         public void Startup() {
@@ -67,6 +69,9 @@ namespace NSMB.UI.Loading {
                 character = f.FindAsset(characters[characterIndex % characters.Length]);
             }
 
+            var characterScene = character.IsMinion ? bowserScene : marioScene;
+            characterScene.SetActive(true);
+            mario = characterScene.GetComponentInChildren<MarioLoader>();
             mario.Initialize(character);
             readyImage.sprite = character.ReadySprite;
 
@@ -79,14 +84,6 @@ namespace NSMB.UI.Loading {
 
             animator.Play("waiting");
 
-            audioSource.volume = 0;
-            audioSource.Play();
-
-            if (fadeVolumeCoroutine != null) {
-                StopCoroutine(fadeVolumeCoroutine);
-            }
-
-            fadeVolumeCoroutine = StartCoroutine(FadeVolume(0.1f, true));
             running = true;
         }
 
@@ -141,12 +138,7 @@ namespace NSMB.UI.Loading {
             readyGroup.gameObject.SetActive(true);
             animator.SetTrigger(longIntro  ? "loaded" : "spectating");
 
-            if (fadeVolumeCoroutine != null) {
-                StopCoroutine(fadeVolumeCoroutine);
-            }
-
-            fadeVolumeCoroutine = StartCoroutine(FadeVolume(0.1f, false));
-            //audioListener.enabled = false;
+            musicPlayer.SetPlaybackState(Songinator.PlaybackState.STOPPED, 2f);
 
             OnLoadingEnded?.Invoke(longIntro);
             running = false;
@@ -155,27 +147,6 @@ namespace NSMB.UI.Loading {
 
         public void EndAnimation() {
             gameObject.SetActive(false);
-        }
-
-        private IEnumerator FadeVolume(float fadeTime, bool fadeIn) {
-            float currentVolume = audioSource.volume;
-            float fadeRate = 1f / fadeTime;
-
-            while (true) {
-                currentVolume += fadeRate * Time.deltaTime * (fadeIn ? 1 : -1);
-
-                if (currentVolume < 0 || currentVolume > 1) {
-                    audioSource.volume = Mathf.Clamp01(currentVolume);
-                    break;
-                }
-
-                audioSource.volume = currentVolume;
-                yield return null;
-            }
-
-            if (!fadeIn) {
-                audioSource.Stop();
-            }
         }
     }
 }

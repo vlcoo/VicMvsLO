@@ -68,7 +68,7 @@ namespace NSMB.UI.Loading {
                 // Waiting for others
                 // TODO: convert to use the state system, needs to update when the ready list changes
                 int secondsUntilKick = (int) Mathf.Max(0, (f.Global->PlayerLoadFrames * f.DeltaTime).AsFloat);
-                statusText.text = secondsUntilKick <= 10 ? secondsUntilKick.ToString() : $"- {tm.GetTranslation("ui.loading.waiting")} -";
+                statusText.text = secondsUntilKick <= 10 ? secondsUntilKick.ToString() : tm.GetTranslation("ui.loading.waiting");
 
                 StringBuilder loadingListBuilder = new();
                 var playerDataFilter = f.Filter<PlayerData>();

@@ -21,6 +21,7 @@ public unsafe class VersusStageData : AssetObject {
     public string DiscordStageImage;
 #if QUANTUM_UNITY
     public Sprite Icon;
+    public Sprite GroundSprite;
 #endif
 
     [Header("-- Tilemap")]

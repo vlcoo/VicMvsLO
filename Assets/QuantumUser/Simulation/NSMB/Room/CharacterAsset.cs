@@ -12,6 +12,7 @@ public class CharacterAsset : AssetObject {
     public string TranslationString;
     public string LegalEnglishName;
     public CharacterPalette[] Palettes;
+    public bool IsMinion;
 
 #if QUANTUM_UNITY
     public Sprite LoadingSmallSprite;

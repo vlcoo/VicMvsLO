@@ -235,7 +235,7 @@ namespace NSMB.UI.MainMenu.Submenus.RoomList {
                     if (tm.RightToLeft) {
                         text = "<align=right>" + translation + "<line-height=0>\n<align=left>" + _ping + "ms " + Utilities.Utils.GetPingSymbol(_ping);
                     } else {
-                        text = "<align=left>" + translation + "<line-height=0>\n<align=right>" + _ping + "ms " + Utilities.Utils.GetPingSymbol(_ping);
+                        text = "<align=left>" + translation + "<font=PauseFont>" + _ping + "ms " + Utilities.Utils.GetPingSymbol(_ping);
                     }
                 }
             }

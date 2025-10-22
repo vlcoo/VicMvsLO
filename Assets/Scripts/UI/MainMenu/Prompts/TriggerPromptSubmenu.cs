@@ -74,6 +74,27 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
             var slot = game.GetLocalPlayerSlots()[game.GetLocalPlayers().IndexOf(game.Frames.Predicted.Global->Host)];
             game.SendCommand(slot, cmd);
         }
+
+        public unsafe void TriggerDuplicated(TriggerListEntry entry) {
+            QuantumGame game = NetworkHandler.Game;
+            
+            var cmd = new CommandChangeTriggers {
+                Index = triggers.Count,
+                Remove = false,
+                TriggerAction = (int)entry.Trigger.Action,
+                TriggerActionParameter = entry.Trigger.ActionParameter,
+                TriggerActionTarget = (int)entry.Trigger.ActionTarget,
+                TriggerCondition = (int)entry.Trigger.Condition,
+                TriggerConditionParameter = entry.Trigger.ConditionParameter,
+                TriggerConditionTarget = (int)entry.Trigger.ConditionTarget,
+                TriggerConstraint = (int)entry.Trigger.Constraint,
+                TriggerConstraintParameter = entry.Trigger.ConstraintParameter,
+                TriggerConstraintTarget = (int)entry.Trigger.ConstraintTarget,
+            };
+
+            var slot = game.GetLocalPlayerSlots()[game.GetLocalPlayers().IndexOf(game.Frames.Predicted.Global->Host)];
+            game.SendCommand(slot, cmd);
+        }
         
         public unsafe void TriggerRemoved(TriggerListEntry entry) {
             QuantumGame game = NetworkHandler.Game;
