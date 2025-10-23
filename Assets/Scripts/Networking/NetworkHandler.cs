@@ -235,6 +235,7 @@ namespace NSMB.Networking {
                 CoinRequirement = rules.CoinsForPowerup,
                 Lives = rules.Lives,
                 Timer = rules.TimerSeconds,
+                TriggerCount = f.ResolveList(rules.Triggers).Count,
             };
             BooleanProperties boolProperties = new BooleanProperties {
                 GameStarted = f.Global->GameState != GameState.PreGameRoom,

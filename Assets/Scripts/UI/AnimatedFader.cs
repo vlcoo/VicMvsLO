@@ -33,8 +33,9 @@ public class AnimatedFader : MonoBehaviour {
     private IEnumerator WaitForAnimation(Action onComplete) {
         yield return null;
         yield return new WaitUntil(() => anim.GetCurrentAnimatorStateInfo(0).normalizedTime > 1 && !anim.IsInTransition(0));
-        yield return new WaitForSeconds(0.5f);
+        yield return new WaitForSeconds(0.25f);
         onComplete?.Invoke();
+        yield return new WaitForSeconds(0.25f);
         FadeOut();
     }
 

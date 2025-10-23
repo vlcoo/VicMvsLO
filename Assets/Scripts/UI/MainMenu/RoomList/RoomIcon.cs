@@ -53,6 +53,10 @@ namespace NSMB.UI.MainMenu.Submenus.RoomList {
 
             StringBuilder symbols = new();
 
+            if (intProperties.TriggerCount > 0) {
+                symbols.Append("<sprite name=room_rules>").Append(Utils.GetSymbolString(intProperties.TriggerCount.ToString(), Utils.smallSymbols));
+            }
+
             if (boolProperties.CustomPowerups) {
                 symbols.Append("<sprite name=room_powerups>");
             }
@@ -73,10 +77,12 @@ namespace NSMB.UI.MainMenu.Submenus.RoomList {
                 symbols.Append("<sprite name=room_stars>").Append(Utils.GetSymbolString(intProperties.StarRequirement.ToString(), Utils.smallSymbols));
             }
 
-            symbols.Append("<sprite name=room_coins>").Append(Utils.GetSymbolString(intProperties.CoinRequirement.ToString(), Utils.smallSymbols));
+            if (intProperties.CoinRequirement > 0) {
+                symbols.Append("<sprite name=room_coins>").Append(Utils.GetSymbolString(intProperties.CoinRequirement.ToString(), Utils.smallSymbols));
+            }
+            
             symbolsText.text = symbols.ToString();
-
-
+            
             StringBuilder gamemodeAndStage = new();
             AssetGuid guid;
 

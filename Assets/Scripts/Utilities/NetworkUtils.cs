@@ -38,41 +38,42 @@ namespace NSMB.Utilities {
         public struct IntegerProperties {
             public static readonly IntegerProperties Default = new() {
                 CoinRequirement = 8,
-                StarRequirement = 10
+                StarRequirement = 10,
             };
 
-            // Level :: Value ranges from 0-63: 6 bits
-            // Timer :: Value ranges from 0-99: 7 bits
-            // Lives :: Value ranges from 1-25: 5 bits
-            // CoinRequirement :: Value ranges from 3-25: 5 bits
-            // StarRequirement :: Value ranges from 1-25: 5 bits
-            // MaxPlayers :: Value ranges from 1-10: 4 bits
+            // Level ::               unused. 0 bits
+            // Amt. of triggers ::    7 bits (0-127) max 80
+            // Timer ::               10 bits (0-1023) max 1000
+            // Lives ::               10 bits "
+            // CoinRequirement ::     10 bits "
+            // StarRequirement ::     10 bits "
+            // MaxPlayers ::          unused. 0 bits
 
-            // 31....26   25.....19   18...14   13...9   8...4   3..0
-            // Level      Timer       Lives     Coins    Stars   Unused
-            public int /*Level,*/ Timer, Lives, CoinRequirement, StarRequirement;
+            // 47 bits total
+            // 46...40  39...30  29...20  19...10  9...0
+            // Triggers Timer    Lives    Coins    Stars
+            // public int /*Level,*/ Timer, Lives, CoinRequirement, StarRequirement;
+            public int TriggerCount, Timer, Lives, CoinRequirement, StarRequirement;
 
-            public static implicit operator int(IntegerProperties props) {
-                int value = 0;
+            public static implicit operator long(IntegerProperties props) {
+                long value = 0;
 
-                //value |= (props.Level & 0b111111) << 26;
-                value |= (props.Timer & 0b1111111) << 19;
-                value |= (props.Lives & 0b11111) << 14;
-                value |= (props.CoinRequirement & 0b11111) << 9;
-                value |= (props.StarRequirement & 0b11111) << 4;
-                // value |= (props.MaxPlayers & 0b1111) << 0;
+                value |= (props.TriggerCount & 0b1111111L) << 40;
+                value |= (props.Timer & 0b1111111111L) << 30;
+                value |= (props.Lives & 0b1111111111L) << 20;
+                value |= (props.CoinRequirement & 0b1111111111L) << 10;
+                value |= (props.StarRequirement & 0b1111111111L) << 0;
 
                 return value;
             }
 
-            public static implicit operator IntegerProperties(int bits) {
+            public static implicit operator IntegerProperties(long bits) {
                 IntegerProperties ret = new() {
-                    //Level = (bits >> 26) & 0b111111,
-                    Timer = (bits >> 19) & 0b1111111,
-                    Lives = (bits >> 14) & 0b11111,
-                    CoinRequirement = (bits >> 9) & 0b11111,
-                    StarRequirement = (bits >> 4) & 0b11111,
-                    // MaxPlayers = (bits >> 0) & 0b1111,
+                    TriggerCount = (int)((bits >> 40) & 0b1111111L),
+                    Timer = (int)((bits >> 30) & 0b1111111111L),
+                    Lives = (int)((bits >> 20) & 0b1111111111L),
+                    CoinRequirement = (int)((bits >> 10) & 0b1111111111L),
+                    StarRequirement = (int)((bits >> 0) & 0b1111111111L),
                 };
                 return ret;
             }

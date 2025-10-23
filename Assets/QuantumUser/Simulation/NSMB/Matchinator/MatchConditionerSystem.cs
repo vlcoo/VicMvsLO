@@ -4,16 +4,17 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Scripting;
 using Int32 = System.Int32;
 
 namespace Quantum
 {
     public class MatchConditionerSystem : SystemSignalsOnly, ISignalOnMarioPlayerCollectedStar, ISignalOnMarioPlayerCollectedCoin, ISignalOnMarioPlayerDied, ISignalOnEntityFreeze, ISignalOnGameStarting, ISignalOnMarioPlayerDisqualified, ISignalOnMarioPlayerJumped, ISignalOnMarioPlayerRespawned, ISignalOnMarioPlayerReceivedKnockback, ISignalOnMarioPlayerCollectedPowerup, ISignalOnMarioPlayerTakeDamage, ISignalOnMarioPlayerReachedCoinLimit, ISignalOnMarioPlayerZeroedStars, ISignalOnMarioPlayerZeroedCoins, ISignalOnMarioTouchedGoal, ISignalOnMarioPlayerGotCheckpoint {
         public override unsafe void OnInit(Frame f) {
-            // MOCK TRIGGER LIST for testing purposes...
-            f.Global->Rules.Triggers = f.AllocateList<MatchConditionerTrigger>(20);
-            var triggerMap = f.ResolveList(f.Global->Rules.Triggers);
+            f.Global->Rules.Triggers = f.AllocateList<MatchConditionerTrigger>(80);
             
+            // mock list for test
+            // var triggerMap = f.ResolveList(f.Global->Rules.Triggers);
             // triggerMap.Add(new MatchConditionerTrigger {
             //     Condition = TriggerCondition.GotCoin,
             //     ConditionParameter = "",
@@ -31,6 +32,13 @@ namespace Quantum
             var conditionerIsPerson = f.Unsafe.TryGetPointer(conditionerEntity, out MarioPlayer* mario);
             var playerData = conditionerIsPerson ? QuantumUtils.GetPlayerData(f, mario->PlayerRef) : null;
             foreach (var trigger in f.ResolveList(f.Global->Rules.Triggers).Where(trigger => trigger.Condition == condition)) {
+                // need to check for condition parameter... this is basically like a second condition on top of the main one.
+                // if we receive no parameter, or the trigger's parameter is "Any", anything goes.
+                if (parameter != "" && trigger.ConditionParameter != "" && trigger.ConditionParameter != "Any")
+                    if (trigger.ConditionParameter != parameter) continue;
+                
+                // todo: constraints.
+                
                 // need to check for condition target... ok so if it's a match based condition (like the timer
                 // being a certain value, or the match starting) then the player ref entity will be null. the trigger
                 // gets executed if this is the case. if the player indeed exists, we check if it matches the target.
@@ -169,6 +177,7 @@ namespace Quantum
                         Err("invalid action target!!"); break;
                 }
 
+                // finally good to go. find action function by name and pass everything.
                 foreach (var actionerEntity in actionerEntities) {
                     GetType().GetMethod($"Act{trigger.Action.ToString()}")?.Invoke(this,
                         new object[] { f, actionerEntity, trigger.ActionParameter.ToString() });
@@ -257,8 +266,11 @@ namespace Quantum
             }
         }
 
-        public void OnMarioPlayerCollectedPowerup(Frame f, EntityRef mario, EntityRef powerup) {
-            ConditionActioned(TriggerCondition.GotPowerup, f, mario);
+        public unsafe void OnMarioPlayerCollectedPowerup(Frame f, EntityRef mario, EntityRef powerupEntity) {
+            if (!f.Unsafe.TryGetPointer(powerupEntity, out CoinItem* powerup)) return;
+            var scriptable = (PowerupAsset) f.FindAsset(powerup->Scriptable);
+            ConditionActioned(TriggerCondition.GotPowerup, f, mario,
+                scriptable.Type == PowerupType.Basic ? scriptable.State.ToString() : scriptable.Type.ToString());
         }
 
         public void OnMarioPlayerTakeDamage(Frame f, EntityRef entity, ref QBoolean keepDamage) {
@@ -272,10 +284,12 @@ namespace Quantum
         #endregion
 
         #region Actions
+        [Preserve]
         public unsafe void ActKill(Frame f, EntityRef entity, string parameter) {
             f.Unsafe.GetPointer<MarioPlayer>(entity)->Death(f, entity, false, true, EntityRef.None);
         }
 
+        [Preserve]
         public unsafe void ActGiveStar(Frame f, EntityRef entity, string parameter) {
             var mario = f.Unsafe.GetPointer<MarioPlayer>(entity);
             mario->GamemodeData.StarChasers->Stars++;
@@ -283,11 +297,13 @@ namespace Quantum
             f.Events.MarioPlayerCollectedStar(entity, *mario, f.Unsafe.GetPointer<Transform2D>(entity)->Position);
         }
 
+        [Preserve]
         public unsafe void ActGiveCoin(Frame f, EntityRef entity, string parameter) {
             // var mario = f.Unsafe.GetPointer<MarioPlayer>(entity);
             f.Signals.OnMarioPlayerCollectedCoin(entity, EntityRef.None, f.Unsafe.GetPointer<Transform2D>(entity)->Position, false, false);
         }
 
+        [Preserve]
         public unsafe void ActRemoveStar(Frame f, EntityRef entity, string parameter) {
             var mario = f.Unsafe.GetPointer<MarioPlayer>(entity);
             if (mario->GamemodeData.StarChasers->Stars == 0) return;
@@ -295,6 +311,7 @@ namespace Quantum
             if (mario->GamemodeData.StarChasers->Stars == 0) f.Signals.OnMarioPlayerZeroedStars(entity);
         }
 
+        [Preserve]
         public unsafe void ActRemoveCoin(Frame f, EntityRef entity, string parameter) {
             var mario = f.Unsafe.GetPointer<MarioPlayer>(entity);
             if (mario->Coins == 0) return;
@@ -302,38 +319,44 @@ namespace Quantum
             if (mario->Coins == 0) f.Signals.OnMarioPlayerZeroedCoins(entity, mario);
         }
 
+        [Preserve]
         public unsafe void ActGiveXPowerup(Frame f, EntityRef entity, string parameter) {
-            if (parameter == "") parameter = "random";
+            if (parameter == "") parameter = "Random";
             var allPowerups = f.FindAsset(f.SimulationConfig.DefaultGamemode).AllCoinItems;
             var newScriptable = f.FindAsset(
-                parameter == "random"
+                parameter == "Random"
                     ? allPowerups[f.RNG->Next(0, allPowerups.Length)]
-                    : allPowerups.FirstOrDefault(c => f.FindAsset(c) is PowerupAsset p && p.State.ToString() == parameter)) as PowerupAsset;
+                    : allPowerups.FirstOrDefault(c => f.FindAsset(c) is PowerupAsset p && (p.State.ToString() == parameter || p.Type.ToString() == parameter))) as PowerupAsset;
             if (newScriptable == null) { Err("powerup asset was null!!"); return; }
             PowerupReserveResult result = PowerupSystem.CollectPowerup(f, entity, f.Unsafe.GetPointer<MarioPlayer>(entity), f.Unsafe.GetPointer<PhysicsObject>(entity), newScriptable);
             f.Events.MarioPlayerCollectedPowerup(entity, result, newScriptable);
         }
 
+        [Preserve]
         public unsafe void ActGiveLife(Frame f, EntityRef entity, string parameter) {
             if (!f.Global->Rules.IsLivesEnabled) return;
             var mario = f.Unsafe.GetPointer<MarioPlayer>(entity);
             mario->Lives++;
         }
 
+        [Preserve]
         public unsafe void ActWin(Frame f, EntityRef entity, string parameter) {
             GameLogicSystem.EndGame(f, false, f.Unsafe.GetPointer<MarioPlayer>(entity)->GetTeam(f));
         }
 
+        [Preserve]
         public unsafe void ActDrawMatch(Frame f, EntityRef entity, string parameter) {
             GameLogicSystem.EndGame(f, false, null);
         }
 
+        [Preserve]
         public unsafe void ActDisqualify(Frame f, EntityRef entity, string parameter) {
             f.Signals.OnMarioPlayerDisqualified(entity);
             f.Destroy(entity);
             GameLogicSystem.CheckForGameEnd(f);
         }
 
+        [Preserve]
         public unsafe void ActStun(Frame f, EntityRef entity, string parameter) {
             if (parameter == "") parameter = "Bump";
             var mario = f.Unsafe.GetPointer<MarioPlayer>(entity);
@@ -355,69 +378,82 @@ namespace Quantum
             }
         }
 
+        [Preserve]
         public unsafe void ActDive(Frame f, EntityRef entity, string parameter) {
             
         }
 
+        [Preserve]
         public unsafe void ActLaunch(Frame f, EntityRef entity, string parameter) {
             
         }
 
+        [Preserve]
         public unsafe void ActFreeze(Frame f, EntityRef entity, string parameter) {
             IceBlockSystem.Freeze(f, entity);
         }
 
+        [Preserve]
         public unsafe void ActHarm(Frame f, EntityRef entity, string parameter) {
             f.Unsafe.GetPointer<MarioPlayer>(entity)->Powerdown(f, entity, parameter == "force", EntityRef.None);
         }
 
+        [Preserve]
         public unsafe void ActSpawnXPowerup(Frame f, EntityRef entity, string parameter) {
-            if (parameter == "") parameter = "random";
+            if (parameter == "") parameter = "Random";
             var allPowerups = f.FindAsset(f.SimulationConfig.DefaultGamemode).AllCoinItems;
-            PowerupAsset newScriptable = f.FindAsset(allPowerups.FirstOrDefault(c => f.FindAsset(c) is PowerupAsset p && p.State.ToString() == parameter)) as PowerupAsset;
+            PowerupAsset newScriptable = f.FindAsset(allPowerups.FirstOrDefault(c => f.FindAsset(c) is PowerupAsset p && (p.State.ToString() == parameter || p.Type.ToString() == parameter))) as PowerupAsset;
             if (newScriptable == null) { Err("powerup asset was null!!"); return; }
-            MarioPlayerSystem.SpawnItem(f, entity, f.Unsafe.GetPointer<MarioPlayer>(entity), parameter == "random" ? default : newScriptable.Prefab, false);
+            MarioPlayerSystem.SpawnItem(f, entity, f.Unsafe.GetPointer<MarioPlayer>(entity), parameter == "Random" ? default : newScriptable.Prefab, false);
         }
 
+        [Preserve]
         public unsafe void ActSpawnXEnemy(Frame f, EntityRef entity, string parameter) {
             
         }
 
+        [Preserve]
         public unsafe void ActRespawnLevel(Frame f, EntityRef entity, string parameter) {
             f.FindAsset<VersusStageData>(f.Map.UserAsset).ResetStage(f, false);
         }
 
+        [Preserve]
         public unsafe void ActExplodeLevel(Frame f, EntityRef entity, string parameter) {
             
         }
 
+        [Preserve]
         public unsafe void ActRandomTeleport(Frame f, EntityRef entity, string parameter) {
             
         }
 
+        [Preserve]
         public unsafe void ActRemoveReserve(Frame f, EntityRef entity, string parameter) {
             var mario = f.Unsafe.GetPointer<MarioPlayer>(entity);
             mario->ReserveItem = default;
         }
 
+        [Preserve]
         public unsafe void ActGiveXReserve(Frame f, EntityRef entity, string parameter) {
-            if (parameter == "") parameter = "random";
+            if (parameter == "") parameter = "Random";
             var mario = f.Unsafe.GetPointer<MarioPlayer>(entity);
             var allPowerups = f.FindAsset(f.SimulationConfig.DefaultGamemode).AllCoinItems;
             var newScriptable = f.FindAsset(
-                parameter == "random"
+                parameter == "Random"
                     ? allPowerups[f.RNG->Next(0, allPowerups.Length)]
-                    : allPowerups.FirstOrDefault(c => f.FindAsset(c) is PowerupAsset p && p.State.ToString() == parameter)) as PowerupAsset;
+                    : allPowerups.FirstOrDefault(c => f.FindAsset(c) is PowerupAsset p && (p.State.ToString() == parameter || p.Type.ToString() == parameter))) as PowerupAsset;
             if (newScriptable == null) { Err("powerup asset was null!!"); return; }
             mario->ReserveItem = newScriptable;
             f.Events.MarioPlayerCollectedPowerup(entity, PowerupReserveResult.ReserveNewPowerup, newScriptable);
         }
 
+        [Preserve]
         public unsafe void ActGiveIFrames(Frame f, EntityRef entity, string parameter) {
             var mario = f.Unsafe.GetPointer<MarioPlayer>(entity);
             mario->DamageInvincibilityFrames = 2 * 60;
         }
 
+        [Preserve]
         public unsafe void ActSpawnLooseCoin(Frame f, EntityRef entity, string parameter) {
             EntityRef coinEntity = f.Create(f.FindAsset(f.SimulationConfig.DefaultGamemode).LooseCoinPrototype);
             f.Unsafe.GetPointer<Transform2D>(coinEntity)->Position = f.Unsafe.GetPointer<Transform2D>(entity)->Position + f.Unsafe.GetPointer<PhysicsCollider2D>(entity)->Shape.Centroid;
@@ -427,6 +463,7 @@ namespace Quantum
                     f.RNG->Next(Constants._4_50, 5));
         }
 
+        [Preserve]
         public unsafe void ActSpawnLooseStar(Frame f, EntityRef entity, string parameter) {
             EntityRef newStarEntity = f.Create(((StarChasersGamemode)f.FindAsset(f.SimulationConfig.DefaultGamemode)).BigStarPrototype);
             f.Unsafe.GetPointer<Transform2D>(newStarEntity)->Position = f.Unsafe.GetPointer<Transform2D>(entity)->Position;
@@ -435,15 +472,18 @@ namespace Quantum
                 f.Unsafe.GetPointer<MarioPlayer>(entity)->FacingRight ? 1 : 2);
         }
 
+        [Preserve]
         public unsafe void ActSpawnStar(Frame f, EntityRef entity, string parameter) {
             
         }
 
+        [Preserve]
         public unsafe void ActZeroCoins(Frame f, EntityRef entity, string parameter) {
             var mario = f.Unsafe.GetPointer<MarioPlayer>(entity);
             mario->Coins = 0;
         }
 
+        [Preserve]
         public unsafe void ActZeroStars(Frame f, EntityRef entity, string parameter) {
             var mario = f.Unsafe.GetPointer<MarioPlayer>(entity);
             mario->GamemodeData.StarChasers->Stars = 0;

@@ -42,6 +42,7 @@ namespace Quantum {
                 rules.RemoveAt(Index);
             } else {
                 if (Index >= rules.Count) {
+                    if (rules.Count >= 80) return;
                     rules.Add(new MatchConditionerTrigger() {
                         Action = (TriggerAction) TriggerAction,
                         ActionParameter = TriggerActionParameter,

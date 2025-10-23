@@ -73,7 +73,7 @@ namespace Quantum {
             while (allPlayers.NextUnsafe(out _, out _, out Transform2D* marioTransform)) {
                 QuantumUtils.WrappedDistance(stage, filter.Transform->Position, marioTransform->Position, out FP distance);
                 QuantumUtils.WrappedDistance(stage, filter.Enemy->Spawnpoint, marioTransform->Position, out FP spawnpointDistance);
-                if (FPMath.Abs(distance) < 12 || FPMath.Abs(spawnpointDistance) < 12) {
+                if (FPMath.Abs(distance) < 10 || FPMath.Abs(spawnpointDistance) < 10) {
                     onscreen = true;
                     break;
                 }

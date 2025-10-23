@@ -81,12 +81,7 @@ namespace Quantum {
 
             if (rulesChanges.HasFlag(Rules.Gamemode)) {
                 gamemodeChanged = rules.Gamemode != Gamemode;
-
-                GameRules tempRules = default;
-                f.FindAsset(Gamemode).DefaultRules.Materialize(f, ref tempRules);
-                tempRules.Stage = rules.Stage;
-
-                rules = tempRules;
+                rules.Gamemode = Gamemode;
             }
             if (rulesChanges.HasFlag(Rules.Stage)) {
                 levelChanged = rules.Stage != Stage;

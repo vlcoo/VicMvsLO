@@ -59,7 +59,8 @@ namespace NSMB.UI.MainMenu {
             OnShow?.Invoke(first);
             if (!IsOverlay || !selfBackground || !scaleParent) return;
             selfBackground.enabled = true;
-            DOTween.To(() => scaleParent.localScale, s => scaleParent.localScale = s, Vector3.one, 0.17f).SetEase(Ease.OutCubic).From(Vector3.zero);
+            DOTween.To(() => scaleParent.localScale, s => scaleParent.localScale = s, Vector3.one, 0.17f)
+                .SetEase(Ease.OutCubic).From(Vector3.zero);
         }
 
         public virtual void Hide(SubmenuHideReason hideReason) {
