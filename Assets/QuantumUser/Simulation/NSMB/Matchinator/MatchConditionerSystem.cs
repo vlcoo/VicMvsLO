@@ -269,7 +269,7 @@ namespace Quantum
         public unsafe void OnMarioPlayerCollectedPowerup(Frame f, EntityRef mario, EntityRef powerupEntity) {
             if (!f.Unsafe.TryGetPointer(powerupEntity, out CoinItem* powerup)) return;
             var scriptable = (PowerupAsset) f.FindAsset(powerup->Scriptable);
-            ConditionActioned(TriggerCondition.GotPowerup, f, mario,
+            ConditionActioned(TriggerCondition.GotXPowerup, f, mario,
                 scriptable.Type == PowerupType.Basic ? scriptable.State.ToString() : scriptable.Type.ToString());
         }
 

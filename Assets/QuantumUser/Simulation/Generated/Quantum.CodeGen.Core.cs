@@ -149,7 +149,7 @@ namespace Quantum {
     Spawned,
     MatchStarted,
     GotCheckpoint,
-    GotPowerup,
+    GotXPowerup,
     LostPowerup,
     Stunned,
     Frozen,

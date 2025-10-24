@@ -46,7 +46,7 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
             if (index != -1) {
                 int slot = game.GetLocalPlayerSlots()[index];
                 game.SendCommand(slot, cmd);
-                Canvas.PlayConfirmSound();
+                // Canvas.PlayConfirmSound();
             } else {
                 Canvas.PlaySound(SoundEffect.UI_Error);
             }

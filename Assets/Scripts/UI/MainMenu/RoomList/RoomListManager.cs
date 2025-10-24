@@ -84,7 +84,7 @@ namespace NSMB.UI.MainMenu.Submenus.RoomList {
                 submenu.InvalidUsername();
                 return;
             }
-            canvas.PlayConfirmSound();
+            // canvas.PlayConfirmSound();
             _ = NetworkHandler.JoinRoom(new EnterRoomArgs {
                 RoomName = room.room.Name,
             });

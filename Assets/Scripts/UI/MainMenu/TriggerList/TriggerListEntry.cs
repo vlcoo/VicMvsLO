@@ -95,7 +95,7 @@ public class TriggerListEntry : MonoBehaviour {
         // { TriggerCondition.XSecondRemaining, new List<string> { "60", "10" } },
         // { TriggerCondition.EveryXSecond, new List<string> { "1", "5", "10", "15", "30", "60" } },
         { TriggerCondition.Stunned, new List<string> { "Bump", "Knockback", "HardKnockback" } },
-        { TriggerCondition.GotPowerup, new List<string> { "Any", "Mushroom", "FireFlower", "IceFlower", "PropellerMushroom", "MiniMushroom", "BlueShell", "HammerSuit", "MegaMushroom", "Starman" } },
+        { TriggerCondition.GotXPowerup, new List<string> { "Any", "Mushroom", "FireFlower", "IceFlower", "PropellerMushroom", "MiniMushroom", "BlueShell", "HammerSuit", "MegaMushroom", "Starman" } },
     };
     private readonly Dictionary<TriggerAction, List<string>> _actionParameters = new() {
         { TriggerAction.GiveXPowerup, new List<string> { "Random", "Mushroom", "FireFlower", "IceFlower", "PropellerMushroom", "MiniMushroom", "BlueShell", "HammerSuit", "MegaMushroom", "Starman" } },
