@@ -81,7 +81,7 @@ namespace Quantum
                         break;
                     case TriggerTarget.OneRandom:
                         var i = 0;
-                        var randomIndex = f.RNG->Next(0, f.PlayerCount);
+                        var randomIndex = f.RNG->Next(0, f.Global->PlayerConnectedCount);
                         while (marioFilter.NextUnsafe(out EntityRef e, out MarioPlayer* _)) {
                             if (i == randomIndex) {
                                 actionerEntities.Add(e);
