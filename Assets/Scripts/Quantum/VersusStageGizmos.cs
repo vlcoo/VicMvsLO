@@ -102,20 +102,6 @@ namespace NSMB.Quantum {
                         Gizmos.DrawLine(worldPos.ToUnityVector3(), QuantumUtils.RelativeTileToWorldRounded(stage, tir2.RelocateTo).ToUnityVector3());
                     }
                 }
-
-                if (!stage.IsCampaignMap) return;
-                Gizmos.color = Color.yellow;
-                if (stage.VerticalMap) {
-                    Gizmos.DrawLine(new Vector3(stage.StageWorldMin.X.AsFloat - 0.5f, stage.Checkpoint.Y.AsFloat),
-                        new Vector3(stage.StageWorldMax.X.AsFloat + 0.5f, stage.Checkpoint.Y.AsFloat));
-                    Gizmos.DrawLine(new Vector3(stage.Checkpoint.X.AsFloat, stage.Checkpoint.Y.AsFloat - 1f),
-                        new Vector3(stage.Checkpoint.X.AsFloat, stage.Checkpoint.Y.AsFloat + 1f));
-                } else {
-                    Gizmos.DrawLine(new Vector3(stage.Checkpoint.X.AsFloat, stage.StageWorldMax.Y.AsFloat + 0.5f),
-                        new Vector3(stage.Checkpoint.X.AsFloat, stage.StageWorldMin.Y.AsFloat - 0.5f));
-                    Gizmos.DrawLine(new Vector3(stage.Checkpoint.X.AsFloat - 1f, stage.Checkpoint.Y.AsFloat),
-                        new Vector3(stage.Checkpoint.X.AsFloat + 1f, stage.Checkpoint.Y.AsFloat));
-                }
             }
 
             var game = QuantumRunner.DefaultGame;
@@ -134,6 +120,20 @@ namespace NSMB.Quantum {
                 Gizmos.DrawCube(starSpawn.transform.position, Vector3.one);
                 Gizmos.DrawWireSphere(starSpawn.transform.position, 2);
                 Gizmos.DrawIcon(starSpawn.transform.position, "star", true);
+            }
+            
+            if (!stage.IsCampaignMap) return;
+            Gizmos.color = Color.yellow;
+            if (stage.VerticalMap) {
+                Gizmos.DrawLine(new Vector3(stage.StageWorldMin.X.AsFloat - 0.5f, stage.Checkpoint.Y.AsFloat),
+                    new Vector3(stage.StageWorldMax.X.AsFloat + 0.5f, stage.Checkpoint.Y.AsFloat));
+                Gizmos.DrawLine(new Vector3(stage.Checkpoint.X.AsFloat, stage.Checkpoint.Y.AsFloat - 1f),
+                    new Vector3(stage.Checkpoint.X.AsFloat, stage.Checkpoint.Y.AsFloat + 1f));
+            } else {
+                Gizmos.DrawLine(new Vector3(stage.Checkpoint.X.AsFloat, stage.StageWorldMax.Y.AsFloat + 0.5f),
+                    new Vector3(stage.Checkpoint.X.AsFloat, stage.StageWorldMin.Y.AsFloat - 0.5f));
+                Gizmos.DrawLine(new Vector3(stage.Checkpoint.X.AsFloat - 1f, stage.Checkpoint.Y.AsFloat),
+                    new Vector3(stage.Checkpoint.X.AsFloat + 1f, stage.Checkpoint.Y.AsFloat));
             }
         }
 

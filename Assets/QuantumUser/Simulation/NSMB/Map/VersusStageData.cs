@@ -47,7 +47,6 @@ public unsafe class VersusStageData : AssetObject {
 
     [Header("-- UI")]
     public ColorRGBA UIColor = new(24, 178, 170);
-    public bool HidePlayersOnMinimap;
 
     [Header("-- Modifiers")]
     public bool SpawnBigPowerups = true;
@@ -64,6 +63,7 @@ public unsafe class VersusStageData : AssetObject {
     [HideInInspector] public StageTileInstance[] TileData;
     [HideInInspector] public FPVector2[] BigStarSpawnpoints;
     [HideInInspector] public bool IsCampaignMap = false;
+    [HideInInspector] public bool HidePlayersOnMinimap;
 
     // public AssetRef<LoopingMusicData> GetCurrentMusic(Frame f) {
     //     return MainMusic[f.Global->TotalGamesPlayed % MainMusic.Length];
