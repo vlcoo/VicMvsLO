@@ -31,7 +31,7 @@ namespace NSMB.Quantum {
             int changed = 0;
             foreach (var stageTile in FindAssetsByType<StageTile>()) {
                 var shapes = stageTile.CollisionData.Shapes;
-                if (shapes.Length != 1) {
+                if (shapes is not { Length: 1 }) {
                     continue;
                 }
 
