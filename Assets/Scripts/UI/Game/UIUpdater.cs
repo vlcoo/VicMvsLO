@@ -28,7 +28,7 @@ namespace NSMB.UI.Game {
         [SerializeField] private CanvasGroup toggler;
         [SerializeField] private TrackIcon playerTrackTemplate, starTrackTemplate, starCoinTrackTemplate, objectiveCoinTrackTemplate, goalTrackTemplate, checkpointTrackTemplate;
         [SerializeField] private Sprite storedItemNull;
-        [SerializeField] private TMP_Text uiTeamObjective, uiMainObjective, uiCoins, uiDebug, uiLives, uiCountdown, uiLaps;
+        [SerializeField] private TMP_Text uiTeamObjective, uiMainObjective, uiCoins, uiDebug, uiLives, uiCountdown, uiLaps, speedrunTimer;
         [SerializeField] private Image itemReserve, itemColor, deathFade;
         [SerializeField] private GameObject boos, reserveItemBox;
         [SerializeField] private Animation reserveAnimation;
@@ -56,6 +56,7 @@ namespace NSMB.UI.Game {
         private VersusStageData stage;
         private bool greenWinText;
         private Color uiColor;
+        private long speedrunTimerStartTimestamp = 0;
 
         private Coroutine endGameSequenceCoroutine, reserveSummonCoroutine;
 
@@ -127,6 +128,7 @@ namespace NSMB.UI.Game {
             QuantumEvent.Subscribe<EventGameEnded>(this, OnGameEnded);
             QuantumEvent.Subscribe<EventTimerExpired>(this, OnTimerExpired);
             QuantumEvent.Subscribe<EventStartCameraFadeOut>(this, OnStartCameraFadeOut);
+            QuantumEvent.Subscribe<EventMarioPlayerRespawned>(this, OnMarioPlayerRespawned);
 
             goalTrackTemplate.gameObject.SetActive(stage.IsCampaignMap);
             greenWinText = Perso.GetBool("winTextColor");
@@ -441,6 +443,15 @@ namespace NSMB.UI.Game {
             GlobalController.Instance.sfx.PlayOneShot(resultMusic);
             winTextAnimator.SetTrigger(resultAnimationTrigger);
             winText.enabled = true;
+
+            if (resultAnimationTrigger == "start" && stage.IsCampaignMap) {
+                speedrunTimer.gameObject.SetActive(true);
+                var timeTotal =
+                    TimeSpan.FromMilliseconds(DateTimeOffset.Now.ToUnixTimeMilliseconds() -
+                                              speedrunTimerStartTimestamp);
+                speedrunTimer.text = string.Format("{0:D2}:{1:D2}<size=22>.{2:D3}", (int)timeTotal.TotalMinutes,
+                    timeTotal.Seconds, timeTotal.Milliseconds);
+            }
         }
 
         //---Callbacks
@@ -551,6 +562,13 @@ namespace NSMB.UI.Game {
             if (slotIndex != -1) {
                 game.SendCommand(game.GetLocalPlayerSlots()[slotIndex], new CommandSpawnReserveItem());
             }
+        }
+
+        public void OnMarioPlayerRespawned(EventMarioPlayerRespawned e) {
+            if (e.Entity != Target || speedrunTimerStartTimestamp > 0) return;
+            
+            speedrunTimerStartTimestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+            Debug.Log("timer begin!!");
         }
 
         private void OnToggleHUD(InputAction.CallbackContext context) {
