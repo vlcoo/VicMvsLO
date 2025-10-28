@@ -28,6 +28,7 @@ namespace NSMB {
         public RumbleManager rumbleManager;
         public AnimatedFader fader;
         public Gradient rainbowGradient;
+        public Color[] uiColors;
         public Sprite[] pingIndicators;
         public SimulationConfig config;
 

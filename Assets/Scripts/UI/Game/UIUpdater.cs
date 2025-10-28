@@ -55,6 +55,7 @@ namespace NSMB.UI.Game {
         private float fpsSample;
         private VersusStageData stage;
         private bool greenWinText;
+        private Color uiColor;
 
         private Coroutine endGameSequenceCoroutine, reserveSummonCoroutine;
 
@@ -129,6 +130,7 @@ namespace NSMB.UI.Game {
 
             goalTrackTemplate.gameObject.SetActive(stage.IsCampaignMap);
             greenWinText = Perso.GetBool("winTextColor");
+            uiColor = Perso.GetItem(GlobalController.Instance.uiColors, "uiColor");
         }
 
         public void OnDestroy() {
@@ -421,7 +423,7 @@ namespace NSMB.UI.Game {
         }
 
         private unsafe void ApplyUIColor(Frame f, MarioPlayer* mario) {
-            Color color = (f.Global->Rules.TeamsEnabled && mario != null && mario->GetTeam(f) is byte team) ? Utils.GetTeamColor(f, team, 0.8f, 1f) : ViewContext.Stage.UIColor.AsColor;
+            Color color = (f.Global->Rules.TeamsEnabled && mario != null && mario->GetTeam(f) is byte team) ? Utils.GetTeamColor(f, team, 0.8f, 1f) : uiColor;
 
             foreach (Image bg in backgrounds) {
                 bg.color = color;

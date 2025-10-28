@@ -4,6 +4,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using static NSMB.Utilities.QuantumViewUtils;
@@ -24,13 +25,15 @@ namespace NSMB.UI.Loading {
         [SerializeField] private CanvasGroup loadingGroup, readyGroup;
         [SerializeField] private Image readyBackground, readyImage, groundImage;
         [SerializeField] private GameObject marioScene, bowserScene;
-
+        [SerializeField] private TMP_Text readyLabel;
+        [SerializeField] private TMP_ColorGradient marioGradient, luigiGradient;
         [SerializeField] private CharacterAsset defaultCharacterAsset;
 
         //---Private Variables
         private Coroutine endCoroutine;
         private bool running;
         private MarioLoader mario;
+        private bool greenReadyText;
 
         public void OnValidate() {
             // this.SetIfNull(ref mario, UnityExtensions.GetComponentType.Children);
@@ -42,6 +45,7 @@ namespace NSMB.UI.Loading {
             QuantumCallback.Subscribe<CallbackGameStarted>(this, OnGameStarted);
             QuantumCallback.Subscribe<CallbackGameDestroyed>(this, OnGameDestroyed);
             QuantumEvent.Subscribe<EventGameStateChanged>(this, OnGameStateChanged);
+            greenReadyText = Perso.GetBool("winTextColor");
         }
 
         public void Initialize(QuantumGame game) {
@@ -78,6 +82,7 @@ namespace NSMB.UI.Loading {
             mario = characterScene.GetComponentInChildren<MarioLoader>();
             mario.Initialize(character);
             readyImage.sprite = character.ReadySprite;
+            readyLabel.colorGradientPreset = greenReadyText ? luigiGradient : marioGradient;
 
             readyGroup.gameObject.SetActive(false);
             gameObject.SetActive(true);

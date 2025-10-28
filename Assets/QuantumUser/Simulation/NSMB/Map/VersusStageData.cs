@@ -45,8 +45,8 @@ public unsafe class VersusStageData : AssetObject {
     public FPVector2 CameraMinPosition;
     public FPVector2 CameraMaxPosition;
 
-    [Header("-- UI")]
-    public ColorRGBA UIColor = new(24, 178, 170);
+    // [Header("-- UI")]
+    // public ColorRGBA UIColor = new(24, 178, 170);
 
     [Header("-- Modifiers")]
     public bool SpawnBigPowerups = true;
