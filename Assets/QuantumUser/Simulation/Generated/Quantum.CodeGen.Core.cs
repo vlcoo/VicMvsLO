@@ -2459,17 +2459,21 @@ namespace Quantum {
     [FieldOffset(0)]
     [ExcludeFromPrototype()]
     public Byte DeathAnimationFrames;
+    [FieldOffset(4)]
+    public QBoolean DontWalkOfLedges;
     public override Int32 GetHashCode() {
       unchecked { 
         var hash = 20731;
         hash = hash * 31 + Speed.GetHashCode();
         hash = hash * 31 + DeathAnimationFrames.GetHashCode();
+        hash = hash * 31 + DontWalkOfLedges.GetHashCode();
         return hash;
       }
     }
     public static void Serialize(void* ptr, FrameSerializer serializer) {
         var p = (Goomba*)ptr;
         serializer.Stream.Serialize(&p->DeathAnimationFrames);
+        QBoolean.Serialize(&p->DontWalkOfLedges, serializer);
         FP.Serialize(&p->Speed, serializer);
     }
   }

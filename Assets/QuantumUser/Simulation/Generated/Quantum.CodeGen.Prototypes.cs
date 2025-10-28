@@ -587,6 +587,7 @@ namespace Quantum.Prototypes {
   [Quantum.Prototypes.Prototype(typeof(Quantum.Goomba))]
   public unsafe partial class GoombaPrototype : ComponentPrototype<Quantum.Goomba> {
     public FP Speed;
+    public QBoolean DontWalkOfLedges;
     partial void MaterializeUser(Frame frame, ref Quantum.Goomba result, in PrototypeMaterializationContext context);
     public override Boolean AddToEntity(FrameBase f, EntityRef entity, in PrototypeMaterializationContext context) {
         Quantum.Goomba component = default;
@@ -595,6 +596,7 @@ namespace Quantum.Prototypes {
     }
     public void Materialize(Frame frame, ref Quantum.Goomba result, in PrototypeMaterializationContext context = default) {
         result.Speed = this.Speed;
+        result.DontWalkOfLedges = this.DontWalkOfLedges;
         MaterializeUser(frame, ref result, in context);
     }
   }

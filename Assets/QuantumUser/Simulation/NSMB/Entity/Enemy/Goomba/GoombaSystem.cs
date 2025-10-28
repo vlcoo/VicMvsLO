@@ -1,4 +1,5 @@
 using Photon.Deterministic;
+using Quantum.Collections;
 
 namespace Quantum {
     [UnityEngine.Scripting.Preserve]
@@ -52,6 +53,34 @@ namespace Quantum {
 
             // Move
             physicsObject->Velocity.X = goomba->Speed * (enemy->FacingRight ? 1 : -1);
+            
+            if (goomba->DontWalkOfLedges && physicsObject->IsTouchingGround) {
+                FPVector2 checkPosition = transform->Position + filter.Collider->Shape.Centroid;
+                if (!PhysicsObjectSystem.Raycast(f, stage, checkPosition, FPVector2.Down, FP._0_33, out var hit)) {
+                    // Failed to hit a raycast, but check to make sure we don't have a contact point instead.
+
+                    bool turnaround = true;
+                    QList<PhysicsContact> contacts = f.ResolveList(physicsObject->Contacts);
+                    foreach (var contact in contacts) {
+                        if (FPVector2.Dot(contact.Normal, FPVector2.Up) < Constants.PhysicsGroundMaxAngleCos) {
+                            // Not on the ground
+                            continue;
+                        }
+
+                        // Is a ground contact
+                        QuantumUtils.UnwrapWorldLocations(stage, transform->Position, contact.Position, out FPVector2 ourPos, out FPVector2 contactPos);
+                        if ((enemy->FacingRight && ourPos.X < contactPos.X)
+                            || (!enemy->FacingRight && ourPos.X > contactPos.X)) {
+                            turnaround = false;
+                            break;
+                        }
+                    }
+
+                    if (turnaround) {
+                        enemy->ChangeFacingRight(f, filter.Entity, !enemy->FacingRight);
+                    }
+                }
+            }
         }
 
         #region Interactions
