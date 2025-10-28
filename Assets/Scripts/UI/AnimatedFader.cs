@@ -7,6 +7,7 @@ public class AnimatedFader : MonoBehaviour {
         Cut,
         Dissolve,
         Circle,
+        Respawn,    // bowser shape on IN, star shape on OUT
     }
     
     [SerializeField] private Animator anim;
@@ -24,6 +25,9 @@ public class AnimatedFader : MonoBehaviour {
         case FadeStyle.Dissolve:
             anim.SetTrigger("dissolve");
             break;
+        case FadeStyle.Respawn:
+            anim.SetTrigger("respawn");
+            break;
         case FadeStyle.Cut:
             break;
         }
@@ -33,9 +37,9 @@ public class AnimatedFader : MonoBehaviour {
     private IEnumerator WaitForAnimation(Action onComplete) {
         yield return null;
         yield return new WaitUntil(() => anim.GetCurrentAnimatorStateInfo(0).normalizedTime > 1 && !anim.IsInTransition(0));
-        yield return new WaitForSeconds(0.25f);
+        yield return new WaitForSeconds(0.4f);
         onComplete?.Invoke();
-        yield return new WaitForSeconds(0.25f);
+        yield return new WaitForSeconds(0.1f);
         FadeOut();
     }
 
@@ -47,6 +51,9 @@ public class AnimatedFader : MonoBehaviour {
             break;
         case FadeStyle.Dissolve:
             anim.SetTrigger("dissolve");
+            break;
+        case FadeStyle.Respawn:
+            anim.SetTrigger("respawn");
             break;
         case FadeStyle.Cut:
             break;

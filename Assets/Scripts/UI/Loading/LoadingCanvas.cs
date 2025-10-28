@@ -159,5 +159,9 @@ namespace NSMB.UI.Loading {
             bowserScene.SetActive(false);
             gameObject.SetActive(false);
         }
+
+        public void AfterReadyFadeTakeover() {
+            GlobalController.Instance.fader.Fade(AnimatedFader.FadeStyle.Dissolve, AnimatedFader.FadeStyle.Respawn, EndAnimation);
+        }
     }
 }

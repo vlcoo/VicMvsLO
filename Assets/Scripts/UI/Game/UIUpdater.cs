@@ -255,7 +255,9 @@ namespace NSMB.UI.Game {
             if (e.Entity != Target) {
                 return;
             }
-            StartCoroutine(FadeOutThenInCoroutine());
+
+            GlobalController.Instance.fader.Fade(AnimatedFader.FadeStyle.Respawn, AnimatedFader.FadeStyle.Respawn);
+            // StartCoroutine(FadeOutThenInCoroutine());
         }
 
         private IEnumerator FadeOutThenInCoroutine() {
