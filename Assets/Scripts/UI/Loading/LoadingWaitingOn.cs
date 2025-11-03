@@ -19,6 +19,7 @@ namespace NSMB.UI.Loading {
         //---Private Variables
         private GameObject playerListParent;
         private LoadingState currentLoadingState = LoadingState.None;
+        private const string StatusLoading = "Now Loading...";
 
         public void OnValidate() {
             this.SetIfNull(ref statusText);
@@ -26,7 +27,7 @@ namespace NSMB.UI.Loading {
 
         public void Awake() {
             playerListParent = playerList.transform.parent.gameObject;
-            statusText.text = GlobalController.Instance.translationManager.GetTranslation("ui.loading.loading");
+            statusText.text = StatusLoading;
 
             QuantumCallback.Subscribe<CallbackUpdateView>(this, OnUpdateView, onlyIfActiveAndEnabled: true);
         }
@@ -49,26 +50,26 @@ namespace NSMB.UI.Loading {
             if (playerData == null || f.Global->GameState >= GameState.Playing) {
                 // Loading (as spectator)
                 RunIfNewState(LoadingState.Spectator, () => {
-                    statusText.text = tm.GetTranslation("ui.loading.spectator");
+                    // statusText.text = tm.GetTranslation("ui.loading.spectator");
                     playerListParent.SetActive(false);
                 });
             } else if (!playerData->IsLoaded) {
                 // *WE* are still loading
                 RunIfNewState(LoadingState.Loading, () => {
-                    statusText.text = tm.GetTranslation("ui.loading.loading");
+                    // statusText.text = tm.GetTranslation("ui.loading.loading");
                     playerListParent.SetActive(false);
                 });
             } else if (f.Global->GameState >= GameState.Starting) {
                 // Game starting
                 RunIfNewState(LoadingState.Starting, () => {
-                    statusText.text = tm.GetTranslation("ui.loading.starting");
+                    // statusText.text = tm.GetTranslation("ui.loading.starting");
                     playerListParent.SetActive(false);
                 });
             } else {
                 // Waiting for others
                 // TODO: convert to use the state system, needs to update when the ready list changes
-                int secondsUntilKick = (int) Mathf.Max(0, (f.Global->PlayerLoadFrames * f.DeltaTime).AsFloat);
-                statusText.text = secondsUntilKick <= 10 ? secondsUntilKick.ToString() : tm.GetTranslation("ui.loading.waiting");
+                // int secondsUntilKick = (int) Mathf.Max(0, (f.Global->PlayerLoadFrames * f.DeltaTime).AsFloat);
+                // statusText.text = secondsUntilKick <= 10 ? secondsUntilKick.ToString() : StatusLoading;
 
                 StringBuilder loadingListBuilder = new();
                 var playerDataFilter = f.Filter<PlayerData>();

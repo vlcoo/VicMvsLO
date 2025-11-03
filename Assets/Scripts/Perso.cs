@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using Random = System.Random;
 
+/// <summary>
+/// Personalization engine.
+/// </summary>
 public static class Perso {
     private static readonly Random Rng = new(SystemInfo.deviceUniqueIdentifier.GetHashCode());
     public static int HwId => Rng.Next();

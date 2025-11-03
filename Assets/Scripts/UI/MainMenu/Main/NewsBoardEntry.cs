@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using TMPro;
 using UnityEngine;
 
@@ -10,7 +11,7 @@ namespace NSMB.UI.MainMenu.Submenus.Main {
 
         public void Initialize(NewsBoardData data) {
             title.text = data.Title;
-            author.text = DateTimeOffset.FromUnixTimeSeconds(data.Created).ToLocalTime().DateTime.ToString() + " - " + data.Author;
+            author.text = DateTimeOffset.FromUnixTimeSeconds(data.Created).ToLocalTime().DateTime.ToString(CultureInfo.CurrentCulture);
             body.text = data.Text;
             gameObject.SetActive(true);
         }

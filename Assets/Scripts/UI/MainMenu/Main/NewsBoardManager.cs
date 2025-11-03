@@ -27,14 +27,27 @@ namespace NSMB.UI.MainMenu.Submenus.Main {
 #endif
 
         public void Awake() {
-#if USE_CACHE
-            try {
-                cachedPosts = JArray.Parse(PlayerPrefs.GetString("NewsCache", "")).Select(jt => jt.ToObject<NewsBoardEntry.NewsBoardData>()).ToDictionary(d => d.Id);
-            } catch (Exception e) {
-                cachedPosts = new();
-            }
-#endif
-            GlobalController.Instance.StartCoroutine(FetchPosts());
+// #if USE_CACHE
+//             try {
+//                 cachedPosts = JArray.Parse(PlayerPrefs.GetString("NewsCache", "")).Select(jt => jt.ToObject<NewsBoardEntry.NewsBoardData>()).ToDictionary(d => d.Id);
+//             } catch (Exception e) {
+//                 cachedPosts = new();
+//             }
+// #endif
+//             GlobalController.Instance.StartCoroutine(FetchPosts());
+
+            template.Initialize(new NewsBoardEntry.NewsBoardData {
+                Title = "???",
+                Id = -1,
+                Text = Perso.GetItem(new [] {
+                    "No news. Enjoy the update!",
+                    "Enjoy the update. I'll post news later.",
+                    "Thanks for playing!",
+                    "Warm tips: please enjoy newest vcmi ever with newly added feature.",
+                    "Your copy of vcmi is defective. Please return to sender at your earliest convenience."
+                }, "oddNews"),
+                Created = 1762198200,
+            });
         }
 
 #if USE_CACHE

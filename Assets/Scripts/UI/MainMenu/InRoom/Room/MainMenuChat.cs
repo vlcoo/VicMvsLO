@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using Button = UnityEngine.UI.Button;
 
 namespace NSMB.UI.MainMenu.Submenus.InRoom {
 
@@ -162,6 +163,7 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
             }
 
             previousTextLength = size;
+            sendBtn.interactable = size > 0 && chatbox.interactable;
 
             var game = QuantumRunner.DefaultGame;
             List<PlayerRef> localPlayers = game.GetLocalPlayers();
