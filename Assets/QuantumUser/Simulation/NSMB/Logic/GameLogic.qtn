@@ -42,43 +42,44 @@ struct GameRules {
 	bool DrawOnTimeUp;
 	int Laps;
 	list<MatchConditionerTrigger> Triggers;
+	byte SpecialsCount;
 	
 	bool SNoReserve;
-    	bool SNoDroppedStars;
-    	bool SInstantDeath;
-    	bool SNoDefrost;
-    	bool SNoCollisions;
-    	bool SNoIframes;
-    	bool SHideSeek;
-    	bool SNoEnemies;
-    	bool SNoBahs;
-    	bool SPitWrap;
-    	bool SAllBricks;
-    	bool SNoLooping;
-    	bool SNoCoins;
-    	bool SNoPowerups;
-    	bool SShowCoinCount;
-    	
-    	int ChanceMushroom;
-        int ChanceFireFlower;
-        int ChanceIceFlower;
-        int ChancePropellerMushroom;
-        int ChanceBlueShell;
-        int ChanceHammerSuit;
-        int ChanceMiniMushroom;
-        int ChanceMegaMushroom;
-        int ChanceStarman;
-        
-        bool HStars;
-        bool HPlayers;
-        bool HHost;
-        bool HIceCubes;
-        int HTeamTarget;
-        bool HStarCount;
-        bool HLifeCount;
-        bool HLapCount;
-        bool HCoinCount;
-        bool HNicknames;
+    bool SNoDroppedStars;
+    bool SInstantDeath;
+    bool SNoDefrost;
+    bool SNoCollisions;
+    bool SNoIframes;
+    bool SHideSeek;
+    bool SNoEnemies;
+    bool SNoBahs;
+    bool SPitWrap;
+    bool SAllBricks;
+    bool SNoLooping;
+    bool SNoCoins;
+    bool SNoPowerups;
+    bool SShowCoinCount;
+    
+    int ChanceMushroom;
+    int ChanceFireFlower;
+    int ChanceIceFlower;
+    int ChancePropellerMushroom;
+    int ChanceBlueShell;
+    int ChanceHammerSuit;
+    int ChanceMiniMushroom;
+    int ChanceMegaMushroom;
+    int ChanceStarman;
+    
+    bool HStars;
+    bool HPlayers;
+    bool HHost;
+    bool HIceCubes;
+    int HTeamTarget;
+    bool HStarCount;
+    bool HLifeCount;
+    bool HLapCount;
+    bool HCoinCount;
+    bool HNicknames;
 }
 
 enum GameState : Byte {

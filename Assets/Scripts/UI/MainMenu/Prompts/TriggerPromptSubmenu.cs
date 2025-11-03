@@ -1,5 +1,6 @@
 ﻿using NSMB.Networking;
 using Quantum;
+using Quantum.Collections;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,7 +11,7 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
         public GameObject triggerTemplate;
         public GameObject triggersParent;
         public GameObject popupCondition, popupAction;
-        public CounterTip counterTip;
+        // public CounterTip counterTip;
         public bool success = true;
         public List<TriggerListEntry> triggers = new();
         public TriggerListEntry currentEditingEntry = null;
@@ -18,11 +19,21 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
         public void Start() {
             QuantumEvent.Subscribe<EventTriggersChanged>(this, OnTriggersChanged);
             QuantumCallback.Subscribe<CallbackGameDestroyed>(this, OnGameDestroyed);
+            QuantumCallback.Subscribe<CallbackGameStarted>(this, OnGameStarted);
         }
 
-        public override void Show(bool first) {
+        public override unsafe void Show(bool first) {
             base.Show(first);
             success = false;
+            NetworkHandler.Client.AddCallbackTarget(this);
+            var f = NetworkHandler.Game.Frames.Predicted;
+            var newTriggers = f.ResolveList(f.Global->Rules.Triggers);
+            RefreshValues(newTriggers);
+        }
+        
+        public override void Hide(SubmenuHideReason hideReason) {
+            base.Hide(hideReason);
+            NetworkHandler.Client.RemoveCallbackTarget(this);
         }
         
         public override bool TryGoBack(out bool playSound) {
@@ -35,15 +46,25 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
             return base.TryGoBack(out playSound);
         }
 
+        public unsafe void OnGameStarted(CallbackGameStarted e) {
+            var f = e.Game.Frames.Predicted;
+            var newTriggers = f.ResolveList(f.Global->Rules.Triggers);
+            RefreshValues(newTriggers);
+        }
+
         public unsafe void OnTriggersChanged(EventTriggersChanged e) {
+            Debug.Log("saw trigger change");
             var f = e.Frame;
             var newTriggers = f.ResolveList(f.Global->Rules.Triggers);
-            
+            RefreshValues(newTriggers);
+        }
+        
+        private void RefreshValues(QList<MatchConditionerTrigger> newTriggers) {
             // go through all the new triggers. we can reuse existing entries in the ui list by simply editing them.
             // if there are more triggers than entries, we need to create new entries.
             // if there are less, we have to remove the excess entries.
             // TODO: can be massively optimized! will iterate on its implementation after checking this fully works.
-            
+
             for (int i = 0; i < newTriggers.Count; i++) {
                 if (i >= triggers.Count) {
                     var newEntry = Instantiate(triggerTemplate, triggersParent.transform, false);
@@ -60,7 +81,7 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
                 triggers.RemoveAt(i);
             }
             
-            counterTip.SetCount(triggers.Count);
+            // counterTip.SetCount(triggers.Count);
         }
 
         public unsafe void TriggerAdded() {
@@ -161,7 +182,7 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
                 Destroy(trigger.gameObject);
             }
             triggers.Clear();
-            counterTip.SetCount(0);
+            // counterTip.SetCount(0);
         }
     }
 }

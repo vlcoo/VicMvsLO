@@ -60,6 +60,7 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
         [SerializeField] private TMP_Text startGameButtonText;
         [SerializeField] private UnityEngine.UI.Button startGameButton;
         [SerializeField] private MenuSongPlayer menuSongManager;
+        [SerializeField] private CounterTip counterTriggers, counterSpecials;
 
         //---Private Variables
         // private InRoomSubmenuPanel selectedPanel;
@@ -79,6 +80,9 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
 
             QuantumCallback.Subscribe<CallbackLocalPlayerAddConfirmed>(this, OnLocalPlayerAddConfirmed);
             QuantumCallback.Subscribe<CallbackGameDestroyed>(this, OnGameDestroyed);
+            QuantumCallback.Subscribe<CallbackGameStarted>(this, OnGameStarted);
+            QuantumEvent.Subscribe<EventRulesChanged>(this, OnRulesChanged);
+            QuantumEvent.Subscribe<EventTriggersChanged>(this, OnTriggersChanged);
             QuantumEvent.Subscribe<EventStartingCountdownChanged>(this, OnStartingCountdownChanged);
             QuantumEvent.Subscribe<EventGameStateChanged>(this, OnGameStateChanged);
             QuantumEvent.Subscribe<EventHostChanged>(this, OnHostChanged);
@@ -263,6 +267,24 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
             }
 
             SelectNextPanel();
+        }
+
+        private unsafe void OnTriggersChanged(EventTriggersChanged e) {
+            var f = e.Frame;
+            var newTriggers = f.ResolveList(f.Global->Rules.Triggers);
+            counterTriggers.SetCount(newTriggers.Count);
+        }
+        
+        private unsafe void OnRulesChanged(EventRulesChanged e) {
+            var f = e.Game.Frames.Predicted;
+            counterSpecials.SetCount(f.Global->Rules.SpecialsCount);
+        }
+        
+        private unsafe void OnGameStarted(CallbackGameStarted e) {
+            var f = e.Game.Frames.Predicted;
+            var newTriggers = f.ResolveList(f.Global->Rules.Triggers);
+            counterTriggers.SetCount(newTriggers.Count);
+            counterSpecials.SetCount(f.Global->Rules.SpecialsCount);
         }
 
         private void OnGameDestroyed(CallbackGameDestroyed e) {

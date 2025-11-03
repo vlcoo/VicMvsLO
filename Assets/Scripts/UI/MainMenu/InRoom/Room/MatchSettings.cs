@@ -35,44 +35,30 @@ public class MatchSettings : MonoBehaviour {
     }
 
     public void RefreshValues() {
-        if (!isHost) {
-            lapsInput.interactable = false;
-            starsToggle.interactable = false;
-            starsInput.interactable = false;
-            coinsToggle.interactable = false;
-            coinsInput.interactable = false;
-            livesToggle.interactable = false;
-            livesInput.interactable = false;
-            timerToggle.interactable = false;
-            timerInput.interactable = false;
-            teamsToggle.interactable = false;
-            return;
-        }
-        
         var isCampaignMap = false;
         if (QuantumUnityDB.TryGetGlobalAsset(rules.Stage, out Map map)
             && QuantumUnityDB.TryGetGlobalAsset(map.UserAsset, out VersusStageData stage))
             isCampaignMap = stage.IsCampaignMap;
         
-        lapsInput.interactable = isCampaignMap;
+        lapsInput.interactable = isCampaignMap && isHost;
         if (rules.Laps > 0 || lapsInput.text.Length == 0) lapsInput.SetTextWithoutNotify(rules.Laps.ToString());
-        starsToggle.interactable = true;
+        starsToggle.interactable = isHost;
         starsToggle.SetIsOnWithoutNotify(rules.StarsToWin > 0);
-        starsInput.interactable = rules.StarsToWin > 0;
+        starsInput.interactable = rules.StarsToWin > 0 && isHost;
         if (rules.StarsToWin > 0 || starsInput.text.Length == 0) starsInput.SetTextWithoutNotify(rules.StarsToWin.ToString());
-        coinsToggle.interactable = true;
+        coinsToggle.interactable = isHost;
         coinsToggle.SetIsOnWithoutNotify(rules.CoinsForPowerup > 0);
-        coinsInput.interactable = rules.CoinsForPowerup > 0;
+        coinsInput.interactable = rules.CoinsForPowerup > 0 && isHost;
         if (rules.CoinsForPowerup > 0 || coinsInput.text.Length == 0) coinsInput.SetTextWithoutNotify(rules.CoinsForPowerup.ToString());
-        livesToggle.interactable = true;
+        livesToggle.interactable = isHost;
         livesToggle.SetIsOnWithoutNotify(rules.Lives > 0);
-        livesInput.interactable = rules.Lives > 0;
+        livesInput.interactable = rules.Lives > 0 && isHost;
         if (rules.Lives > 0 || livesInput.text.Length == 0) livesInput.SetTextWithoutNotify(rules.Lives.ToString());
-        timerToggle.interactable = true;
+        timerToggle.interactable = isHost;
         timerToggle.SetIsOnWithoutNotify(rules.TimerSeconds > 0);
-        timerInput.interactable = rules.TimerSeconds > 0;
+        timerInput.interactable = rules.TimerSeconds > 0 && isHost;
         if (rules.TimerSeconds > 0 || timerInput.text.Length == 0) timerInput.SetTextWithoutNotify(rules.TimerSeconds.ToString());
-        teamsToggle.interactable = true;
+        teamsToggle.interactable = isHost;
         teamsToggle.SetIsOnWithoutNotify(rules.TeamsEnabled);
     }
 

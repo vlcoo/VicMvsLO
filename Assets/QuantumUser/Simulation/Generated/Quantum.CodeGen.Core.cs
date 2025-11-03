@@ -999,91 +999,93 @@ namespace Quantum {
     public AssetRef<Map> Stage;
     [FieldOffset(176)]
     public AssetRef<GamemodeAsset> Gamemode;
-    [FieldOffset(52)]
-    public Int32 StarsToWin;
-    [FieldOffset(36)]
-    public Int32 CoinsForPowerup;
-    [FieldOffset(48)]
-    public Int32 Lives;
     [FieldOffset(56)]
-    public Int32 TimerSeconds;
-    [FieldOffset(164)]
-    public QBoolean TeamsEnabled;
-    [FieldOffset(60)]
-    public QBoolean CustomPowerupsEnabled;
-    [FieldOffset(64)]
-    public QBoolean DrawOnTimeUp;
-    [FieldOffset(44)]
-    public Int32 Laps;
-    [FieldOffset(168)]
-    public QListPtr<MatchConditionerTrigger> Triggers;
-    [FieldOffset(152)]
-    public QBoolean SNoReserve;
-    [FieldOffset(132)]
-    public QBoolean SNoDroppedStars;
-    [FieldOffset(112)]
-    public QBoolean SInstantDeath;
-    [FieldOffset(128)]
-    public QBoolean SNoDefrost;
-    [FieldOffset(124)]
-    public QBoolean SNoCollisions;
-    [FieldOffset(140)]
-    public QBoolean SNoIframes;
-    [FieldOffset(108)]
-    public QBoolean SHideSeek;
-    [FieldOffset(136)]
-    public QBoolean SNoEnemies;
-    [FieldOffset(116)]
-    public QBoolean SNoBahs;
-    [FieldOffset(156)]
-    public QBoolean SPitWrap;
-    [FieldOffset(104)]
-    public QBoolean SAllBricks;
-    [FieldOffset(144)]
-    public QBoolean SNoLooping;
-    [FieldOffset(120)]
-    public QBoolean SNoCoins;
-    [FieldOffset(148)]
-    public QBoolean SNoPowerups;
-    [FieldOffset(160)]
-    public QBoolean SShowCoinCount;
-    [FieldOffset(24)]
-    public Int32 ChanceMushroom;
-    [FieldOffset(4)]
-    public Int32 ChanceFireFlower;
-    [FieldOffset(12)]
-    public Int32 ChanceIceFlower;
-    [FieldOffset(28)]
-    public Int32 ChancePropellerMushroom;
-    [FieldOffset(0)]
-    public Int32 ChanceBlueShell;
-    [FieldOffset(8)]
-    public Int32 ChanceHammerSuit;
-    [FieldOffset(20)]
-    public Int32 ChanceMiniMushroom;
-    [FieldOffset(16)]
-    public Int32 ChanceMegaMushroom;
-    [FieldOffset(32)]
-    public Int32 ChanceStarman;
-    [FieldOffset(100)]
-    public QBoolean HStars;
-    [FieldOffset(92)]
-    public QBoolean HPlayers;
-    [FieldOffset(72)]
-    public QBoolean HHost;
-    [FieldOffset(76)]
-    public QBoolean HIceCubes;
+    public Int32 StarsToWin;
     [FieldOffset(40)]
-    public Int32 HTeamTarget;
-    [FieldOffset(96)]
-    public QBoolean HStarCount;
-    [FieldOffset(84)]
-    public QBoolean HLifeCount;
-    [FieldOffset(80)]
-    public QBoolean HLapCount;
+    public Int32 CoinsForPowerup;
+    [FieldOffset(52)]
+    public Int32 Lives;
+    [FieldOffset(60)]
+    public Int32 TimerSeconds;
+    [FieldOffset(168)]
+    public QBoolean TeamsEnabled;
+    [FieldOffset(64)]
+    public QBoolean CustomPowerupsEnabled;
     [FieldOffset(68)]
-    public QBoolean HCoinCount;
+    public QBoolean DrawOnTimeUp;
+    [FieldOffset(48)]
+    public Int32 Laps;
+    [FieldOffset(172)]
+    public QListPtr<MatchConditionerTrigger> Triggers;
+    [FieldOffset(0)]
+    public Byte SpecialsCount;
+    [FieldOffset(156)]
+    public QBoolean SNoReserve;
+    [FieldOffset(136)]
+    public QBoolean SNoDroppedStars;
+    [FieldOffset(116)]
+    public QBoolean SInstantDeath;
+    [FieldOffset(132)]
+    public QBoolean SNoDefrost;
+    [FieldOffset(128)]
+    public QBoolean SNoCollisions;
+    [FieldOffset(144)]
+    public QBoolean SNoIframes;
+    [FieldOffset(112)]
+    public QBoolean SHideSeek;
+    [FieldOffset(140)]
+    public QBoolean SNoEnemies;
+    [FieldOffset(120)]
+    public QBoolean SNoBahs;
+    [FieldOffset(160)]
+    public QBoolean SPitWrap;
+    [FieldOffset(108)]
+    public QBoolean SAllBricks;
+    [FieldOffset(148)]
+    public QBoolean SNoLooping;
+    [FieldOffset(124)]
+    public QBoolean SNoCoins;
+    [FieldOffset(152)]
+    public QBoolean SNoPowerups;
+    [FieldOffset(164)]
+    public QBoolean SShowCoinCount;
+    [FieldOffset(28)]
+    public Int32 ChanceMushroom;
+    [FieldOffset(8)]
+    public Int32 ChanceFireFlower;
+    [FieldOffset(16)]
+    public Int32 ChanceIceFlower;
+    [FieldOffset(32)]
+    public Int32 ChancePropellerMushroom;
+    [FieldOffset(4)]
+    public Int32 ChanceBlueShell;
+    [FieldOffset(12)]
+    public Int32 ChanceHammerSuit;
+    [FieldOffset(24)]
+    public Int32 ChanceMiniMushroom;
+    [FieldOffset(20)]
+    public Int32 ChanceMegaMushroom;
+    [FieldOffset(36)]
+    public Int32 ChanceStarman;
+    [FieldOffset(104)]
+    public QBoolean HStars;
+    [FieldOffset(96)]
+    public QBoolean HPlayers;
+    [FieldOffset(76)]
+    public QBoolean HHost;
+    [FieldOffset(80)]
+    public QBoolean HIceCubes;
+    [FieldOffset(44)]
+    public Int32 HTeamTarget;
+    [FieldOffset(100)]
+    public QBoolean HStarCount;
     [FieldOffset(88)]
+    public QBoolean HLifeCount;
+    [FieldOffset(84)]
+    public QBoolean HLapCount;
+    [FieldOffset(72)]
+    public QBoolean HCoinCount;
+    [FieldOffset(92)]
     public QBoolean HNicknames;
     public override Int32 GetHashCode() {
       unchecked { 
@@ -1099,6 +1101,7 @@ namespace Quantum {
         hash = hash * 31 + DrawOnTimeUp.GetHashCode();
         hash = hash * 31 + Laps.GetHashCode();
         hash = hash * 31 + Triggers.GetHashCode();
+        hash = hash * 31 + SpecialsCount.GetHashCode();
         hash = hash * 31 + SNoReserve.GetHashCode();
         hash = hash * 31 + SNoDroppedStars.GetHashCode();
         hash = hash * 31 + SInstantDeath.GetHashCode();
@@ -1141,6 +1144,7 @@ namespace Quantum {
     }
     public static void Serialize(void* ptr, FrameSerializer serializer) {
         var p = (GameRules*)ptr;
+        serializer.Stream.Serialize(&p->SpecialsCount);
         serializer.Stream.Serialize(&p->ChanceBlueShell);
         serializer.Stream.Serialize(&p->ChanceFireFlower);
         serializer.Stream.Serialize(&p->ChanceHammerSuit);

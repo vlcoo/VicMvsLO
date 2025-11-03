@@ -165,12 +165,17 @@ namespace NSMB.UI.Game {
             previousMarioExists = marioExists;
             justResynced = false;
 
-            if (marioExists && mario->HasCheckpoint && !checkpointTrackTemplate.gameObject.activeSelf) {
-                checkpointTrackTemplate.gameObject.SetActive(true);
-                // checkpoint is a Vector3 position in the stage, we have to convert it to a Transform
-                var checkpointTransform = new GameObject("CheckpointTransform").transform;
-                checkpointTransform.position = stage.Checkpoint.ToUnityVector3();
-                checkpointTrackTemplate.Initialize(playerElements, Target, checkpointTransform);
+            if (marioExists) {
+                if (mario->HasCheckpoint && !checkpointTrackTemplate.gameObject.activeSelf) {
+                    checkpointTrackTemplate.gameObject.SetActive(true);
+                    // checkpoint is a Vector3 position in the stage, we have to convert it to a Transform
+                    var checkpointTransform = new GameObject("CheckpointTransform").transform;
+                    checkpointTransform.position = stage.Checkpoint.ToUnityVector3();
+                    checkpointTrackTemplate.Initialize(playerElements, Target, checkpointTransform);
+                }
+                else if (!mario->HasCheckpoint && checkpointTrackTemplate.gameObject.activeSelf) {
+                    checkpointTrackTemplate.gameObject.SetActive(false);
+                }
             }
         }
 

@@ -1,4 +1,5 @@
-﻿using Quantum;
+﻿using NSMB.Networking;
+using Quantum;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,6 +27,13 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
         public void Start() {
             QuantumEvent.Subscribe<EventRulesChanged>(this, OnRulesChanged);
             QuantumCallback.Subscribe<CallbackGameStarted>(this, OnGameStarted);
+            
+            NetworkHandler.Client.AddCallbackTarget(this);
+        }
+        
+        public override void Hide(SubmenuHideReason hideReason) {
+            base.Hide(hideReason);
+            NetworkHandler.Client.RemoveCallbackTarget(this);
         }
         
         private unsafe void OnGameStarted(CallbackGameStarted e) {

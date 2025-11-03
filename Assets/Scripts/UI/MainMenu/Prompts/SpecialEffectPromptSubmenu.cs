@@ -1,4 +1,5 @@
-﻿using Quantum;
+﻿using NSMB.Networking;
+using Quantum;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,18 +9,9 @@ using UnityEngine.UI;
 namespace NSMB.UI.MainMenu.Submenus.Prompts {
     public class SpecialEffectPromptSubmenu : PromptSubmenu {
         public bool success = true;
-        public CounterTip counterTip;
+        // public CounterTip counterTip;
         private readonly Dictionary<string, Toggle> _toggles = new();
         [HideInInspector] public GameRules rules;
-        
-        public override void Initialize() {
-            base.Initialize();
-            var toggles = new List<Toggle>();
-            GetComponentsInChildren(true, toggles);
-            foreach (var toggle in toggles) {
-                _toggles[toggle.gameObject.name] = toggle;
-            }
-        }
 
         public void Start() {
             QuantumEvent.Subscribe<EventRulesChanged>(this, OnRulesChanged);
@@ -27,14 +19,32 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
             QuantumCallback.Subscribe<CallbackGameStarted>(this, OnGameStarted);
         }
         
+        public override void Hide(SubmenuHideReason hideReason) {
+            base.Hide(hideReason);
+            NetworkHandler.Client.RemoveCallbackTarget(this);
+        }
+        
         private unsafe void OnGameStarted(CallbackGameStarted e) {
             rules = e.Game.Frames.Predicted.Global->Rules;
             RefreshValues();
         }
         
-        public override void Show(bool first) {
+        public override unsafe void Show(bool first) {
             base.Show(first);
             success = false;
+            
+            var toggles = new List<Toggle>();
+            GetComponentsInChildren(true, toggles);
+            _toggles.Clear();
+            foreach (var toggle in toggles) {
+                _toggles[toggle.gameObject.name] = toggle;
+            }
+            
+            var f = NetworkHandler.Game.Frames.Predicted;
+            rules = f.Global->Rules;
+            NetworkHandler.Client.AddCallbackTarget(this);
+            RefreshValues();
+            Debug.Log(_toggles.Count);
         }
         
         public override bool TryGoBack(out bool playSound) {
@@ -68,14 +78,17 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
         
         public void OnGameDestroyed(CallbackGameDestroyed e) {
             // cleanup
-            counterTip.SetCount(0);
+            // counterTip.SetCount(0);
         }
 
         public void RefreshValues() {
             foreach (var toggle in _toggles) {
-                if (rules.GetType().GetField(toggle.Key).GetValue(rules) is bool ruleValue) toggle.Value.SetIsOnWithoutNotify(ruleValue);
+                Debug.Log(toggle.Key);
+                if (rules.GetType().GetField(toggle.Key).GetValue(rules) is bool ruleValue) {
+                    toggle.Value.SetIsOnWithoutNotify(ruleValue);
+                }
             }
-            counterTip.SetCount(_toggles.Count(toggle => toggle.Value.isOn));
+            // counterTip.SetCount(_toggles.Count(toggle => toggle.Value.isOn));
         }
     }
 }

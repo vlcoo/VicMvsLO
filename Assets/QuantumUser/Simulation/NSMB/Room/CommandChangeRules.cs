@@ -110,6 +110,24 @@ namespace Quantum {
             if (rulesChanges.HasFlag(Rules.SNoCoins)) rules.SNoCoins = SNoCoins;
             if (rulesChanges.HasFlag(Rules.SNoPowerups)) rules.SNoPowerups = SNoPowerups;
             if (rulesChanges.HasFlag(Rules.SShowCoinCount)) rules.SShowCoinCount = SShowCoinCount;
+            
+            var specialsCount = 0;
+            if (rules.SNoReserve) specialsCount++;
+            if (rules.SNoDroppedStars) specialsCount++;
+            if (rules.SInstantDeath) specialsCount++;
+            if (rules.SNoDefrost) specialsCount++;
+            if (rules.SNoCollisions) specialsCount++;
+            if (rules.SNoIframes) specialsCount++;
+            if (rules.SHideSeek) specialsCount++;
+            if (rules.SNoEnemies) specialsCount++;
+            if (rules.SNoBahs) specialsCount++;
+            if (rules.SPitWrap) specialsCount++;
+            if (rules.SAllBricks) specialsCount++;
+            if (rules.SNoLooping) specialsCount++;
+            if (rules.SNoCoins) specialsCount++;
+            if (rules.SNoPowerups) specialsCount++;
+            if (rules.SShowCoinCount) specialsCount++;
+            rules.SpecialsCount = (byte) specialsCount;
 
             f.Global->Rules = rules;
             f.Events.RulesChanged(gamemodeChanged, levelChanged);

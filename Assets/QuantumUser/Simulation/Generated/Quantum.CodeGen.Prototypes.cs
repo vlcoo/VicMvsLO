@@ -410,6 +410,7 @@ namespace Quantum.Prototypes {
     public Int32 Laps;
     [DynamicCollectionAttribute()]
     public Quantum.Prototypes.MatchConditionerTriggerPrototype[] Triggers = {};
+    public Byte SpecialsCount;
     public QBoolean SNoReserve;
     public QBoolean SNoDroppedStars;
     public QBoolean SInstantDeath;
@@ -466,6 +467,7 @@ namespace Quantum.Prototypes {
             list.Add(tmp);
           }
         }
+        result.SpecialsCount = this.SpecialsCount;
         result.SNoReserve = this.SNoReserve;
         result.SNoDroppedStars = this.SNoDroppedStars;
         result.SInstantDeath = this.SInstantDeath;

@@ -2059,8 +2059,9 @@ namespace Quantum {
             var lastLap = true;
             var stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
             if (mario->CurrentLap <= f.Global->Rules.Laps) {
+                mario->HasCheckpoint = false;
                 var transform = f.Unsafe.GetPointer<Transform2D>(marioEntity);
-                var spawnpoint = mario->HasCheckpoint ? stage.Checkpoint : stage.GetWorldSpawnpointForPlayer(mario->SpawnpointIndex, f.Global->TotalMarios);
+                var spawnpoint = stage.GetWorldSpawnpointForPlayer(mario->SpawnpointIndex, f.Global->TotalMarios);
                 transform->Position = spawnpoint;
                 f.Unsafe.GetPointer<CameraController>(marioEntity)->Recenter(stage, spawnpoint);
                 mario->DamageInvincibilityFrames = 2 * 60;
