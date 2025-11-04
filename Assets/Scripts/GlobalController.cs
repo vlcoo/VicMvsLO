@@ -9,6 +9,8 @@ using NSMB.Utilities.Extensions;
 using Quantum;
 using System;
 using System.Collections;
+using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.Audio;
 using UnityEngine.InputSystem;
@@ -28,6 +30,7 @@ namespace NSMB {
         public RumbleManager rumbleManager;
         public AnimatedFader fader;
         public Gradient rainbowGradient;
+        public TMP_SpriteAsset emotesAsset;
         public Color[] uiColors;
         public Sprite[] pingIndicators;
         public SimulationConfig config;
@@ -46,6 +49,7 @@ namespace NSMB {
 
         //---Private Variables
         private Coroutine fadeMusicRoutine, fadeSfxRoutine, totalFadeRoutine;
+        public readonly List<string> EMOTE_NAMES = new();
 #if IDLE_LOCK_30FPS
         private int previousVsyncCount, previousFrameRate;
 #endif
@@ -64,6 +68,8 @@ namespace NSMB {
 
             firstConnection = true;
             checkedForVersion = false;
+            
+            emotesAsset.spriteCharacterTable.ForEach(character => EMOTE_NAMES.Add(character.name));
         }
 
         public void Start() {

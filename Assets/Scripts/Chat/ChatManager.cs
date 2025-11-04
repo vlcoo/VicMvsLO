@@ -153,6 +153,7 @@ namespace NSMB.Chat {
             string message = e.Message;
             message = message[..Mathf.Min(128, message.Length)];
             message = message.Replace("\n", " ").Trim().Replace("</noparse>", "");
+            message = Utils.RawMessageToEmoji(message);
 
             // Add username
             Frame f = e.Game.Frames.Verified;
@@ -193,9 +194,10 @@ namespace NSMB.Chat {
         }
 
         private void OnHostChanged(EventHostChanged e) {
-            // if (e.Game.PlayerIsLocal(e.NewHost)) {
-            //     AddSystemMessage("ui.inroom.chat.hostreminder");
-            // }
+            Frame f = e.Game.Frames.Predicted;
+            AddSystemMessage(e.Game.PlayerIsLocal(e.NewHost)
+                ? "You are now the host of this room."
+                : $"<i>{f.GetPlayerData(e.NewHost).PlayerNickname.ToValidNickname(f, e.NewHost)}</i> has become this room's host.");
         }
     }
 }

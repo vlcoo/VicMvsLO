@@ -10,29 +10,13 @@ namespace NSMB.UI.Elements {
         //---Serialized Variables
         [SerializeField] private GameObject panel;
         [SerializeField] private TMP_Text label;
-        [SerializeField] private string message;
-        [SerializeField] private Vector2 offset;
-        [SerializeField] private float delayBeforeShow = 0f;
+        [TextArea] [SerializeField] private string message;
+        [SerializeField] private Vector2 offset = new(16, -16);
+        [SerializeField] private float delayBeforeShow = 0.5f;
+        
+        //---Private Variables
         private Coroutine showCoroutine;
         private Vector2 lastPointerPosition;
-
-        public void OnValidate() {
-            
-        }
-
-        public void OnEnable() {
-            
-        }
-
-        public void OnDisable() {
-            
-        }
-
-        public void Update() {
-            // if (objectToShow && objectToShow.activeInHierarchy && followCursor) {
-            //     objectToShow.transform.position = Settings.Controls.UI.Point.ReadValue<Vector2>() + offset;
-            // }
-        }
 
         public void OnPointerEnter(PointerEventData eventData) {
             if (delayBeforeShow <= 0f) {

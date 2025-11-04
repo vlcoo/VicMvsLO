@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using UnityEngine;
 using DeviceType = Enums.DeviceType;
 
@@ -138,6 +139,17 @@ namespace NSMB.Utilities {
                 }
             }
             return symbolStringBuilder.ToString();
+        }
+        
+        public static string RawMessageToEmoji(string message)
+        {
+            return Regex.Replace(message, ":([^:\\s]+):", match =>
+            {
+                var capturedGroup = match.Groups[1].Value;
+                return GlobalController.Instance.EMOTE_NAMES.Contains(capturedGroup)
+                    ? $"</noparse><sprite name=\"{capturedGroup}\"><noparse>"
+                    : match.Value;
+            });
         }
 
         private static readonly Color spectatorColor = new(0.8f, 0.8f, 0.8f, 0.7f);
