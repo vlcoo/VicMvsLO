@@ -222,6 +222,11 @@ event MarioPlayerUsedReserveItem {
 	nothashed bool Success;
 }
 
+event MarioPlayerTaunted {
+    EntityRef Entity;
+    byte EmoteId;
+}
+
 event MarioPlayerWalljumped {
 	EntityRef Entity;
 	nothashed FPVector2 Position;

@@ -31,6 +31,7 @@ namespace NSMB {
         public AnimatedFader fader;
         public Gradient rainbowGradient;
         public TMP_SpriteAsset emotesAsset;
+        public byte[] emoteKeyMapping;
         public Color[] uiColors;
         public Sprite[] pingIndicators;
         public SimulationConfig config;

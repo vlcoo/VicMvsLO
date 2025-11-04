@@ -8,6 +8,7 @@ namespace Quantum {
             factories.Add(new CommandSpawnReserveItem());
             factories.Add(new CommandHostEndGame());
             factories.Add(new CommandEndGameContinue());
+            factories.Add(new CommandTaunt());
 
             // --- In room
             // Start Game

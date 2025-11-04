@@ -103,7 +103,7 @@ namespace NSMB.Entities.Player {
         [SerializeField] private Animator animator;
         [SerializeField] private Avatar smallAvatar, largeAvatar;
         [SerializeField] private Shader normalShader, rainbowShader;
-        [SerializeField] private ParticleSystem dust, sparkles, drillParticle, giantParticle, fireParticle, bubblesParticle, iceSkiddingParticle, waterRunningParticle, waterSkiddingParticle;
+        [SerializeField] private ParticleSystem dust, sparkles, drillParticle, giantParticle, fireParticle, bubblesParticle, iceSkiddingParticle, waterRunningParticle, waterSkiddingParticle, tauntParticle;
         [SerializeField] private GameObject smallModel, largeModel, largeShellExclude, blueShell, propellerHelmet, propeller, HammerHelm, HammerShell, HammerTuck;
         [SerializeField] private GameObject smallHeadBone, largeHeadBone;
         [SerializeField] private AudioClip normalDrill, propellerDrill;
@@ -203,6 +203,7 @@ namespace NSMB.Entities.Player {
             QuantumEvent.Subscribe<EventMarioTouchedGoal>(this, OnMarioTouchedGoal, FilterOutReplayFastForward);
             QuantumEvent.Subscribe<EventMarioPlayerNextGoalAnimation>(this, OnMarioFlagpoleAnimationProgressed, FilterOutReplayFastForward);
             QuantumEvent.Subscribe<EventMarioPlayerGotCheckpoint>(this, OnMarioPlayerGotCheckpoint, FilterOutReplayFastForward);
+            QuantumEvent.Subscribe<EventMarioPlayerTaunted>(this, OnMarioPlayerTaunted);
         }
 
         public override void OnActivate(Frame f) {
@@ -1310,6 +1311,14 @@ namespace NSMB.Entities.Player {
             Debug.Log("checkpoint!!");
             PlaySoundEverywhere(SoundEffect.World_Checkpoint);
             Instantiate(checkpointParticle, e.Position.ToUnityVector3(), Quaternion.identity);
+        }
+
+        private void OnMarioPlayerTaunted(EventMarioPlayerTaunted e) {
+            // var emoteObj = Instantiate(tauntParticle, transform.position + new Vector3(0, 1, 0), Quaternion.identity);
+            // var emoteObjParticles = emoteObj.GetComponent<ParticleSystem>();
+            tauntParticle.GetComponent<Renderer>().material.mainTextureOffset =
+                new Vector2(0.125f * (e.EmoteId % 8f), 0.125f * (int)(e.EmoteId / 8f));
+            tauntParticle.Emit(1);
         }
 
         private void OnEnemyKicked(EventEnemyKicked e) {

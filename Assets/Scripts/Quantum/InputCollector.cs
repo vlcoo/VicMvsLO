@@ -19,13 +19,17 @@ namespace NSMB.Quantum {
 #endif
         [SerializeField] private PlayerElements playerElements;
 
+        private byte _emoteCooldown = 0;
+
         public void Start() {
             Settings.Controls.Player.ReserveItem.performed += OnPowerupAction;
+            Settings.Controls.Player.Taunt.performed += OnTauntAction;
             QuantumCallback.Subscribe<CallbackPollInput>(this, OnPollInput);
         }
 
         public void OnDestroy() {
             Settings.Controls.Player.ReserveItem.performed -= OnPowerupAction;
+            Settings.Controls.Player.Taunt.performed -= OnTauntAction;
         }
 
 
@@ -49,6 +53,8 @@ namespace NSMB.Quantum {
                     CommandId = CommandMvLDebugCmd.DebugCommand.FreezeSelf,
                 });
             }
+
+            QuantumUtils.Decrement(ref _emoteCooldown);
         }
 
         [Serializable]
@@ -62,6 +68,15 @@ namespace NSMB.Quantum {
             if (!playerElements.IsSpectating && !playerElements.PauseMenu.IsPaused) {
                 QuantumRunner.DefaultGame.SendCommand(new CommandSpawnReserveItem());
             }
+        }
+
+        public void OnTauntAction(InputAction.CallbackContext context) {
+            if (_emoteCooldown > 0) return;
+            if (playerElements.IsSpectating || playerElements.PauseMenu.IsPaused) return;
+            QuantumRunner.DefaultGame.SendCommand(new CommandTaunt {
+                EmoteId = GlobalController.Instance.emoteKeyMapping[int.Parse(context.control.name)],
+            });
+            _emoteCooldown = 60;
         }
 
         public void OnPollInput(CallbackPollInput callback) {

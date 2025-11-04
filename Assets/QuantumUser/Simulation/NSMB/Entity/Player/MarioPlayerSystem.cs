@@ -59,9 +59,10 @@ namespace Quantum {
 
             if (HandleFlagpoleAnimation(f, ref filter, stage)) return;
 
-            if (f.GetPlayerCommand(player) is CommandSpawnReserveItem) {
+            if (f.GetPlayerCommand(player) is CommandSpawnReserveItem)
                 SpawnReserveItem(f, ref filter);
-            }
+            if (f.GetPlayerCommand(player) is CommandTaunt commandTaunt)
+                f.Events.MarioPlayerTaunted(filter.Entity, commandTaunt.EmoteId);
 
             if (HandleMegaMushroom(f, ref filter, physics, stage)) {
                 HandleHitbox(f, ref filter, physics);

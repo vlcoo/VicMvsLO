@@ -40,7 +40,7 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
                 _toggles[toggle.gameObject.name] = toggle;
             }
             
-            var f = NetworkHandler.Game.Frames.Predicted;
+            var f = QuantumRunner.DefaultGame.Frames.Predicted;
             rules = f.Global->Rules;
             NetworkHandler.Client.AddCallbackTarget(this);
             RefreshValues();

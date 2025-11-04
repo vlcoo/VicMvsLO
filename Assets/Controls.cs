@@ -132,10 +132,19 @@ public partial class @Controls: IInputActionCollection2, IDisposable
                     ""name"": ""Reserve Item"",
                     ""type"": ""Button"",
                     ""id"": ""27ec6a67-2030-438e-ab5f-3e20fddb0588"",
-                    ""expectedControlType"": ""Button"",
+                    ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""!Taunt"",
+                    ""type"": ""Button"",
+                    ""id"": ""2c580ed1-e440-4b84-8a17-03f86ba2e6d6"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -268,6 +277,116 @@ public partial class @Controls: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""groups"": ""Gamepad"",
                     ""action"": ""Movement"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""f4dd1303-ef34-4d23-bcf9-8d850b934b42"",
+                    ""path"": ""<Keyboard>/1"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard"",
+                    ""action"": ""!Taunt"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""954fca47-4cbe-4456-badf-c4fc72837644"",
+                    ""path"": ""<Keyboard>/2"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard"",
+                    ""action"": ""!Taunt"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""c37cee43-0f5f-49cd-ab5f-b0e3e6897e19"",
+                    ""path"": ""<Keyboard>/3"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard"",
+                    ""action"": ""!Taunt"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""971edbf3-e37d-4920-9848-d820073debbf"",
+                    ""path"": ""<Keyboard>/4"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard"",
+                    ""action"": ""!Taunt"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""b74491cf-a229-4995-a644-fcd9f5d84d30"",
+                    ""path"": ""<Keyboard>/5"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard"",
+                    ""action"": ""!Taunt"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""f898de03-d92a-4a34-a4d3-e43818538506"",
+                    ""path"": ""<Keyboard>/6"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard"",
+                    ""action"": ""!Taunt"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""39d15d46-15d4-4084-8ea3-c447457d2589"",
+                    ""path"": ""<Keyboard>/7"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard"",
+                    ""action"": ""!Taunt"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""3688e004-d696-48f0-9780-53b270a16627"",
+                    ""path"": ""<Keyboard>/8"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard"",
+                    ""action"": ""!Taunt"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""633a0504-c2fb-457a-8a1b-335141218285"",
+                    ""path"": ""<Keyboard>/9"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard"",
+                    ""action"": ""!Taunt"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""c4951580-7b65-409e-b4ca-879f58575d1c"",
+                    ""path"": ""<Keyboard>/0"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard"",
+                    ""action"": ""!Taunt"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -520,7 +639,7 @@ public partial class @Controls: IInputActionCollection2, IDisposable
                     ""name"": ""!SpectatePlayerByIndex"",
                     ""type"": ""Button"",
                     ""id"": ""39bd28f4-bd03-4374-9e6f-ba1c13f41a2c"",
-                    ""expectedControlType"": ""Button"",
+                    ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
@@ -1514,6 +1633,7 @@ public partial class @Controls: IInputActionCollection2, IDisposable
         m_Player_Sprint = m_Player.FindAction("Sprint", throwIfNotFound: true);
         m_Player_PowerupAction = m_Player.FindAction("Powerup Action", throwIfNotFound: true);
         m_Player_ReserveItem = m_Player.FindAction("Reserve Item", throwIfNotFound: true);
+        m_Player_Taunt = m_Player.FindAction("!Taunt", throwIfNotFound: true);
         // UI
         m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
         m_UI_Navigate = m_UI.FindAction("Navigate", throwIfNotFound: true);
@@ -1626,6 +1746,7 @@ public partial class @Controls: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_Sprint;
     private readonly InputAction m_Player_PowerupAction;
     private readonly InputAction m_Player_ReserveItem;
+    private readonly InputAction m_Player_Taunt;
     /// <summary>
     /// Provides access to input actions defined in input action map "Player".
     /// </summary>
@@ -1657,6 +1778,10 @@ public partial class @Controls: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "Player/ReserveItem".
         /// </summary>
         public InputAction @ReserveItem => m_Wrapper.m_Player_ReserveItem;
+        /// <summary>
+        /// Provides access to the underlying input action "Player/Taunt".
+        /// </summary>
+        public InputAction @Taunt => m_Wrapper.m_Player_Taunt;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -1698,6 +1823,9 @@ public partial class @Controls: IInputActionCollection2, IDisposable
             @ReserveItem.started += instance.OnReserveItem;
             @ReserveItem.performed += instance.OnReserveItem;
             @ReserveItem.canceled += instance.OnReserveItem;
+            @Taunt.started += instance.OnTaunt;
+            @Taunt.performed += instance.OnTaunt;
+            @Taunt.canceled += instance.OnTaunt;
         }
 
         /// <summary>
@@ -1724,6 +1852,9 @@ public partial class @Controls: IInputActionCollection2, IDisposable
             @ReserveItem.started -= instance.OnReserveItem;
             @ReserveItem.performed -= instance.OnReserveItem;
             @ReserveItem.canceled -= instance.OnReserveItem;
+            @Taunt.started -= instance.OnTaunt;
+            @Taunt.performed -= instance.OnTaunt;
+            @Taunt.canceled -= instance.OnTaunt;
         }
 
         /// <summary>
@@ -2278,6 +2409,13 @@ public partial class @Controls: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnReserveItem(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "!Taunt" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnTaunt(InputAction.CallbackContext context);
     }
     /// <summary>
     /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "UI" which allows adding and removing callbacks.
