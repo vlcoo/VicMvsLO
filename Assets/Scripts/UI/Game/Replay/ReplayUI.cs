@@ -123,7 +123,7 @@ namespace NSMB.UI.Game.Replay {
             simulationTargetTrackArrow.gameObject.SetActive(false);
 
             if (QuantumRunner.DefaultGame.Frames.Predicted.Global->GameState != GameState.Playing) {
-                FindFirstObjectByType<LoopingMusicPlayer>().Stop();
+                // FindFirstObjectByType<LoopingMusicPlayer>().Stop();
             }
         }
 

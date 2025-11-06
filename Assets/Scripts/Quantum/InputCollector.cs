@@ -76,7 +76,7 @@ namespace NSMB.Quantum {
             QuantumRunner.DefaultGame.SendCommand(new CommandTaunt {
                 EmoteId = GlobalController.Instance.emoteKeyMapping[int.Parse(context.control.name)],
             });
-            _emoteCooldown = 60;
+            _emoteCooldown = 80;
         }
 
         public void OnPollInput(CallbackPollInput callback) {

@@ -83,8 +83,7 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
 
         public void RefreshValues() {
             foreach (var toggle in _toggles) {
-                Debug.Log(toggle.Key);
-                if (rules.GetType().GetField(toggle.Key).GetValue(rules) is bool ruleValue) {
+                if (rules.GetType().GetField(toggle.Key).GetValue(rules) is QBoolean ruleValue) {
                     toggle.Value.SetIsOnWithoutNotify(ruleValue);
                 }
             }

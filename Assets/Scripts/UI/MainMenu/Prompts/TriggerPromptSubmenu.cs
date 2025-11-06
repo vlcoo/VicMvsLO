@@ -111,6 +111,9 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
                 TriggerConstraint = (int)entry.Trigger.Constraint,
                 TriggerConstraintParameter = entry.Trigger.ConstraintParameter,
                 TriggerConstraintTarget = (int)entry.Trigger.ConstraintTarget,
+                TriggerDelaySeconds = entry.Trigger.DelaySeconds,
+                TriggerRepeatCount = entry.Trigger.RepeatCount,
+                TriggerChance = entry.Trigger.Chance,
             };
 
             var slot = game.GetLocalPlayerSlots()[game.GetLocalPlayers().IndexOf(game.Frames.Predicted.Global->Host)];
@@ -144,6 +147,9 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
                 TriggerConstraint = (int)entry.Trigger.Constraint,
                 TriggerConstraintParameter = entry.Trigger.ConstraintParameter,
                 TriggerConstraintTarget = (int)entry.Trigger.ConstraintTarget,
+                TriggerDelaySeconds = entry.Trigger.DelaySeconds,
+                TriggerRepeatCount = entry.Trigger.RepeatCount,
+                TriggerChance = entry.Trigger.Chance,
             };
 
             var slot = game.GetLocalPlayerSlots()[game.GetLocalPlayers().IndexOf(game.Frames.Predicted.Global->Host)];

@@ -1275,26 +1275,32 @@ namespace Quantum {
   }
   [StructLayout(LayoutKind.Explicit)]
   public unsafe partial struct MatchConditionerTrigger {
-    public const Int32 SIZE = 216;
+    public const Int32 SIZE = 220;
     public const Int32 ALIGNMENT = 4;
-    [FieldOffset(4)]
-    public TriggerCondition Condition;
-    [FieldOffset(88)]
-    public QString64 ConditionParameter;
-    [FieldOffset(16)]
-    public TriggerTarget ConditionTarget;
-    [FieldOffset(0)]
-    public TriggerAction Action;
-    [FieldOffset(24)]
-    public QString64 ActionParameter;
-    [FieldOffset(12)]
-    public TriggerTarget ActionTarget;
     [FieldOffset(8)]
-    public TriggerConstraint Constraint;
-    [FieldOffset(152)]
-    public QString64 ConstraintParameter;
+    public TriggerCondition Condition;
+    [FieldOffset(92)]
+    public QString64 ConditionParameter;
     [FieldOffset(20)]
+    public TriggerTarget ConditionTarget;
+    [FieldOffset(4)]
+    public TriggerAction Action;
+    [FieldOffset(28)]
+    public QString64 ActionParameter;
+    [FieldOffset(16)]
+    public TriggerTarget ActionTarget;
+    [FieldOffset(12)]
+    public TriggerConstraint Constraint;
+    [FieldOffset(156)]
+    public QString64 ConstraintParameter;
+    [FieldOffset(24)]
     public TriggerTarget ConstraintTarget;
+    [FieldOffset(1)]
+    public Byte DelaySeconds;
+    [FieldOffset(2)]
+    public Byte RepeatCount;
+    [FieldOffset(0)]
+    public Byte Chance;
     public override Int32 GetHashCode() {
       unchecked { 
         var hash = 7481;
@@ -1307,11 +1313,17 @@ namespace Quantum {
         hash = hash * 31 + (Int32)Constraint;
         hash = hash * 31 + ConstraintParameter.GetHashCode();
         hash = hash * 31 + (Int32)ConstraintTarget;
+        hash = hash * 31 + DelaySeconds.GetHashCode();
+        hash = hash * 31 + RepeatCount.GetHashCode();
+        hash = hash * 31 + Chance.GetHashCode();
         return hash;
       }
     }
     public static void Serialize(void* ptr, FrameSerializer serializer) {
         var p = (MatchConditionerTrigger*)ptr;
+        serializer.Stream.Serialize(&p->Chance);
+        serializer.Stream.Serialize(&p->DelaySeconds);
+        serializer.Stream.Serialize(&p->RepeatCount);
         serializer.Stream.Serialize((Int32*)&p->Action);
         serializer.Stream.Serialize((Int32*)&p->Condition);
         serializer.Stream.Serialize((Int32*)&p->Constraint);

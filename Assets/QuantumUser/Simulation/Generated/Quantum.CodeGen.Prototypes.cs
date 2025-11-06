@@ -815,6 +815,9 @@ namespace Quantum.Prototypes {
     [MaxStringByteCount(62, "Unicode")]
     public string ConstraintParameter;
     public Quantum.QEnum32<TriggerTarget> ConstraintTarget;
+    public Byte DelaySeconds;
+    public Byte RepeatCount;
+    public Byte Chance;
     partial void MaterializeUser(Frame frame, ref Quantum.MatchConditionerTrigger result, in PrototypeMaterializationContext context);
     public void Materialize(Frame frame, ref Quantum.MatchConditionerTrigger result, in PrototypeMaterializationContext context = default) {
         result.Condition = this.Condition;
@@ -826,6 +829,9 @@ namespace Quantum.Prototypes {
         result.Constraint = this.Constraint;
         PrototypeValidator.AssignQString(this.ConstraintParameter, 64, in context, out result.ConstraintParameter);
         result.ConstraintTarget = this.ConstraintTarget;
+        result.DelaySeconds = this.DelaySeconds;
+        result.RepeatCount = this.RepeatCount;
+        result.Chance = this.Chance;
         MaterializeUser(frame, ref result, in context);
     }
   }

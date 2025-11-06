@@ -1314,8 +1314,6 @@ namespace NSMB.Entities.Player {
         }
 
         private void OnMarioPlayerTaunted(EventMarioPlayerTaunted e) {
-            // var emoteObj = Instantiate(tauntParticle, transform.position + new Vector3(0, 1, 0), Quaternion.identity);
-            // var emoteObjParticles = emoteObj.GetComponent<ParticleSystem>();
             tauntParticle.GetComponent<Renderer>().material.mainTextureOffset =
                 new Vector2(0.125f * (e.EmoteId % 8f), 0.125f * (int)(e.EmoteId / 8f));
             tauntParticle.Emit(1);

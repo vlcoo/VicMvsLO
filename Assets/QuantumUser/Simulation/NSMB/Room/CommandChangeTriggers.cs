@@ -15,6 +15,7 @@ namespace Quantum {
         public int TriggerConstraint = (int)Quantum.TriggerConstraint.Always;
         public int TriggerConstraintTarget = (int)TriggerTarget.Any;
         public string TriggerConstraintParameter = "";
+        public byte TriggerDelaySeconds = 0, TriggerRepeatCount = 1, TriggerChance = 100;
 
         public override void Serialize(BitStream stream) {
             stream.Serialize(ref Index);
@@ -28,6 +29,9 @@ namespace Quantum {
             stream.Serialize(ref TriggerConstraint);
             stream.Serialize(ref TriggerConstraintTarget);
             stream.Serialize(ref TriggerConstraintParameter);
+            stream.Serialize(ref TriggerDelaySeconds);
+            stream.Serialize(ref TriggerRepeatCount);
+            stream.Serialize(ref TriggerChance);
         }
 
         public unsafe void Execute(Frame f, PlayerRef sender, PlayerData* playerData) {
@@ -52,7 +56,10 @@ namespace Quantum {
                         ConditionTarget = (TriggerTarget) TriggerConditionTarget,
                         Constraint = (TriggerConstraint) TriggerConstraint,
                         ConstraintParameter = TriggerConstraintParameter,
-                        ConstraintTarget = (TriggerTarget) TriggerConstraintTarget
+                        ConstraintTarget = (TriggerTarget) TriggerConstraintTarget,
+                        DelaySeconds = TriggerDelaySeconds,
+                        RepeatCount = TriggerRepeatCount,
+                        Chance = TriggerChance,
                     });
                 } else {
                     rules[Index] = new MatchConditionerTrigger() {
@@ -64,7 +71,10 @@ namespace Quantum {
                         ConditionTarget = (TriggerTarget) TriggerConditionTarget,
                         Constraint = (TriggerConstraint) TriggerConstraint,
                         ConstraintParameter = TriggerConstraintParameter,
-                        ConstraintTarget = (TriggerTarget) TriggerConstraintTarget
+                        ConstraintTarget = (TriggerTarget) TriggerConstraintTarget,
+                        DelaySeconds = TriggerDelaySeconds,
+                        RepeatCount = TriggerRepeatCount,
+                        Chance = TriggerChance,
                     };
                 }
             }

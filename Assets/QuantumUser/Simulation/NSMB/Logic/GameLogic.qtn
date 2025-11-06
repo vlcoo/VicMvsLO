@@ -100,6 +100,9 @@ struct MatchConditionerTrigger {
     TriggerConstraint Constraint;
     QString<64> ConstraintParameter;
     TriggerTarget ConstraintTarget;
+    byte DelaySeconds;      // 0-60
+    byte RepeatCount;       // 1-100
+    byte Chance;            // 1-100 (percent)
 }
 
 enum TriggerCondition {

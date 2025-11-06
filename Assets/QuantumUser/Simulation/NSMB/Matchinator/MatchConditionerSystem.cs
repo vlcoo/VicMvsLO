@@ -39,6 +39,9 @@ namespace Quantum
                 
                 // todo: constraints.
                 
+                // random chance. the variable can be from 1 to 100 (percentage)...
+                if (trigger.Chance < 100 && f.RNG->Next(1, 101) > trigger.Chance) continue;
+                
                 // need to check for condition target... ok so if it's a match based condition (like the timer
                 // being a certain value, or the match starting) then the player ref entity will be null. the trigger
                 // gets executed if this is the case. if the player indeed exists, we check if it matches the target.
@@ -178,9 +181,15 @@ namespace Quantum
                 }
 
                 // finally good to go. find action function by name and pass everything.
+                // todo: delay.
+                var actionMethod = GetType().GetMethod($"Act{trigger.Action.ToString()}");
+                if (actionMethod == null) {
+                    Err($"No function for Act<b>{trigger.Action}</b>!!");
+                    return;
+                }
                 foreach (var actionerEntity in actionerEntities) {
-                    GetType().GetMethod($"Act{trigger.Action.ToString()}")?.Invoke(this,
-                        new object[] { f, actionerEntity, trigger.ActionParameter.ToString() });
+                    for (var i = 0; i < trigger.RepeatCount; i++)
+                        actionMethod.Invoke(this, new object[] { f, actionerEntity, trigger.ActionParameter.ToString() });
                 }
             }
         }
@@ -351,6 +360,7 @@ namespace Quantum
 
         [Preserve]
         public unsafe void ActDisqualify(Frame f, EntityRef entity, string parameter) {
+            if (f.IsPredicted) return;
             f.Signals.OnMarioPlayerDisqualified(entity);
             f.Destroy(entity);
             GameLogicSystem.CheckForGameEnd(f);
@@ -471,8 +481,7 @@ namespace Quantum
                 f.FindAsset<VersusStageData>(f.Map.UserAsset), newStarEntity,
                 f.Unsafe.GetPointer<MarioPlayer>(entity)->FacingRight ? 1 : 2);
         }
-
-        [Preserve]
+        
         public unsafe void ActSpawnStar(Frame f, EntityRef entity, string parameter) {
             
         }
