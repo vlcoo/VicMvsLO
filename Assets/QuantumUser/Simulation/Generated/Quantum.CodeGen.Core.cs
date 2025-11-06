@@ -133,6 +133,7 @@ namespace Quantum {
     Freeze,
     Harm,
     SpawnXPowerup,
+    SpawnXEnemy,
     RespawnLevel,
     RemoveReserve,
     GiveXReserve,

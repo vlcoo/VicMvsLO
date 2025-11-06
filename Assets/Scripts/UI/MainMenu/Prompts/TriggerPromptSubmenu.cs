@@ -53,7 +53,6 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
         }
 
         public unsafe void OnTriggersChanged(EventTriggersChanged e) {
-            Debug.Log("saw trigger change");
             var f = e.Frame;
             var newTriggers = f.ResolveList(f.Global->Rules.Triggers);
             RefreshValues(newTriggers);

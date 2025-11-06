@@ -116,6 +116,7 @@ namespace Quantum {
                 } else {
                     // Check for respawns
                     if (enemy->DisableRespawning) {
+                        f.Destroy(entity);
                         continue;
                     }
 

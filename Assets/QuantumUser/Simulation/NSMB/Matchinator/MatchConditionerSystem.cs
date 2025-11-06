@@ -419,7 +419,30 @@ namespace Quantum
 
         [Preserve]
         public unsafe void ActSpawnXEnemy(Frame f, EntityRef entity, string parameter) {
+            if (parameter == "") parameter = "Random";
+            var allEnemies = f.SimulationConfig.SpawnableEnemies;
+            EntityPrototype enemyPrototype;
+            if (parameter == "Random") {
+                var i = f.RNG->Next(0, allEnemies.Length);
+                enemyPrototype = f.FindAsset(allEnemies[i]);
+            } else {
+                enemyPrototype =
+                    f.FindAsset(allEnemies.FirstOrDefault(e =>
+                        f.FindAsset(e).name == $"{parameter}EntityPrototype"));
+            }
+            if (enemyPrototype == null) { Err("enemy prototype was null!!"); return; }
             
+            var enemyEntity = f.Create(enemyPrototype);
+            var enemy = f.Unsafe.GetPointer<Enemy>(enemyEntity);
+            var mario = f.Unsafe.GetPointer<MarioPlayer>(entity);
+
+            enemy->Spawnpoint =
+                f.Unsafe.GetPointer<Transform2D>(entity)->Position +
+                (mario->FacingRight ? FPVector2.Left : FPVector2.Right) +
+                new FPVector2(0, FP._0_20);
+            enemy->Respawn(f, enemyEntity);
+            enemy->DisableRespawning = true;
+            enemy->FacingRight = mario->FacingRight;
         }
 
         [Preserve]

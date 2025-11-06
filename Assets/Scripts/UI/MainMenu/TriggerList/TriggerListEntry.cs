@@ -101,7 +101,7 @@ public class TriggerListEntry : MonoBehaviour {
         { TriggerAction.GiveXPowerup, new List<string> { "Random", "Mushroom", "FireFlower", "IceFlower", "PropellerMushroom", "MiniMushroom", "BlueShell", "HammerSuit", "MegaMushroom", "Starman" } },
         { TriggerAction.SpawnXPowerup, new List<string> { "Random", "Mushroom", "FireFlower", "IceFlower", "PropellerMushroom", "MiniMushroom", "BlueShell", "HammerSuit", "MegaMushroom", "Starman" } },
         { TriggerAction.GiveXReserve, new List<string> { "Random", "Mushroom", "FireFlower", "IceFlower", "PropellerMushroom", "MiniMushroom", "BlueShell", "HammerSuit", "MegaMushroom", "Starman" } },
-        // { TriggerAction.SpawnXEnemy, new List<string> { "Random", "Goomba", "GreenKoopa", "RedKoopa", "BlueKoopa", "BulletBill", "Boo", "Spiny", "Bobomb" } },
+        { TriggerAction.SpawnXEnemy, new List<string> { "Random", "Goomba", "Goombrat", "Koopa", "RedKoopa", "BlueKoopa", "BulletBill", "Boo", "Spiny", "Bobomb" } },
         // { TriggerAction.BecomeXTeam, new List<string> { "Random", "A", "B", "C", "D", "E" } },
         { TriggerAction.Stun, new List<string> { "Bump", "Knockback", "HardKnockback", "ForcefulKnockback" } },
     };
