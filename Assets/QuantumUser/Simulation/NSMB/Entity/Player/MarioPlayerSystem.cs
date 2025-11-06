@@ -2017,16 +2017,20 @@ namespace Quantum {
             return false;
         }
 
-        public static void SpawnItem(Frame f, EntityRef marioEntity, MarioPlayer* mario, AssetRef<EntityPrototype> prefab, bool fromBlock) {
+        public static bool SpawnItem(Frame f, EntityRef marioEntity, MarioPlayer* mario, AssetRef<EntityPrototype> prefab, bool fromBlock) {
             var gamemode = f.FindAsset(f.Global->Rules.Gamemode);
             if (!prefab.IsValid) {
-                prefab = gamemode.GetRandomItem(f, mario, fromBlock).Prefab;
+                var randomItem = gamemode.GetRandomItem(f, mario, fromBlock);
+                if (!randomItem) return false;
+                prefab = randomItem.Prefab;
             }
 
             EntityRef newEntity = f.Create(prefab);
             if (f.Unsafe.TryGetPointer(newEntity, out CoinItem* coinItem)) {
                 coinItem->ParentToPlayer(f, newEntity, marioEntity);
             }
+
+            return true;
         }
 
         public void SpawnReserveItem(Frame f, ref Filter filter) {

@@ -64,7 +64,8 @@ namespace Quantum {
             FP totalChance = 0;
             foreach (AssetRef<CoinItemAsset> coinItemAsset in AllCoinItems) {
                 CoinItemAsset coinItem = f.FindAsset(coinItemAsset);
-                if ((coinItem is PowerupAsset powerup) && powerup.State == PowerupState.MegaMushroom && !canSpawnMega) {
+                PowerupAsset powerup = coinItem as PowerupAsset;
+                if (powerup && powerup.State == PowerupState.MegaMushroom && !canSpawnMega) {
                     continue;
                 }
 
@@ -76,6 +77,11 @@ namespace Quantum {
                     || (coinItem.OnlyOneCanExist && onlyOneAlreadyExists)) {
                     continue;
                 }
+
+                var actualPowerupName = powerup.Type == PowerupType.Basic ? powerup.State.ToString() : powerup.Type.ToString();
+                if (powerup &&
+                    rules.GetType().GetField($"P{actualPowerupName}").GetValue(rules) is QBoolean ruleValue &&
+                    !ruleValue) continue;
 
                 totalChance += GetItemSpawnWeight(f, coinItem, leaderObjectiveCount, ourObjectiveCount);
             }
@@ -83,7 +89,8 @@ namespace Quantum {
             FP rand = mario->RNG.Next(0, totalChance);
             foreach (AssetRef<CoinItemAsset> coinItemAsset in AllCoinItems) {
                 CoinItemAsset coinItem = f.FindAsset(coinItemAsset);
-                if ((coinItem is PowerupAsset powerup) && powerup.State == PowerupState.MegaMushroom && !canSpawnMega) {
+                PowerupAsset powerup = coinItem as PowerupAsset;
+                if (powerup && powerup.State == PowerupState.MegaMushroom && !canSpawnMega) {
                     continue;
                 }
 
@@ -95,6 +102,11 @@ namespace Quantum {
                     || (coinItem.OnlyOneCanExist && onlyOneAlreadyExists)) {
                     continue;
                 }
+                
+                var actualPowerupName = powerup.Type == PowerupType.Basic ? powerup.State.ToString() : powerup.Type.ToString();
+                if (powerup &&
+                    rules.GetType().GetField($"P{actualPowerupName}").GetValue(rules) is QBoolean ruleValue &&
+                    !ruleValue) continue;
 
                 FP chance = GetItemSpawnWeight(f, coinItem, leaderObjectiveCount, ourObjectiveCount);
 
@@ -105,7 +117,7 @@ namespace Quantum {
                 rand -= chance;
             }
 
-            return f.FindAsset(FallbackCoinItem);
+            return null;
         }
 
         public abstract FP GetItemSpawnWeight(Frame f, CoinItemAsset item, int leaderObjectiveCount, int ourObjectiveCount);

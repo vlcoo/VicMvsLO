@@ -573,7 +573,6 @@ namespace NSMB.UI.Game {
             if (e.Entity != Target || speedrunTimerStartTimestamp > 0) return;
             
             speedrunTimerStartTimestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
-            Debug.Log("timer begin!!");
         }
 
         private void OnToggleHUD(InputAction.CallbackContext context) {

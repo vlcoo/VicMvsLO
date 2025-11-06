@@ -1009,9 +1009,9 @@ namespace Quantum {
     public Int32 TimerSeconds;
     [FieldOffset(168)]
     public QBoolean TeamsEnabled;
-    [FieldOffset(64)]
+    [FieldOffset(28)]
     public QBoolean CustomPowerupsEnabled;
-    [FieldOffset(68)]
+    [FieldOffset(32)]
     public QBoolean DrawOnTimeUp;
     [FieldOffset(12)]
     public Int32 Laps;
@@ -1049,43 +1049,43 @@ namespace Quantum {
     public QBoolean SNoPowerups;
     [FieldOffset(164)]
     public QBoolean SShowCoinCount;
-    [FieldOffset(52)]
-    public QBoolean ChanceMushroom;
-    [FieldOffset(32)]
-    public QBoolean ChanceFireFlower;
-    [FieldOffset(40)]
-    public QBoolean ChanceIceFlower;
-    [FieldOffset(56)]
-    public QBoolean ChancePropellerMushroom;
-    [FieldOffset(28)]
-    public QBoolean ChanceBlueShell;
-    [FieldOffset(36)]
-    public QBoolean ChanceHammerSuit;
-    [FieldOffset(48)]
-    public QBoolean ChanceMiniMushroom;
-    [FieldOffset(44)]
-    public QBoolean ChanceMegaMushroom;
-    [FieldOffset(60)]
-    public QBoolean ChanceStarman;
-    [FieldOffset(104)]
-    public QBoolean HStars;
     [FieldOffset(96)]
-    public QBoolean HPlayers;
+    public QBoolean PMushroom;
     [FieldOffset(76)]
-    public QBoolean HHost;
+    public QBoolean PFireFlower;
+    [FieldOffset(84)]
+    public QBoolean PIceFlower;
+    [FieldOffset(100)]
+    public QBoolean PPropellerMushroom;
+    [FieldOffset(72)]
+    public QBoolean PBlueShell;
     [FieldOffset(80)]
+    public QBoolean PHammerSuit;
+    [FieldOffset(92)]
+    public QBoolean PMiniMushroom;
+    [FieldOffset(88)]
+    public QBoolean PMegaMushroom;
+    [FieldOffset(104)]
+    public QBoolean PStarman;
+    [FieldOffset(68)]
+    public QBoolean HStars;
+    [FieldOffset(60)]
+    public QBoolean HPlayers;
+    [FieldOffset(40)]
+    public QBoolean HHost;
+    [FieldOffset(44)]
     public QBoolean HIceCubes;
     [FieldOffset(8)]
     public Int32 HTeamTarget;
-    [FieldOffset(100)]
+    [FieldOffset(64)]
     public QBoolean HStarCount;
-    [FieldOffset(88)]
+    [FieldOffset(52)]
     public QBoolean HLifeCount;
-    [FieldOffset(84)]
+    [FieldOffset(48)]
     public QBoolean HLapCount;
-    [FieldOffset(72)]
+    [FieldOffset(36)]
     public QBoolean HCoinCount;
-    [FieldOffset(92)]
+    [FieldOffset(56)]
     public QBoolean HNicknames;
     public override Int32 GetHashCode() {
       unchecked { 
@@ -1117,15 +1117,15 @@ namespace Quantum {
         hash = hash * 31 + SNoCoins.GetHashCode();
         hash = hash * 31 + SNoPowerups.GetHashCode();
         hash = hash * 31 + SShowCoinCount.GetHashCode();
-        hash = hash * 31 + ChanceMushroom.GetHashCode();
-        hash = hash * 31 + ChanceFireFlower.GetHashCode();
-        hash = hash * 31 + ChanceIceFlower.GetHashCode();
-        hash = hash * 31 + ChancePropellerMushroom.GetHashCode();
-        hash = hash * 31 + ChanceBlueShell.GetHashCode();
-        hash = hash * 31 + ChanceHammerSuit.GetHashCode();
-        hash = hash * 31 + ChanceMiniMushroom.GetHashCode();
-        hash = hash * 31 + ChanceMegaMushroom.GetHashCode();
-        hash = hash * 31 + ChanceStarman.GetHashCode();
+        hash = hash * 31 + PMushroom.GetHashCode();
+        hash = hash * 31 + PFireFlower.GetHashCode();
+        hash = hash * 31 + PIceFlower.GetHashCode();
+        hash = hash * 31 + PPropellerMushroom.GetHashCode();
+        hash = hash * 31 + PBlueShell.GetHashCode();
+        hash = hash * 31 + PHammerSuit.GetHashCode();
+        hash = hash * 31 + PMiniMushroom.GetHashCode();
+        hash = hash * 31 + PMegaMushroom.GetHashCode();
+        hash = hash * 31 + PStarman.GetHashCode();
         hash = hash * 31 + HStars.GetHashCode();
         hash = hash * 31 + HPlayers.GetHashCode();
         hash = hash * 31 + HHost.GetHashCode();
@@ -1151,15 +1151,6 @@ namespace Quantum {
         serializer.Stream.Serialize(&p->Lives);
         serializer.Stream.Serialize(&p->StarsToWin);
         serializer.Stream.Serialize(&p->TimerSeconds);
-        QBoolean.Serialize(&p->ChanceBlueShell, serializer);
-        QBoolean.Serialize(&p->ChanceFireFlower, serializer);
-        QBoolean.Serialize(&p->ChanceHammerSuit, serializer);
-        QBoolean.Serialize(&p->ChanceIceFlower, serializer);
-        QBoolean.Serialize(&p->ChanceMegaMushroom, serializer);
-        QBoolean.Serialize(&p->ChanceMiniMushroom, serializer);
-        QBoolean.Serialize(&p->ChanceMushroom, serializer);
-        QBoolean.Serialize(&p->ChancePropellerMushroom, serializer);
-        QBoolean.Serialize(&p->ChanceStarman, serializer);
         QBoolean.Serialize(&p->CustomPowerupsEnabled, serializer);
         QBoolean.Serialize(&p->DrawOnTimeUp, serializer);
         QBoolean.Serialize(&p->HCoinCount, serializer);
@@ -1171,6 +1162,15 @@ namespace Quantum {
         QBoolean.Serialize(&p->HPlayers, serializer);
         QBoolean.Serialize(&p->HStarCount, serializer);
         QBoolean.Serialize(&p->HStars, serializer);
+        QBoolean.Serialize(&p->PBlueShell, serializer);
+        QBoolean.Serialize(&p->PFireFlower, serializer);
+        QBoolean.Serialize(&p->PHammerSuit, serializer);
+        QBoolean.Serialize(&p->PIceFlower, serializer);
+        QBoolean.Serialize(&p->PMegaMushroom, serializer);
+        QBoolean.Serialize(&p->PMiniMushroom, serializer);
+        QBoolean.Serialize(&p->PMushroom, serializer);
+        QBoolean.Serialize(&p->PPropellerMushroom, serializer);
+        QBoolean.Serialize(&p->PStarman, serializer);
         QBoolean.Serialize(&p->SAllBricks, serializer);
         QBoolean.Serialize(&p->SHideSeek, serializer);
         QBoolean.Serialize(&p->SInstantDeath, serializer);
