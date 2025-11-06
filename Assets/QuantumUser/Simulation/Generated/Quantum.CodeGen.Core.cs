@@ -999,13 +999,13 @@ namespace Quantum {
     public AssetRef<Map> Stage;
     [FieldOffset(176)]
     public AssetRef<GamemodeAsset> Gamemode;
-    [FieldOffset(56)]
+    [FieldOffset(20)]
     public Int32 StarsToWin;
-    [FieldOffset(40)]
+    [FieldOffset(4)]
     public Int32 CoinsForPowerup;
-    [FieldOffset(52)]
+    [FieldOffset(16)]
     public Int32 Lives;
-    [FieldOffset(60)]
+    [FieldOffset(24)]
     public Int32 TimerSeconds;
     [FieldOffset(168)]
     public QBoolean TeamsEnabled;
@@ -1013,7 +1013,7 @@ namespace Quantum {
     public QBoolean CustomPowerupsEnabled;
     [FieldOffset(68)]
     public QBoolean DrawOnTimeUp;
-    [FieldOffset(48)]
+    [FieldOffset(12)]
     public Int32 Laps;
     [FieldOffset(172)]
     public QListPtr<MatchConditionerTrigger> Triggers;
@@ -1049,24 +1049,24 @@ namespace Quantum {
     public QBoolean SNoPowerups;
     [FieldOffset(164)]
     public QBoolean SShowCoinCount;
-    [FieldOffset(28)]
-    public Int32 ChanceMushroom;
-    [FieldOffset(8)]
-    public Int32 ChanceFireFlower;
-    [FieldOffset(16)]
-    public Int32 ChanceIceFlower;
+    [FieldOffset(52)]
+    public QBoolean ChanceMushroom;
     [FieldOffset(32)]
-    public Int32 ChancePropellerMushroom;
-    [FieldOffset(4)]
-    public Int32 ChanceBlueShell;
-    [FieldOffset(12)]
-    public Int32 ChanceHammerSuit;
-    [FieldOffset(24)]
-    public Int32 ChanceMiniMushroom;
-    [FieldOffset(20)]
-    public Int32 ChanceMegaMushroom;
+    public QBoolean ChanceFireFlower;
+    [FieldOffset(40)]
+    public QBoolean ChanceIceFlower;
+    [FieldOffset(56)]
+    public QBoolean ChancePropellerMushroom;
+    [FieldOffset(28)]
+    public QBoolean ChanceBlueShell;
     [FieldOffset(36)]
-    public Int32 ChanceStarman;
+    public QBoolean ChanceHammerSuit;
+    [FieldOffset(48)]
+    public QBoolean ChanceMiniMushroom;
+    [FieldOffset(44)]
+    public QBoolean ChanceMegaMushroom;
+    [FieldOffset(60)]
+    public QBoolean ChanceStarman;
     [FieldOffset(104)]
     public QBoolean HStars;
     [FieldOffset(96)]
@@ -1075,7 +1075,7 @@ namespace Quantum {
     public QBoolean HHost;
     [FieldOffset(80)]
     public QBoolean HIceCubes;
-    [FieldOffset(44)]
+    [FieldOffset(8)]
     public Int32 HTeamTarget;
     [FieldOffset(100)]
     public QBoolean HStarCount;
@@ -1145,21 +1145,21 @@ namespace Quantum {
     public static void Serialize(void* ptr, FrameSerializer serializer) {
         var p = (GameRules*)ptr;
         serializer.Stream.Serialize(&p->SpecialsCount);
-        serializer.Stream.Serialize(&p->ChanceBlueShell);
-        serializer.Stream.Serialize(&p->ChanceFireFlower);
-        serializer.Stream.Serialize(&p->ChanceHammerSuit);
-        serializer.Stream.Serialize(&p->ChanceIceFlower);
-        serializer.Stream.Serialize(&p->ChanceMegaMushroom);
-        serializer.Stream.Serialize(&p->ChanceMiniMushroom);
-        serializer.Stream.Serialize(&p->ChanceMushroom);
-        serializer.Stream.Serialize(&p->ChancePropellerMushroom);
-        serializer.Stream.Serialize(&p->ChanceStarman);
         serializer.Stream.Serialize(&p->CoinsForPowerup);
         serializer.Stream.Serialize(&p->HTeamTarget);
         serializer.Stream.Serialize(&p->Laps);
         serializer.Stream.Serialize(&p->Lives);
         serializer.Stream.Serialize(&p->StarsToWin);
         serializer.Stream.Serialize(&p->TimerSeconds);
+        QBoolean.Serialize(&p->ChanceBlueShell, serializer);
+        QBoolean.Serialize(&p->ChanceFireFlower, serializer);
+        QBoolean.Serialize(&p->ChanceHammerSuit, serializer);
+        QBoolean.Serialize(&p->ChanceIceFlower, serializer);
+        QBoolean.Serialize(&p->ChanceMegaMushroom, serializer);
+        QBoolean.Serialize(&p->ChanceMiniMushroom, serializer);
+        QBoolean.Serialize(&p->ChanceMushroom, serializer);
+        QBoolean.Serialize(&p->ChancePropellerMushroom, serializer);
+        QBoolean.Serialize(&p->ChanceStarman, serializer);
         QBoolean.Serialize(&p->CustomPowerupsEnabled, serializer);
         QBoolean.Serialize(&p->DrawOnTimeUp, serializer);
         QBoolean.Serialize(&p->HCoinCount, serializer);

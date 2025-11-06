@@ -14,16 +14,6 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
         [HideInInspector] public GameRules rules;
         public TMP_Dropdown teamTargetDropdown;
         
-        public override void Initialize() {
-            base.Initialize();
-            var toggles = new List<Toggle>();
-            GetComponentsInChildren(true, toggles);
-            foreach (var toggle in toggles) {
-                if (toggle.gameObject.name == "Item") continue;
-                _toggles[toggle.gameObject.name] = toggle;
-            }
-        }
-        
         public void Start() {
             QuantumEvent.Subscribe<EventRulesChanged>(this, OnRulesChanged);
             QuantumCallback.Subscribe<CallbackGameStarted>(this, OnGameStarted);
@@ -41,9 +31,22 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
             RefreshValues();
         }
 
-        public override void Show(bool first) {
+        public override unsafe void Show(bool first) {
             base.Show(first);
             success = false;
+            
+            var toggles = new List<Toggle>();
+            GetComponentsInChildren(true, toggles);
+            _toggles.Clear();
+            foreach (var toggle in toggles) {
+                if (toggle.gameObject.name == "Item") continue;
+                _toggles[toggle.gameObject.name] = toggle;
+            }
+            
+            var f = QuantumRunner.DefaultGame.Frames.Predicted;
+            rules = f.Global->Rules;
+            NetworkHandler.Client.AddCallbackTarget(this);
+            RefreshValues();
         }
         
         public override bool TryGoBack(out bool playSound) {
@@ -59,7 +62,7 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
         public unsafe void ToggleHudRule(Toggle rule) {
             var ruleName = rule.gameObject.name;
             CommandChangePowerupsHuds.PowerupsHuds effectValue = Enum.Parse<CommandChangePowerupsHuds.PowerupsHuds>(ruleName);
-            var cmd = new CommandChangePowerupsHuds();
+            var cmd = new CommandChangePowerupsHuds { EnabledChanges = effectValue, };
             var field = cmd.GetType().GetField(ruleName);
             if (field == null) return;
             field.SetValue(cmd, rule.isOn);
@@ -68,9 +71,9 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
             game.SendCommand(slot, cmd);
         }
 
-        public unsafe void ChangeTeamTargetRule(int value) {
-            var cmd = new CommandChangePowerupsHuds();
-            cmd.HTeamTarget = value;
+        public unsafe void ChangeTeamTargetRule() {
+            var cmd = new CommandChangePowerupsHuds { EnabledChanges = CommandChangePowerupsHuds.PowerupsHuds.HTeamTarget, };
+            cmd.HTeamTarget = teamTargetDropdown.value;
             QuantumGame game = QuantumRunner.DefaultGame;
             int slot = game.GetLocalPlayerSlots()[game.GetLocalPlayers().IndexOf(game.Frames.Predicted.Global->Host)];
             game.SendCommand(slot, cmd);
@@ -83,7 +86,9 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
 
         public void RefreshValues() {
             foreach (var toggle in _toggles) {
-                if (rules.GetType().GetField(toggle.Key).GetValue(rules) is bool ruleValue) toggle.Value.SetIsOnWithoutNotify(ruleValue);
+                if (rules.GetType().GetField(toggle.Key).GetValue(rules) is QBoolean ruleValue) {
+                    toggle.Value.SetIsOnWithoutNotify(ruleValue);
+                }
             }
             teamTargetDropdown.SetValueWithoutNotify(rules.HTeamTarget);
         }

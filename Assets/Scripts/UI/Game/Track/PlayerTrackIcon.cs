@@ -36,7 +36,8 @@ namespace NSMB.UI.Game.Track {
             
             stage.HidePlayersOnMinimap = !f.Global->Rules.HPlayers;
             hostIcon.enabled = f.Global->Rules.HHost && QuantumUtils.GetPlayerData(f, mario->PlayerRef)->IsRoomHost;
-            targetIcon.enabled = f.Global->Rules.TeamsEnabled && f.Global->Rules.HTeamTarget == mario->GetTeam(f);
+            var actualTeamTarget = f.Global->Rules.HTeamTarget - 1; // -1 is disabled. 0 is team A, etc.
+            targetIcon.enabled = f.Global->Rules.TeamsEnabled && actualTeamTarget == mario->GetTeam(f);
             iceCubeIconEnabled = f.Global->Rules.HIceCubes;
         }
 

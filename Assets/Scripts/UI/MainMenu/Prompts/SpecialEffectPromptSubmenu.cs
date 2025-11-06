@@ -15,7 +15,6 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
 
         public void Start() {
             QuantumEvent.Subscribe<EventRulesChanged>(this, OnRulesChanged);
-            QuantumCallback.Subscribe<CallbackGameDestroyed>(this, OnGameDestroyed);
             QuantumCallback.Subscribe<CallbackGameStarted>(this, OnGameStarted);
         }
         
@@ -44,7 +43,6 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
             rules = f.Global->Rules;
             NetworkHandler.Client.AddCallbackTarget(this);
             RefreshValues();
-            Debug.Log(_toggles.Count);
         }
         
         public override bool TryGoBack(out bool playSound) {
@@ -60,9 +58,7 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
         public unsafe void ToggleSpecialEffect(Toggle effect) {
             var effectName = effect.gameObject.name;
             CommandChangeRules.Rules effectValue = Enum.Parse<CommandChangeRules.Rules>(effectName);
-            var cmd = new CommandChangeRules {
-                EnabledChanges = effectValue,
-            };
+            var cmd = new CommandChangeRules { EnabledChanges = effectValue, };
             var field = cmd.GetType().GetField(effectName);
             if (field == null) return;
             field.SetValue(cmd, effect.isOn);
@@ -74,11 +70,6 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
         private unsafe void OnRulesChanged(EventRulesChanged e) {
             rules = e.Game.Frames.Predicted.Global->Rules;
             RefreshValues();
-        }
-        
-        public void OnGameDestroyed(CallbackGameDestroyed e) {
-            // cleanup
-            // counterTip.SetCount(0);
         }
 
         public void RefreshValues() {

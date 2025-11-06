@@ -132,9 +132,9 @@ namespace Quantum {
             f.Global->Rules = rules;
             f.Events.RulesChanged(gamemodeChanged, levelChanged);
 
-            if (f.Global->GameStartFrames > 0 && !QuantumUtils.IsGameStartable(f)) {
-                GameLogicSystem.StopCountdown(f);
-            }
+            // if (f.Global->GameStartFrames > 0 && !QuantumUtils.IsGameStartable(f)) {
+            //     GameLogicSystem.StopCountdown(f);
+            // }
         }
 
         [Flags]

@@ -2,15 +2,18 @@ using Photon.Deterministic;
 
 namespace Quantum {
     public class CommandChangePowerupsHuds : DeterministicCommand, ILobbyCommand {
-        public int ChanceMushroom;
-        public int ChanceFireFlower;
-        public int ChanceIceFlower;
-        public int ChancePropellerMushroom;
-        public int ChanceBlueShell;
-        public int ChanceHammerSuit;
-        public int ChanceMiniMushroom;
-        public int ChanceMegaMushroom;
-        public int ChanceStarman;
+        
+        public PowerupsHuds EnabledChanges;
+        
+        public bool ChanceMushroom;
+        public bool ChanceFireFlower;
+        public bool ChanceIceFlower;
+        public bool ChancePropellerMushroom;
+        public bool ChanceBlueShell;
+        public bool ChanceHammerSuit;
+        public bool ChanceMiniMushroom;
+        public bool ChanceMegaMushroom;
+        public bool ChanceStarman;
         
         public bool HStars;
         public bool HPlayers;
@@ -24,6 +27,12 @@ namespace Quantum {
         public bool HNicknames;
 
         public override void Serialize(BitStream stream) {
+            if (stream.Writing) {
+                stream.WriteUInt((uint) EnabledChanges);
+            } else {
+                EnabledChanges = (PowerupsHuds) stream.ReadUInt();
+            }
+            
             stream.Serialize(ref ChanceMushroom);
             stream.Serialize(ref ChanceFireFlower);
             stream.Serialize(ref ChanceIceFlower);
@@ -52,34 +61,31 @@ namespace Quantum {
                 return;
             }
 
+            PowerupsHuds rulesChanges = EnabledChanges;
             var rules = f.Global->Rules;
 
-            rules.ChanceMushroom = ChanceMushroom;
-            rules.ChanceFireFlower = ChanceFireFlower;
-            rules.ChanceIceFlower = ChanceIceFlower;
-            rules.ChancePropellerMushroom = ChancePropellerMushroom;
-            rules.ChanceBlueShell = ChanceBlueShell;
-            rules.ChanceHammerSuit = ChanceHammerSuit;
-            rules.ChanceMiniMushroom = ChanceMiniMushroom;
-            rules.ChanceMegaMushroom = ChanceMegaMushroom;
-            rules.ChanceStarman = ChanceStarman;
-            rules.HStars = HStars;
-            rules.HPlayers = HPlayers;
-            rules.HHost = HHost;
-            rules.HIceCubes = HIceCubes;
-            rules.HTeamTarget = HTeamTarget;
-            rules.HStarCount = HStarCount;
-            rules.HLifeCount = HLifeCount;
-            rules.HLapCount = HLapCount;
-            rules.HCoinCount = HCoinCount;
-            rules.HNicknames = HNicknames;
+            if (rulesChanges.HasFlag(PowerupsHuds.Mushroom)) rules.ChanceMushroom = ChanceMushroom;
+            if (rulesChanges.HasFlag(PowerupsHuds.FireFlower)) rules.ChanceFireFlower = ChanceFireFlower;
+            if (rulesChanges.HasFlag(PowerupsHuds.IceFlower)) rules.ChanceIceFlower = ChanceIceFlower;
+            if (rulesChanges.HasFlag(PowerupsHuds.PropellerMushroom)) rules.ChancePropellerMushroom = ChancePropellerMushroom;
+            if (rulesChanges.HasFlag(PowerupsHuds.BlueShell)) rules.ChanceBlueShell = ChanceBlueShell;
+            if (rulesChanges.HasFlag(PowerupsHuds.HammerSuit)) rules.ChanceHammerSuit = ChanceHammerSuit;
+            if (rulesChanges.HasFlag(PowerupsHuds.MiniMushroom)) rules.ChanceMiniMushroom = ChanceMiniMushroom;
+            if (rulesChanges.HasFlag(PowerupsHuds.MegaMushroom)) rules.ChanceMegaMushroom = ChanceMegaMushroom;
+            if (rulesChanges.HasFlag(PowerupsHuds.Starman)) rules.ChanceStarman = ChanceStarman;
+            if (rulesChanges.HasFlag(PowerupsHuds.HStars)) rules.HStars = HStars;
+            if (rulesChanges.HasFlag(PowerupsHuds.HPlayers)) rules.HPlayers = HPlayers;
+            if (rulesChanges.HasFlag(PowerupsHuds.HHost)) rules.HHost = HHost;
+            if (rulesChanges.HasFlag(PowerupsHuds.HIceCubes)) rules.HIceCubes = HIceCubes;
+            if (rulesChanges.HasFlag(PowerupsHuds.HTeamTarget)) rules.HTeamTarget = HTeamTarget;
+            if (rulesChanges.HasFlag(PowerupsHuds.HStarCount)) rules.HStarCount = HStarCount;
+            if (rulesChanges.HasFlag(PowerupsHuds.HLifeCount)) rules.HLifeCount = HLifeCount;
+            if (rulesChanges.HasFlag(PowerupsHuds.HLapCount)) rules.HLapCount = HLapCount;
+            if (rulesChanges.HasFlag(PowerupsHuds.HCoinCount)) rules.HCoinCount = HCoinCount;
+            if (rulesChanges.HasFlag(PowerupsHuds.HNicknames)) rules.HNicknames = HNicknames;
             
             f.Global->Rules = rules;
             f.Events.RulesChanged(false, false);
-
-            if (f.Global->GameStartFrames > 0 && !QuantumUtils.IsGameStartable(f)) {
-                GameLogicSystem.StopCountdown(f);
-            }
         }
 
         public enum PowerupsHuds : uint {
