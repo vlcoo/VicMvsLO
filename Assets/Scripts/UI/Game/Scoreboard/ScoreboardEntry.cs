@@ -95,7 +95,10 @@ namespace NSMB.UI.Game.Scoreboard {
             if (f.Global->Rules.IsLivesEnabled) {
                 scoreBuilder.Append(character.UiString).Append(Utils.GetSymbolString(lives.ToString()));
             }
-            scoreBuilder.Append(Utils.GetSymbolString(gamemode.ObjectiveSymbolPrefix + objective.ToString()));
+
+            if (f.Global->Rules.IsStarsEnabled || gamemode is not StarChasersGamemode) {
+                scoreBuilder.Append(Utils.GetSymbolString(gamemode.ObjectiveSymbolPrefix + objective.ToString()));
+            }
 
             scoreText.text = scoreBuilder.ToString();
             updater.RequestSorting = true;

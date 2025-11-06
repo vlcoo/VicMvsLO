@@ -57,6 +57,7 @@ namespace NSMB.UI.Game {
         private bool greenWinText;
         private Color uiColor;
         private long speedrunTimerStartTimestamp = 0;
+        private GamemodeAsset gamemode;
 
         private Coroutine endGameSequenceCoroutine, reserveSummonCoroutine;
 
@@ -96,6 +97,8 @@ namespace NSMB.UI.Game {
             foreach (MarioPlayerAnimator mario in MarioPlayerAnimator.AllMarioPlayers) {
                 OnMarioInitialized(game, f, mario);
             }
+            
+            gamemode = f.FindAsset(f.Global->Rules.Gamemode);
         }
 
         public void Awake() {
@@ -117,9 +120,9 @@ namespace NSMB.UI.Game {
         public void Start() {
             stage = ViewContext.Stage;
             
-            bool minimapBoosEnabled = false;    // stage.HidePlayersOnMinimap TODO: temporarily disabled. maybe make boos appear when all Ms are off.
-            PlayerTrackIcon.HideAllPlayerIcons = minimapBoosEnabled;
-            boos.SetActive(minimapBoosEnabled);
+            // bool minimapBoosEnabled = false;    // stage.HidePlayersOnMinimap
+            // PlayerTrackIcon.HideAllPlayerIcons = minimapBoosEnabled;
+            // boos.SetActive(minimapBoosEnabled);
             StartCoroutine(UpdatePingTextCoroutine());
 
             QuantumCallback.Subscribe<CallbackUpdateView>(this, OnUpdateView);
@@ -243,10 +246,10 @@ namespace NSMB.UI.Game {
 
         private void UpdateElementVisibility(Frame f, bool marioExists) {
             teamsParent.SetActive(marioExists && f.Global->Rules.TeamsEnabled);
-            starsParent.SetActive(marioExists && f.Global->Rules.IsStarsEnabled);
+            starsParent.SetActive(marioExists && (f.Global->Rules.IsStarsEnabled || gamemode is not StarChasersGamemode));
             lapsParent.SetActive(marioExists && f.Global->Rules.IsLapsEnabled && stage.IsCampaignMap);
             livesParent.SetActive(marioExists && f.Global->Rules.IsLivesEnabled);
-            coinsParent.SetActive(marioExists && f.Global->Rules.IsCoinsEnabled);
+            coinsParent.SetActive(marioExists);
             timerParent.SetActive(f.Global->Rules.IsTimerEnabled);
             reserveItemBox.SetActive(marioExists && !f.Global->Rules.SNoReserve);
         }
@@ -299,7 +302,8 @@ namespace NSMB.UI.Game {
             bool teamsEnabled = rules.TeamsEnabled;
             bool livesEnabled = rules.IsLivesEnabled;
             bool timerEnabled = rules.TimerSeconds > 0;
-            bool minimapBoosEnabled = false;    // TODO: temporarily disabled. maybe make boos appear when all Ms are off.
+            boos.SetActive(!rules.HStars && !rules.HHost && !rules.HIceCubes && !rules.HPlayers &&
+                           rules.HTeamTarget == 0);
             int lapsRequirement = rules.Laps;
 
             // TIMER
@@ -349,7 +353,9 @@ namespace NSMB.UI.Game {
             // COINS
             if (mario->Coins != cachedCoins) {
                 cachedCoins = mario->Coins;
-                uiCoins.text = Utils.GetSymbolString("Cx" + cachedCoins + "/" + coinRequirement);
+                uiCoins.text = f.Global->Rules.IsCoinsEnabled
+                    ? Utils.GetSymbolString("Cx" + cachedCoins + "/" + coinRequirement)
+                    : Utils.GetSymbolString("Cx" + cachedCoins);
             }
             
             // LAPS

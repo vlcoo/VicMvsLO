@@ -122,7 +122,9 @@ namespace NSMB.UI.Game {
                 stringBuilder.Append(character.UiString).Append(Utils.GetSymbolString("x" + mario->Lives)).Append(' ');
             }
 
-            stringBuilder.Append(Utils.GetSymbolString(gamemode.ObjectiveSymbolPrefix + "x" + Mathf.Max(0, gamemode.GetObjectiveCount(f, mario))));
+            if (f.Global->Rules.IsStarsEnabled || gamemode is not StarChasersGamemode) {
+                stringBuilder.Append(Utils.GetSymbolString(gamemode.ObjectiveSymbolPrefix + "x" + Mathf.Max(0, gamemode.GetObjectiveCount(f, mario))));
+            }
 
             text.text = stringBuilder.ToString();
         }
