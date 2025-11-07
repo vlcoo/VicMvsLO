@@ -41,7 +41,11 @@ namespace Quantum {
         private static FPVector2 SamplePosition(QList<PathNode> positions, FP sample, LoopingMode loopMode, bool durationIsSpeed = false) {
             FP totalDuration = 0;
             for (int i = 0; i < positions.Count; i++) {
-                totalDuration += positions[i].TravelDuration;
+                if (durationIsSpeed) {
+                    totalDuration += FPVector2.Distance(positions[i].Position, positions[(i + 1) % positions.Count].Position) / positions[i].TravelDuration;
+                } else {
+                    totalDuration += positions[i].TravelDuration;
+                }
             }
 
             if (loopMode == LoopingMode.Loop) {
@@ -58,11 +62,13 @@ namespace Quantum {
             for (int i = 0; i < positions.Count; i++) {
                 PathNode current = positions[i];
                 PathNode next = positions[(i + 1) % positions.Count];
-
-                if (sample > current.TravelDuration) {
-                    sample -= current.TravelDuration;
+                FP currentDuration = current.TravelDuration;
+                if (durationIsSpeed) currentDuration = FPVector2.Distance(current.Position, next.Position) / currentDuration;
+                
+                if (sample > currentDuration) {
+                    sample -= currentDuration;
                 } else {
-                    FP alpha = sample / current.TravelDuration;
+                    FP alpha = sample / currentDuration;
                     if (next.EaseIn && next.EaseOut) {
                         alpha = QuantumUtils.EaseInOut(alpha);
                     } else if (next.EaseIn) {

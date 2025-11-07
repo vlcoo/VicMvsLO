@@ -33,7 +33,7 @@ namespace Quantum {
                 return;
             }
 
-            bool chomping = piranhaPlant->ChompFrames > 0;
+            bool chomping = piranhaPlant->ChompFrames > 0 || piranhaPlant->AlwaysOut;
             if (chomping) {
                 // Currently chomping.
                 if (QuantumUtils.Decrement(ref piranhaPlant->ChompFrames)) {

@@ -944,6 +944,7 @@ namespace Quantum.Prototypes {
   [Quantum.Prototypes.Prototype(typeof(Quantum.PiranhaPlant))]
   public unsafe class PiranhaPlantPrototype : ComponentPrototype<Quantum.PiranhaPlant> {
     public MapEntityId Pipe;
+    public QBoolean AlwaysOut;
     public override Boolean AddToEntity(FrameBase f, EntityRef entity, in PrototypeMaterializationContext context) {
         Quantum.PiranhaPlant component = default;
         Materialize((Frame)f, ref component, in context);
@@ -951,6 +952,7 @@ namespace Quantum.Prototypes {
     }
     public void Materialize(Frame frame, ref Quantum.PiranhaPlant result, in PrototypeMaterializationContext context = default) {
         PrototypeValidator.FindMapEntity(this.Pipe, in context, out result.Pipe);
+        result.AlwaysOut = this.AlwaysOut;
     }
   }
   [System.SerializableAttribute()]

@@ -3451,6 +3451,8 @@ namespace Quantum {
     public const Int32 ALIGNMENT = 8;
     [FieldOffset(8)]
     public EntityRef Pipe;
+    [FieldOffset(4)]
+    public QBoolean AlwaysOut;
     [FieldOffset(1)]
     [ExcludeFromPrototype()]
     public Byte WaitingFrames;
@@ -3464,6 +3466,7 @@ namespace Quantum {
       unchecked { 
         var hash = 19889;
         hash = hash * 31 + Pipe.GetHashCode();
+        hash = hash * 31 + AlwaysOut.GetHashCode();
         hash = hash * 31 + WaitingFrames.GetHashCode();
         hash = hash * 31 + ChompFrames.GetHashCode();
         hash = hash * 31 + PopupAnimationTime.GetHashCode();
@@ -3474,6 +3477,7 @@ namespace Quantum {
         var p = (PiranhaPlant*)ptr;
         serializer.Stream.Serialize(&p->ChompFrames);
         serializer.Stream.Serialize(&p->WaitingFrames);
+        QBoolean.Serialize(&p->AlwaysOut, serializer);
         EntityRef.Serialize(&p->Pipe, serializer);
         FP.Serialize(&p->PopupAnimationTime, serializer);
     }

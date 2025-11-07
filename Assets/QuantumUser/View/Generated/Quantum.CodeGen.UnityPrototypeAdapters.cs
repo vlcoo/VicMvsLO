@@ -128,10 +128,12 @@ namespace Quantum.Prototypes.Unity {
   [System.SerializableAttribute()]
   public unsafe partial class PiranhaPlantPrototype : Quantum.QuantumUnityPrototypeAdapter<Quantum.Prototypes.PiranhaPlantPrototype> {
     public Quantum.QuantumEntityPrototype Pipe;
+    public QBoolean AlwaysOut;
     partial void ConvertUser(Quantum.QuantumEntityPrototypeConverter converter, ref Quantum.Prototypes.PiranhaPlantPrototype prototype);
     public override Quantum.Prototypes.PiranhaPlantPrototype Convert(Quantum.QuantumEntityPrototypeConverter converter) {
       var result = new Quantum.Prototypes.PiranhaPlantPrototype();
       converter.Convert(this.Pipe, out result.Pipe);
+      converter.Convert(this.AlwaysOut, out result.AlwaysOut);
       ConvertUser(converter, ref result);
       return result;
     }

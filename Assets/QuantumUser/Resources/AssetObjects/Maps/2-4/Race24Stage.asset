@@ -445,6 +445,26 @@ MonoBehaviour:
     - rid: 2579234705001938951
     - rid: 2579234705001938952
   - Components:
+    - rid: 4135559569776574464
+    - rid: 4135559569776574465
+    - rid: 4135559569776574466
+    - rid: 4135559569776574467
+    - rid: 4135559569776574468
+    - rid: 4135559569776574469
+    - rid: 4135559569776574470
+    - rid: 4135559569776574471
+    - rid: 4135559569776574472
+  - Components:
+    - rid: 5563775101381378048
+    - rid: 5563775101381378049
+    - rid: 5563775101381378050
+    - rid: 5563775101381378051
+    - rid: 5563775101381378052
+    - rid: 5563775101381378053
+    - rid: 5563775101381378054
+    - rid: 5563775101381378055
+    - rid: 5563775101381378056
+  - Components:
     - rid: 3066758439930691584
     - rid: 3066758439930691585
     - rid: 3066758439930691586
@@ -634,26 +654,6 @@ MonoBehaviour:
     - rid: 6618277250011758594
     - rid: 6618277250011758595
   - Components:
-    - rid: 4135559569776574464
-    - rid: 4135559569776574465
-    - rid: 4135559569776574466
-    - rid: 4135559569776574467
-    - rid: 4135559569776574468
-    - rid: 4135559569776574469
-    - rid: 4135559569776574470
-    - rid: 4135559569776574471
-    - rid: 4135559569776574472
-  - Components:
-    - rid: 5563775101381378048
-    - rid: 5563775101381378049
-    - rid: 5563775101381378050
-    - rid: 5563775101381378051
-    - rid: 5563775101381378052
-    - rid: 5563775101381378053
-    - rid: 5563775101381378054
-    - rid: 5563775101381378055
-    - rid: 5563775101381378056
-  - Components:
     - rid: 3312611037345218560
     - rid: 3312611037345218561
     - rid: 3312611037345218562
@@ -676,6 +676,11 @@ MonoBehaviour:
     - rid: 5862917591420370946
     - rid: 5862917591420370947
     - rid: 5862917591420370948
+  - Components:
+    - rid: 412640290780741632
+    - rid: 412640290780741633
+    - rid: 412640290780741634
+    - rid: 412640290780741635
   SerializedTriangleDataUncompressedSize: 8
   references:
     version: 2
@@ -904,6 +909,67 @@ MonoBehaviour:
       type: {class: WrappingObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         _empty_prototype_dummy_field_: 0
+    - rid: 412640290780741632
+      type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
+      data:
+        Position:
+          X:
+            RawValue: 3981312
+          Y:
+            RawValue: 442368
+        Rotation:
+          RawValue: 0
+    - rid: 412640290780741633
+      type: {class: PhysicsCollider2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
+      data:
+        ShapeConfig:
+          ShapeType: 8
+          PolygonCollider:
+            Id:
+              Value: 0
+          CircleRadius:
+            RawValue: 0
+          CapsuleSize:
+            X:
+              RawValue: 0
+            Y:
+              RawValue: 0
+          EdgeExtent:
+            RawValue: 16384
+          BoxExtents:
+            X:
+              RawValue: 0
+            Y:
+              RawValue: 0
+          PositionOffset:
+            X:
+              RawValue: 0
+            Y:
+              RawValue: -16384
+          RotationOffset:
+            RawValue: 11796480
+          UserTag: 0
+          IsPersistent: 1
+          CompoundShapes: []
+        Layer: 0
+        IsTrigger: 0
+        PhysicsMaterial:
+          Id:
+            Value: 0
+    - rid: 412640290780741634
+      type: {class: PhysicsCallbacks2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
+      data:
+        CallbackFlags:
+          Value: 0
+    - rid: 412640290780741635
+      type: {class: InvisibleBlockPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
+      data:
+        BumpTile:
+          Id:
+            Value: 342476424856818660
+        Tile:
+          Id:
+            Value: 520268055672688161
     - rid: 570447016404975616
       type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
       data:
@@ -1937,6 +2003,8 @@ MonoBehaviour:
       data:
         Pipe:
           SceneIndexPlusOne: 0
+        AlwaysOut:
+          Value: 0
     - rid: 1635260067253059584
       type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
       data:
@@ -2908,6 +2976,8 @@ MonoBehaviour:
       data:
         Pipe:
           SceneIndexPlusOne: 0
+        AlwaysOut:
+          Value: 0
     - rid: 2579234705001938944
       type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
       data:
@@ -3019,6 +3089,8 @@ MonoBehaviour:
       data:
         Pipe:
           SceneIndexPlusOne: 0
+        AlwaysOut:
+          Value: 0
     - rid: 2614285505755348992
       type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
       data:
@@ -3604,6 +3676,8 @@ MonoBehaviour:
       data:
         Pipe:
           SceneIndexPlusOne: 0
+        AlwaysOut:
+          Value: 0
     - rid: 3362885212240347136
       type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
       data:
@@ -4509,6 +4583,8 @@ MonoBehaviour:
       data:
         Pipe:
           SceneIndexPlusOne: 0
+        AlwaysOut:
+          Value: 0
     - rid: 4175235816232058880
       type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
       data:
@@ -5053,6 +5129,8 @@ MonoBehaviour:
       data:
         Pipe:
           SceneIndexPlusOne: 0
+        AlwaysOut:
+          Value: 0
     - rid: 5046342483366117376
       type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
       data:
@@ -5313,6 +5391,8 @@ MonoBehaviour:
       data:
         Pipe:
           SceneIndexPlusOne: 0
+        AlwaysOut:
+          Value: 0
     - rid: 5862917591420370944
       type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
       data:
@@ -5623,6 +5703,8 @@ MonoBehaviour:
       data:
         Pipe:
           SceneIndexPlusOne: 0
+        AlwaysOut:
+          Value: 0
     - rid: 6103039381759590400
       type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
       data:
@@ -6019,6 +6101,8 @@ MonoBehaviour:
       data:
         Pipe:
           SceneIndexPlusOne: 0
+        AlwaysOut:
+          Value: 0
     - rid: 6530396665742884864
       type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
       data:
@@ -7737,6 +7821,8 @@ MonoBehaviour:
       data:
         Pipe:
           SceneIndexPlusOne: 0
+        AlwaysOut:
+          Value: 0
     - rid: 7772952398355496960
       type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
       data:
@@ -8753,6 +8839,8 @@ MonoBehaviour:
       data:
         Pipe:
           SceneIndexPlusOne: 0
+        AlwaysOut:
+          Value: 0
     - rid: 9150546045250306048
       type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
       data:
