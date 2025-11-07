@@ -11,31 +11,13 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
     public class HudPromptSubmenu : PromptSubmenu {
         public bool success = true;
         private readonly Dictionary<string, Toggle> _toggles = new();
-        [HideInInspector] public GameRules rules;
         public TMP_Dropdown teamTargetDropdown;
+        public MatchSettings matchSettings;
         
-        public void Start() {
-            QuantumEvent.Subscribe<EventRulesChanged>(this, OnRulesChanged);
-            QuantumCallback.Subscribe<CallbackGameStarted>(this, OnGameStarted);
-            QuantumEvent.Subscribe<EventHostChanged>(this, OnHostChanged);
-            
-            NetworkHandler.Client.AddCallbackTarget(this);
-        }
-        
-        public override void Hide(SubmenuHideReason hideReason) {
-            base.Hide(hideReason);
-            NetworkHandler.Client.RemoveCallbackTarget(this);
-        }
-        
-        private unsafe void OnGameStarted(CallbackGameStarted e) {
-            rules = e.Game.Frames.Predicted.Global->Rules;
-            RefreshValues();
-        }
-        
-        private void OnHostChanged(EventHostChanged e) {
-            var isHost = e.Game.PlayerIsLocal(e.NewHost);
+        private void RefreshInteractability() {
+            teamTargetDropdown.interactable = matchSettings.isHost;
             foreach (var toggle in _toggles) {
-                toggle.Value.interactable = isHost;
+                toggle.Value.interactable = matchSettings.isHost;
             }
         }
 
@@ -51,9 +33,7 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
                 _toggles[toggle.gameObject.name] = toggle;
             }
             
-            var f = QuantumRunner.DefaultGame.Frames.Predicted;
-            rules = f.Global->Rules;
-            NetworkHandler.Client.AddCallbackTarget(this);
+            RefreshInteractability();
             RefreshValues();
         }
         
@@ -87,12 +67,8 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
             game.SendCommand(slot, cmd);
         }
 
-        private unsafe void OnRulesChanged(EventRulesChanged e) {
-            rules = e.Game.Frames.Predicted.Global->Rules;
-            RefreshValues();
-        }
-
         public void RefreshValues() {
+            var rules = matchSettings.rules;
             foreach (var toggle in _toggles) {
                 if (rules.GetType().GetField(toggle.Key).GetValue(rules) is QBoolean ruleValue) {
                     toggle.Value.SetIsOnWithoutNotify(ruleValue);

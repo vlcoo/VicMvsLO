@@ -2,12 +2,14 @@ using Quantum;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using Button = UnityEngine.UI.Button;
 
 public class MatchSettings : MonoBehaviour {
     public Toggle starsToggle, coinsToggle, livesToggle, timerToggle, teamsToggle;
     public TMP_InputField lapsInput, starsInput, coinsInput, livesInput, timerInput;
     [HideInInspector] public GameRules rules;
-    private bool isHost;
+    [HideInInspector] public bool isHost;
+    public Button btnGamemode;
     
     public void Start() {
         QuantumEvent.Subscribe<EventRulesChanged>(this, OnRulesChanged);
@@ -60,6 +62,7 @@ public class MatchSettings : MonoBehaviour {
         if (rules.TimerSeconds > 0 || timerInput.text.Length == 0) timerInput.SetTextWithoutNotify(rules.TimerSeconds.ToString());
         teamsToggle.interactable = isHost;
         teamsToggle.SetIsOnWithoutNotify(rules.TeamsEnabled);
+        btnGamemode.interactable = isHost;
     }
 
     public unsafe void ChangeRuleValue() {

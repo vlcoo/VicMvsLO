@@ -34,7 +34,7 @@ public class TriggerListEntry : MonoBehaviour {
         ddConstraintTarget;
 
     public GameObject extrasDialog;
-    public Button btnDelete, btnDuplicate;
+    public Button btnDelete, btnDuplicate, btnCondition, btnAction;
     
     // some conditions, actions and constraints are global (not referring to a player, but rather the stage or match itself)
     // they can't have a target.
@@ -139,9 +139,16 @@ public class TriggerListEntry : MonoBehaviour {
         Parent.TriggerRemoved(this);
     }
 
-    public void OnHostChanged(bool isHost) {
+    public void RefreshInteractability() {
+        var isHost = Parent.matchSettings.isHost;
         btnDelete.interactable = isHost;
         btnDuplicate.interactable = isHost;
+        btnCondition.interactable = isHost;
+        btnAction.interactable = isHost;
+        ddConditionTarget.interactable = isHost;
+        ddConditionParameter.interactable = isHost;
+        ddActionTarget.interactable = isHost;
+        ddActionParameter.interactable = isHost;
     }
 
     public void SetTrigger(MatchConditionerTrigger newTrigger) {

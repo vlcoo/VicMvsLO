@@ -17,11 +17,11 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
         public List<TriggerListEntry> triggers = new();
         public TriggerListEntry currentEditingEntry = null;
         public Button btnAdd;
+        public MatchSettings matchSettings;
 
         public void Start() {
             QuantumEvent.Subscribe<EventTriggersChanged>(this, OnTriggersChanged);
             QuantumCallback.Subscribe<CallbackGameDestroyed>(this, OnGameDestroyed);
-            QuantumEvent.Subscribe<EventHostChanged>(this, OnHostChanged);
             QuantumCallback.Subscribe<CallbackGameStarted>(this, OnGameStarted);
         }
 
@@ -31,6 +31,7 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
             NetworkHandler.Client.AddCallbackTarget(this);
             var f = NetworkHandler.Game.Frames.Predicted;
             var newTriggers = f.ResolveList(f.Global->Rules.Triggers);
+            RefreshInteractability();
             RefreshValues(newTriggers);
         }
         
@@ -61,11 +62,10 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
             RefreshValues(newTriggers);
         }
         
-        private void OnHostChanged(EventHostChanged e) {
-            var isHost = e.Game.PlayerIsLocal(e.NewHost);
-            btnAdd.interactable = isHost;
+        private void RefreshInteractability() {
+            btnAdd.interactable = matchSettings.isHost;
             foreach (var trigger in triggers) {
-                trigger.OnHostChanged(isHost);
+                trigger.RefreshInteractability();
             }
         }
         
@@ -83,6 +83,7 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
                     newEntryScript.Index = triggers.Count - 1;
                     newEntryScript.Parent = this;
                     newEntry.SetActive(true);
+                    newEntryScript.RefreshInteractability();
                 }
                 triggers[i].Trigger = newTriggers[i];
             }

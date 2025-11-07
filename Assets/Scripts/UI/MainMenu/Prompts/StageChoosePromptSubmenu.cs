@@ -9,18 +9,19 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
     public class StageChoosePromptSubmenu : PromptSubmenu {
         public bool success = true;
         private List<Button> stageButtons = new();
-        
-        public void Start() {
+        public MatchSettings matchSettings;
+
+        public override void OnValidate() {
+            stageButtons.Clear();
             foreach (var button in GetComponentsInChildren<Button>()) {
                 if (button.interactable && button.gameObject != BackButton) stageButtons.Add(button);
             }
-            
-            QuantumEvent.Subscribe<EventHostChanged>(this, OnHostChanged);
         }
         
         public override void Show(bool first) {
             base.Show(first);
             success = false;
+            RefreshInteractability();
         }
         
         public override bool TryGoBack(out bool playSound) {
@@ -33,10 +34,9 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
             return base.TryGoBack(out playSound);
         }
         
-        private void OnHostChanged(EventHostChanged e) {
-            var isHost = e.Game.PlayerIsLocal(e.NewHost);
+        private void RefreshInteractability() {
             foreach (var button in stageButtons) {
-                button.interactable = isHost;
+                button.interactable = matchSettings.isHost;
             }
         }
         
