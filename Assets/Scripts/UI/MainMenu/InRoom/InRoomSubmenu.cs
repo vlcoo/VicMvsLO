@@ -217,6 +217,7 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
                 Canvas.PlaySound(SoundEffect.UI_FileSelect);
                 menuSongManager.Stop();
                 GlobalController.Instance.fader.Fade(AnimatedFader.FadeStyle.Circle, AnimatedFader.FadeStyle.Dissolve, () => {
+                    GlobalController.Instance.rumbleManager.RumbleForSeconds(0.1f, 0.3f, 0.3f, RumbleManager.RumbleSetting.High);
                     int slot = game.GetLocalPlayerSlots()[game.GetLocalPlayers().IndexOf(host)];
                     game.SendCommand(slot, new CommandToggleCountdown());
                 });

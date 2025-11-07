@@ -30,7 +30,7 @@ namespace NSMB.UI.Game {
         [SerializeField] private Sprite storedItemNull;
         [SerializeField] private TMP_Text uiTeamObjective, uiMainObjective, uiCoins, uiDebug, uiLives, uiCountdown, uiLaps, speedrunTimer;
         [SerializeField] private Image itemReserve, itemColor, deathFade;
-        [SerializeField] private GameObject boos, reserveItemBox;
+        [SerializeField] private GameObject boos, reserveItemBox, onScreenControls;
         [SerializeField] private Animation reserveAnimation;
 
         [SerializeField] private TMP_Text winText;
@@ -136,6 +136,11 @@ namespace NSMB.UI.Game {
             goalTrackTemplate.gameObject.SetActive(stage.IsCampaignMap);
             greenWinText = Perso.GetBool("winTextColor");
             uiColor = Perso.GetItem(GlobalController.Instance.uiColors, "uiColor");
+            
+            onScreenControls.SetActive(Settings.Instance.controlsOnScreen);
+            foreach (var onScreenButton in onScreenControls.transform.GetComponentsInChildren<Image>())
+                if (onScreenButton.transform.name != "Item")
+                    onScreenButton.color = new Color(uiColor.r, uiColor.g, uiColor.b, .4f);
         }
 
         public void OnDestroy() {
