@@ -19,7 +19,7 @@ namespace NSMB.Entities.World {
         [SerializeField] private GameObject starCollectPrefab;
 
         //---Components
-        [SerializeField] private MeshRenderer renderer;
+        [SerializeField] private MeshRenderer mRenderer;
         [SerializeField] private BoxCollider2D worldCollider;
         [SerializeField] private Animation legacyAnimation;
         [SerializeField] private AudioSource sfx, sfx2;
@@ -34,15 +34,15 @@ namespace NSMB.Entities.World {
             this.SetIfNull(ref worldCollider);
             this.SetIfNull(ref legacyAnimation);
             this.SetIfNull(ref sfx);
-            this.SetIfNull(ref renderer);
+            this.SetIfNull(ref mRenderer);
         }
 
         public override unsafe void OnActivate(Frame f) {
-            normalMaterial = renderer.sharedMaterial;
+            normalMaterial = mRenderer.sharedMaterial;
             var star = f.Unsafe.GetPointer<BigStar>(EntityRef);
 
             graphicTransform.rotation = Quaternion.identity;
-            renderer.enabled = true;
+            mRenderer.enabled = true;
             if (f.Global->GameState == GameState.Playing && !IsReplayFastForwarding) {
                 sfx2.PlayOneShot(SoundEffect.World_Star_Spawn);
             }
@@ -64,7 +64,7 @@ namespace NSMB.Entities.World {
             }
 
             if (!f.Exists(EntityRef)) {
-                renderer.enabled = false;
+                mRenderer.enabled = false;
                 return;
             }
 
@@ -75,14 +75,14 @@ namespace NSMB.Entities.World {
                 float sin = Mathf.Sin(pulseEffectCounter * pulseSpeed) * pulseAmount;
                 graphicTransform.localScale = Vector3.one + new Vector3(sin, sin, 0);
                 // sRenderer.color = Color.white;
-                renderer.sharedMaterial = normalMaterial;
-                renderer.enabled = true;
+                mRenderer.sharedMaterial = normalMaterial;
+                mRenderer.enabled = true;
             } else {
                 graphicTransform.localScale = Vector3.one;
                 graphicTransform.Rotate(new(0, 0, rotationSpeed * 30 * (star->FacingRight ? -1 : 1) * Time.deltaTime), Space.Self);
                 float timeRemaining = star->Lifetime / 60f;
-                renderer.enabled = !(timeRemaining < 5 && timeRemaining * 2 % (blinkingSpeed * 2) < blinkingSpeed);
-                renderer.sharedMaterial = star->UncollectableFrames > 0 ? uncollectableMaterial : normalMaterial;
+                mRenderer.enabled = !(timeRemaining < 5 && timeRemaining * 2 % (blinkingSpeed * 2) < blinkingSpeed);
+                mRenderer.sharedMaterial = star->UncollectableFrames > 0 ? uncollectableMaterial : normalMaterial;
                 legacyAnimation.Stop();
             }
         }

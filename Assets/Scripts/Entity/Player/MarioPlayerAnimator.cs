@@ -1283,6 +1283,9 @@ namespace NSMB.Entities.Player {
         }
 
         private void OnMarioFlagpoleAnimationProgressed(EventMarioPlayerNextGoalAnimation e) {
+            if (e.Entity != EntityRef) {
+                return;
+            }
             switch (e.AnimationState) {
             case GoalAnimationState.Grabbed:
                 break;
@@ -1308,12 +1311,18 @@ namespace NSMB.Entities.Player {
         }
 
         private void OnMarioPlayerGotCheckpoint(EventMarioPlayerGotCheckpoint e) {
+            if (e.Entity != EntityRef) {
+                return;
+            }
             Debug.Log("checkpoint!!");
             PlaySoundEverywhere(SoundEffect.World_Checkpoint);
             Instantiate(checkpointParticle, e.Position.ToUnityVector3(), Quaternion.identity);
         }
 
         private void OnMarioPlayerTaunted(EventMarioPlayerTaunted e) {
+            if (e.Entity != EntityRef) {
+                return;
+            }
             tauntParticle.GetComponent<Renderer>().material.mainTextureOffset =
                 new Vector2(0.125f * (e.EmoteId % 8f), 0.125f * (int)(e.EmoteId / 8f));
             tauntParticle.Emit(1);

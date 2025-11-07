@@ -133,7 +133,8 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
                 msg.UpdateVisibleState();
             }
 
-            sendBtn.interactable = chatbox.interactable = !Settings.Instance.GeneralDisableChat;
+            chatbox.interactable = !Settings.Instance.GeneralDisableChat;
+            sendBtn.interactable = chatbox.text.Length > 0 && chatbox.interactable;
 
             if (!chatbox.interactable) {
                 chatbox.text = "";

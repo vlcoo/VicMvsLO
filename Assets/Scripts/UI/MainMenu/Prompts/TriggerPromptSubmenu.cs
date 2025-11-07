@@ -174,6 +174,7 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
         public void OnConditionSelected(string condition) {
             currentEditingEntry.OnConditionChanged(Enum.Parse<TriggerCondition>(condition));
             ClosePopups();
+            Canvas.PlayConfirmSound();
         }
         
         public void OnActionClicked(TriggerListEntry entry) {
@@ -184,6 +185,7 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
         public void OnActionSelected(string action) {
             currentEditingEntry.OnActionChanged(Enum.Parse<TriggerAction>(action));
             ClosePopups();
+            Canvas.PlayConfirmSound();
         }
         
         public void ClosePopups() {

@@ -19,34 +19,33 @@ namespace NSMB.UI.RTL {
         }
 
         protected override void ApplyDirection(bool rtl) {
-            return;
-            bool newValue = rtl ? !isFlippedByDefault : isFlippedByDefault;
-            if (component.reverseArrangement == newValue) {
-                return;
-            }
-
-            component.reverseArrangement = newValue;
-
-            if (flipChildrenNavigation) {
-                Selectable[] children = GetComponentsInChildren<Selectable>();
-                foreach (var child in children) {
-                    if (immediateChildrenOnly && child.transform.parent != transform
-                        || child.navigation.mode != Navigation.Mode.Explicit) {
-                        continue;
-                    }
-                    originalChildrenNavigations[child] = child.navigation;
-                }
-
-                foreach ((var child, var navigation) in originalChildrenNavigations) {
-                    Navigation newNav = navigation;
-                    if (rtl) {
-                        (newNav.selectOnLeft, newNav.selectOnRight) = (newNav.selectOnRight, newNav.selectOnLeft);
-                    }
-                    child.navigation = newNav;
-                }
-            }
-
-            LayoutRebuilder.MarkLayoutForRebuild((RectTransform) component.transform);
+            // bool newValue = rtl ? !isFlippedByDefault : isFlippedByDefault;
+            // if (component.reverseArrangement == newValue) {
+            //     return;
+            // }
+            //
+            // component.reverseArrangement = newValue;
+            //
+            // if (flipChildrenNavigation) {
+            //     Selectable[] children = GetComponentsInChildren<Selectable>();
+            //     foreach (var child in children) {
+            //         if (immediateChildrenOnly && child.transform.parent != transform
+            //             || child.navigation.mode != Navigation.Mode.Explicit) {
+            //             continue;
+            //         }
+            //         originalChildrenNavigations[child] = child.navigation;
+            //     }
+            //
+            //     foreach ((var child, var navigation) in originalChildrenNavigations) {
+            //         Navigation newNav = navigation;
+            //         if (rtl) {
+            //             (newNav.selectOnLeft, newNav.selectOnRight) = (newNav.selectOnRight, newNav.selectOnLeft);
+            //         }
+            //         child.navigation = newNav;
+            //     }
+            // }
+            //
+            // LayoutRebuilder.MarkLayoutForRebuild((RectTransform) component.transform);
         }
     }
 }

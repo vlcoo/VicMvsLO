@@ -240,6 +240,10 @@ namespace NSMB.UI.MainMenu {
         public void PlayCursorSound() {
             PlaySound(SoundEffect.UI_Cursor);
         }
+        
+        public void PlayBackSound() {
+            PlaySound(SoundEffect.UI_Back);
+        }
 
         private void ShowHideMainPanel() {
             bool showMainPanel = false;

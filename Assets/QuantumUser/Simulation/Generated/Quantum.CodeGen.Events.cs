@@ -714,8 +714,9 @@ namespace Quantum {
         _f.AddEvent(ev);
         return ev;
       }
-      public EventMarioPlayerGotCheckpoint MarioPlayerGotCheckpoint(FPVector2 Position) {
+      public EventMarioPlayerGotCheckpoint MarioPlayerGotCheckpoint(EntityRef Entity, FPVector2 Position) {
         var ev = _f.Context.AcquireEvent<EventMarioPlayerGotCheckpoint>(EventMarioPlayerGotCheckpoint.ID);
+        ev.Entity = Entity;
         ev.Position = Position;
         _f.AddEvent(ev);
         return ev;
@@ -2873,6 +2874,7 @@ namespace Quantum {
   }
   public unsafe partial class EventMarioPlayerGotCheckpoint : EventBase {
     public new const Int32 ID = 79;
+    public EntityRef Entity;
     public FPVector2 Position;
     protected EventMarioPlayerGotCheckpoint(Int32 id, EventFlags flags) : 
         base(id, flags) {
@@ -2891,6 +2893,7 @@ namespace Quantum {
     public override Int32 GetHashCode() {
       unchecked {
         var hash = 467;
+        hash = hash * 31 + Entity.GetHashCode();
         hash = hash * 31 + Position.GetHashCode();
         return hash;
       }

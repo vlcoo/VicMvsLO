@@ -41,7 +41,6 @@ namespace NSMB.UI.MainMenu.Submenus.Replays {
 
         //---Private Variables
         private ReplayListManager manager;
-        private Coroutine showHideButtonsCoroutine;
 
         public void Initialize(ReplayListManager ourManager, BinaryReplayFile ourReplay) {
             manager = ourManager;
@@ -153,7 +152,6 @@ namespace NSMB.UI.MainMenu.Submenus.Replays {
             dropDownRectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, target);
             Canvas.ForceUpdateCanvases();
             manager.layout.SetLayoutVertical();
-            showHideButtonsCoroutine = null;
         }
 
         public void OnFavoriteClicked() {
