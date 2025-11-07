@@ -1,11 +1,22 @@
 ﻿using NSMB.Networking;
 using Quantum;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using Button = UnityEngine.UI.Button;
 
 namespace NSMB.UI.MainMenu.Submenus.Prompts {
     public class StageChoosePromptSubmenu : PromptSubmenu {
         public bool success = true;
+        private List<Button> stageButtons = new();
+        
+        public void Start() {
+            foreach (var button in GetComponentsInChildren<Button>()) {
+                if (button.interactable && button.gameObject != BackButton) stageButtons.Add(button);
+            }
+            
+            QuantumEvent.Subscribe<EventHostChanged>(this, OnHostChanged);
+        }
         
         public override void Show(bool first) {
             base.Show(first);
@@ -20,6 +31,13 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
             }
 
             return base.TryGoBack(out playSound);
+        }
+        
+        private void OnHostChanged(EventHostChanged e) {
+            var isHost = e.Game.PlayerIsLocal(e.NewHost);
+            foreach (var button in stageButtons) {
+                button.interactable = isHost;
+            }
         }
         
         public unsafe void StageSelected(VersusStageData stage) {

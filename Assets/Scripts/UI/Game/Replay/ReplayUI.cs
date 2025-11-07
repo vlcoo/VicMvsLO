@@ -393,7 +393,7 @@ namespace NSMB.UI.Game.Replay {
                 replayCanvasGroup.interactable = true;
                 if (ActiveReplayManager.Instance.IsReplayFastForwarding) {
                     if (e.Game.Frames.Predicted.Global->GameState != GameState.Playing) {
-                        FindFirstObjectByType<LoopingMusicPlayer>().Stop();
+                        // FindFirstObjectByType<LoopingMusicPlayer>().Stop();
                     }
                 } else {
                     Time.timeScale = replaySpeed;
@@ -404,7 +404,7 @@ namespace NSMB.UI.Game.Replay {
         private void OnGameEnded(EventGameEnded e) {
             if (ActiveReplayManager.Instance.IsReplay) {
                 gameEnded = true;
-                replayCanvasGroup.interactable = false;
+                // replayCanvasGroup.interactable = false;
                 FinishFastForward();
                 replayPaused = false;
                 Time.timeScale = 1;

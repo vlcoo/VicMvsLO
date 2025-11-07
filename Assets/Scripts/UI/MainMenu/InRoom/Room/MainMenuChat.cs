@@ -78,8 +78,6 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
                 return;
             }
 
-            sfx.PlayOneShot(SoundEffect.UI_Chat_Send);
-
             ChatManager.Instance.SendChatMessage(text);
             StartCoroutine(SelectTextboxNextFrame());
         }
@@ -112,6 +110,7 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
                 } else {
                     active = !ChatManager.Instance.mutedPlayers.Contains(player.UserId);
                 }
+                sfx.PlayOneShot(SoundEffect.UI_Chat_Send);
             }
             chat.gameObject.SetActive(active);
 

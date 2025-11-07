@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using TMPro;
 using UnityEngine;
+using Button = UnityEngine.UI.Button;
 
 public class TriggerListEntry : MonoBehaviour {
     public int Index;
@@ -33,6 +34,7 @@ public class TriggerListEntry : MonoBehaviour {
         ddConstraintTarget;
 
     public GameObject extrasDialog;
+    public Button btnDelete, btnDuplicate;
     
     // some conditions, actions and constraints are global (not referring to a player, but rather the stage or match itself)
     // they can't have a target.
@@ -135,6 +137,11 @@ public class TriggerListEntry : MonoBehaviour {
     
     public void OnDeleted() {
         Parent.TriggerRemoved(this);
+    }
+
+    public void OnHostChanged(bool isHost) {
+        btnDelete.interactable = isHost;
+        btnDuplicate.interactable = isHost;
     }
 
     public void SetTrigger(MatchConditionerTrigger newTrigger) {

@@ -50,9 +50,9 @@ namespace NSMB.UI.Options {
             bool rtl = GlobalController.Instance.translationManager.RightToLeft;
             if (IsSelected) {
                 if (rtl) {
-                    label.text = GetTranslatedString() + " «";
+                    label.text = GetTranslatedString() + " Â«";
                 } else {
-                    label.text = "» " + GetTranslatedString();
+                    label.text = "Â» " + GetTranslatedString();
                 }
             } else {
                 label.text = GetTranslatedString();

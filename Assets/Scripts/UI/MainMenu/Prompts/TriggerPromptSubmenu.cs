@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using Button = UnityEngine.UI.Button;
 
 namespace NSMB.UI.MainMenu.Submenus.Prompts {
     public class TriggerPromptSubmenu : PromptSubmenu {
@@ -15,10 +16,12 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
         public bool success = true;
         public List<TriggerListEntry> triggers = new();
         public TriggerListEntry currentEditingEntry = null;
+        public Button btnAdd;
 
         public void Start() {
             QuantumEvent.Subscribe<EventTriggersChanged>(this, OnTriggersChanged);
             QuantumCallback.Subscribe<CallbackGameDestroyed>(this, OnGameDestroyed);
+            QuantumEvent.Subscribe<EventHostChanged>(this, OnHostChanged);
             QuantumCallback.Subscribe<CallbackGameStarted>(this, OnGameStarted);
         }
 
@@ -56,6 +59,14 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
             var f = e.Frame;
             var newTriggers = f.ResolveList(f.Global->Rules.Triggers);
             RefreshValues(newTriggers);
+        }
+        
+        private void OnHostChanged(EventHostChanged e) {
+            var isHost = e.Game.PlayerIsLocal(e.NewHost);
+            btnAdd.interactable = isHost;
+            foreach (var trigger in triggers) {
+                trigger.OnHostChanged(isHost);
+            }
         }
         
         private void RefreshValues(QList<MatchConditionerTrigger> newTriggers) {

@@ -17,6 +17,7 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
         public void Start() {
             QuantumEvent.Subscribe<EventRulesChanged>(this, OnRulesChanged);
             QuantumCallback.Subscribe<CallbackGameStarted>(this, OnGameStarted);
+            QuantumEvent.Subscribe<EventHostChanged>(this, OnHostChanged);
             
             NetworkHandler.Client.AddCallbackTarget(this);
         }
@@ -29,6 +30,13 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
         private unsafe void OnGameStarted(CallbackGameStarted e) {
             rules = e.Game.Frames.Predicted.Global->Rules;
             RefreshValues();
+        }
+        
+        private void OnHostChanged(EventHostChanged e) {
+            var isHost = e.Game.PlayerIsLocal(e.NewHost);
+            foreach (var toggle in _toggles) {
+                toggle.Value.interactable = isHost;
+            }
         }
 
         public override unsafe void Show(bool first) {

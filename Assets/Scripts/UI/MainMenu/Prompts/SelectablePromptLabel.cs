@@ -80,12 +80,12 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
 
                 if (selected) {
                     if (twoSided) {
-                        text = "» " + text + " «";
+                        text = "Â» " + text + " Â«";
                     } else {
                         if (rtl) {
-                            text = text + " «";
+                            text = text + " Â«";
                         } else {
-                            text = "» " + text;
+                            text = "Â» " + text;
                         }
                     }
                 }

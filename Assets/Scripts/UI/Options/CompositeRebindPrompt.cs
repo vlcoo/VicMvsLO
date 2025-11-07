@@ -104,7 +104,7 @@ namespace NSMB.UI.Options {
 
         private void SelectOption(int index) {
             if (index >= options.Count) {
-                backText.text = "» " + GlobalController.Instance.translationManager.GetTranslation("ui.generic.back") + " «";
+                backText.text = "Â» " + GlobalController.Instance.translationManager.GetTranslation("ui.generic.back") + " Â«";
             } else {
                 options[index].Selected();
             }

@@ -49,10 +49,7 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
             if (index != -1) {
                 int slot = game.GetLocalPlayerSlots()[index];
                 game.SendCommand(slot, cmd);
-                canvas.PlayConfirmSound();
-            } else {
-                canvas.PlaySound(SoundEffect.UI_Error);
-            }
+            } 
         }
 
         public void OnPointerClick(PointerEventData eventData) {
