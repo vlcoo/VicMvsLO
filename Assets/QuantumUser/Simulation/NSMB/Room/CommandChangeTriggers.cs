@@ -5,7 +5,7 @@ namespace Quantum {
     public class CommandChangeTriggers : DeterministicCommand, ILobbyCommand {
 
         public int Index;
-        public bool Remove;
+        public bool RemoveSingle, RemoveAll;
         public int TriggerCondition = (int)Quantum.TriggerCondition.GotStar;
         public int TriggerConditionTarget = (int)TriggerTarget.Any;
         public string TriggerConditionParameter = "";
@@ -19,7 +19,8 @@ namespace Quantum {
 
         public override void Serialize(BitStream stream) {
             stream.Serialize(ref Index);
-            stream.Serialize(ref Remove);
+            stream.Serialize(ref RemoveSingle);
+            stream.Serialize(ref RemoveAll);
             stream.Serialize(ref TriggerCondition);
             stream.Serialize(ref TriggerConditionTarget);
             stream.Serialize(ref TriggerConditionParameter);
@@ -42,9 +43,9 @@ namespace Quantum {
 
             var rules = f.ResolveList(f.Global->Rules.Triggers);
 
-            if (Remove) {
-                rules.RemoveAt(Index);
-            } else {
+            if (RemoveAll) rules.Clear();
+            else if (RemoveSingle) rules.RemoveAt(Index);
+            else {
                 if (Index >= rules.Count) {
                     if (rules.Count >= 80) return;
                     rules.Add(new MatchConditionerTrigger() {

@@ -99,11 +99,11 @@ namespace NSMB.Entities.Player {
         //---Serialized Variables
         [SerializeField] private CharacterAsset character;
         [SerializeField] private PlayerElements playerElementsPrefab;
-        [SerializeField] private GameObject coinNumberParticle, coinFromBlockParticle, respawnParticle, starCollectParticle, goalOrbParticle, checkpointParticle;
+        [SerializeField] private GameObject coinNumberParticle, coinFromBlockParticle, respawnParticle, starCollectParticle, goalOrbParticle, checkpointParticle, emoteParticle;
         [SerializeField] private Animator animator;
         [SerializeField] private Avatar smallAvatar, largeAvatar;
         [SerializeField] private Shader normalShader, rainbowShader;
-        [SerializeField] private ParticleSystem dust, sparkles, drillParticle, giantParticle, fireParticle, bubblesParticle, iceSkiddingParticle, waterRunningParticle, waterSkiddingParticle, tauntParticle;
+        [SerializeField] private ParticleSystem dust, sparkles, drillParticle, giantParticle, fireParticle, bubblesParticle, iceSkiddingParticle, waterRunningParticle, waterSkiddingParticle;
         [SerializeField] private GameObject smallModel, largeModel, largeShellExclude, blueShell, propellerHelmet, propeller, HammerHelm, HammerShell, HammerTuck;
         [SerializeField] private GameObject smallHeadBone, largeHeadBone;
         [SerializeField] private AudioClip normalDrill, propellerDrill;
@@ -1323,9 +1323,12 @@ namespace NSMB.Entities.Player {
             if (e.Entity != EntityRef) {
                 return;
             }
-            tauntParticle.GetComponent<Renderer>().material.mainTextureOffset =
+            var emoteObj = Instantiate(emoteParticle,
+                transform.position + new Vector3(0, .8f, 0), Quaternion.identity);
+            var emoteParticleSystem = emoteObj.GetComponent<ParticleSystem>();
+            emoteParticleSystem.GetComponent<Renderer>().material.mainTextureOffset =
                 new Vector2(0.125f * (e.EmoteId % 8f), 0.125f * (int)(e.EmoteId / 8f));
-            tauntParticle.Emit(1);
+            emoteParticleSystem.Emit(1);
         }
 
         private void OnEnemyKicked(EventEnemyKicked e) {

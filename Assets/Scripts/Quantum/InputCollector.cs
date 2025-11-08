@@ -33,8 +33,8 @@ namespace NSMB.Quantum {
         }
 
 
-#if UNITY_EDITOR || MVL_DEBUG
         public void Update() {
+#if UNITY_EDITOR || MVL_DEBUG
             foreach (var debug in debugSpawnCommands) {
                 if (UnityEngine.Input.GetKeyDown(debug.KeyCode)) {
                     QuantumRunner.DefaultGame.SendCommand(new CommandMvLDebugCmd { 
@@ -53,6 +53,7 @@ namespace NSMB.Quantum {
                     CommandId = CommandMvLDebugCmd.DebugCommand.FreezeSelf,
                 });
             }
+#endif
 
             QuantumUtils.Decrement(ref _emoteCooldown);
         }
@@ -62,7 +63,6 @@ namespace NSMB.Quantum {
             public KeyCode KeyCode;
             public AssetRef<EntityPrototype> Entity;
         }
-#endif
 
         public void OnPowerupAction(InputAction.CallbackContext context) {
             if (!playerElements.IsSpectating && !playerElements.PauseMenu.IsPaused) {

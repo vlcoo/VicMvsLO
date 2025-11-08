@@ -22,10 +22,9 @@ public class RumbleManager : MonoBehaviour {
     }
 
     private void OnDeviceChange(InputDevice device, InputDeviceChange change) {
-        if (device is Gamepad gamepad) {
-            pad?.ResetHaptics();
-            pad = gamepad;
-        }
+        if (device is not Gamepad gamepad) return;
+        pad?.ResetHaptics();
+        pad = gamepad;
     }
 
     public void RumbleForSeconds(float bassStrength, float trebleStrength, float duration, RumbleSetting setting) {
@@ -36,16 +35,18 @@ public class RumbleManager : MonoBehaviour {
             return;
         }
 
-        if (currentlyRumbling != null) {
-            StopCoroutine(currentlyRumbling);
-        }
+#if UNITY_ANDROID
+        Vibration.VibrateAndroid((long)(duration * 1000));
+#else
+        if (currentlyRumbling != null) StopCoroutine(currentlyRumbling);
         currentlyRumbling = StartCoroutine(Rumble(bassStrength, trebleStrength, duration));
+#endif
     }
 
     private IEnumerator Rumble(float lowFreq, float highFreq, float duration) {
         pad.SetMotorSpeeds(lowFreq * strengthMultiplier, highFreq * strengthMultiplier);
         yield return new WaitForSeconds(duration);
-        pad.ResetHaptics();
+        pad.SetMotorSpeeds(0f, 0f);
     }
 
     public enum RumbleSetting : int {

@@ -1,4 +1,5 @@
 using NSMB.UI.MainMenu.Submenus.Prompts;
+using NSMB.UI.MainMenu.TriggerList;
 using Quantum;
 using System;
 using System.Collections.Generic;
@@ -35,87 +36,6 @@ public class TriggerListEntry : MonoBehaviour {
 
     public GameObject extrasDialog;
     public Button btnDelete, btnDuplicate, btnCondition, btnAction;
-    
-    // some conditions, actions and constraints are global (not referring to a player, but rather the stage or match itself)
-    // they can't have a target.
-    private readonly List<TriggerCondition> _nonPeopleConditions = new() {
-        TriggerCondition.MatchStarted,
-        // TriggerCondition.XSecondRemaining,
-        // TriggerCondition.EveryXSecond,
-        // TriggerCondition.SongBahd,
-    };
-    private readonly List<TriggerAction> _nonPeopleActions = new() {
-        TriggerAction.DrawMatch,
-        TriggerAction.RespawnLevel,
-        // TriggerAction.ExplodeLevel,
-        // TriggerAction.SpawnStar
-    };
-    private readonly List<TriggerConstraint> _nonPeopleConstraints = new() {
-        TriggerConstraint.Always,
-        TriggerConstraint.TimerIsLessThanX,
-        TriggerConstraint.TimerIsMoreThanX,
-        TriggerConstraint.StarsExist,
-        TriggerConstraint.StarsNotExist,
-        TriggerConstraint.EnemiesExist,
-        TriggerConstraint.EnemiesNotExist,
-        TriggerConstraint.CoinsExist,
-        TriggerConstraint.CoinsNotExist,
-        TriggerConstraint.XPlayersRemaining,
-        TriggerConstraint.LessThanXPlayersRemaining,
-        TriggerConstraint.MoreThanXPlayersRemaining,
-    };
-    
-    // some targets are exclusive to either the conditions, the actions or the constraints.
-    private readonly List<TriggerTarget> _incompatibleConditionTargets = new() {
-        TriggerTarget.Everyone,
-        TriggerTarget.OneRandom,
-        TriggerTarget.Randoms,
-        TriggerTarget.Conditioner, 
-        TriggerTarget.ConditionerTeam, 
-        TriggerTarget.NonConditioner,
-        TriggerTarget.NonConditionerTeam,
-        TriggerTarget.Actioner,
-        TriggerTarget.ActionerTeam,
-        TriggerTarget.NonActioner,
-        TriggerTarget.NonActionerTeam,
-    };
-    private readonly List<TriggerTarget> _incompatibleActionTargets = new() {
-        TriggerTarget.Any,
-        TriggerTarget.Actioner,
-        TriggerTarget.ActionerTeam,
-        TriggerTarget.NonActioner,
-        TriggerTarget.NonActionerTeam,
-    };
-    private readonly List<TriggerTarget> _incompatibleConstraintTargets = new() {
-        TriggerTarget.OneRandom,
-        TriggerTarget.Randoms
-    };
-    
-    // also, we have to map the parameters to each condition, action or constraint.
-    private readonly Dictionary<TriggerCondition, List<string>> _conditionParameters = new() {
-        // { TriggerCondition.LookedXDirection, new List<string> { "Any", "Up", "Right", "Down", "Left" } },
-        // { TriggerCondition.XSecondRemaining, new List<string> { "60", "10" } },
-        // { TriggerCondition.EveryXSecond, new List<string> { "1", "5", "10", "15", "30", "60" } },
-        { TriggerCondition.Stunned, new List<string> { "Bump", "Knockback", "HardKnockback" } },
-        { TriggerCondition.GotXPowerup, new List<string> { "Any", "Mushroom", "FireFlower", "IceFlower", "PropellerMushroom", "MiniMushroom", "BlueShell", "HammerSuit", "MegaMushroom", "Starman" } },
-    };
-    private readonly Dictionary<TriggerAction, List<string>> _actionParameters = new() {
-        { TriggerAction.GiveXPowerup, new List<string> { "Random", "Mushroom", "FireFlower", "IceFlower", "PropellerMushroom", "MiniMushroom", "BlueShell", "HammerSuit", "MegaMushroom", "Starman" } },
-        { TriggerAction.SpawnXPowerup, new List<string> { "Random", "Mushroom", "FireFlower", "IceFlower", "PropellerMushroom", "MiniMushroom", "BlueShell", "HammerSuit", "MegaMushroom", "Starman" } },
-        { TriggerAction.GiveXReserve, new List<string> { "Random", "Mushroom", "FireFlower", "IceFlower", "PropellerMushroom", "MiniMushroom", "BlueShell", "HammerSuit", "MegaMushroom", "Starman" } },
-        { TriggerAction.SpawnXEnemy, new List<string> { "Random", "Goomba", "Goombrat", "Koopa", "RedKoopa", "BlueKoopa", "BulletBill", "Boo", "Spiny", "Bobomb" } },
-        // { TriggerAction.BecomeXTeam, new List<string> { "Random", "A", "B", "C", "D", "E" } },
-        { TriggerAction.Stun, new List<string> { "Bump", "Knockback", "HardKnockback", "ForcefulKnockback" } },
-    };
-    private readonly Dictionary<TriggerConstraint, List<string>> _constraintParameters = new() {
-        { TriggerConstraint.IsXPowerup, new List<string> { "Random", "Mushroom", "FireFlower", "IceFlower", "PropellerMushroom", "MiniMushroom", "BlueShell", "HammerSuit", "MegaMushroom" } },
-        { TriggerConstraint.IsNotXPowerup, new List<string> { "Random", "Mushroom", "FireFlower", "IceFlower", "PropellerMushroom", "MiniMushroom", "BlueShell", "HammerSuit", "MegaMushroom" } },
-    };
-    
-    // finally, certain condition-action pairs are recursive or contradictory and are forbidden. list them here.
-    private readonly Dictionary<TriggerCondition, TriggerAction> _forbiddenPairs = new() {
-        { TriggerCondition.GotStar, TriggerAction.GiveStar }, { TriggerCondition.GotCoin, TriggerAction.GiveCoin },
-    };
     
     void OnEnable() {
         if (ddConstraint.options.Count != 0) {
@@ -236,14 +156,14 @@ public class TriggerListEntry : MonoBehaviour {
     public void RecalculateConditionTargets() {
         ddConditionTarget.ClearOptions();
         
-        if (_nonPeopleConditions.Contains(Trigger.Condition)) {
+        if (TriggerMappings.NonPeopleConditions.Contains(Trigger.Condition)) {
             txtConditionTarget.text = "";
             return;
         }
 
         var i = 0;
         foreach (var target in Enum.GetValues(typeof(TriggerTarget))) {
-            if (_incompatibleConditionTargets.Contains((TriggerTarget) target)) {
+            if (TriggerMappings.IncompatibleConditionTargets.Contains((TriggerTarget) target)) {
                 continue;
             }
             ddConditionTarget.options.Add(new DropdownTriggerOption(i++, target.ToString(), (int) target));
@@ -255,12 +175,12 @@ public class TriggerListEntry : MonoBehaviour {
     public void RecalculateConditionParameters() {
         ddConditionParameter.ClearOptions();
         
-        if (!_conditionParameters.ContainsKey(Trigger.Condition)) {
+        if (!TriggerMappings.ConditionParameters.ContainsKey(Trigger.Condition)) {
             txtConditionParameter.text = "";
             return;
         }
         
-        foreach (var parameter in _conditionParameters[Trigger.Condition]) {
+        foreach (var parameter in TriggerMappings.ConditionParameters[Trigger.Condition]) {
             ddConditionParameter.options.Add(new TMP_Dropdown.OptionData(parameter));
         }
         
@@ -270,14 +190,14 @@ public class TriggerListEntry : MonoBehaviour {
     public void RecalculateActionTargets() {
         ddActionTarget.ClearOptions();
         
-        if (_nonPeopleActions.Contains(Trigger.Action)) {
+        if (TriggerMappings.NonPeopleActions.Contains(Trigger.Action)) {
             txtActionTarget.text = "";
             return;
         }
         
         var i = 0;
         foreach (var target in Enum.GetValues(typeof(TriggerTarget))) {
-            if (_incompatibleActionTargets.Contains((TriggerTarget) target)) {
+            if (TriggerMappings.IncompatibleActionTargets.Contains((TriggerTarget) target)) {
                 continue;
             }
             // if (_nonPeopleConditions.Contains(Trigger.Condition) && new [] {TriggerTarget.Conditioner, TriggerTarget.NonConditioner, TriggerTarget.ConditionerTeam, TriggerTarget.NonConditionerTeam}.Contains((TriggerTarget) target)) {
@@ -292,12 +212,12 @@ public class TriggerListEntry : MonoBehaviour {
     public void RecalculateActionParameters() {
         ddActionParameter.ClearOptions();
         
-        if (!_actionParameters.ContainsKey(Trigger.Action)) {
+        if (!TriggerMappings.ActionParameters.ContainsKey(Trigger.Action)) {
             txtActionParameter.text = "";
             return;
         }
         
-        foreach (var parameter in _actionParameters[Trigger.Action]) {
+        foreach (var parameter in TriggerMappings.ActionParameters[Trigger.Action]) {
             ddActionParameter.options.Add(new TMP_Dropdown.OptionData(parameter));
         }
         
@@ -307,14 +227,14 @@ public class TriggerListEntry : MonoBehaviour {
     public void RecalculateConstraintTargets() {
         ddConstraintTarget.ClearOptions();
         
-        if (_nonPeopleConstraints.Contains(Trigger.Constraint)) {
+        if (TriggerMappings.NonPeopleConstraints.Contains(Trigger.Constraint)) {
             txtConstraintTarget.text = "";
             return;
         }
         
         var i = 0;
         foreach (var target in Enum.GetValues(typeof(TriggerTarget))) {
-            if (_incompatibleConstraintTargets.Contains((TriggerTarget) target)) {
+            if (TriggerMappings.IncompatibleConstraintTargets.Contains((TriggerTarget) target)) {
                 continue;
             }
             ddConstraintTarget.options.Add(new DropdownTriggerOption(i++, target.ToString(), (int) target));
@@ -326,12 +246,12 @@ public class TriggerListEntry : MonoBehaviour {
     public void RecalculateConstraintParameters() {
         ddConstraintParameter.ClearOptions();
         
-        if (!_constraintParameters.ContainsKey(Trigger.Constraint)) {
+        if (!TriggerMappings.ConstraintParameters.ContainsKey(Trigger.Constraint)) {
             txtConstraintParameter.text = "";
             return;
         }
         
-        foreach (var parameter in _constraintParameters[Trigger.Constraint]) {
+        foreach (var parameter in TriggerMappings.ConstraintParameters[Trigger.Constraint]) {
             ddConstraintParameter.options.Add(new TMP_Dropdown.OptionData(parameter));
         }
         

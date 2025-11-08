@@ -100,7 +100,7 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
             
             var cmd = new CommandChangeTriggers {
                 Index = triggers.Count,
-                Remove = false,
+                RemoveSingle = false,
             };
 
             var slot = game.GetLocalPlayerSlots()[game.GetLocalPlayers().IndexOf(game.Frames.Predicted.Global->Host)];
@@ -112,7 +112,6 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
             
             var cmd = new CommandChangeTriggers {
                 Index = triggers.Count,
-                Remove = false,
                 TriggerAction = (int)entry.Trigger.Action,
                 TriggerActionParameter = entry.Trigger.ActionParameter,
                 TriggerActionTarget = (int)entry.Trigger.ActionTarget,
@@ -136,7 +135,7 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
             
             var cmd = new CommandChangeTriggers {
                 Index = entry.Index,
-                Remove = true,
+                RemoveSingle = true,
             };
 
             var slot = game.GetLocalPlayerSlots()[game.GetLocalPlayers().IndexOf(game.Frames.Predicted.Global->Host)];
@@ -148,7 +147,6 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
             
             var cmd = new CommandChangeTriggers {
                 Index = entry.Index,
-                Remove = false,
                 TriggerAction = (int)entry.Trigger.Action,
                 TriggerActionParameter = entry.Trigger.ActionParameter,
                 TriggerActionTarget = (int)entry.Trigger.ActionTarget,
