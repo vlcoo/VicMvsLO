@@ -204,7 +204,7 @@ namespace NSMB.UI.MainMenu.Submenus.RoomList {
 
         private void OnPlayerAdded(EventPlayerAdded e) {
             if (e.Game.PlayerIsLocal(e.Player) && !Canvas.IsSubmenuOpen(inRoomSubmenu)) {
-                Canvas.OpenMenu(inRoomSubmenu);
+                Canvas.OpenMenu(inRoomSubmenu, null);
             }
         }
 

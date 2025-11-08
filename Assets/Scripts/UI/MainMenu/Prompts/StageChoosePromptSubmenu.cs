@@ -12,10 +12,7 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
         public MatchSettings matchSettings;
 
         public override void OnValidate() {
-            stageButtons.Clear();
-            foreach (var button in GetComponentsInChildren<Button>()) {
-                if (button.interactable && button.gameObject != BackButton) stageButtons.Add(button);
-            }
+            
         }
         
         public override void Show(bool first) {
@@ -35,6 +32,12 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
         }
         
         private void RefreshInteractability() {
+            if (stageButtons.Count == 0) {
+                foreach (var button in GetComponentsInChildren<Button>()) {
+                    if (button.interactable && button.gameObject != BackButton) stageButtons.Add(button);
+                }
+            }
+            
             foreach (var button in stageButtons) {
                 button.interactable = matchSettings.isHost;
             }

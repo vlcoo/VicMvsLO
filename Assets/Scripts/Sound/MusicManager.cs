@@ -213,5 +213,11 @@ namespace NSMB.Sound {
         
             currentMusicType = type;
         }
+
+        public void SetSpectatingMusic(bool how) {
+            musicPlayerNormal.SetSpectating(how);
+            musicPlayerInvincibility.SetSpectating(how);
+            musicPlayerMega.SetSpectating(how);
+        }
     }
 }

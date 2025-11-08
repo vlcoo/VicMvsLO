@@ -16,7 +16,7 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
         public bool success = true;
         public List<TriggerListEntry> triggers = new();
         public TriggerListEntry currentEditingEntry = null;
-        public Button btnAdd;
+        public Button btnAdd, btnClear;
         public MatchSettings matchSettings;
 
         public void Start() {
@@ -64,6 +64,7 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
         
         private void RefreshInteractability() {
             btnAdd.interactable = matchSettings.isHost;
+            btnClear.interactable = matchSettings.isHost;
             foreach (var trigger in triggers) {
                 trigger.RefreshInteractability();
             }
@@ -93,6 +94,17 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
             }
             
             // counterTip.SetCount(triggers.Count);
+        }
+
+        public unsafe void TriggersCleared() {
+            QuantumGame game = NetworkHandler.Game;
+            
+            var cmd = new CommandChangeTriggers {
+                RemoveAll = true,
+            };
+
+            var slot = game.GetLocalPlayerSlots()[game.GetLocalPlayers().IndexOf(game.Frames.Predicted.Global->Host)];
+            game.SendCommand(slot, cmd);
         }
 
         public unsafe void TriggerAdded() {

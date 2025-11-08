@@ -126,7 +126,6 @@ namespace Quantum {
         }
 
         public void SetReserveItem(Frame f, PowerupAsset newItem) {
-            if (f.Global->Rules.SNoReserve) return;
             var currentItem = f.FindAsset(ReserveItem);
 
             if (currentItem == null) {
@@ -205,6 +204,10 @@ namespace Quantum {
                 Runner.Despawn(FrozenCube.Object);
             }
             */
+
+            if (f.Unsafe.TryGetPointer(entity, out Freezable* freezable) && freezable->IsFrozen(f)) {
+                IceBlockSystem.Destroy(f, freezable->FrozenCubeEntity, IceBlockBreakReason.Other);
+            }
 
             if (f.Exists(HeldEntity) && f.Unsafe.TryGetPointer(HeldEntity, out Holdable* holdable)) {
                 holdable->DropWithoutThrowing(f, HeldEntity);

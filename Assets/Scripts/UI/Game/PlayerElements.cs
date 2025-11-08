@@ -54,6 +54,7 @@ namespace NSMB.UI.Game {
         private bool initialized;
         private bool spectating;
         private Vector2 previousNavigate;
+        private MusicManager musicManager;
 
         public void OnValidate() {
             this.SetIfNull(ref uiUpdater);
@@ -88,6 +89,7 @@ namespace NSMB.UI.Game {
 
         public void Start() {
             nametagCanvas.SetActive(Settings.Instance.GraphicsPlayerNametags);
+            musicManager = FindFirstObjectByType<MusicManager>();
         }
 
         public void Initialize(QuantumGame game, Frame f, EntityRef entity, PlayerRef player) {
@@ -158,10 +160,12 @@ namespace NSMB.UI.Game {
             }
 
             OnCameraFocusChanged?.Invoke();
-            FindFirstObjectByType<MusicManager>().HandleMusic(Game, true);
+            musicManager.HandleMusic(Game, true);
         }
 
         public void StartSpectating() {
+            if (!spectating) musicManager.SetSpectatingMusic(true);
+            
             spectating = true;
             spectationUI.SetActive(!IsReplay);
             if (!IsReplay) {

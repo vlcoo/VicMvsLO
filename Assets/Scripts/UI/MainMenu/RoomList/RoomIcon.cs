@@ -25,7 +25,7 @@ namespace NSMB.UI.MainMenu.Submenus.RoomList {
         public RoomInfo room;
 
         //---Serialized Variables
-        [SerializeField] private TMP_Text playersText, nameText, inProgressText, symbolsText, mapText;
+        [SerializeField] private TMP_Text nameText, symbolsText, detailText;
         [SerializeField] private Image icon;
 
         public void OnValidate() {
@@ -47,9 +47,11 @@ namespace NSMB.UI.MainMenu.Submenus.RoomList {
 
             IntegerProperties intProperties = intPropertiesPacked;
             BooleanProperties boolProperties = boolPropertiesPacked;
-
-            playersText.text = $"{room.PlayerCount}/{room.MaxPlayers}";
-            inProgressText.text = boolProperties.GameStarted ? tm.GetTranslation("ui.rooms.listing.status.started") : tm.GetTranslation("ui.rooms.listing.status.notstarted");
+            
+            detailText.text = $"{room.PlayerCount}/{room.MaxPlayers}" + " - " +
+                              (boolProperties.GameStarted
+                                  ? tm.GetTranslation("ui.rooms.listing.status.started")
+                                  : tm.GetTranslation("ui.rooms.listing.status.notstarted"));
 
             StringBuilder symbols = new();
 
@@ -82,33 +84,6 @@ namespace NSMB.UI.MainMenu.Submenus.RoomList {
             }
             
             symbolsText.text = symbols.ToString();
-            
-            StringBuilder gamemodeAndStage = new();
-            AssetGuid guid;
-
-            if (gamemodeAssetGuid != null
-                && AssetGuid.TryParse(gamemodeAssetGuid, out guid, true)
-                && QuantumUnityDB.TryGetGlobalAsset(new AssetRef<GamemodeAsset>(guid), out GamemodeAsset gamemode)) {
-
-                gamemodeAndStage.Append(gamemode.NamePrefix).Append(tm.GetTranslation(gamemode.TranslationKey));
-            } else {
-                gamemodeAndStage.Append("???");
-            }
-
-            gamemodeAndStage.Append(" - ");
-
-            if (stageAssetGuid != null
-                && AssetGuid.TryParse(stageAssetGuid, out guid, true)
-                && QuantumUnityDB.TryGetGlobalAsset(new AssetRef<Map>(guid), out Map map)
-                && QuantumUnityDB.TryGetGlobalAsset(map.UserAsset, out VersusStageData stage)) {
-
-                gamemodeAndStage.Append(tm.GetTranslation(stage.TranslationKey));
-            } else {
-                gamemodeAndStage.Append("???");
-            }
-
-
-            mapText.text = gamemodeAndStage.ToString();
         }
     }
 }

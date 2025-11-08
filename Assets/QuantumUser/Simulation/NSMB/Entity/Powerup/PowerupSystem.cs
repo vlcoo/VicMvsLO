@@ -134,6 +134,7 @@ namespace Quantum {
 
             // Reserve if it's the same item
             if (mario->CurrentPowerupState == newState) {
+                if (f.Global->Rules.SNoReserve) return PowerupReserveResult.None;
                 mario->SetReserveItem(f, newPowerup);
                 return PowerupReserveResult.ReserveNewPowerup;
             }
@@ -157,6 +158,7 @@ namespace Quantum {
 
             // Reserve if we have a higher priority item
             if (currentPowerupStatePriority > newPowerupItemPriority) {
+                if (f.Global->Rules.SNoReserve) return PowerupReserveResult.None;
                 mario->SetReserveItem(f, newPowerup);
                 return PowerupReserveResult.ReserveNewPowerup;
             }

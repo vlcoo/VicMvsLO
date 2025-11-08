@@ -20,6 +20,8 @@ namespace NSMB {
         private ActivityManager activityManager;
         private float lastInitializeTime;
 
+        private bool differentLogo;
+
         public void OnEnable() {
             TranslationManager.OnLanguageChanged += OnLanguageChanged;
         }
@@ -35,6 +37,7 @@ namespace NSMB {
 #endif
 
             Initialize();
+            differentLogo = Perso.GetBool("discordLogo");
         }
 
 
@@ -115,7 +118,7 @@ namespace NSMB {
                     Id = realtimeRoom.Name + "1",
                 };
                 activity.State = realtimeRoom.IsVisible ? "public" : "private";
-                activity.Details = "playing";
+                activity.Details = "room";
                 activity.Secrets = new() { Join = realtimeRoom.Name };
             }
             if (game != null) {
@@ -123,21 +126,15 @@ namespace NSMB {
 
                 if (f != null && f.Global->GameState >= GameState.Playing) {
                     // In a level
-                    if (activity.Details == null) {
-                        if (runner.Session.IsReplay) {
-                            activity.Details = "replay";
-                        } else {
-                            activity.Details = "playing";
-                        }
-                    }
+                    activity.Details = runner.Session.IsReplay ? "replay" : "playing";
                     var stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
                     var gamemode = f.FindAsset<GamemodeAsset>(f.Global->Rules.Gamemode);
 
                     activity.Assets = new ActivityAssets {
-                        LargeImage = !string.IsNullOrWhiteSpace(stage.DiscordStageImage) ? stage.DiscordStageImage : "logo",
-                        LargeText = stage.LegalEnglishName,
-                        SmallImage = gamemode.DiscordRpcKey,
-                        SmallText = tm.GetTranslation(gamemode.TranslationKey),
+                        LargeImage = differentLogo ? "logoalt" : "logo",
+                        LargeText = "map: " + stage.LegalEnglishName.ToLower(),
+                        // SmallImage = gamemode.DiscordRpcKey,
+                        // SmallText = tm.GetTranslation(gamemode.TranslationKey),
                     };
 
                     long now = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
@@ -149,8 +146,8 @@ namespace NSMB {
                 }
             } else {
                 // In the main menu, not in a room
-                activity.Details = "main menu";
-                activity.Assets = new() { LargeImage = "logo" };
+                activity.Details = "menu";
+                activity.Assets = new() { LargeImage = differentLogo ? "logoalt" : "logo" };
             }
 
             activityManager.UpdateActivity(activity, (res) => { });

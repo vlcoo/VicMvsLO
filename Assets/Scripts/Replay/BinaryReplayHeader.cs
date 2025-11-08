@@ -113,7 +113,7 @@ namespace NSMB.Replay {
             if (QuantumUnityDB.TryGetGlobalAsset(Rules.Stage, out Map map)
                 && QuantumUnityDB.TryGetGlobalAsset(map.UserAsset, out VersusStageData stage)) {
                 // We can find the map they're talking about
-                return tm.GetTranslationWithReplacements("ui.extras.replays.defaultname", "playercount", playerCount.ToString(), "map", tm.GetTranslation(stage.TranslationKey));
+                return tm.GetTranslationWithReplacements("ui.extras.replays.defaultname", "playercount", playerCount.ToString(), "map", stage.LegalEnglishName);
             } else {
                 return tm.GetTranslationWithReplacements("ui.extras.replays.defaultname.invalidmap", "playercount", playerCount.ToString());
             }

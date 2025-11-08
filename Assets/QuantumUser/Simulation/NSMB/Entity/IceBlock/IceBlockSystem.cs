@@ -104,6 +104,7 @@ namespace Quantum {
         }
 
         public static void Destroy(Frame f, EntityRef iceBlockEntity, IceBlockBreakReason breakReason) {
+            if (!f.Exists(iceBlockEntity)) return;
             var iceBlock = f.Unsafe.GetPointer<IceBlock>(iceBlockEntity);
             f.Signals.OnIceBlockBroken(iceBlockEntity, breakReason);
             f.Events.EntityThawed(iceBlock->Entity, iceBlockEntity);
