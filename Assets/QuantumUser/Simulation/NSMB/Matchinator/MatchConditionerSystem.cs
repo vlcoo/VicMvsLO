@@ -345,7 +345,9 @@ namespace Quantum
         public unsafe void ActGiveLife(Frame f, EntityRef entity, string parameter) {
             if (!f.Global->Rules.IsLivesEnabled) return;
             var mario = f.Unsafe.GetPointer<MarioPlayer>(entity);
+            if (mario->Lives <= 0) return;
             mario->Lives++;
+            f.Events.MarioPlayerGot1Up(entity, f.Unsafe.GetPointer<Transform2D>(entity)->Position);
         }
 
         [Preserve]

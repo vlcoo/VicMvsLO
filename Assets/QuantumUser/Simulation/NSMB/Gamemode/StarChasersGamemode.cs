@@ -45,7 +45,7 @@ namespace Quantum {
             
             // End Condition: team gets to enough stars
             int? winningTeam = GetWinningTeam(f, out int stars);
-            if (winningTeam != null && stars >= f.Global->Rules.StarsToWin) {
+            if (winningTeam != null && f.Global->Rules.IsStarsEnabled && stars >= f.Global->Rules.StarsToWin) {
                 // <team> wins
                 GameLogicSystem.EndGame(f, false, winningTeam.Value);
                 return;

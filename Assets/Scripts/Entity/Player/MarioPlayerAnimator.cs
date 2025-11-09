@@ -183,6 +183,7 @@ namespace NSMB.Entities.Player {
             QuantumEvent.Subscribe<EventMarioPlayerPropellerSpin>(this, OnMarioPlayerPropellerSpin, FilterOutReplayFastForward);
             QuantumEvent.Subscribe<EventMarioPlayerCollectedStar>(this, OnMarioPlayerCollectedStar, FilterOutReplayFastForward);
             QuantumEvent.Subscribe<EventMarioPlayerDied>(this, OnMarioPlayerDied);
+            QuantumEvent.Subscribe<EventMarioPlayerGot1Up>(this, OnMarioPlayerGot1Up);
             QuantumEvent.Subscribe<EventMarioPlayerPreRespawned>(this, OnMarioPlayerPreRespawned, FilterOutReplayFastForward);
             QuantumEvent.Subscribe<EventMarioPlayerRespawned>(this, OnMarioPlayerRespawned);
             QuantumEvent.Subscribe<EventMarioPlayerTookDamage>(this, OnMarioPlayerTookDamage, FilterOutReplayFastForward);
@@ -958,9 +959,9 @@ namespace NSMB.Entities.Player {
             if (!IsReplayFastForwarding) {
                 PlaySound(IsMarioLocal(e.Entity) ? SoundEffect.Player_Sound_Death : SoundEffect.Player_Sound_DeathOthers);
                 
-                if (e.IsLava) {
-                    PlaySound(SoundEffect.Player_Sound_LavaHiss);
-                }
+                // if (e.IsLava) {
+                //     PlaySound(SoundEffect.Player_Sound_LavaHiss);
+                // }
             }
         }
 
@@ -972,8 +973,19 @@ namespace NSMB.Entities.Player {
             animator.SetTrigger("deathup");
 
             if (e.FireDeath && !IsReplayFastForwarding) {
+                PlaySound(SoundEffect.Player_Sound_LavaHiss);
                 PlaySound(SoundEffect.Player_Voice_LavaDeath);
             }
+        }
+
+        private void OnMarioPlayerGot1Up(EventMarioPlayerGot1Up e) {
+            if (e.Entity != EntityRef) {
+                return;
+            }
+            
+            PlaySound(SoundEffect.Powerup_1UP_Collect);
+            GameObject number = Instantiate(coinNumberParticle, e.Position.ToUnityVector3(), Quaternion.identity);
+            number.GetComponentInChildren<NumberParticle>().Initialize("", Color.black, false, true);
         }
 
         private void OnMarioPlayerCollectedStar(EventMarioPlayerCollectedStar e) {
@@ -1314,7 +1326,6 @@ namespace NSMB.Entities.Player {
             if (e.Entity != EntityRef) {
                 return;
             }
-            Debug.Log("checkpoint!!");
             PlaySoundEverywhere(SoundEffect.World_Checkpoint);
             Instantiate(checkpointParticle, e.Position.ToUnityVector3(), Quaternion.identity);
         }

@@ -1098,7 +1098,7 @@ namespace Quantum.Prototypes {
   [System.SerializableAttribute()]
   [Quantum.Prototypes.Prototype(typeof(Quantum.StarChasersData))]
   public unsafe partial class StarChasersDataPrototype : StructPrototype {
-    public Byte Stars;
+    public Int32 Stars;
     partial void MaterializeUser(Frame frame, ref Quantum.StarChasersData result, in PrototypeMaterializationContext context);
     public void Materialize(Frame frame, ref Quantum.StarChasersData result, in PrototypeMaterializationContext context = default) {
         result.Stars = this.Stars;

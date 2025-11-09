@@ -122,10 +122,6 @@ namespace NSMB.Replay {
         public Sprite GetMapSprite() {
             if (QuantumUnityDB.TryGetGlobalAsset(Rules.Stage, out Map map)
                 && QuantumUnityDB.TryGetGlobalAsset(map.UserAsset, out VersusStageData stage)) {
-                if (stage.WorldIndex >= 0) {
-                    // ...
-                }
-                
                 return stage.Icon;
             }
             

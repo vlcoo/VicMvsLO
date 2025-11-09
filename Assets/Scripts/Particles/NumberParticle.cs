@@ -1,5 +1,6 @@
 using NSMB.Utilities.Extensions;
 using TMPro;
+using UnityEditor.ShaderGraph.Serialization;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -11,6 +12,7 @@ namespace NSMB.Particles {
         [SerializeField] private TMP_Text text;
         [SerializeField] private Vector3 colorOffset;
         [SerializeField] private float overlay;
+        [SerializeField] private GameObject sprite1up;
 
         //---Components
         [SerializeField] private AnimationCurve yMovement;
@@ -28,18 +30,24 @@ namespace NSMB.Particles {
             this.SetIfNull(ref legacyAnimation, UnityExtensions.GetComponentType.Children);
         }
 
-        public void Initialize(string newText, Color color, bool final) {
+        public void Initialize(string newText, Color color, bool final, bool is1up = false) {
             this.final = final;
 
-            text.text = newText;
-            text.ForceMeshUpdate();
-            mr = GetComponentsInChildren<MeshRenderer>()[1];
+            if (is1up) {
+                text.text = "";
+                sprite1up.SetActive(true);
+            } else {
+                sprite1up.SetActive(false);
+                text.text = newText;
+                text.ForceMeshUpdate();
+                mr = GetComponentsInChildren<MeshRenderer>()[1];
 
-            mpb = new();
-            mpb.SetColor("_Color", color);
-            mr.SetPropertyBlock(mpb);
+                mpb = new();
+                mpb.SetColor("_Color", color);
+                mr.SetPropertyBlock(mpb);
 
-            legacyAnimation.enabled = final;
+                legacyAnimation.enabled = final;
+            }
 
             spawnTime = Time.time;
             Destroy(gameObject.transform.parent.gameObject, final ? 1.42f : 0.666f);

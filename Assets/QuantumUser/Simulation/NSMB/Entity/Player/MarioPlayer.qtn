@@ -50,9 +50,9 @@ component MarioPlayer {
 	[ExcludeFromPrototype] RNGSession RNG;
 
 	[ExcludeFromPrototype] GamemodeSpecificData GamemodeData;
-	[ExcludeFromPrototype] byte Coins;
-	[ExcludeFromPrototype] byte Lives;
-	[ExcludeFromPrototype] byte Laps;
+	[ExcludeFromPrototype] int Coins;
+	[ExcludeFromPrototype] int Lives;
+	[ExcludeFromPrototype] int Laps;
 
 	[ExcludeFromPrototype] bool Disconnected;
 	[ExcludeFromPrototype] bool IsDead;
@@ -155,7 +155,7 @@ component MarioPlayer {
 }
 
 struct StarChasersData {
-	byte Stars;
+	int Stars;
 }
 
 struct CoinRunnersData {
@@ -252,6 +252,11 @@ synced event MarioPlayerDied {
 	bool IsLava;
 }
 
+event MarioPlayerGot1Up {
+    EntityRef Entity;
+    FPVector2 Position;
+}
+
 event MarioPlayerDeathUp {
 	EntityRef Entity;
 	bool FireDeath;
@@ -323,7 +328,7 @@ event MarioPlayerNextGoalAnimation {
     GoalAnimationState AnimationState;
 }
 
-event MarioPlayerGotCheckpoint {
+synced event MarioPlayerGotCheckpoint {
     EntityRef Entity;
     FPVector2 Position;
 }

@@ -1,5 +1,6 @@
 using Photon.Deterministic;
 using UnityEngine;
+using Byte = System.Byte;
 
 namespace Quantum {
     [UnityEngine.Scripting.Preserve]
@@ -37,7 +38,7 @@ namespace Quantum {
             if (chomping) {
                 // Currently chomping.
                 if (QuantumUtils.Decrement(ref piranhaPlant->ChompFrames)) {
-                    piranhaPlant->WaitingFrames = 216;
+                    piranhaPlant->WaitingFrames = (Byte)(piranhaPlant->AlwaysOut ? 1 : 216);
                 }
             } else {
                 // Not chomping, run the countdown timer.
