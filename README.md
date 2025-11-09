@@ -1,6 +1,6 @@
 <p align="center"><img src="Assets/Sprites/UI/Menu/TitleAll.png" alt="vic's Custom Match-inator" width="400px"></p>
 
-Welcome to the newest vcmi ever! This is a port of the entire mod to MvLO 2.0 with all the bells and whistles! Still a work in progress...
+Welcome to the newest vcmi ever! This is a port of the entire mod to MvLO 2.0 with all the bells and whistles!
 
 A **standalone mod** of the 2-10 player remake of the Mario vs. Luigi gamemode from New Super Mario Bros. DS.
 
@@ -22,4 +22,5 @@ Go to the repository's releases or use these shortcuts to the latest builds:
 [**Join the discord**](https://discord.gg/dgKVaUKpj5) of the original game to keep up to date with its development, make feature suggestions, report bugs (if you're too lazy to use issues...), get technical support, look for people to play with, and just talk about the game!
 
 ## For developers...
-This is the **dev** branch of vcmi, which has unfinished features and is generally unstable so beware! Want to use vcmi as a base for your own creations? I recommend you use the [**v17 Cleansed**](https://github.com/vlcoo/VicMvsLO/archive/refs/heads/cleansed-17.zip) branch, which is super clean and stable - ready for modding further! Please credit properly.
+Want to use vcmi as a base for your own creations? I recommend you use the [**v17 Cleansed**](https://github.com/vlcoo/VicMvsLO/archive/refs/heads/cleansed-17.zip) branch, which is super clean and stable - ready for modding further! Please credit properly. However, it's based on 1.7. In case you want to use the new vcmi, you can clone this stable branch instead.
+
