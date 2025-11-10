@@ -1,4 +1,5 @@
 ﻿using NSMB.Networking;
+using NSMB.UI.MainMenu.TriggerList;
 using Quantum;
 using Quantum.Collections;
 using System;
@@ -156,21 +157,23 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
         
         public unsafe void TriggerEdited(TriggerListEntry entry) {
             QuantumGame game = NetworkHandler.Game;
+
+            var correctTrigger = CorrectifyTrigger(entry.Trigger);
             
             var cmd = new CommandChangeTriggers {
                 Index = entry.Index,
-                TriggerAction = (int)entry.Trigger.Action,
-                TriggerActionParameter = entry.Trigger.ActionParameter,
-                TriggerActionTarget = (int)entry.Trigger.ActionTarget,
-                TriggerCondition = (int)entry.Trigger.Condition,
-                TriggerConditionParameter = entry.Trigger.ConditionParameter,
-                TriggerConditionTarget = (int)entry.Trigger.ConditionTarget,
-                TriggerConstraint = (int)entry.Trigger.Constraint,
-                TriggerConstraintParameter = entry.Trigger.ConstraintParameter,
-                TriggerConstraintTarget = (int)entry.Trigger.ConstraintTarget,
-                TriggerDelaySeconds = entry.Trigger.DelaySeconds,
-                TriggerRepeatCount = entry.Trigger.RepeatCount,
-                TriggerChance = entry.Trigger.Chance,
+                TriggerAction = (int)correctTrigger.Action,
+                TriggerActionParameter = correctTrigger.ActionParameter,
+                TriggerActionTarget = (int)correctTrigger.ActionTarget,
+                TriggerCondition = (int)correctTrigger.Condition,
+                TriggerConditionParameter = correctTrigger.ConditionParameter,
+                TriggerConditionTarget = (int)correctTrigger.ConditionTarget,
+                TriggerConstraint = (int)correctTrigger.Constraint,
+                TriggerConstraintParameter = correctTrigger.ConstraintParameter,
+                TriggerConstraintTarget = (int)correctTrigger.ConstraintTarget,
+                TriggerDelaySeconds = correctTrigger.DelaySeconds,
+                TriggerRepeatCount = correctTrigger.RepeatCount,
+                TriggerChance = correctTrigger.Chance,
             };
 
             var slot = game.GetLocalPlayerSlots()[game.GetLocalPlayers().IndexOf(game.Frames.Predicted.Global->Host)];
@@ -212,6 +215,21 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
             }
             triggers.Clear();
             // counterTip.SetCount(0);
+        }
+
+        private MatchConditionerTrigger CorrectifyTrigger(MatchConditionerTrigger entry) {
+            var conditionNeedsParameter = TriggerMappings.ConditionParameters.Keys.Contains(entry.Condition);
+            var actionNeedsParameter = TriggerMappings.ActionParameters.Keys.Contains(entry.Action);
+            var constraintNeedsParameter = TriggerMappings.ConstraintParameters.Keys.Contains(entry.Constraint);
+            
+            if (conditionNeedsParameter && entry.ConditionParameter == "")
+                entry.ConditionParameter = TriggerMappings.ConditionParameters[entry.Condition][0];
+            if (actionNeedsParameter && entry.ActionParameter == "")
+                entry.ActionParameter = TriggerMappings.ActionParameters[entry.Action][0];
+            if (constraintNeedsParameter && entry.ConstraintParameter == "")
+                entry.ConstraintParameter = TriggerMappings.ConstraintParameters[entry.Constraint][0];
+            
+            return entry;
         }
     }
 }

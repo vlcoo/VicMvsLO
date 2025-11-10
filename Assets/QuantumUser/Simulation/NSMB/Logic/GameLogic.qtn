@@ -10,6 +10,7 @@ global {
 	ushort PlayerLoadFrames;
 	ushort AutomaticStageRefreshInterval;
 	ushort AutomaticStageRefreshTimer;
+	ushort LoopingSecondsTimer;
 
 	array<PlayerInformation>[MaxPlayers] PlayerInfo;
 	byte RealPlayers;
@@ -127,7 +128,7 @@ enum TriggerCondition {
     ReachedCoinLimit,
     Disqualified,
 //    XSecondRemaining,   // 60, 10
-//    EveryXSecond, // 1, 5, 10, 15, 30, 60
+    EveryXSeconds, // 1, 5, 10, 15, 30, 60
 //    SongBahd,
     ReachedZeroCoins,
     ReachedZeroStars,
@@ -274,6 +275,7 @@ signal OnLoadingComplete();
 signal OnGameStarting();
 signal OnGameEnding(int winningTeam, bool hasWinner);
 signal OnReturnToRoom();
+signal OnSecondTicked(byte time);
 
 synced event GameStateChanged {
 	GameState NewState;

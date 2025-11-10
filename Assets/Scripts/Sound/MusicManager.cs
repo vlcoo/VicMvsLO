@@ -143,7 +143,7 @@ namespace NSMB.Sound {
         }
 
         private void OnMarioPlayerDied(EventMarioPlayerDied e) {
-            if (IsMarioLocal(e.Entity) && Settings.Instance.audioRestartMusicOnDeath) {
+            if (IsMarioLocal(e.Entity)) {
                 SetMusicType(MusicType.Silence);
             }
         }

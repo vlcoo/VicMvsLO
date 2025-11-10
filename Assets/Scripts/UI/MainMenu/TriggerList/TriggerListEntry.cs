@@ -200,7 +200,7 @@ public class TriggerListEntry : MonoBehaviour {
             if (TriggerMappings.IncompatibleActionTargets.Contains((TriggerTarget) target)) {
                 continue;
             }
-            // if (_nonPeopleConditions.Contains(Trigger.Condition) && new [] {TriggerTarget.Conditioner, TriggerTarget.NonConditioner, TriggerTarget.ConditionerTeam, TriggerTarget.NonConditionerTeam}.Contains((TriggerTarget) target)) {
+            // if (TriggerMappings.NonPeopleConditions.Contains(Trigger.Condition) && new [] {TriggerTarget.Conditioner, TriggerTarget.NonConditioner, TriggerTarget.ConditionerTeam, TriggerTarget.NonConditionerTeam}.Contains((TriggerTarget) target)) {
             //     continue;
             // }
             ddActionTarget.options.Add(new DropdownTriggerOption(i++, target.ToString(), (int) target));

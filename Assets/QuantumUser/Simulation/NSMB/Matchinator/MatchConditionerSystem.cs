@@ -9,7 +9,7 @@ using Int32 = System.Int32;
 
 namespace Quantum
 {
-    public class MatchConditionerSystem : SystemSignalsOnly, ISignalOnMarioPlayerCollectedStar, ISignalOnMarioPlayerCollectedCoin, ISignalOnMarioPlayerDied, ISignalOnEntityFreeze, ISignalOnGameStarting, ISignalOnMarioPlayerDisqualified, ISignalOnMarioPlayerJumped, ISignalOnMarioPlayerRespawned, ISignalOnMarioPlayerReceivedKnockback, ISignalOnMarioPlayerCollectedPowerup, ISignalOnMarioPlayerTakeDamage, ISignalOnMarioPlayerReachedCoinLimit, ISignalOnMarioPlayerZeroedStars, ISignalOnMarioPlayerZeroedCoins, ISignalOnMarioTouchedGoal, ISignalOnMarioPlayerGotCheckpoint {
+    public class MatchConditionerSystem : SystemSignalsOnly, ISignalOnMarioPlayerCollectedStar, ISignalOnMarioPlayerCollectedCoin, ISignalOnMarioPlayerDied, ISignalOnEntityFreeze, ISignalOnGameStarting, ISignalOnMarioPlayerDisqualified, ISignalOnMarioPlayerJumped, ISignalOnMarioPlayerRespawned, ISignalOnMarioPlayerReceivedKnockback, ISignalOnMarioPlayerCollectedPowerup, ISignalOnMarioPlayerTakeDamage, ISignalOnMarioPlayerReachedCoinLimit, ISignalOnMarioPlayerZeroedStars, ISignalOnMarioPlayerZeroedCoins, ISignalOnMarioTouchedGoal, ISignalOnMarioPlayerGotCheckpoint, ISignalOnSecondTicked {
         public override unsafe void OnInit(Frame f) {
             f.Global->Rules.Triggers = f.AllocateList<MatchConditionerTrigger>(80);
             
@@ -29,6 +29,7 @@ namespace Quantum
         }
 
         private unsafe void ConditionActioned(TriggerCondition condition, Frame f, EntityRef conditionerEntity, string parameter = "") {
+            if (f.IsPredicted) return;
             var conditionerIsPerson = f.Unsafe.TryGetPointer(conditionerEntity, out MarioPlayer* mario);
             var playerData = conditionerIsPerson ? QuantumUtils.GetPlayerData(f, mario->PlayerRef) : null;
             foreach (var trigger in f.ResolveList(f.Global->Rules.Triggers).Where(trigger => trigger.Condition == condition)) {
@@ -66,12 +67,20 @@ namespace Quantum
 
                 if (!conditionTargetMatches) continue;
                 Debug.Log(
-                    $"[MatchConditioner] <b>{condition}</b> succeeded... <b>{trigger.Action}</b>{(trigger.ActionParameter != "" ? (" (" + trigger.ActionParameter + ")") : "")} begin!!");
+                    $"[MatchConditioner] <b>{condition}</b>{(trigger.ConditionParameter != "" ? (" (" + trigger.ConditionParameter + ")") : "")} succeeded... <b>{trigger.Action}</b>{(trigger.ActionParameter != "" ? (" (" + trigger.ActionParameter + ")") : "")} begin!!");
                 
                 var actionerEntities = new List<EntityRef>();
                 var marioFilter = f.Filter<MarioPlayer>();
+                var actionTarget = trigger.ActionTarget;
+                if ((!conditionerIsPerson || !f.Exists(conditionerEntity)) && (new[] {
+                        TriggerTarget.Conditioner, TriggerTarget.ConditionerTeam, TriggerTarget.NonConditioner,
+                        TriggerTarget.NonConditionerTeam
+                    }.Contains(trigger.ActionTarget))) {
+                    Debug.LogWarning("[MatchConditioner] Conditioner is needed, but doesn't exist! Defaulting to Everyone.");
+                    actionTarget = TriggerTarget.Everyone;
+                }
 
-                switch (trigger.ActionTarget) {
+                switch (actionTarget) {
                     case TriggerTarget.Everyone:
                         while (marioFilter.NextUnsafe(out EntityRef e, out MarioPlayer* _)) {
                             actionerEntities.Add(e);
@@ -290,6 +299,17 @@ namespace Quantum
             ConditionActioned(TriggerCondition.GotCheckpoint, f, entity);
         }
 
+        public void OnSecondTicked(Frame f, byte time) {
+            // possible parameters: 1, 5, 10, 15, 30, 60.
+            // time ticks every second from 60 to 0, and loops.
+            if (time % 60 == 0) ConditionActioned(TriggerCondition.EveryXSeconds, f, default, "60");
+            if (time % 30 == 0) ConditionActioned(TriggerCondition.EveryXSeconds, f, default, "30");
+            if (time % 15 == 0) ConditionActioned(TriggerCondition.EveryXSeconds, f, default, "15");
+            if (time % 10 == 0) ConditionActioned(TriggerCondition.EveryXSeconds, f, default, "10");
+            if (time % 5 == 0) ConditionActioned(TriggerCondition.EveryXSeconds, f, default, "5");
+            if (time % 1 == 0) ConditionActioned(TriggerCondition.EveryXSeconds, f, default, "1");
+        }
+
         #endregion
 
         #region Actions
@@ -303,6 +323,7 @@ namespace Quantum
             var mario = f.Unsafe.GetPointer<MarioPlayer>(entity);
             mario->GamemodeData.StarChasers->Stars++;
             f.Signals.OnMarioPlayerCollectedStar(entity);
+            GameLogicSystem.CheckForGameEnd(f);
             f.Events.MarioPlayerCollectedStar(entity, *mario, f.Unsafe.GetPointer<Transform2D>(entity)->Position);
         }
 

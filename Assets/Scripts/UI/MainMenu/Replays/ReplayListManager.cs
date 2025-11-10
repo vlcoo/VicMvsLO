@@ -22,8 +22,8 @@ namespace NSMB.UI.MainMenu.Submenus.Replays {
     public class ReplayListManager : Selectable {
 
 #if UNITY_WEBGL && !UNITY_EDITOR
-        [System.Runtime.InteropServices.DllImport("__Internal")]
-        public static extern void UploadFile(string gameObjectName, string methodName, string filter, bool multiple);
+        // [System.Runtime.InteropServices.DllImport("__Internal")]
+        // public static extern void UploadFile(string gameObjectName, string methodName, string filter, bool multiple);
 #endif
 
         //---Static Variables
@@ -418,7 +418,7 @@ namespace NSMB.UI.MainMenu.Submenus.Replays {
             TranslationManager tm = GlobalController.Instance.translationManager;
 
 #if UNITY_WEBGL && !UNITY_EDITOR
-            UploadFile(name, nameof(ImportFile), ".mvlreplay", false);
+            // UploadFile(name, nameof(ImportFile), ".mvlreplay", false);
 #else
             // string[] selected = StandaloneFileBrowser.OpenFilePanel(tm.GetTranslation("ui.extras.replays.actions.import"), "", "mvlreplay", false);
             var path = DialogModule.OpenFileBrowser("vcmi Replay files|*.mvlreplay");

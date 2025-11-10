@@ -289,7 +289,7 @@ namespace NSMB {
             PlayerPrefs.SetInt("Controls_FireballFromSprint", controlsFireballSprint ? 1 : 0);
             PlayerPrefs.SetInt("Controls_AutoSprint", controlsAutoSprint ? 1 : 0);
             PlayerPrefs.SetInt("Controls_PropellerJump", controlsPropellerJump ? 1 : 0);
-            PlayerPrefs.SetInt("Controls_OnScreen", controlsOnScreen ? 1 : (Utilities.Utils.GetDeviceType() == Enums.DeviceType.MOBILE ? 1 : 0));
+            PlayerPrefs.SetInt("Controls_OnScreen", controlsOnScreen ? 1 : 0);
             PlayerPrefs.SetInt("Controls_Rumble", (int) controlsRumble);
             PlayerPrefs.SetString("Controls_Bindings", ControlsBindings);
 
@@ -360,7 +360,7 @@ namespace NSMB {
             audioMuteMusicOnUnfocus = false;
             audioMuteSFXOnUnfocus = false;
             audioPanning = true;
-            audioRestartMusicOnDeath = false;
+            audioRestartMusicOnDeath = true;
             audioSpecialPowerupMusic = Enums.SpecialPowerupMusic.Starman | Enums.SpecialPowerupMusic.MegaMushroom;
 
             FileInfo bindingsFile = new(Application.persistentDataPath + "/controls.json");
@@ -372,7 +372,7 @@ namespace NSMB {
             controlsFireballSprint = PlayerPrefs.GetInt("FireballFromSprint", 1) == 1;
             controlsAutoSprint = false;
             controlsPropellerJump = false;
-            controlsOnScreen = PlayerPrefs.GetInt("ForceOnScreenControls", 1) == 1;
+            controlsOnScreen = PlayerPrefs.GetInt("ForceOnScreenControls", 1) == 1 || Utilities.Utils.GetDeviceType() == Enums.DeviceType.MOBILE;
 
             miscFilterFullRooms = false;
             miscFilterInProgressRooms = false;

@@ -15,8 +15,8 @@ namespace NSMB.UI.MainMenu.Submenus.Replays {
     public class ReplayListEntry : MonoBehaviour {
 
 #if UNITY_WEBGL && !UNITY_EDITOR
-        [System.Runtime.InteropServices.DllImport("__Internal")]
-        public static extern void DownloadFile(string gameObjectName, string methodName, string filename, byte[] byteArray, int byteArraySize);
+        // [System.Runtime.InteropServices.DllImport("__Internal")]
+        // public static extern void DownloadFile(string gameObjectName, string methodName, string filename, byte[] byteArray, int byteArraySize);
 #endif
 
         //---Properties
@@ -186,11 +186,11 @@ namespace NSMB.UI.MainMenu.Submenus.Replays {
 
         public void OnExportClick() {
 #if UNITY_WEBGL && !UNITY_EDITOR
-            if (ReplayFile.LoadAllIfNeeded() == ReplayParseResult.Success) {
-                using MemoryStream stream = new((int) ReplayFile.FileSize);
-                long replaySize = ReplayFile.WriteToStream(stream);
-                DownloadFile(name, nameof(FileDownloadedCallback), ReplayFile.Header.GetDisplayName() + ".mvlreplay", stream.ToArray(), (int) replaySize);
-            }
+            // if (ReplayFile.LoadAllIfNeeded() == ReplayParseResult.Success) {
+            //     using MemoryStream stream = new((int) ReplayFile.FileSize);
+            //     long replaySize = ReplayFile.WriteToStream(stream);
+            //     DownloadFile(name, nameof(FileDownloadedCallback), ReplayFile.Header.GetDisplayName() + ".mvlreplay", stream.ToArray(), (int) replaySize);
+            // }
 #else
             TranslationManager tm = GlobalController.Instance.translationManager;
             var path = DialogModule.SaveFileBrowser("vcmi Replay files|*.mvlreplay", "vcmiReplay.mvlreplay");

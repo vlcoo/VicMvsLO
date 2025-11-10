@@ -6,9 +6,9 @@ using UnityEngine;
 
 namespace Quantum {
     [UnityEngine.Scripting.Preserve]
-    public unsafe class GameLogicSystem : SystemMainThread, ISignalOnPlayerAdded, ISignalOnPlayerRemoved, ISignalOnMarioPlayerDied, ISignalOnMarioTouchedGoal, ISignalOnMarioPlayerFinishedFlagpoleAnimation,
+    public unsafe class GameLogicSystem : SystemMainThread, ISignalOnPlayerAdded, ISignalOnPlayerRemoved,
+        ISignalOnMarioPlayerDied, ISignalOnMarioTouchedGoal, ISignalOnMarioPlayerFinishedFlagpoleAnimation,
         ISignalOnLoadingComplete, ISignalOnReturnToRoom, ISignalOnComponentRemoved<MarioPlayer> {
-
         public override void OnInit(Frame f) {
             var config = f.RuntimeConfig;
             var gamemode = f.FindAsset(f.SimulationConfig.DefaultGamemode);
@@ -26,7 +26,7 @@ namespace Quantum {
         public override void Update(Frame f) {
             // Tick RNG
             _ = f.RNG->Next();
-            
+
             // Parse lobby commands
             var playerDataDictionary = f.ResolveDictionary(f.Global->PlayerDatas);
             for (int i = 0; i < f.PlayerCount; i++) {
@@ -75,13 +75,15 @@ namespace Quantum {
                         }
                     }
                 }
+
                 f.Global->RealPlayers = (byte) validPlayers;
 
                 if (validPlayers <= 0) {
                     break;
                 }
 
-                if (QuantumUtils.Decrement(ref f.Global->PlayerLoadFrames) || !f.RuntimeConfig.IsRealGame || (validPlayers == loadedPlayers)) {
+                if (QuantumUtils.Decrement(ref f.Global->PlayerLoadFrames) || !f.RuntimeConfig.IsRealGame ||
+                    (validPlayers == loadedPlayers)) {
                     // Progress to next stage.
                     f.Global->RealPlayers = (byte) loadedPlayers;
                     f.Global->GameState = GameState.Starting;
@@ -91,6 +93,7 @@ namespace Quantum {
                     f.Signals.OnLoadingComplete();
                     f.Events.GameStateChanged(GameState.Starting);
                 }
+
                 break;
             case GameState.Starting:
                 if (QuantumUtils.Decrement(ref f.Global->GameStartFrames)) {
@@ -103,11 +106,11 @@ namespace Quantum {
                         data->IsLoaded = false;
                         data->IsReady = false;
                     }
-
                 } else if (f.Global->GameStartFrames == 79) {
                     f.Events.RecordingStarted();
-                    
-                } if (f.Global->GameStartFrames == 78) {
+                }
+
+                if (f.Global->GameStartFrames == 78) {
                     // Respawn all players and enable systems
                     f.Global->StartFrame = f.Number;
                     f.SystemEnable<StartDisabledSystemGroup>();
@@ -118,10 +121,12 @@ namespace Quantum {
 
                     var gamemode = f.FindAsset(f.Global->Rules.Gamemode);
                     gamemode.EnableGamemode(f);
+                    f.Global->LoopingSecondsTimer = (ushort) (60 * f.UpdateRate - 1);
 
                     f.Signals.OnGameStarting();
                     f.Events.GameStarted();
                 }
+
                 break;
 
             case GameState.Playing:
@@ -145,6 +150,12 @@ namespace Quantum {
                 if (f.GetPlayerCommand(f.Global->Host) is CommandHostEndGame) {
                     EndGame(f, true, null);
                 }
+
+                if (f.Global->LoopingSecondsTimer % f.UpdateRate == 0)
+                    f.Signals.OnSecondTicked((byte) (f.Global->LoopingSecondsTimer / f.UpdateRate));
+                if (QuantumUtils.Decrement(ref f.Global->LoopingSecondsTimer))
+                    f.Global->LoopingSecondsTimer = (ushort) (60 * f.UpdateRate);
+
                 break;
 
             case GameState.Ended:
@@ -160,6 +171,7 @@ namespace Quantum {
                         //f.MapAssetRef = f.SimulationConfig.LobbyMap;
                         f.Map = null;
                     }
+
                     f.SystemEnable<StartDisabledSystemGroup>();
                     f.Signals.OnReturnToRoom();
                     f.Global->GameState = GameState.PreGameRoom;
@@ -169,6 +181,7 @@ namespace Quantum {
                     var gamemode = f.FindAsset(f.Global->Rules.Gamemode);
                     gamemode.DisableGamemode(f);
                 }
+
                 break;
             }
         }
@@ -187,7 +200,7 @@ namespace Quantum {
                     return;
                 }
             }
-            
+
             var gamemode = f.FindAsset(f.Global->Rules.Gamemode);
             gamemode.CheckForGameEnd(f);
         }
@@ -209,9 +222,10 @@ namespace Quantum {
                 if (winningTeam == data->RealTeam && !data->IsSpectator) {
                     data->Wins++;
                 }
+
                 data->IsSpectator = data->ManualSpectator;
             }
-            
+
             f.Global->GameState = GameState.Ended;
             f.Events.GameStateChanged(GameState.Ended);
             f.Global->GameStartFrames = (ushort) ((endedByHost ? FP._1_75 : Constants._4_50) * f.UpdateRate);
@@ -224,7 +238,7 @@ namespace Quantum {
         public void OnMarioPlayerDied(Frame f, EntityRef entity) {
             CheckForGameEnd(f);
         }
-        
+
         public void OnMarioTouchedGoal(Frame f, EntityRef marioEntity, EntityRef goalEntity, QBoolean isLastLap) {
             if (!isLastLap) return;
             // destroy everyone else but the player
@@ -278,6 +292,7 @@ namespace Quantum {
                     lowestTeamIndex = i;
                 }
             }
+
             newData->RequestedTeam = (byte) lowestTeamIndex;
 
             // Other bookkeeping
@@ -317,7 +332,6 @@ namespace Quantum {
 
             if (playerDatas.TryGetValue(player, out EntityRef entity)
                 && f.Unsafe.TryGetPointer(entity, out PlayerData* deletedPlayerData)) {
-
                 if (deletedPlayerData->IsRoomHost) {
                     // Give the host to the youngest player.
                     PlayerData* youngestPlayer = null;
@@ -353,6 +367,7 @@ namespace Quantum {
                 if (f.Global->GameStartFrames > 0 && (hostChanged || !QuantumUtils.IsGameStartable(f))) {
                     StopCountdown(f);
                 }
+
                 break;
             case GameState.Starting:
                 // Fixes spectators being able to take over old players' objects.
@@ -362,6 +377,7 @@ namespace Quantum {
                         v->PlayerRef = PlayerRef.None;
                     }
                 }
+
                 goto case GameState.Playing;
             case GameState.Playing:
                 for (int i = 0; i < f.Global->RealPlayers; i++) {
@@ -374,6 +390,7 @@ namespace Quantum {
                     info.Disqualified = true;
                     break;
                 }
+
                 break;
             }
         }
@@ -429,7 +446,8 @@ namespace Quantum {
                 spawnpoints.RemoveAt(randomIndex);
 
                 var camera = f.Unsafe.GetPointer<CameraController>(entity);
-                camera->Recenter(stage, stage.GetWorldSpawnpointForPlayer(mario->SpawnpointIndex, f.Global->TotalMarios));
+                camera->Recenter(stage,
+                    stage.GetWorldSpawnpointForPlayer(mario->SpawnpointIndex, f.Global->TotalMarios));
             }
         }
 
@@ -451,6 +469,7 @@ namespace Quantum {
             for (int i = 0; i < f.Global->PlayerInfo.Length; i++) {
                 f.Global->PlayerInfo[i] = default;
             }
+
             f.Global->UsedStarSpawns.ClearAll();
             f.Global->UsedStarSpawnCount = 0;
 

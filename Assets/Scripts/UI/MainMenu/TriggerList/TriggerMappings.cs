@@ -8,7 +8,7 @@ namespace NSMB.UI.MainMenu.TriggerList {
         public static readonly List<TriggerCondition> NonPeopleConditions = new() {
             TriggerCondition.MatchStarted,
             // TriggerCondition.XSecondRemaining,
-            // TriggerCondition.EveryXSecond,
+            TriggerCondition.EveryXSeconds,
             // TriggerCondition.SongBahd,
         };
         public static readonly List<TriggerAction> NonPeopleActions = new() {
@@ -62,7 +62,7 @@ namespace NSMB.UI.MainMenu.TriggerList {
         public static readonly Dictionary<TriggerCondition, List<string>> ConditionParameters = new() {
             // { TriggerCondition.LookedXDirection, new List<string> { "Any", "Up", "Right", "Down", "Left" } },
             // { TriggerCondition.XSecondRemaining, new List<string> { "60", "10" } },
-            // { TriggerCondition.EveryXSecond, new List<string> { "1", "5", "10", "15", "30", "60" } },
+            { TriggerCondition.EveryXSeconds, new List<string> { "1", "5", "10", "15", "30", "60" } },
             { TriggerCondition.Stunned, new List<string> { "Bump", "Knockback", "HardKnockback" } },
             { TriggerCondition.GotXPowerup, new List<string> { "Any", "Mushroom", "FireFlower", "IceFlower", "PropellerMushroom", "MiniMushroom", "BlueShell", "HammerSuit", "MegaMushroom", "Starman" } },
         };

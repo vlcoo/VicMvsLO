@@ -159,6 +159,7 @@ namespace Quantum {
     Jumped,
     ReachedCoinLimit,
     Disqualified,
+    EveryXSeconds,
     ReachedZeroCoins,
     ReachedZeroStars,
     FinishedLap,
@@ -1560,12 +1561,14 @@ namespace Quantum {
     public Int32 TotalGamesPlayed;
     [FieldOffset(1658)]
     public UInt16 GameStartFrames;
-    [FieldOffset(1660)]
+    [FieldOffset(1662)]
     public UInt16 PlayerLoadFrames;
     [FieldOffset(1652)]
     public UInt16 AutomaticStageRefreshInterval;
     [FieldOffset(1654)]
     public UInt16 AutomaticStageRefreshTimer;
+    [FieldOffset(1660)]
+    public UInt16 LoopingSecondsTimer;
     [FieldOffset(1720)]
     [FramePrinter.FixedArrayAttribute(typeof(PlayerInformation), 10)]
     private fixed Byte _PlayerInfo_[1120];
@@ -1624,6 +1627,7 @@ namespace Quantum {
         hash = hash * 31 + PlayerLoadFrames.GetHashCode();
         hash = hash * 31 + AutomaticStageRefreshInterval.GetHashCode();
         hash = hash * 31 + AutomaticStageRefreshTimer.GetHashCode();
+        hash = hash * 31 + LoopingSecondsTimer.GetHashCode();
         hash = hash * 31 + HashCodeUtils.GetArrayHashCode(PlayerInfo);
         hash = hash * 31 + RealPlayers.GetHashCode();
         hash = hash * 31 + TotalMarios.GetHashCode();
@@ -1666,6 +1670,7 @@ namespace Quantum {
         serializer.Stream.Serialize(&p->AutomaticStageRefreshTimer);
         serializer.Stream.Serialize(&p->BigStarSpawnTimer);
         serializer.Stream.Serialize(&p->GameStartFrames);
+        serializer.Stream.Serialize(&p->LoopingSecondsTimer);
         serializer.Stream.Serialize(&p->PlayerLoadFrames);
         serializer.Stream.Serialize(&p->StartFrame);
         serializer.Stream.Serialize(&p->TotalGamesPlayed);
@@ -3811,6 +3816,9 @@ namespace Quantum {
   public unsafe partial interface ISignalOnReturnToRoom : ISignal {
     void OnReturnToRoom(Frame f);
   }
+  public unsafe partial interface ISignalOnSecondTicked : ISignal {
+    void OnSecondTicked(Frame f, Byte time);
+  }
   public unsafe partial interface ISignalOnMarioTouchedGoal : ISignal {
     void OnMarioTouchedGoal(Frame f, EntityRef marioEntity, EntityRef goalEntity, QBoolean isLastLap);
   }
@@ -4193,6 +4201,7 @@ namespace Quantum {
     private ISignalOnGameStarting[] _ISignalOnGameStartingSystems;
     private ISignalOnGameEnding[] _ISignalOnGameEndingSystems;
     private ISignalOnReturnToRoom[] _ISignalOnReturnToRoomSystems;
+    private ISignalOnSecondTicked[] _ISignalOnSecondTickedSystems;
     private ISignalOnMarioTouchedGoal[] _ISignalOnMarioTouchedGoalSystems;
     private ISignalOnThrowHoldable[] _ISignalOnThrowHoldableSystems;
     private ISignalOnIceBlockBroken[] _ISignalOnIceBlockBrokenSystems;
@@ -4249,6 +4258,7 @@ namespace Quantum {
       _ISignalOnGameStartingSystems = BuildSignalsArray<ISignalOnGameStarting>();
       _ISignalOnGameEndingSystems = BuildSignalsArray<ISignalOnGameEnding>();
       _ISignalOnReturnToRoomSystems = BuildSignalsArray<ISignalOnReturnToRoom>();
+      _ISignalOnSecondTickedSystems = BuildSignalsArray<ISignalOnSecondTicked>();
       _ISignalOnMarioTouchedGoalSystems = BuildSignalsArray<ISignalOnMarioTouchedGoal>();
       _ISignalOnThrowHoldableSystems = BuildSignalsArray<ISignalOnThrowHoldable>();
       _ISignalOnIceBlockBrokenSystems = BuildSignalsArray<ISignalOnIceBlockBroken>();
@@ -4599,6 +4609,15 @@ namespace Quantum {
           var s = array[i];
           if (_f.SystemIsEnabledInHierarchy((SystemBase)s)) {
             s.OnReturnToRoom(_f);
+          }
+        }
+      }
+      public void OnSecondTicked(Byte time) {
+        var array = _f._ISignalOnSecondTickedSystems;
+        for (Int32 i = 0; i < array.Length; ++i) {
+          var s = array[i];
+          if (_f.SystemIsEnabledInHierarchy((SystemBase)s)) {
+            s.OnSecondTicked(_f, time);
           }
         }
       }
