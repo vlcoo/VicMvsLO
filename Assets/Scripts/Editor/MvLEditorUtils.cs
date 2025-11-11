@@ -78,7 +78,6 @@ public class MvLEditorUtils : EditorWindow {
         AssetDatabase.ImportAsset(destinationAssets[0], ImportAssetOptions.ForceUpdate);
 
         VersusStageData stage = AssetDatabase.LoadAssetAtPath<VersusStageData>(destinationAssets[2]);
-        stage.TranslationKey = $"levels.custom.{mapName}";
         stage.Guid = default;
         EditorUtility.SetDirty(stage);
         AssetDatabase.ImportAsset(destinationAssets[2], ImportAssetOptions.ForceUpdate);

@@ -58,7 +58,7 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
 
         public void UpdateText() {
             stageImage.sprite = stage.Icon;
-            stageName.text = GlobalController.Instance.translationManager.GetTranslation(stage.TranslationKey);
+            stageName.text = stage.LegalEnglishName;
 
             stageAuthor.text = "";
             foreach (string split in stage.StageAuthor.Split(',')) {

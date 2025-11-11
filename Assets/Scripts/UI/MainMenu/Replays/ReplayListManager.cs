@@ -551,7 +551,7 @@ namespace NSMB.UI.MainMenu.Submenus.Replays {
                     if (QuantumUnityDB.TryGetGlobalAsset(replay.ReplayFile.Header.Rules.Stage, out Map map)
                         && QuantumUnityDB.TryGetGlobalAsset(map.UserAsset, out VersusStageData stage)) {
 
-                        if (tm.GetTranslation(stage.TranslationKey).Contains(searchField.text, StringComparison.InvariantCultureIgnoreCase)) {
+                        if (stage.LegalEnglishName.Contains(searchField.text, StringComparison.InvariantCultureIgnoreCase)) {
                             enabledHeaders.Add(GetHeader(replay));
                             continue;
                         }
@@ -608,7 +608,7 @@ namespace NSMB.UI.MainMenu.Submenus.Replays {
                 // Stage
                 if (QuantumUnityDB.TryGetGlobalAsset(rle.ReplayFile.Header.Rules.Stage, out Map map)) {
                     if (QuantumUnityDB.TryGetGlobalAsset(map.UserAsset, out VersusStageData stage)) {
-                        return GlobalController.Instance.translationManager.GetTranslation(stage.TranslationKey);
+                        return stage.LegalEnglishName;
                     }
                 }
                 return "???";

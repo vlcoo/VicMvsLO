@@ -15,10 +15,7 @@ public unsafe class VersusStageData : AssetObject {
     public bool ShowAuthorAndComposer;
     public string StageAuthor;
     public string MusicComposer;
-    public string TranslationKey;
     public string LegalEnglishName;
-    public string GroupingTranslationKey;
-    public string DiscordStageImage;
     public int WorldIndex;
 #if QUANTUM_UNITY
     public Sprite Icon;
