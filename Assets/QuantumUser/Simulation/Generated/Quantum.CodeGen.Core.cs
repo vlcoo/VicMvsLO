@@ -159,10 +159,10 @@ namespace Quantum {
     Jumped,
     ReachedCoinLimit,
     Disqualified,
-    EveryXSeconds,
     ReachedZeroCoins,
     ReachedZeroStars,
     FinishedLap,
+    EveryXSeconds,
   }
   public enum TriggerConstraint : int {
     Always,

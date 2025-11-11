@@ -13,7 +13,7 @@ namespace Quantum {
         public int TriggerActionTarget = (int)TriggerTarget.Conditioner;
         public string TriggerActionParameter = "";
         public int TriggerConstraint = (int)Quantum.TriggerConstraint.Always;
-        public int TriggerConstraintTarget = (int)TriggerTarget.Any;
+        public int TriggerConstraintTarget = (int)TriggerTarget.Conditioner;
         public string TriggerConstraintParameter = "";
         public byte TriggerDelaySeconds = 0, TriggerRepeatCount = 1, TriggerChance = 100;
 

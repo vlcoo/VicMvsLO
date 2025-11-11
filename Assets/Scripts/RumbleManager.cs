@@ -35,12 +35,8 @@ public class RumbleManager : MonoBehaviour {
             return;
         }
 
-#if UNITY_ANDROID
-        Vibration.VibrateAndroid((long)(duration * 1000));
-#else
         if (currentlyRumbling != null) StopCoroutine(currentlyRumbling);
         currentlyRumbling = StartCoroutine(Rumble(bassStrength, trebleStrength, duration));
-#endif
     }
 
     private IEnumerator Rumble(float lowFreq, float highFreq, float duration) {

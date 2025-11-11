@@ -75,8 +75,25 @@ namespace NSMB.UI.MainMenu.TriggerList {
             { TriggerAction.Stun, new List<string> { "Bump", "Knockback", "HardKnockback", "ForcefulKnockback" } },
         };
         public static readonly Dictionary<TriggerConstraint, List<string>> ConstraintParameters = new() {
-            { TriggerConstraint.IsXPowerup, new List<string> { "Random", "Mushroom", "FireFlower", "IceFlower", "PropellerMushroom", "MiniMushroom", "BlueShell", "HammerSuit", "MegaMushroom" } },
-            { TriggerConstraint.IsNotXPowerup, new List<string> { "Random", "Mushroom", "FireFlower", "IceFlower", "PropellerMushroom", "MiniMushroom", "BlueShell", "HammerSuit", "MegaMushroom" } },
+            { TriggerConstraint.IsXPowerup, new List<string> { "SmallMario", "Mushroom", "FireFlower", "IceFlower", "PropellerMushroom", "MiniMushroom", "BlueShell", "HammerSuit", "MegaMushroom" } },
+            { TriggerConstraint.IsNotXPowerup, new List<string> { "SmallMario", "Mushroom", "FireFlower", "IceFlower", "PropellerMushroom", "MiniMushroom", "BlueShell", "HammerSuit", "MegaMushroom" } },
+        };
+
+        public static readonly List<TriggerConstraint> ConstraintNumberParameters = new() {
+            TriggerConstraint.HasXCoins,
+            TriggerConstraint.HasXStars,
+            TriggerConstraint.HasXLives,
+            TriggerConstraint.HasLessThanXCoins,
+            TriggerConstraint.HasLessThanXStars,
+            TriggerConstraint.HasLessThanXLives,
+            TriggerConstraint.HasMoreThanXCoins,
+            TriggerConstraint.HasMoreThanXStars,
+            TriggerConstraint.HasMoreThanXLives,
+            TriggerConstraint.TimerIsLessThanX,
+            TriggerConstraint.TimerIsMoreThanX,
+            TriggerConstraint.XPlayersRemaining,
+            TriggerConstraint.LessThanXPlayersRemaining,
+            TriggerConstraint.MoreThanXPlayersRemaining,
         };
         
         // finally, certain condition-action pairs are recursive or contradictory and are forbidden. list them here.

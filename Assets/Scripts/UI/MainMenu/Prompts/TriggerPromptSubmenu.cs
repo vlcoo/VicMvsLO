@@ -12,7 +12,7 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
     public class TriggerPromptSubmenu : PromptSubmenu {
         public GameObject triggerTemplate;
         public GameObject triggersParent;
-        public GameObject popupCondition, popupAction;
+        public GameObject popupCondition, popupAction, popupExtras;
         // public CounterTip counterTip;
         public bool success = true;
         public List<TriggerListEntry> triggers = new();
@@ -179,6 +179,12 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
             var slot = game.GetLocalPlayerSlots()[game.GetLocalPlayers().IndexOf(game.Frames.Predicted.Global->Host)];
             game.SendCommand(slot, cmd);
         }
+        
+        public void OnExtrasClicked(TriggerListEntry entry) {
+            currentEditingEntry = entry;
+            popupExtras.SetActive(true);
+            popupExtras.GetComponent<TriggerExtraOptionsMenu>().RefreshValues();
+        }
 
         public void OnConditionClicked(TriggerListEntry entry) {
             currentEditingEntry = entry;
@@ -226,8 +232,11 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
                 entry.ConditionParameter = TriggerMappings.ConditionParameters[entry.Condition][0];
             if (actionNeedsParameter && entry.ActionParameter == "")
                 entry.ActionParameter = TriggerMappings.ActionParameters[entry.Action][0];
-            if (constraintNeedsParameter && entry.ConstraintParameter == "")
-                entry.ConstraintParameter = TriggerMappings.ConstraintParameters[entry.Constraint][0];
+            if (constraintNeedsParameter && entry.ConstraintParameter == "") {
+                entry.ConstraintParameter = TriggerMappings.ConstraintNumberParameters.Contains(entry.Constraint)
+                    ? "1"
+                    : TriggerMappings.ConstraintParameters[entry.Constraint][0];
+            }
             
             return entry;
         }

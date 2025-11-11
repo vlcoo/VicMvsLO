@@ -128,7 +128,6 @@ enum TriggerCondition {
     ReachedCoinLimit,
     Disqualified,
 //    XSecondRemaining,   // 60, 10
-    EveryXSeconds, // 1, 5, 10, 15, 30, 60
 //    SongBahd,
     ReachedZeroCoins,
     ReachedZeroStars,
@@ -136,6 +135,7 @@ enum TriggerCondition {
 //    EnteredPipe,
 //    GrabbedSomething,
     FinishedLap,
+    EveryXSeconds, // 1, 5, 10, 15, 30, 60
 //    TouchedGround,
 //    StoppedMoving,
 //    KilledSomeone,

@@ -16,43 +16,25 @@ public class TriggerListEntry : MonoBehaviour {
         get => _trigger;
         set => SetTrigger(value);
     }
-    
+
     public TMP_Text txtCondition,
         txtConditionParameter,
         txtConditionTarget,
         txtAction,
         txtActionParameter,
-        txtActionTarget,
-        txtConstraint,
-        txtConstraintParameter,
-        txtConstraintTarget;
+        txtActionTarget;
     public TMP_Dropdown ddConditionParameter,
         ddConditionTarget,
         ddActionParameter,
-        ddActionTarget,
-        ddConstraint,
-        ddConstraintParameter,
-        ddConstraintTarget;
+        ddActionTarget;
 
-    public GameObject extrasDialog;
     public Button btnDelete, btnDuplicate, btnCondition, btnAction;
     
     void OnEnable() {
-        if (ddConstraint.options.Count != 0) {
-            return;
-        }
-        
-        var i = 0;
-        foreach (var constraint in Enum.GetValues(typeof(TriggerConstraint))) {
-            ddConstraint.options.Add(new DropdownTriggerOption(i++, constraint.ToString(), (int) constraint));
-        }
-        txtConstraint.text = ((DropdownTriggerOption)ddConstraint.options[ddConstraint.value]).OptionName;
         RecalculateConditionParameters();
         RecalculateActionParameters();
-        RecalculateConstraintParameters();
         RecalculateConditionTargets();
         RecalculateActionTargets();
-        RecalculateConstraintTargets();
     }
     
     public void OnDeleted() {
@@ -76,26 +58,18 @@ public class TriggerListEntry : MonoBehaviour {
         // try to find the index of the correct option in the dropdown, that corresponds to the fields of the given new trigger.
         txtCondition.text = newTrigger.Condition.ToString();
         txtAction.text = newTrigger.Action.ToString();
-        ddConstraint.SetValueWithoutNotify(ddConstraint.options.FindIndex(o =>
-            ((DropdownTriggerOption) o).EnumValue == (int) newTrigger.Constraint));
         RecalculateConditionParameters();
         RecalculateActionParameters();
-        RecalculateConstraintParameters();
         RecalculateConditionTargets();
         RecalculateActionTargets();
-        RecalculateConstraintTargets();
         ddConditionParameter.SetValueWithoutNotify(ddConditionParameter.options.FindIndex(o =>
             o.text == newTrigger.ConditionParameter));
         ddActionParameter.SetValueWithoutNotify(ddActionParameter.options.FindIndex(o => 
             o.text == newTrigger.ActionParameter));
-        ddConstraintParameter.SetValueWithoutNotify(ddConstraintParameter.options.FindIndex(o =>
-            o.text == newTrigger.ConstraintParameter));
         ddConditionTarget.SetValueWithoutNotify(ddConditionTarget.options.FindIndex(o =>
             ((DropdownTriggerOption) o).EnumValue == (int) newTrigger.ConditionTarget));
         ddActionTarget.SetValueWithoutNotify(ddActionTarget.options.FindIndex(o =>
             ((DropdownTriggerOption) o).EnumValue == (int) newTrigger.ActionTarget));
-        ddConstraintTarget.SetValueWithoutNotify(ddConstraintTarget.options.FindIndex(o =>
-            ((DropdownTriggerOption) o).EnumValue == (int) newTrigger.ConstraintTarget));
     }
     
     public void OnConditionChanged(TriggerCondition condition) {
@@ -133,23 +107,15 @@ public class TriggerListEntry : MonoBehaviour {
         _trigger.ActionTarget = (TriggerTarget) value.EnumValue;
         Parent.TriggerEdited(this);
     }
-    
-    public void OnConstraintChanged() {
-        var value = (DropdownTriggerOption) ddConstraint.options[ddConstraint.value];
-        _trigger.Constraint = (TriggerConstraint) value.EnumValue;
-        RecalculateConstraintParameters();
-        RecalculateConstraintTargets();
-        Parent.TriggerEdited(this);
-    }
-    
-    public void OnConstraintParameterChanged() {
-        _trigger.ConstraintParameter = ddConstraintParameter.options[ddConstraintParameter.value].text;
-        Parent.TriggerEdited(this);
-    }
-    
-    public void OnConstraintTargetChanged() {
-        var value = (DropdownTriggerOption) ddConstraintTarget.options[ddConstraintTarget.value];
-        _trigger.ConstraintTarget = (TriggerTarget) value.EnumValue;
+
+    public void OnExtrasChanged(byte chance, byte delay, byte repeat, TriggerConstraint constraint,
+        TriggerTarget target, string parameter) {
+        _trigger.Chance = chance;
+        _trigger.DelaySeconds = delay;
+        _trigger.RepeatCount = repeat;
+        _trigger.Constraint = constraint;
+        _trigger.ConstraintTarget = target;
+        _trigger.ConstraintParameter = parameter;
         Parent.TriggerEdited(this);
     }
     
@@ -223,42 +189,8 @@ public class TriggerListEntry : MonoBehaviour {
         
         txtActionParameter.text = ddActionParameter.options[ddActionParameter.value].text;
     }
-    
-    public void RecalculateConstraintTargets() {
-        ddConstraintTarget.ClearOptions();
-        
-        if (TriggerMappings.NonPeopleConstraints.Contains(Trigger.Constraint)) {
-            txtConstraintTarget.text = "";
-            return;
-        }
-        
-        var i = 0;
-        foreach (var target in Enum.GetValues(typeof(TriggerTarget))) {
-            if (TriggerMappings.IncompatibleConstraintTargets.Contains((TriggerTarget) target)) {
-                continue;
-            }
-            ddConstraintTarget.options.Add(new DropdownTriggerOption(i++, target.ToString(), (int) target));
-        }
-        
-        txtConstraintTarget.text = ((DropdownTriggerOption)ddConstraintTarget.options[ddConstraintTarget.value]).OptionName;
-    }
-    
-    public void RecalculateConstraintParameters() {
-        ddConstraintParameter.ClearOptions();
-        
-        if (!TriggerMappings.ConstraintParameters.ContainsKey(Trigger.Constraint)) {
-            txtConstraintParameter.text = "";
-            return;
-        }
-        
-        foreach (var parameter in TriggerMappings.ConstraintParameters[Trigger.Constraint]) {
-            ddConstraintParameter.options.Add(new TMP_Dropdown.OptionData(parameter));
-        }
-        
-        txtConstraintParameter.text = ddConstraintParameter.options[ddConstraintParameter.value].text;
-    }
 
-    private class DropdownTriggerOption : TMP_Dropdown.OptionData {
+    public class DropdownTriggerOption : TMP_Dropdown.OptionData {
         public int Index { get; }
         public string OptionName { get; }
         public int EnumValue { get; }
