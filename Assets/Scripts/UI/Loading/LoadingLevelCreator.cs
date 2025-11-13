@@ -20,7 +20,7 @@ namespace NSMB.UI.Loading {
 
             // No need to worry about language changes in this state...
             // or else...?
-            text.text = GlobalController.Instance.translationManager.GetTranslationWithReplacements(key, "username", value);
+            text.text = $"Level designed by <i>{value}</i>";
         }
 
         private string GetValueFromField() {
