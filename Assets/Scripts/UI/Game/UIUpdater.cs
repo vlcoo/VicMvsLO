@@ -438,7 +438,7 @@ namespace NSMB.UI.Game {
                 uiDebug.text = $"{fpsSample:0} FPS\n{ping}ms {Utils.GetPingSymbol(ping)}";
                 //uiDebug.isRightToLeftText = GlobalController.Instance.translationManager.RightToLeft;
             } else {
-                uiDebug.enabled = false;
+                uiDebug.text = $"{fpsSample:0} FPS\nLocal {Utils.GetPingSymbol(0)}";
             }
         }
 

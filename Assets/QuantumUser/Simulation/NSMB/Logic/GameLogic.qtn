@@ -33,6 +33,7 @@ struct PlayerInformation {
 struct GameRules {
 	AssetRef<Map> Stage;
 	AssetRef<GamemodeAsset> Gamemode;
+	QStringUtf8<402> Description;
 
 	int StarsToWin;
 	int CoinsForPowerup;

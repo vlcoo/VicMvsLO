@@ -400,6 +400,8 @@ namespace Quantum.Prototypes {
   public unsafe partial class GameRulesPrototype : StructPrototype {
     public AssetRef<Map> Stage;
     public AssetRef<GamemodeAsset> Gamemode;
+    [MaxStringByteCount(400, "UTF-8")]
+    public string Description;
     public Int32 StarsToWin;
     public Int32 CoinsForPowerup;
     public Int32 Lives;
@@ -449,6 +451,7 @@ namespace Quantum.Prototypes {
     public void Materialize(Frame frame, ref Quantum.GameRules result, in PrototypeMaterializationContext context = default) {
         result.Stage = this.Stage;
         result.Gamemode = this.Gamemode;
+        PrototypeValidator.AssignQStringUtf8(this.Description, 402, in context, out result.Description);
         result.StarsToWin = this.StarsToWin;
         result.CoinsForPowerup = this.CoinsForPowerup;
         result.Lives = this.Lives;

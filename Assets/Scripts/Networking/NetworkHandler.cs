@@ -251,6 +251,7 @@ namespace NSMB.Networking {
                 [Enums.NetRoomProperties.HostName] = hostData?.PlayerNickname ?? "noname",
                 [Enums.NetRoomProperties.StageGuid] = rules.Stage.Id.ToString(),
                 [Enums.NetRoomProperties.GamemodeGuid] = rules.Gamemode.Id.ToString(),
+                [Enums.NetRoomProperties.Description] = rules.Description.ToString(),
             });
         }
 

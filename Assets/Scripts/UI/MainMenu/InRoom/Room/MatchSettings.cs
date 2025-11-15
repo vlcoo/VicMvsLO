@@ -1,4 +1,5 @@
 using Quantum;
+using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -10,6 +11,7 @@ public class MatchSettings : MonoBehaviour {
     [HideInInspector] public GameRules rules;
     [HideInInspector] public bool isHost;
     public Button btnGamemode;
+    public Action OnRulesChangedCallback;
     
     public void Start() {
         QuantumEvent.Subscribe<EventRulesChanged>(this, OnRulesChanged);
@@ -20,6 +22,7 @@ public class MatchSettings : MonoBehaviour {
     private unsafe void OnRulesChanged(EventRulesChanged e) {
         rules = e.Game.Frames.Predicted.Global->Rules;
         RefreshValues();
+        OnRulesChangedCallback?.Invoke();
     }
     
     private unsafe void OnGameStarted(CallbackGameStarted e) {

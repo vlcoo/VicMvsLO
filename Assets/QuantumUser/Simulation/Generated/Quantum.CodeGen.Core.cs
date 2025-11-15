@@ -868,6 +868,74 @@ namespace Quantum {
   }
   [StructLayout(LayoutKind.Explicit)]
   [System.SerializableAttribute()]
+  public unsafe partial struct QStringUtf8_402 : IQStringUtf8, System.IEquatable<QStringUtf8_402> {
+    public const Int32 SIZE = 404;
+    public const Int32 ALIGNMENT = 4;
+    [FieldOffset(402)]
+    private fixed Byte _alignment_padding_[2];
+    [FieldOffset(0)]
+    public UInt16 ByteCount;
+    [FieldOffset(2)]
+    [FixedBufferDynamicLength("ByteCount")]
+    public fixed Byte Bytes[400];
+    public const int MaxByteCount = 400;
+    public QStringUtf8_402(String str) {
+      QStringUtf8.ConstructFrom(str, MaxByteCount, out this);
+    }
+    public int Length {
+      get {
+        return QStringUtf8.GetLength(ref this);
+      }
+    }
+    public override System.String ToString() {
+      return QStringUtf8.GetString(ref this);
+    }
+    public static Boolean CanHold(String str) {
+      return QStringUtf8.CanHold(str, MaxByteCount);
+    }
+    Int32 IQStringUtf8.CompareOrdinal(byte* bytes, UInt16 byteCount) {
+      return QStringUtf8.CompareOrdinal(ref this, bytes, byteCount);
+    }
+    public Int32 CompareOrdinal(String str) {
+      return QStringUtf8.CompareOrdinal(ref this, str);
+    }
+    public static implicit operator QStringUtf8_402(String str) {
+      return new QStringUtf8_402(str);
+    }
+    public static implicit operator String(QStringUtf8_402 str) {
+      return str.ToString();
+    }
+    public override Boolean Equals(Object obj) {
+      return QStringUtf8.AreEqual(ref this, obj);
+    }
+    public Boolean Equals(QStringUtf8_402 str) {
+      return QStringUtf8.CompareOrdinal(ref this, str.Bytes, str.ByteCount) == 0;
+    }
+    public Boolean Equals<T>(ref T str)
+      where T : unmanaged, IQStringUtf8 {
+      return QStringUtf8.CompareOrdinal(ref this, ref str) == 0;
+    }
+    public Int32 CompareOrdinal<T>(ref T str)
+      where T : unmanaged, IQStringUtf8 {
+      return QStringUtf8.CompareOrdinal(ref this, ref str);
+    }
+    public override Int32 GetHashCode() {
+      unchecked { 
+        var hash = 907;
+        hash = hash * 31 + ByteCount.GetHashCode();
+        fixed (Byte* p = Bytes) hash = hash * 31 + HashCodeUtils.GetArrayHashCode(p, this.ByteCount);
+        return hash;
+      }
+    }
+    public static void Serialize(void* ptr, FrameSerializer serializer) {
+        var p = (QStringUtf8_402*)ptr;
+        serializer.Stream.Serialize(&p->ByteCount);
+        Assert.Always(p->ByteCount <= 400, p->ByteCount);
+        serializer.Stream.SerializeBuffer(&p->Bytes[0], p->ByteCount);
+    }
+  }
+  [StructLayout(LayoutKind.Explicit)]
+  [System.SerializableAttribute()]
   public unsafe partial struct QStringUtf8_48 : IQStringUtf8, System.IEquatable<QStringUtf8_48> {
     public const Int32 SIZE = 48;
     public const Int32 ALIGNMENT = 4;
@@ -996,12 +1064,16 @@ namespace Quantum {
   }
   [StructLayout(LayoutKind.Explicit)]
   public unsafe partial struct GameRules {
-    public const Int32 SIZE = 192;
+    public const Int32 SIZE = 600;
     public const Int32 ALIGNMENT = 8;
+    [FieldOffset(596)]
+    private fixed Byte _alignment_padding_[4];
     [FieldOffset(184)]
     public AssetRef<Map> Stage;
     [FieldOffset(176)]
     public AssetRef<GamemodeAsset> Gamemode;
+    [FieldOffset(192)]
+    public QStringUtf8_402 Description;
     [FieldOffset(20)]
     public Int32 StarsToWin;
     [FieldOffset(4)]
@@ -1095,6 +1167,7 @@ namespace Quantum {
         var hash = 443;
         hash = hash * 31 + Stage.GetHashCode();
         hash = hash * 31 + Gamemode.GetHashCode();
+        hash = hash * 31 + Description.GetHashCode();
         hash = hash * 31 + StarsToWin.GetHashCode();
         hash = hash * 31 + CoinsForPowerup.GetHashCode();
         hash = hash * 31 + Lives.GetHashCode();
@@ -1193,6 +1266,7 @@ namespace Quantum {
         QList.Serialize(&p->Triggers, serializer, Statics.SerializeMatchConditionerTrigger);
         AssetRef.Serialize(&p->Gamemode, serializer);
         AssetRef.Serialize(&p->Stage, serializer);
+        Quantum.QStringUtf8_402.Serialize(&p->Description, serializer);
     }
   }
   [StructLayout(LayoutKind.Explicit)]
@@ -1516,7 +1590,7 @@ namespace Quantum {
   }
   [StructLayout(LayoutKind.Explicit)]
   public unsafe partial struct _globals_ {
-    public const Int32 SIZE = 3032;
+    public const Int32 SIZE = 3440;
     public const Int32 ALIGNMENT = 8;
     [FieldOffset(0)]
     public AssetRef<Map> Map;
@@ -5004,6 +5078,7 @@ namespace Quantum {
       typeRegistry.Register(typeof(Quantum.QString48), Quantum.QString48.SIZE);
       typeRegistry.Register(typeof(Quantum.QString64), Quantum.QString64.SIZE);
       typeRegistry.Register(typeof(Quantum.QStringUtf8_40), Quantum.QStringUtf8_40.SIZE);
+      typeRegistry.Register(typeof(Quantum.QStringUtf8_402), Quantum.QStringUtf8_402.SIZE);
       typeRegistry.Register(typeof(Quantum.QStringUtf8_48), Quantum.QStringUtf8_48.SIZE);
       typeRegistry.Register(typeof(Quantum.Ptr), Quantum.Ptr.SIZE);
       typeRegistry.Register(typeof(QueryOptions), 2);
@@ -5096,6 +5171,7 @@ namespace Quantum {
       FramePrinter.EnsurePrimitiveNotStripped<Quantum.QString48>();
       FramePrinter.EnsurePrimitiveNotStripped<Quantum.QString64>();
       FramePrinter.EnsurePrimitiveNotStripped<Quantum.QStringUtf8_40>();
+      FramePrinter.EnsurePrimitiveNotStripped<Quantum.QStringUtf8_402>();
       FramePrinter.EnsurePrimitiveNotStripped<Quantum.QStringUtf8_48>();
       FramePrinter.EnsurePrimitiveNotStripped<QueryOptions>();
       FramePrinter.EnsurePrimitiveNotStripped<Quantum.StageTileFlags>();

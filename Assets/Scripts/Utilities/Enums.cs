@@ -48,6 +48,7 @@ public static class Enums {
         public const string HostName = "H";
         public const string StageGuid = "S";
         public const string GamemodeGuid = "G";
+        public const string Description = "D";
     }
     #endregion
     

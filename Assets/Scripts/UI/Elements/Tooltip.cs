@@ -10,7 +10,7 @@ namespace NSMB.UI.Elements {
         //---Serialized Variables
         [SerializeField] private GameObject panel;
         [SerializeField] private TMP_Text label;
-        [TextArea] [SerializeField] private string message;
+        [TextArea] [SerializeField] public string message;
         [SerializeField] private Vector2 offset = new(16, -16);
         [SerializeField] private float delayBeforeShow = 0.5f;
         

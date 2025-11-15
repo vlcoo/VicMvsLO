@@ -8,6 +8,7 @@ namespace Quantum {
 
         public AssetRef<Map> Stage;
         public AssetRef<GamemodeAsset> Gamemode;
+        public string Description;
         public int StarsToWin;
         public int CoinsForPowerup;
         public int Lives;
@@ -42,6 +43,7 @@ namespace Quantum {
 
             stream.Serialize(ref Stage);
             stream.Serialize(ref Gamemode);
+            stream.Serialize(ref Description);
             stream.Serialize(ref StarsToWin);
             stream.Serialize(ref CoinsForPowerup);
             stream.Serialize(ref Lives);
@@ -87,6 +89,7 @@ namespace Quantum {
                 levelChanged = rules.Stage != Stage;
                 rules.Stage = Stage;
             }
+            if (rulesChanges.HasFlag(Rules.Description)) rules.Description = Description;
             if (rulesChanges.HasFlag(Rules.StarsToWin)) rules.StarsToWin = StarsToWin;
             if (rulesChanges.HasFlag(Rules.CoinsForPowerup)) rules.CoinsForPowerup = CoinsForPowerup;
             if (rulesChanges.HasFlag(Rules.Lives)) rules.Lives = Lives;
@@ -165,6 +168,7 @@ namespace Quantum {
             SNoCoins = 1 << 23,
             SNoPowerups = 1 << 24,
             SShowCoinCount = 1 << 25,
+            Description = 1 << 30,
         }
     }
 }

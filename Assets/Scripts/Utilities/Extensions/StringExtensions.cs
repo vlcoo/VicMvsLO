@@ -72,5 +72,23 @@ namespace NSMB.Utilities {
 
             return input;
         }
+
+        public static string WrapText(this string input, int maxLineLength) {
+            if (string.IsNullOrEmpty(input) || maxLineLength <= 0 || input.Length <= maxLineLength) return input;
+            var words = input.Split(" ");
+            var wrappedText = "";
+            var currentLineLength = 0;
+
+            foreach (var word in words) {
+                if (currentLineLength >= maxLineLength) {
+                    currentLineLength = 0;
+                    wrappedText += "\n";
+                }
+                wrappedText += word + " ";
+                currentLineLength += word.Length + 1;
+            }
+
+            return wrappedText;
+        }
     }
 }

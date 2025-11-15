@@ -1,4 +1,5 @@
-﻿using NSMB.UI.Translation;
+﻿using NSMB.UI.Elements;
+using NSMB.UI.Translation;
 using NSMB.Utilities;
 using NSMB.Utilities.Extensions;
 using Photon.Realtime;
@@ -27,6 +28,7 @@ namespace NSMB.UI.MainMenu.Submenus.RoomList {
         //---Serialized Variables
         [SerializeField] private TMP_Text nameText, symbolsText, detailText;
         [SerializeField] private Image icon;
+        [SerializeField] private Tooltip descriptionTooltip;
 
         public void OnValidate() {
             this.SetIfNull(ref icon);
@@ -44,6 +46,10 @@ namespace NSMB.UI.MainMenu.Submenus.RoomList {
             GetCustomProperty(room.CustomProperties, Enums.NetRoomProperties.StageGuid, out string stageAssetGuid);
             GetCustomProperty(room.CustomProperties, Enums.NetRoomProperties.IntProperties, out int intPropertiesPacked);
             GetCustomProperty(room.CustomProperties, Enums.NetRoomProperties.BoolProperties, out int boolPropertiesPacked);
+            GetCustomProperty(room.CustomProperties, Enums.NetRoomProperties.Description, out string description);
+
+            descriptionTooltip.gameObject.SetActive(description == "");
+            descriptionTooltip.message = description.WrapText(50);
 
             IntegerProperties intProperties = intPropertiesPacked;
             BooleanProperties boolProperties = boolPropertiesPacked;

@@ -12,6 +12,7 @@ namespace NSMB.Utilities {
             [Enums.NetRoomProperties.BoolProperties] = (int) BooleanProperties.Default,
             [Enums.NetRoomProperties.StageGuid] = QuantumUnityDB.GetGlobalAsset(GlobalController.Instance.config.DefaultGamemode).DefaultRules.Stage.Id.ToString(),
             [Enums.NetRoomProperties.GamemodeGuid] = GlobalController.Instance.config.DefaultGamemode.Id.ToString(),
+            [Enums.NetRoomProperties.Description] = "",
         };
 
         public static Dictionary<short, string> RealtimeErrorCodes = new() {

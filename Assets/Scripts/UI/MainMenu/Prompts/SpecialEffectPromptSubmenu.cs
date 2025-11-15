@@ -29,10 +29,16 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
                 _toggles[toggle.gameObject.name] = toggle;
             }
             
+            matchSettings.OnRulesChangedCallback += RefreshValues;
             RefreshInteractability();
             RefreshValues();
         }
-        
+
+        public override void Hide(SubmenuHideReason hideReason) {
+            matchSettings.OnRulesChangedCallback -= RefreshValues;
+            base.Hide(hideReason);
+        }
+
         public override bool TryGoBack(out bool playSound) {
             if (success) {
                 Canvas.PlayConfirmSound();

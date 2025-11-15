@@ -53,6 +53,17 @@ public class TriggerExtraOptionsMenu : MonoBehaviour {
         ddConstraintTarget.SetValueWithoutNotify(ddConstraintTarget.options.FindIndex(o =>
             ((TriggerListEntry.DropdownTriggerOption) o).EnumValue == (int) _currentTarget));
     }
+    
+    public void RefreshInteractability() {
+        var isHost = Parent.matchSettings.isHost;
+        ddConstraint.interactable = isHost;
+        ddConstraintParameter.interactable = isHost;
+        ddConstraintTarget.interactable = isHost;
+        sChance.interactable = isHost;
+        sDelay.interactable = isHost;
+        sRepeat.interactable = isHost;
+        inConstraintParameter.interactable = isHost;
+    }
 
     public void OnConfirm() {
         Parent.currentEditingEntry.OnExtrasChanged(

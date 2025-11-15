@@ -93,6 +93,8 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
                 Destroy(triggers[i].gameObject);
                 triggers.RemoveAt(i);
             }
+
+            if (popupExtras.activeSelf) popupExtras.SetActive(false);
             
             // counterTip.SetCount(triggers.Count);
         }
@@ -183,7 +185,9 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
         public void OnExtrasClicked(TriggerListEntry entry) {
             currentEditingEntry = entry;
             popupExtras.SetActive(true);
-            popupExtras.GetComponent<TriggerExtraOptionsMenu>().RefreshValues();
+            var popupExtrasCo = popupExtras.GetComponent<TriggerExtraOptionsMenu>();
+            popupExtrasCo.RefreshValues();
+            popupExtrasCo.RefreshInteractability();
         }
 
         public void OnConditionClicked(TriggerListEntry entry) {
