@@ -1064,15 +1064,15 @@ namespace Quantum {
   }
   [StructLayout(LayoutKind.Explicit)]
   public unsafe partial struct GameRules {
-    public const Int32 SIZE = 600;
+    public const Int32 SIZE = 608;
     public const Int32 ALIGNMENT = 8;
-    [FieldOffset(596)]
+    [FieldOffset(604)]
     private fixed Byte _alignment_padding_[4];
-    [FieldOffset(184)]
-    public AssetRef<Map> Stage;
-    [FieldOffset(176)]
-    public AssetRef<GamemodeAsset> Gamemode;
     [FieldOffset(192)]
+    public AssetRef<Map> Stage;
+    [FieldOffset(184)]
+    public AssetRef<GamemodeAsset> Gamemode;
+    [FieldOffset(200)]
     public QStringUtf8_402 Description;
     [FieldOffset(20)]
     public Int32 StarsToWin;
@@ -1082,15 +1082,17 @@ namespace Quantum {
     public Int32 Lives;
     [FieldOffset(24)]
     public Int32 TimerSeconds;
-    [FieldOffset(168)]
+    [FieldOffset(172)]
     public QBoolean TeamsEnabled;
     [FieldOffset(28)]
     public QBoolean CustomPowerupsEnabled;
     [FieldOffset(32)]
     public QBoolean DrawOnTimeUp;
+    [FieldOffset(168)]
+    public QBoolean ScoreEnabled;
     [FieldOffset(12)]
     public Int32 Laps;
-    [FieldOffset(172)]
+    [FieldOffset(176)]
     public QListPtr<MatchConditionerTrigger> Triggers;
     [FieldOffset(0)]
     public Byte SpecialsCount;
@@ -1175,6 +1177,7 @@ namespace Quantum {
         hash = hash * 31 + TeamsEnabled.GetHashCode();
         hash = hash * 31 + CustomPowerupsEnabled.GetHashCode();
         hash = hash * 31 + DrawOnTimeUp.GetHashCode();
+        hash = hash * 31 + ScoreEnabled.GetHashCode();
         hash = hash * 31 + Laps.GetHashCode();
         hash = hash * 31 + Triggers.GetHashCode();
         hash = hash * 31 + SpecialsCount.GetHashCode();
@@ -1262,6 +1265,7 @@ namespace Quantum {
         QBoolean.Serialize(&p->SNoReserve, serializer);
         QBoolean.Serialize(&p->SPitWrap, serializer);
         QBoolean.Serialize(&p->SShowCoinCount, serializer);
+        QBoolean.Serialize(&p->ScoreEnabled, serializer);
         QBoolean.Serialize(&p->TeamsEnabled, serializer);
         QList.Serialize(&p->Triggers, serializer, Statics.SerializeMatchConditionerTrigger);
         AssetRef.Serialize(&p->Gamemode, serializer);
@@ -1590,7 +1594,7 @@ namespace Quantum {
   }
   [StructLayout(LayoutKind.Explicit)]
   public unsafe partial struct _globals_ {
-    public const Int32 SIZE = 3440;
+    public const Int32 SIZE = 3448;
     public const Int32 ALIGNMENT = 8;
     [FieldOffset(0)]
     public AssetRef<Map> Map;
@@ -2895,13 +2899,13 @@ namespace Quantum {
   }
   [StructLayout(LayoutKind.Explicit)]
   public unsafe partial struct MarioPlayer : Quantum.IComponent {
-    public const Int32 SIZE = 280;
+    public const Int32 SIZE = 288;
     public const Int32 ALIGNMENT = 8;
-    [FieldOffset(192)]
+    [FieldOffset(200)]
     public AssetRef<MarioPlayerPhysicsInfo> PhysicsAsset;
-    [FieldOffset(184)]
+    [FieldOffset(192)]
     public AssetRef<CharacterAsset> CharacterAsset;
-    [FieldOffset(76)]
+    [FieldOffset(80)]
     [ExcludeFromPrototype()]
     public PlayerRef PlayerRef;
     [FieldOffset(32)]
@@ -2913,13 +2917,13 @@ namespace Quantum {
     [FieldOffset(40)]
     [ExcludeFromPrototype()]
     public PowerupState PreviousPowerupState;
-    [FieldOffset(200)]
+    [FieldOffset(208)]
     [ExcludeFromPrototype()]
     public AssetRef<PowerupAsset> ReserveItem;
-    [FieldOffset(264)]
+    [FieldOffset(272)]
     [ExcludeFromPrototype()]
     public RNGSession RNG;
-    [FieldOffset(240)]
+    [FieldOffset(248)]
     [ExcludeFromPrototype()]
     public GamemodeSpecificData GamemodeData;
     [FieldOffset(48)]
@@ -2931,19 +2935,22 @@ namespace Quantum {
     [FieldOffset(64)]
     [ExcludeFromPrototype()]
     public Int32 Laps;
-    [FieldOffset(80)]
+    [FieldOffset(76)]
+    [ExcludeFromPrototype()]
+    public Int32 Score;
+    [FieldOffset(84)]
     [ExcludeFromPrototype()]
     public QBoolean Disconnected;
-    [FieldOffset(104)]
+    [FieldOffset(108)]
     [ExcludeFromPrototype()]
     public QBoolean IsDead;
-    [FieldOffset(96)]
+    [FieldOffset(100)]
     [ExcludeFromPrototype()]
     public QBoolean HasCheckpoint;
-    [FieldOffset(92)]
+    [FieldOffset(96)]
     [ExcludeFromPrototype()]
     public QBoolean FireDeath;
-    [FieldOffset(132)]
+    [FieldOffset(136)]
     [ExcludeFromPrototype()]
     public QBoolean IsRespawning;
     [FieldOffset(6)]
@@ -2961,13 +2968,13 @@ namespace Quantum {
     [FieldOffset(19)]
     [ExcludeFromPrototype()]
     public Byte NoLivesStarDirection;
-    [FieldOffset(88)]
+    [FieldOffset(92)]
     [ExcludeFromPrototype()]
     public QBoolean FacingRight;
-    [FieldOffset(136)]
+    [FieldOffset(140)]
     [ExcludeFromPrototype()]
     public QBoolean IsSkidding;
-    [FieldOffset(152)]
+    [FieldOffset(156)]
     [ExcludeFromPrototype()]
     public QBoolean IsTurnaround;
     [FieldOffset(7)]
@@ -3000,7 +3007,7 @@ namespace Quantum {
     [FieldOffset(60)]
     [ExcludeFromPrototype()]
     public Int32 LandedFrame;
-    [FieldOffset(84)]
+    [FieldOffset(88)]
     [ExcludeFromPrototype()]
     public QBoolean DoEntityBounce;
     [FieldOffset(9)]
@@ -3009,10 +3016,10 @@ namespace Quantum {
     [FieldOffset(0)]
     [ExcludeFromPrototype()]
     public Byte CantJumpTimer;
-    [FieldOffset(176)]
+    [FieldOffset(180)]
     [ExcludeFromPrototype()]
     public QBoolean WallslideLeft;
-    [FieldOffset(180)]
+    [FieldOffset(184)]
     [ExcludeFromPrototype()]
     public QBoolean WallslideRight;
     [FieldOffset(35)]
@@ -3021,10 +3028,10 @@ namespace Quantum {
     [FieldOffset(34)]
     [ExcludeFromPrototype()]
     public Byte WalljumpFrames;
-    [FieldOffset(116)]
+    [FieldOffset(120)]
     [ExcludeFromPrototype()]
     public QBoolean IsGroundpounding;
-    [FieldOffset(112)]
+    [FieldOffset(116)]
     [ExcludeFromPrototype()]
     public QBoolean IsGroundpoundActive;
     [FieldOffset(12)]
@@ -3039,13 +3046,13 @@ namespace Quantum {
     [FieldOffset(38)]
     [ExcludeFromPrototype()]
     public KnockbackStrength CurrentKnockback;
-    [FieldOffset(124)]
+    [FieldOffset(128)]
     [ExcludeFromPrototype()]
     public QBoolean IsInWeakKnockback;
-    [FieldOffset(156)]
+    [FieldOffset(160)]
     [ExcludeFromPrototype()]
     public QBoolean KnockForwards;
-    [FieldOffset(160)]
+    [FieldOffset(164)]
     [ExcludeFromPrototype()]
     public QBoolean KnockbackWasOriginallyFacingRight;
     [FieldOffset(56)]
@@ -3060,19 +3067,19 @@ namespace Quantum {
     [FieldOffset(2)]
     [ExcludeFromPrototype()]
     public Byte CrushDamageInvincibilityFrames;
-    [FieldOffset(100)]
+    [FieldOffset(104)]
     [ExcludeFromPrototype()]
     public QBoolean IsCrouching;
-    [FieldOffset(140)]
-    [ExcludeFromPrototype()]
-    public QBoolean IsSliding;
     [FieldOffset(144)]
     [ExcludeFromPrototype()]
+    public QBoolean IsSliding;
+    [FieldOffset(148)]
+    [ExcludeFromPrototype()]
     public QBoolean IsSpinnerFlying;
-    [FieldOffset(108)]
+    [FieldOffset(112)]
     [ExcludeFromPrototype()]
     public QBoolean IsDrilling;
-    [FieldOffset(148)]
+    [FieldOffset(152)]
     [ExcludeFromPrototype()]
     public QBoolean IsStuckInBlock;
     [FieldOffset(42)]
@@ -3087,7 +3094,7 @@ namespace Quantum {
     [FieldOffset(16)]
     [ExcludeFromPrototype()]
     public Byte MegaMushroomEndFrames;
-    [FieldOffset(164)]
+    [FieldOffset(168)]
     [ExcludeFromPrototype()]
     public QBoolean MegaMushroomStationaryEnd;
     [FieldOffset(17)]
@@ -3105,13 +3112,13 @@ namespace Quantum {
     [FieldOffset(4)]
     [ExcludeFromPrototype()]
     public Byte CurrentVolley;
-    [FieldOffset(120)]
+    [FieldOffset(124)]
     [ExcludeFromPrototype()]
     public QBoolean IsInShell;
     [FieldOffset(30)]
     [ExcludeFromPrototype()]
     public Byte ShellSlowdownFrames;
-    [FieldOffset(128)]
+    [FieldOffset(132)]
     [ExcludeFromPrototype()]
     public QBoolean IsPropellerFlying;
     [FieldOffset(27)]
@@ -3120,7 +3127,7 @@ namespace Quantum {
     [FieldOffset(28)]
     [ExcludeFromPrototype()]
     public Byte PropellerSpinFrames;
-    [FieldOffset(172)]
+    [FieldOffset(176)]
     [ExcludeFromPrototype()]
     public QBoolean UsedPropellerThisJump;
     [FieldOffset(25)]
@@ -3129,19 +3136,19 @@ namespace Quantum {
     [FieldOffset(26)]
     [ExcludeFromPrototype()]
     public Byte PropellerDrillHoldFrames;
-    [FieldOffset(232)]
+    [FieldOffset(240)]
     [ExcludeFromPrototype()]
     public EntityRef HeldEntity;
     [FieldOffset(52)]
     [ExcludeFromPrototype()]
     public Int32 HoldStartFrame;
-    [FieldOffset(216)]
+    [FieldOffset(224)]
     [ExcludeFromPrototype()]
     public EntityRef CurrentPipe;
-    [FieldOffset(248)]
+    [FieldOffset(256)]
     [ExcludeFromPrototype()]
     public FPVector2 PipeDirection;
-    [FieldOffset(168)]
+    [FieldOffset(172)]
     [ExcludeFromPrototype()]
     public QBoolean PipeEntering;
     [FieldOffset(21)]
@@ -3150,10 +3157,10 @@ namespace Quantum {
     [FieldOffset(20)]
     [ExcludeFromPrototype()]
     public Byte PipeCooldownFrames;
-    [FieldOffset(224)]
+    [FieldOffset(232)]
     [ExcludeFromPrototype()]
     public EntityRef CurrentSpinner;
-    [FieldOffset(208)]
+    [FieldOffset(216)]
     [ExcludeFromPrototype()]
     public EntityRef CurrentFlagpole;
     public override Int32 GetHashCode() {
@@ -3171,6 +3178,7 @@ namespace Quantum {
         hash = hash * 31 + Coins.GetHashCode();
         hash = hash * 31 + Lives.GetHashCode();
         hash = hash * 31 + Laps.GetHashCode();
+        hash = hash * 31 + Score.GetHashCode();
         hash = hash * 31 + Disconnected.GetHashCode();
         hash = hash * 31 + IsDead.GetHashCode();
         hash = hash * 31 + HasCheckpoint.GetHashCode();
@@ -3301,6 +3309,7 @@ namespace Quantum {
         serializer.Stream.Serialize(&p->Laps);
         serializer.Stream.Serialize(&p->LastPushingFrame);
         serializer.Stream.Serialize(&p->Lives);
+        serializer.Stream.Serialize(&p->Score);
         PlayerRef.Serialize(&p->PlayerRef, serializer);
         QBoolean.Serialize(&p->Disconnected, serializer);
         QBoolean.Serialize(&p->DoEntityBounce, serializer);

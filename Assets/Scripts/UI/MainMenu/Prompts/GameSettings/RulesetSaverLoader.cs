@@ -100,6 +100,7 @@ public class RulesetSaverLoader : MonoBehaviour
         code += (rules.HHost ? "1" : "0") + CODE_SEPARATOR;
         code += (rules.HIceCubes ? "1" : "0") + CODE_SEPARATOR;
         code += rules.HTeamTarget + CODE_SEPARATOR;
+        code += (rules.ScoreEnabled ? "1" : "0") + CODE_SEPARATOR;
 
         var sum = 0;
         foreach (var c in code) {
@@ -119,7 +120,7 @@ public class RulesetSaverLoader : MonoBehaviour
         int slot = game.GetLocalPlayerSlots()[game.GetLocalPlayers().IndexOf(game.Frames.Predicted.Global->Host)];
         
         var parts = code.Split(CODE_SEPARATOR);
-        if (parts.Length < 30) return false;
+        if (parts.Length < 31) return false;
         var sum = 0;
         for (int i = 0; i < code.Length - 2; i++) {
             sum += code[i];
@@ -137,6 +138,7 @@ public class RulesetSaverLoader : MonoBehaviour
             Lives = int.Parse(parts[4]),
             TimerSeconds = int.Parse(parts[5]),
             TeamsEnabled = parts[6] == "1",
+            ScoreEnabled = parts[31] == "1",
             SNoReserve = parts[8] == "1",
             SNoDroppedStars = parts[9] == "1",
             SNoDefrost = parts[10] == "1",

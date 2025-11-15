@@ -6,7 +6,7 @@ using UnityEngine.UI;
 using Button = UnityEngine.UI.Button;
 
 public class MatchSettings : MonoBehaviour {
-    public Toggle starsToggle, coinsToggle, livesToggle, timerToggle, teamsToggle;
+    public Toggle starsToggle, coinsToggle, livesToggle, timerToggle, teamsToggle, scoreToggle;
     public TMP_InputField lapsInput, starsInput, coinsInput, livesInput, timerInput;
     [HideInInspector] public GameRules rules;
     [HideInInspector] public bool isHost;
@@ -65,6 +65,8 @@ public class MatchSettings : MonoBehaviour {
         if (rules.TimerSeconds > 0 || timerInput.text.Length == 0) timerInput.SetTextWithoutNotify(rules.TimerSeconds.ToString());
         teamsToggle.interactable = isHost;
         teamsToggle.SetIsOnWithoutNotify(rules.TeamsEnabled);
+        scoreToggle.interactable = isHost;
+        scoreToggle.SetIsOnWithoutNotify(rules.ScoreEnabled);
         btnGamemode.interactable = isHost;
     }
 
@@ -79,13 +81,15 @@ public class MatchSettings : MonoBehaviour {
                            | CommandChangeRules.Rules.CoinsForPowerup
                            | CommandChangeRules.Rules.Lives
                            | CommandChangeRules.Rules.TimerSeconds
-                           | CommandChangeRules.Rules.TeamsEnabled,
+                           | CommandChangeRules.Rules.TeamsEnabled
+                           | CommandChangeRules.Rules.ScoreEnabled,
             Laps = int.Parse(lapsInput.text),
             StarsToWin = starsToggle.isOn ? int.Parse(starsInput.text) : 0,
             CoinsForPowerup = coinsToggle.isOn ? int.Parse(coinsInput.text) : 0,
             Lives = livesToggle.isOn ? int.Parse(livesInput.text) : 0,
             TimerSeconds = timerToggle.isOn ? int.Parse(timerInput.text) : 0,
             TeamsEnabled = teamsToggle.isOn,
+            ScoreEnabled = scoreToggle.isOn,
         };
         QuantumGame game = QuantumRunner.DefaultGame;
         int slot = game.GetLocalPlayerSlots()[game.GetLocalPlayers().IndexOf(game.Frames.Predicted.Global->Host)];

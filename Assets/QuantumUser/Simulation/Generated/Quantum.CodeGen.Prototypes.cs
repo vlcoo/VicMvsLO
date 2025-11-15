@@ -409,6 +409,7 @@ namespace Quantum.Prototypes {
     public QBoolean TeamsEnabled;
     public QBoolean CustomPowerupsEnabled;
     public QBoolean DrawOnTimeUp;
+    public QBoolean ScoreEnabled;
     public Int32 Laps;
     [DynamicCollectionAttribute()]
     public Quantum.Prototypes.MatchConditionerTriggerPrototype[] Triggers = {};
@@ -459,6 +460,7 @@ namespace Quantum.Prototypes {
         result.TeamsEnabled = this.TeamsEnabled;
         result.CustomPowerupsEnabled = this.CustomPowerupsEnabled;
         result.DrawOnTimeUp = this.DrawOnTimeUp;
+        result.ScoreEnabled = this.ScoreEnabled;
         result.Laps = this.Laps;
         if (this.Triggers.Length == 0) {
           result.Triggers = default;

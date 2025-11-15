@@ -16,6 +16,7 @@ namespace Quantum {
         public bool TeamsEnabled;
         public bool CustomPowerupsEnabled;
         public bool DrawOnTimeUp;
+        public bool ScoreEnabled;
         public int Laps;
         
         public bool SNoReserve;
@@ -52,6 +53,7 @@ namespace Quantum {
             stream.Serialize(ref CustomPowerupsEnabled);
             stream.Serialize(ref DrawOnTimeUp);
             stream.Serialize(ref Laps);
+            stream.Serialize(ref ScoreEnabled);
             
             stream.Serialize(ref SNoReserve);
             stream.Serialize(ref SNoDroppedStars);
@@ -98,6 +100,7 @@ namespace Quantum {
             if (rulesChanges.HasFlag(Rules.TeamsEnabled)) rules.TeamsEnabled = TeamsEnabled;
             if (rulesChanges.HasFlag(Rules.CustomPowerupsEnabled)) rules.CustomPowerupsEnabled = CustomPowerupsEnabled;
             if (rulesChanges.HasFlag(Rules.DrawOnTimeUp)) rules.DrawOnTimeUp = DrawOnTimeUp;
+            if (rulesChanges.HasFlag(Rules.ScoreEnabled)) rules.ScoreEnabled = ScoreEnabled;
             if (rulesChanges.HasFlag(Rules.SNoReserve)) rules.SNoReserve = SNoReserve;
             if (rulesChanges.HasFlag(Rules.SNoDroppedStars)) rules.SNoDroppedStars = SNoDroppedStars;
             if (rulesChanges.HasFlag(Rules.SInstantDeath)) rules.SInstantDeath = SInstantDeath;
@@ -153,6 +156,7 @@ namespace Quantum {
             CustomPowerupsEnabled = 1 << 7,
             DrawOnTimeUp = 1 << 8,
             Laps = 1 << 9,
+            ScoreEnabled = 1 << 10,
             SNoReserve = 1 << 11,
             SNoDroppedStars = 1 << 12,
             SInstantDeath = 1 << 13,

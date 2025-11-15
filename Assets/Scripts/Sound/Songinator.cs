@@ -97,7 +97,7 @@ public class Songinator : MonoBehaviour
             {
                 EnableReverbAndChorus = false,
                 BlockSize = 64,
-                MaximumPolyphony = 128
+                MaximumPolyphony = 128,
             }
         );
         Sequencer = new MidiFileSequencer(Synth);
