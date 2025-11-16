@@ -75,20 +75,23 @@ namespace NSMB.UI.MainMenu.TriggerList {
             { TriggerAction.Stun, new List<string> { "Bump", "Knockback", "HardKnockback", "ForcefulKnockback" } },
         };
         public static readonly Dictionary<TriggerConstraint, List<string>> ConstraintParameters = new() {
-            { TriggerConstraint.IsXPowerup, new List<string> { "SmallMario", "Mushroom", "FireFlower", "IceFlower", "PropellerMushroom", "MiniMushroom", "BlueShell", "HammerSuit", "MegaMushroom" } },
-            { TriggerConstraint.IsNotXPowerup, new List<string> { "SmallMario", "Mushroom", "FireFlower", "IceFlower", "PropellerMushroom", "MiniMushroom", "BlueShell", "HammerSuit", "MegaMushroom" } },
+            { TriggerConstraint.IsXPowerup, new List<string> { "SmallMario", "Mushroom", "FireFlower", "IceFlower", "PropellerMushroom", "MiniMushroom", "BlueShell", "HammerSuit", "MegaMushroom", "Starman" } },
+            { TriggerConstraint.IsNotXPowerup, new List<string> { "SmallMario", "Mushroom", "FireFlower", "IceFlower", "PropellerMushroom", "MiniMushroom", "BlueShell", "HammerSuit", "MegaMushroom", "Starman" } },
         };
 
         public static readonly List<TriggerConstraint> ConstraintNumberParameters = new() {
             TriggerConstraint.HasXCoins,
             TriggerConstraint.HasXStars,
             TriggerConstraint.HasXLives,
+            TriggerConstraint.HasXScore,
             TriggerConstraint.HasLessThanXCoins,
             TriggerConstraint.HasLessThanXStars,
             TriggerConstraint.HasLessThanXLives,
+            TriggerConstraint.HasLessThanXScore,
             TriggerConstraint.HasMoreThanXCoins,
             TriggerConstraint.HasMoreThanXStars,
             TriggerConstraint.HasMoreThanXLives,
+            TriggerConstraint.HasMoreThanXScore,
             TriggerConstraint.TimerIsLessThanX,
             TriggerConstraint.TimerIsMoreThanX,
             TriggerConstraint.XPlayersRemaining,

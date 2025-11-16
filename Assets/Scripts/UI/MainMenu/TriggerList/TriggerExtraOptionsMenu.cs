@@ -2,6 +2,7 @@ using NSMB.UI.MainMenu.Submenus.Prompts;
 using NSMB.UI.MainMenu.TriggerList;
 using Quantum;
 using System;
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -48,8 +49,11 @@ public class TriggerExtraOptionsMenu : MonoBehaviour {
             ((TriggerListEntry.DropdownTriggerOption) o).EnumValue == (int) _currentConstraint));
         RecalculateConstraintParameters();
         RecalculateConstraintTargets();
-        ddConstraintParameter.SetValueWithoutNotify(ddConstraintParameter.options.FindIndex(o =>
+        if (ddConstraintParameter.gameObject.activeSelf) 
+            ddConstraintParameter.SetValueWithoutNotify(ddConstraintParameter.options.FindIndex(o =>
             o.text == _currentParameter));
+        if (inConstraintParameter.gameObject.activeSelf)
+            inConstraintParameter.text = _currentParameter;
         ddConstraintTarget.SetValueWithoutNotify(ddConstraintTarget.options.FindIndex(o =>
             ((TriggerListEntry.DropdownTriggerOption) o).EnumValue == (int) _currentTarget));
     }
@@ -104,7 +108,6 @@ public class TriggerExtraOptionsMenu : MonoBehaviour {
     
     public void RecalculateConstraintTargets() {
         ddConstraintTarget.ClearOptions();
-        Debug.Log("recalc constraint targets");
         
         if (TriggerMappings.NonPeopleConstraints.Contains(_currentConstraint)) {
             txtConstraintTarget.text = "";
@@ -113,7 +116,6 @@ public class TriggerExtraOptionsMenu : MonoBehaviour {
         
         var i = 0;
         foreach (var target in Enum.GetValues(typeof(TriggerTarget))) {
-            Debug.Log(target.ToString());
             if (TriggerMappings.IncompatibleConstraintTargets.Contains((TriggerTarget) target)) {
                 continue;
             }
@@ -130,25 +132,27 @@ public class TriggerExtraOptionsMenu : MonoBehaviour {
             // show input field
             ddConstraintParameter.gameObject.SetActive(false);
             inConstraintParameter.gameObject.SetActive(true);
-            inConstraintParameter.text = "1";
-            _currentParameter = "1";
+            if (!int.TryParse(_currentParameter, out _)) {
+                inConstraintParameter.text = "1";
+                _currentParameter = "1";
+            }
         } else {
             // preset parameters
             ddConstraintParameter.gameObject.SetActive(true);
             inConstraintParameter.gameObject.SetActive(false);
             ddConstraintParameter.ClearOptions();
             
-            if (!TriggerMappings.ConstraintParameters.ContainsKey(_currentConstraint)) {
+            if (!TriggerMappings.ConstraintParameters.TryGetValue(_currentConstraint, out var constraintParameters)) {
                 txtConstraintParameter.text = "";
                 return;
             }
             
-            foreach (var parameter in TriggerMappings.ConstraintParameters[_currentConstraint]) {
+            foreach (var parameter in constraintParameters) {
                 ddConstraintParameter.options.Add(new TMP_Dropdown.OptionData(parameter));
             }
             
             txtConstraintParameter.text = ddConstraintParameter.options[ddConstraintParameter.value].text;
-            _currentParameter = "";
+            // _currentParameter = "";
         }
     }
 }

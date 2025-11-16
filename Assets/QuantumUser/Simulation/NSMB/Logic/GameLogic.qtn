@@ -183,8 +183,10 @@ enum TriggerConstraint {
     IsStationary,
     IsAirborne,
     IsGrounded,
-    IsXPowerup,   // small, mushroom, fire, ice, propeller, shell, hammer, starman, mega, mini
-    IsNotXPowerup,   // small, mushroom, fire, ice, propeller, shell, hammer, starman, mega, mini
+    IsXPowerup,   // small, mushroom, fire, ice, propeller, shell, hammer, mega, mini
+    IsNotXPowerup,   // small, mushroom, fire, ice, propeller, shell, hammer, mega, mini
+    IsStarman,
+    IsNotStarman,
     IsFrozen,
     IsNotFrozen,
     IsUnderwater,
@@ -192,12 +194,15 @@ enum TriggerConstraint {
     HasXCoins,  // any X in valid range vvv
     HasXStars,
     HasXLives,
+    HasXScore,
     HasLessThanXCoins,
     HasLessThanXStars,
     HasLessThanXLives,
+    HasLessThanXScore,
     HasMoreThanXCoins,
     HasMoreThanXStars,
     HasMoreThanXLives,
+    HasMoreThanXScore,
     TimerIsLessThanX,
     TimerIsMoreThanX,
     StarsExist,
@@ -226,10 +231,6 @@ enum TriggerTarget {
     NonActionerTeam,
     Host,
     NonHost,
-//    FirstPlace,
-//    NonFirstPlace,
-//    LastPlace,
-//    NonLastPlace,
     TeamA,
     NonTeamA,
     TeamB,
@@ -240,6 +241,10 @@ enum TriggerTarget {
     NonTeamD,
     TeamE,
     NonTeamE,
+//    FirstPlace,
+//    NonFirstPlace,
+//    LastPlace,
+//    NonLastPlace,
 }
 
 enum TriggerParameter {

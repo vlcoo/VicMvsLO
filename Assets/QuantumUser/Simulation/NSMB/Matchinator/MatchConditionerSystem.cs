@@ -38,8 +38,6 @@ namespace Quantum
                 if (parameter != "" && trigger.ConditionParameter != "" && trigger.ConditionParameter != "Any")
                     if (trigger.ConditionParameter != parameter) continue;
                 
-                // todo: constraints.
-                
                 // random chance. the variable can be from 1 to 100 (percentage)...
                 if (trigger.Chance < 100 && f.RNG->Next(1, 101) > trigger.Chance) continue;
                 
@@ -66,8 +64,6 @@ namespace Quantum
                 };
 
                 if (!conditionTargetMatches) continue;
-                Debug.Log(
-                    $"[MatchConditioner] <b>{condition}</b>{(trigger.ConditionParameter != "" ? (" (" + trigger.ConditionParameter + ")") : "")} succeeded... <b>{trigger.Action}</b>{(trigger.ActionParameter != "" ? (" (" + trigger.ActionParameter + ")") : "")} begin!!");
                 
                 var actionerEntities = new List<EntityRef>();
                 var marioFilter = f.Filter<MarioPlayer>();
@@ -188,14 +184,169 @@ namespace Quantum
                     default:
                         Err("invalid action target!!"); break;
                 }
+                
+                // todo: constraints
+                var constraintEntities = new List<EntityRef>();
+                marioFilter = f.Filter<MarioPlayer>();
+                switch (trigger.ConstraintTarget) {
+                    case TriggerTarget.Any:
+                    case TriggerTarget.Everyone:
+                        while (marioFilter.NextUnsafe(out EntityRef e, out MarioPlayer* _)) {
+                            constraintEntities.Add(e);
+                        }
+                        break;
+                    case TriggerTarget.Host:
+                        while (marioFilter.NextUnsafe(out EntityRef e, out MarioPlayer* m)) {
+                            if (QuantumUtils.GetPlayerData(f, m->PlayerRef)->IsRoomHost) constraintEntities.Add(e);
+                        }
+                        break;
+                    case TriggerTarget.NonHost:
+                        while (marioFilter.NextUnsafe(out EntityRef e, out MarioPlayer* m)) {
+                            if (!QuantumUtils.GetPlayerData(f, m->PlayerRef)->IsRoomHost) constraintEntities.Add(e);
+                        }
+                        break;
+                    case TriggerTarget.Conditioner:
+                        constraintEntities.Add(conditionerEntity);
+                        break;
+                    case TriggerTarget.NonConditioner:
+                        while (marioFilter.NextUnsafe(out EntityRef e, out MarioPlayer* _)) {
+                            if (e != conditionerEntity) constraintEntities.Add(e);
+                        }
+                        break;
+                    case TriggerTarget.ConditionerTeam:
+                        while (marioFilter.NextUnsafe(out EntityRef e, out MarioPlayer* m)) {
+                            if (m->GetTeam(f) == mario->GetTeam(f)) constraintEntities.Add(e);
+                        }
+                        break;
+                    case TriggerTarget.NonConditionerTeam:
+                        while (marioFilter.NextUnsafe(out EntityRef e, out MarioPlayer* m)) {
+                            if (m->GetTeam(f) != mario->GetTeam(f)) constraintEntities.Add(e);
+                        }
+                        break;
+                    case TriggerTarget.Actioner:
+                        constraintEntities.AddRange(actionerEntities);
+                        break;
+                    case TriggerTarget.NonActioner:
+                        while (marioFilter.NextUnsafe(out EntityRef e, out MarioPlayer* _)) {
+                            if (!actionerEntities.Contains(e)) constraintEntities.Add(e);
+                        }
+                        break;
+                    case TriggerTarget.ActionerTeam:
+                        while (marioFilter.NextUnsafe(out EntityRef e, out MarioPlayer* m)) {
+                            if (actionerEntities.Any(ae => {
+                                    var am = f.Unsafe.GetPointer<MarioPlayer>(ae);
+                                    return am->GetTeam(f) == m->GetTeam(f);
+                                })) constraintEntities.Add(e);
+                        }
+                        break;
+                    case TriggerTarget.NonActionerTeam:
+                        while (marioFilter.NextUnsafe(out EntityRef e, out MarioPlayer* m)) {
+                            if (actionerEntities.All(ae => {
+                                    var am = f.Unsafe.GetPointer<MarioPlayer>(ae);
+                                    return am->GetTeam(f) != m->GetTeam(f);
+                                })) constraintEntities.Add(e);
+                        }
+                        break;
+                    case TriggerTarget.TeamA:
+                        while (marioFilter.NextUnsafe(out EntityRef e, out MarioPlayer* m)) {
+                            if (m->GetTeam(f) == 0) constraintEntities.Add(e);
+                        }
+                        break;
+                    case TriggerTarget.TeamB:
+                        while (marioFilter.NextUnsafe(out EntityRef e, out MarioPlayer* m)) {
+                            if (m->GetTeam(f) == 1) constraintEntities.Add(e);
+                        }
+                        break;
+                    case TriggerTarget.TeamC:
+                        while (marioFilter.NextUnsafe(out EntityRef e, out MarioPlayer* m)) {
+                            if (m->GetTeam(f) == 2) constraintEntities.Add(e);
+                        }
+                        break;
+                    case TriggerTarget.TeamD:
+                        while (marioFilter.NextUnsafe(out EntityRef e, out MarioPlayer* m)) {
+                            if (m->GetTeam(f) == 3) constraintEntities.Add(e);
+                        }
+                        break;
+                    case TriggerTarget.TeamE:
+                        while (marioFilter.NextUnsafe(out EntityRef e, out MarioPlayer* m)) {
+                            if (m->GetTeam(f) == 4) constraintEntities.Add(e);
+                        }
+                        break;
+                    case TriggerTarget.NonTeamA:
+                        while (marioFilter.NextUnsafe(out EntityRef e, out MarioPlayer* m)) {
+                            if (m->GetTeam(f) != 0) constraintEntities.Add(e);
+                        }
+                        break;
+                    case TriggerTarget.NonTeamB:
+                        while (marioFilter.NextUnsafe(out EntityRef e, out MarioPlayer* m)) {
+                            if (m->GetTeam(f) != 1) constraintEntities.Add(e);
+                        }
+                        break;
+                    case TriggerTarget.NonTeamC:
+                        while (marioFilter.NextUnsafe(out EntityRef e, out MarioPlayer* m)) {
+                            if (m->GetTeam(f) != 2) constraintEntities.Add(e);
+                        }
+                        break;
+                    case TriggerTarget.NonTeamD:
+                        while (marioFilter.NextUnsafe(out EntityRef e, out MarioPlayer* m)) {
+                            if (m->GetTeam(f) != 3) constraintEntities.Add(e);
+                        }
+                        break;
+                    case TriggerTarget.NonTeamE:
+                        while (marioFilter.NextUnsafe(out EntityRef e, out MarioPlayer* m)) {
+                            if (m->GetTeam(f) != 4) constraintEntities.Add(e);
+                        }
+                        break;
+                    case TriggerTarget.OneRandom:
+                    case TriggerTarget.Randoms:
+                    default:
+                        Err("invalid constraint target!!"); break;
+                }
+
+                var constraintFunctionName = trigger.Constraint.ToString();
+                var isNegated = constraintFunctionName.Contains("Not");
+                if (isNegated) constraintFunctionName = constraintFunctionName.Replace("Not", "");
+                constraintFunctionName = $"Constrain{constraintFunctionName}";
+                if (trigger.Constraint != TriggerConstraint.Always) {
+                    var constraintMethod = GetType().GetMethod(constraintFunctionName);
+                    if (constraintMethod == null) {
+                        Err($"No function for Constrain<b>{trigger.Constraint}</b>!!");
+                        continue;
+                    }
+
+                    bool constraintPassed;
+                    if (trigger.ConstraintTarget == TriggerTarget.Any) {
+                        // at least one in the constraint entities has to pass.
+                        constraintPassed = false;
+                        foreach (var constraintEntity in constraintEntities) {
+                            var result = isNegated != (bool) constraintMethod.Invoke(this,
+                                new object[] { f, constraintEntity, trigger.ConstraintParameter.ToString() });
+                            constraintPassed |= result;
+                            if (constraintPassed) break;
+                        }
+                    } else {
+                        // everyone in the constraint entities has to pass. if one fails, we don't need to check further.
+                        constraintPassed = true;
+                        foreach (var constraintEntity in constraintEntities) {
+                            var result = isNegated != (bool) constraintMethod.Invoke(this,
+                                new object[] { f, constraintEntity, trigger.ConstraintParameter.ToString() });
+                            constraintPassed &= result;
+                            if (!constraintPassed) break;
+                        }
+                    }
+                    
+                    if (!constraintPassed) continue;
+                }
 
                 // finally good to go. find action function by name and pass everything.
                 // todo: delay.
                 var actionMethod = GetType().GetMethod($"Act{trigger.Action.ToString()}");
                 if (actionMethod == null) {
                     Err($"No function for Act<b>{trigger.Action}</b>!!");
-                    return;
+                    continue;
                 }
+                
+                Debug.Log($"[MatchConditioner] <b>{condition}</b>{(trigger.ConditionParameter != "" ? (" (" + trigger.ConditionParameter + ")") : "")} succeeded... <b>{trigger.Action}</b>{(trigger.ActionParameter != "" ? (" (" + trigger.ActionParameter + ")") : "")} begin!!");
                 foreach (var actionerEntity in actionerEntities) {
                     for (var i = 0; i < trigger.RepeatCount; i++)
                         actionMethod.Invoke(this, new object[] { f, actionerEntity, trigger.ActionParameter.ToString() });
@@ -551,6 +702,204 @@ namespace Quantum
         public unsafe void ActBecomeXTeam(Frame f, EntityRef entity, string parameter) {
             
         }
+        #endregion
+        
+        #region Constraints
+
+        [Preserve]
+        public unsafe bool ConstrainIsMoving(Frame f, EntityRef entity, string parameter) {
+            var physics = f.Unsafe.GetPointer<PhysicsObject>(entity);
+            return physics->Velocity.X != 0;
+        }
+        
+        [Preserve]
+        public unsafe bool ConstrainIsStationary(Frame f, EntityRef entity, string parameter) {
+            var physics = f.Unsafe.GetPointer<PhysicsObject>(entity);
+            return physics->Velocity.X == 0;
+        }
+        
+        [Preserve]
+        public unsafe bool ConstrainIsAirborne(Frame f, EntityRef entity, string parameter) {
+            var physics = f.Unsafe.GetPointer<PhysicsObject>(entity);
+            return physics->Velocity.Y != 0;
+        }
+        
+        [Preserve]
+        public unsafe bool ConstrainIsGrounded(Frame f, EntityRef entity, string parameter) {
+            var physics = f.Unsafe.GetPointer<PhysicsObject>(entity);
+            return physics->Velocity.Y == 0;
+        }
+        
+        [Preserve]
+        public unsafe bool ConstrainIsXPowerup(Frame f, EntityRef entity, string parameter) {
+            var mario = f.Unsafe.GetPointer<MarioPlayer>(entity);
+            if (parameter == "SmallMario") parameter = "NoPowerup";
+            return parameter == mario->CurrentPowerupState.ToString();
+        }
+        
+        [Preserve]
+        public unsafe bool ConstrainIsStarman(Frame f, EntityRef entity, string parameter) {
+            var mario = f.Unsafe.GetPointer<MarioPlayer>(entity);
+            return mario->IsStarmanInvincible;
+        }
+        
+        [Preserve]
+        public unsafe bool ConstrainIsFrozen(Frame f, EntityRef entity, string parameter) {
+            return f.Unsafe.TryGetPointer(entity, out Freezable* freezable) && freezable->IsFrozen(f);
+        }
+        
+        [Preserve]
+        public unsafe bool ConstrainIsUnderwater(Frame f, EntityRef entity, string parameter) {
+            var physics = f.Unsafe.GetPointer<PhysicsObject>(entity);
+            return physics->IsUnderwater;
+        }
+
+        [Preserve]
+        public unsafe bool ConstrainHasXCoins(Frame f, EntityRef entity, string parameter) {
+            if (!int.TryParse(parameter, out var count)) return false;
+            var mario = f.Unsafe.GetPointer<MarioPlayer>(entity);
+            return mario->Coins == count;
+        }
+        
+        [Preserve]
+        public unsafe bool ConstrainHasXStars(Frame f, EntityRef entity, string parameter) {
+            if (!int.TryParse(parameter, out var count)) return false;
+            var mario = f.Unsafe.GetPointer<MarioPlayer>(entity);
+            return mario->GamemodeData.StarChasers->Stars == count;
+        }
+        
+        [Preserve]
+        public unsafe bool ConstrainHasXLives(Frame f, EntityRef entity, string parameter) {
+            if (!int.TryParse(parameter, out var count)) return false;
+            var mario = f.Unsafe.GetPointer<MarioPlayer>(entity);
+            return mario->Lives == count;
+        }
+        
+        [Preserve]
+        public unsafe bool ConstrainHasXScore(Frame f, EntityRef entity, string parameter) {
+            if (!int.TryParse(parameter, out var count)) return false;
+            var mario = f.Unsafe.GetPointer<MarioPlayer>(entity);
+            return mario->Score == count;
+        }
+        
+        [Preserve]
+        public unsafe bool ConstrainHasLessThanXCoins(Frame f, EntityRef entity, string parameter) {
+            if (!int.TryParse(parameter, out var count)) return false;
+            var mario = f.Unsafe.GetPointer<MarioPlayer>(entity);
+            return mario->Coins < count;
+        }
+        
+        [Preserve]
+        public unsafe bool ConstrainHasLessThanXStars(Frame f, EntityRef entity, string parameter) {
+            if (!int.TryParse(parameter, out var count)) return false;
+            var mario = f.Unsafe.GetPointer<MarioPlayer>(entity);
+            return mario->GamemodeData.StarChasers->Stars < count;
+        }
+        
+        [Preserve]
+        public unsafe bool ConstrainHasLessThanXLives(Frame f, EntityRef entity, string parameter) {
+            if (!int.TryParse(parameter, out var count)) return false;
+            var mario = f.Unsafe.GetPointer<MarioPlayer>(entity);
+            return mario->Lives < count;
+        }
+        
+        [Preserve]
+        public unsafe bool ConstrainHasLessThanXScore(Frame f, EntityRef entity, string parameter) {
+            if (!int.TryParse(parameter, out var count)) return false;
+            var mario = f.Unsafe.GetPointer<MarioPlayer>(entity);
+            return mario->Score < count;
+        }
+        
+        [Preserve]
+        public unsafe bool ConstrainHasMoreThanXCoins(Frame f, EntityRef entity, string parameter) {
+            if (!int.TryParse(parameter, out var count)) return false;
+            var mario = f.Unsafe.GetPointer<MarioPlayer>(entity);
+            return mario->Coins > count;
+        }
+        
+        [Preserve]
+        public unsafe bool ConstrainHasMoreThanXStars(Frame f, EntityRef entity, string parameter) {
+            if (!int.TryParse(parameter, out var count)) return false;
+            var mario = f.Unsafe.GetPointer<MarioPlayer>(entity);
+            return mario->GamemodeData.StarChasers->Stars > count;
+        }
+        
+        [Preserve]
+        public unsafe bool ConstrainHasMoreThanXLives(Frame f, EntityRef entity, string parameter) {
+            if (!int.TryParse(parameter, out var count)) return false;
+            var mario = f.Unsafe.GetPointer<MarioPlayer>(entity);
+            return mario->Lives > count;
+        }
+        
+        [Preserve]
+        public unsafe bool ConstrainHasMoreThanXScore(Frame f, EntityRef entity, string parameter) {
+            if (!int.TryParse(parameter, out var count)) return false;
+            var mario = f.Unsafe.GetPointer<MarioPlayer>(entity);
+            return mario->Score > count;
+        }
+        
+        [Preserve]
+        public unsafe bool ConstrainTimerIsLessThanX(Frame f, EntityRef entity, string parameter) {
+            if (!int.TryParse(parameter, out var count)) return false;
+            var secondsRemaining = Mathf.Max(Mathf.CeilToInt(f.Global->Timer.AsFloat), 0);
+            return secondsRemaining < count;
+        }
+        
+        [Preserve]
+        public unsafe bool ConstrainTimerIsMoreThanX(Frame f, EntityRef entity, string parameter) {
+            if (!int.TryParse(parameter, out var count)) return false;
+            var secondsRemaining = Mathf.Max(Mathf.CeilToInt(f.Global->Timer.AsFloat), 0);
+            return secondsRemaining > count;
+        }
+
+        [Preserve]
+        public unsafe bool ContrainStarsExist(Frame f, EntityRef entity, string parameter) {
+            return f.Filter<BigStar>().Next(out _, out _);
+        }
+        
+        [Preserve]
+        public unsafe bool ContrainEnemiesExist(Frame f, EntityRef entity, string parameter) {
+            return f.Filter<Enemy>().Next(out _, out _);
+        }
+        
+        [Preserve]
+        public unsafe bool ContrainCoinsExist(Frame f, EntityRef entity, string parameter) {
+            return f.Filter<Coin>().Next(out _, out _);
+        }
+        
+        [Preserve]
+        public unsafe bool XPlayersRemaining(Frame f, EntityRef entity, string parameter) {
+            if (!int.TryParse(parameter, out var count)) return false;
+            var marioFilter = f.Filter<MarioPlayer>();
+            var playersRemaining = 0;
+            while (marioFilter.NextUnsafe(out EntityRef e, out MarioPlayer* m)) {
+                if (!f.DestroyPending(e)) playersRemaining++;
+            }
+            return playersRemaining == count;
+        }
+        
+        [Preserve]
+        public unsafe bool LessThanXPlayersRemaining(Frame f, EntityRef entity, string parameter) {
+            if (!int.TryParse(parameter, out var count)) return false;
+            var marioFilter = f.Filter<MarioPlayer>();
+            var playersRemaining = 0;
+            while (marioFilter.NextUnsafe(out EntityRef e, out MarioPlayer* m)) {
+                if (!f.DestroyPending(e)) playersRemaining++;
+            }
+            return playersRemaining < count;
+        }
+        
+        [Preserve]
+        public unsafe bool MoreThanXPlayersRemaining(Frame f, EntityRef entity, string parameter) {
+            if (!int.TryParse(parameter, out var count)) return false;
+            var marioFilter = f.Filter<MarioPlayer>();
+            var playersRemaining = 0;
+            while (marioFilter.NextUnsafe(out EntityRef e, out MarioPlayer* m)) {
+                if (!f.DestroyPending(e)) playersRemaining++;
+            }
+            return playersRemaining > count;
+        }
+
         #endregion
     }
 }
