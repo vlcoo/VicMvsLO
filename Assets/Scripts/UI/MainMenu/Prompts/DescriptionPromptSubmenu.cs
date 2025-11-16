@@ -32,6 +32,8 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
         }
         
         public unsafe void DescriptionChanged() {
+            if (!matchSettings.isHost) return;
+            
             var cmd = new CommandChangeRules {
                 EnabledChanges = CommandChangeRules.Rules.Description,
                 Description = descriptionField.text

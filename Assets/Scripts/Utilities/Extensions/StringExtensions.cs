@@ -4,7 +4,6 @@ using UnityEngine;
 
 namespace NSMB.Utilities {
     public static class StringExtensions {
-
         public const int NicknameMin = 2, NicknameMax = 20;
 
         public static string Filter(this string input) {
@@ -16,6 +15,7 @@ namespace NSMB.Utilities {
         }
 
         private static readonly string NicknameRegex = $"^[\\w]{{{NicknameMin},{NicknameMax}}}";
+
         public static bool IsValidNickname(this string input) {
             if (input == null) {
                 return false;
@@ -80,10 +80,17 @@ namespace NSMB.Utilities {
             var currentLineLength = 0;
 
             foreach (var word in words) {
+                if (word.EndsWith("\n")) {
+                    currentLineLength = 0;
+                    wrappedText += word;
+                    continue;
+                }
+
                 if (currentLineLength >= maxLineLength) {
                     currentLineLength = 0;
                     wrappedText += "\n";
                 }
+
                 wrappedText += word + " ";
                 currentLineLength += word.Length + 1;
             }

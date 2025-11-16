@@ -48,7 +48,7 @@ namespace NSMB.UI.MainMenu.Submenus.RoomList {
             GetCustomProperty(room.CustomProperties, Enums.NetRoomProperties.BoolProperties, out int boolPropertiesPacked);
             GetCustomProperty(room.CustomProperties, Enums.NetRoomProperties.Description, out string description);
 
-            descriptionTooltip.gameObject.SetActive(description == "");
+            descriptionTooltip.gameObject.SetActive(description != "");
             descriptionTooltip.message = description.WrapText(50);
 
             IntegerProperties intProperties = intPropertiesPacked;
@@ -65,9 +65,9 @@ namespace NSMB.UI.MainMenu.Submenus.RoomList {
                 symbols.Append("<sprite name=room_rules>").Append(Utils.GetSymbolString(intProperties.TriggerCount.ToString(), Utils.smallSymbols));
             }
 
-            if (boolProperties.CustomPowerups) {
-                symbols.Append("<sprite name=room_powerups>");
-            }
+            // if (boolProperties.CustomPowerups) {
+            //     symbols.Append("<sprite name=room_powerups>");
+            // }
 
             if (boolProperties.Teams) {
                 symbols.Append("<sprite name=room_teams>");

@@ -26,6 +26,7 @@ public class MatchSettings : MonoBehaviour {
     }
     
     private unsafe void OnGameStarted(CallbackGameStarted e) {
+        isHost = false;
         rules = e.Game.Frames.Predicted.Global->Rules;
         RefreshValues();
     }
