@@ -12,6 +12,7 @@ public class RulesetSaverLoader : MonoBehaviour
 {
     private MainMenuCanvas Canvas => GetComponent<PromptSubmenu>().Canvas;
     private string CODE_SEPARATOR = "-";
+    private int CODE_VERSION = 2;
 
     public void OnSavePressed() {
         GUIUtility.systemCopyBuffer = RulesetToCode();
@@ -101,6 +102,7 @@ public class RulesetSaverLoader : MonoBehaviour
         code += (rules.HIceCubes ? "1" : "0") + CODE_SEPARATOR;
         code += rules.HTeamTarget + CODE_SEPARATOR;
         code += (rules.ScoreEnabled ? "1" : "0") + CODE_SEPARATOR;
+        code += CODE_VERSION + CODE_SEPARATOR;
 
         var sum = 0;
         foreach (var c in code) {
@@ -118,9 +120,14 @@ public class RulesetSaverLoader : MonoBehaviour
         GameRules rules = f.Global->Rules;
         QuantumGame game = QuantumRunner.DefaultGame;
         int slot = game.GetLocalPlayerSlots()[game.GetLocalPlayers().IndexOf(game.Frames.Predicted.Global->Host)];
+        int code_version;
         
         var parts = code.Split(CODE_SEPARATOR);
-        if (parts.Length < 31) return false;
+        // if (parts.Length < 31) return false;
+        if (parts.Length < 30) return false;    // version 2 has 32 parts, version 1 has 31 parts
+        if (parts.Length < 31) code_version = 1;    // version 1 didn't have version stored in code
+        else code_version = int.Parse(parts[^2]);
+        
         var sum = 0;
         for (int i = 0; i < code.Length - 2; i++) {
             sum += code[i];
@@ -138,7 +145,7 @@ public class RulesetSaverLoader : MonoBehaviour
             Lives = int.Parse(parts[4]),
             TimerSeconds = int.Parse(parts[5]),
             TeamsEnabled = parts[6] == "1",
-            ScoreEnabled = parts[31] == "1",
+            ScoreEnabled = code_version >= 2 ? parts[31] == "1" : rules.ScoreEnabled,
             SNoReserve = parts[8] == "1",
             SNoDroppedStars = parts[9] == "1",
             SNoDefrost = parts[10] == "1",
