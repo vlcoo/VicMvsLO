@@ -1,10 +1,12 @@
-﻿using Unity.Collections.LowLevel.Unsafe;
+﻿using System.Collections.Generic;
+using Unity.Collections.LowLevel.Unsafe;
 
 namespace Quantum {
     public unsafe partial class Frame {
 
         public StageTileInstance* StageTiles;
         public int StageTilesLength;
+        public List<MatchConditionerSystem.PendingAction> PendingMatchConditionerActions = new();
 
         partial void FreeUser() {
             if (StageTiles != null) {
