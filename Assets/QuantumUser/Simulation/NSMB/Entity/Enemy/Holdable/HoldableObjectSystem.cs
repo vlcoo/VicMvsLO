@@ -80,7 +80,7 @@ namespace Quantum {
             }
         }
 
-        public void OnEntityFreeze(Frame f, EntityRef entity, EntityRef iceBlock) {
+        public void OnEntityFreeze(Frame f, EntityRef entity, EntityRef iceBlock, EntityRef attacker) {
             if (!f.Unsafe.TryGetPointer(entity, out Holdable* holdable)) {
                 return;
             }

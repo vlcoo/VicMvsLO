@@ -64,6 +64,7 @@ namespace NSMB.UI.MainMenu.TriggerList {
             // { TriggerCondition.XSecondRemaining, new List<string> { "60", "10" } },
             { TriggerCondition.EveryXSeconds, new List<string> { "1", "5", "10", "15", "30", "60" } },
             { TriggerCondition.Stunned, new List<string> { "Bump", "Knockback", "HardKnockback" } },
+            { TriggerCondition.StunnedSomeone, new List<string> { "Bump", "Knockback", "HardKnockback" } },
             { TriggerCondition.GotXPowerup, new List<string> { "Any", "Mushroom", "FireFlower", "IceFlower", "PropellerMushroom", "MiniMushroom", "BlueShell", "HammerSuit", "MegaMushroom", "Starman" } },
         };
         public static readonly Dictionary<TriggerAction, List<string>> ActionParameters = new() {

@@ -218,7 +218,7 @@ namespace Quantum {
             physicsObject->DisableCollision = true;
             physicsObject->CurrentData = default;
 
-            f.Signals.OnMarioPlayerDied(entity);
+            f.Signals.OnMarioPlayerDied(entity, attacker);
             f.Events.MarioPlayerDied(entity, fire);
         }
 
@@ -228,7 +228,7 @@ namespace Quantum {
             }
 
             QBoolean doDamage = true;
-            f.Signals.OnMarioPlayerTakeDamage(entity, ref doDamage);
+            f.Signals.OnMarioPlayerTakeDamage(entity, ref doDamage, attacker);
             if (!doDamage) {
                 return false;
             }

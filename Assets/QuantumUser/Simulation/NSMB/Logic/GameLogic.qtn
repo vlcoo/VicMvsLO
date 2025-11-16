@@ -120,7 +120,6 @@ enum TriggerCondition {
     Stunned,
     Frozen,
 //    Thawed,
-//    StunnedSomeone,
 //    SteppedOnEnemy,
 //    TriggeredPowerup,
     Died,
@@ -138,10 +137,12 @@ enum TriggerCondition {
 //    GrabbedSomething,
     FinishedLap,
     EveryXSeconds, // 1, 5, 10, 15, 30, 60
+    StunnedSomeone, // bump, knockback, hardknockback
+    FrozeSomeone,
+    HarmedSomeone,
+    KilledSomeone,
 //    TouchedGround,
 //    StoppedMoving,
-//    KilledSomeone,
-//    HarmedSomeone,
 }
 
 enum TriggerAction {

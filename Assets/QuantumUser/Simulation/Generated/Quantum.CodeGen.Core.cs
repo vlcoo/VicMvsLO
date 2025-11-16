@@ -163,6 +163,10 @@ namespace Quantum {
     ReachedZeroStars,
     FinishedLap,
     EveryXSeconds,
+    StunnedSomeone,
+    FrozeSomeone,
+    HarmedSomeone,
+    KilledSomeone,
   }
   public enum TriggerConstraint : int {
     Always,
@@ -3890,7 +3894,7 @@ namespace Quantum {
     void OnEnemyReturnedHome(Frame f, EntityRef entity);
   }
   public unsafe partial interface ISignalOnEntityFreeze : ISignal {
-    void OnEntityFreeze(Frame f, EntityRef entity, EntityRef iceBlock);
+    void OnEntityFreeze(Frame f, EntityRef entity, EntityRef iceBlock, EntityRef attacker);
   }
   public unsafe partial interface ISignalOnLoadingComplete : ISignal {
     void OnLoadingComplete(Frame f);
@@ -3926,7 +3930,7 @@ namespace Quantum {
     void OnEntityEnterExitLiquid(Frame f, EntityRef entity, EntityRef liquid, QBoolean underwater);
   }
   public unsafe partial interface ISignalOnMarioPlayerDied : ISignal {
-    void OnMarioPlayerDied(Frame f, EntityRef entity);
+    void OnMarioPlayerDied(Frame f, EntityRef entity, EntityRef attacker);
   }
   public unsafe partial interface ISignalOnMarioPlayerBecameInvincible : ISignal {
     void OnMarioPlayerBecameInvincible(Frame f, EntityRef entity);
@@ -3935,7 +3939,7 @@ namespace Quantum {
     void OnMarioPlayerDropObjective(Frame f, EntityRef entity, Int32 amount, EntityRef attacker);
   }
   public unsafe partial interface ISignalOnMarioPlayerTakeDamage : ISignal {
-    void OnMarioPlayerTakeDamage(Frame f, EntityRef entity, ref QBoolean keepDamage);
+    void OnMarioPlayerTakeDamage(Frame f, EntityRef entity, ref QBoolean keepDamage, EntityRef attacker);
   }
   public unsafe partial interface ISignalOnMarioPlayerGroundpoundedSolid : ISignal {
     void OnMarioPlayerGroundpoundedSolid(Frame f, EntityRef mario, PhysicsContact contact, ref QBoolean continueGroundpound);
@@ -4655,12 +4659,12 @@ namespace Quantum {
           }
         }
       }
-      public void OnEntityFreeze(EntityRef entity, EntityRef iceBlock) {
+      public void OnEntityFreeze(EntityRef entity, EntityRef iceBlock, EntityRef attacker) {
         var array = _f._ISignalOnEntityFreezeSystems;
         for (Int32 i = 0; i < array.Length; ++i) {
           var s = array[i];
           if (_f.SystemIsEnabledInHierarchy((SystemBase)s)) {
-            s.OnEntityFreeze(_f, entity, iceBlock);
+            s.OnEntityFreeze(_f, entity, iceBlock, attacker);
           }
         }
       }
@@ -4763,12 +4767,12 @@ namespace Quantum {
           }
         }
       }
-      public void OnMarioPlayerDied(EntityRef entity) {
+      public void OnMarioPlayerDied(EntityRef entity, EntityRef attacker) {
         var array = _f._ISignalOnMarioPlayerDiedSystems;
         for (Int32 i = 0; i < array.Length; ++i) {
           var s = array[i];
           if (_f.SystemIsEnabledInHierarchy((SystemBase)s)) {
-            s.OnMarioPlayerDied(_f, entity);
+            s.OnMarioPlayerDied(_f, entity, attacker);
           }
         }
       }
@@ -4790,12 +4794,12 @@ namespace Quantum {
           }
         }
       }
-      public void OnMarioPlayerTakeDamage(EntityRef entity, ref QBoolean keepDamage) {
+      public void OnMarioPlayerTakeDamage(EntityRef entity, ref QBoolean keepDamage, EntityRef attacker) {
         var array = _f._ISignalOnMarioPlayerTakeDamageSystems;
         for (Int32 i = 0; i < array.Length; ++i) {
           var s = array[i];
           if (_f.SystemIsEnabledInHierarchy((SystemBase)s)) {
-            s.OnMarioPlayerTakeDamage(_f, entity, ref keepDamage);
+            s.OnMarioPlayerTakeDamage(_f, entity, ref keepDamage, attacker);
           }
         }
       }

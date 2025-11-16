@@ -182,7 +182,7 @@ namespace Quantum {
             GameLogicSystem.CheckForGameEnd(f);
         }
 
-        public void OnMarioPlayerDied(Frame f, EntityRef entity) {
+        public void OnMarioPlayerDied(Frame f, EntityRef entity, EntityRef attacker) {
             // Lose half of all coins
             var mario = f.Unsafe.GetPointer<MarioPlayer>(entity);
             var transform = f.Unsafe.GetPointer<Transform2D>(entity);

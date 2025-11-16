@@ -29,7 +29,10 @@ public unsafe class CoinTile : BreakableBrickTile {
         }
 
         // Give coin to player
-        f.Signals.OnMarioPlayerCollectedCoin(entity, EntityRef.None, QuantumUtils.RelativeTileToWorld(f, tilePosition) + FPVector2.One * FP._0_25, true, direction == InteractionDirection.Down);
+        if (!f.Global->Rules.SNoCoins)
+            f.Signals.OnMarioPlayerCollectedCoin(entity, EntityRef.None,
+                QuantumUtils.RelativeTileToWorld(f, tilePosition) + FPVector2.One * FP._0_25, true,
+                direction == InteractionDirection.Down);
         Bump(f, null, tilePosition, resultTile, direction == InteractionDirection.Down, entity, allowSelfDamage);
         playBumpSound = false;
 

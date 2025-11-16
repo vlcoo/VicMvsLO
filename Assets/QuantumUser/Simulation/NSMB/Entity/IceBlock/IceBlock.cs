@@ -12,7 +12,7 @@ namespace Quantum {
                 || ((!physicsObject->IsUnderwater || InLiquidType == LiquidType.Water) && !IsSliding && !f.Exists(holdable->Holder));
         }
 
-        public void Initialize(Frame f, EntityRef iceBlockEntity, EntityRef childEntity) {
+        public void Initialize(Frame f, EntityRef iceBlockEntity, EntityRef childEntity, EntityRef attacker = default) {
             var transform = f.Unsafe.GetPointer<Transform2D>(iceBlockEntity);
             var physicsCollider = f.Unsafe.GetPointer<PhysicsCollider2D>(iceBlockEntity);
             var child = f.Unsafe.GetPointer<Freezable>(childEntity);
@@ -49,7 +49,7 @@ namespace Quantum {
                 PhysicsObjectSystem.TryEject(f, iceBlockEntity);
             }
 
-            f.Signals.OnEntityFreeze(childEntity, iceBlockEntity);
+            f.Signals.OnEntityFreeze(childEntity, iceBlockEntity, attacker);
             f.Events.EntityFrozen(childEntity, iceBlockEntity);
         }
     }

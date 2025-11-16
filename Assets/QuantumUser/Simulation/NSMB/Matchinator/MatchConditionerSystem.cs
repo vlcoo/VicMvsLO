@@ -1,12 +1,9 @@
 using Photon.Deterministic;
-using Quantum.Collections;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using UnityEngine;
 using UnityEngine.Scripting;
-using Int32 = System.Int32;
 
 namespace Quantum
 {
@@ -354,21 +351,25 @@ namespace Quantum
                 if (f.IsVerified) Debug.Log($"[MatchConditioner] <b>{condition}</b>{(trigger.ConditionParameter != "" ? (" (" + trigger.ConditionParameter + ")") : "")} succeeded... <b>{trigger.Action}</b>{(trigger.ActionParameter != "" ? (" (" + trigger.ActionParameter + ")") : "")} begin!!" + (trigger.DelaySeconds > 0 ? $" (wait {trigger.DelaySeconds}s)" : ""));
                 foreach (var actionerEntity in actionerEntities) {
                     for (var i = 0; i < trigger.RepeatCount; i++) {
+                        var methodParameters = actionMethod.GetParameters().Length == 4
+                            ? new object[] { f, actionerEntity, trigger.ActionParameter.ToString(), conditionerEntity }
+                            : new object[] { f, actionerEntity, trigger.ActionParameter.ToString() };
+                        
                         if (trigger.DelaySeconds > 0) {
                             f.PendingMatchConditionerActions.Add(new PendingAction {
                                 ActionMethod = actionMethod,
-                                MethodParameters = new object[] { f, actionerEntity, trigger.ActionParameter.ToString() },
+                                MethodParameters = methodParameters,
                                 SecondsRemaining = trigger.DelaySeconds,
                             });
                         } else {
-                            actionMethod.Invoke(this, new object[] { f, actionerEntity, trigger.ActionParameter.ToString() });
+                            actionMethod.Invoke(this, methodParameters);
                         }
                     }
                 }
             }
         }
 
-        private unsafe void HandlePendingActions(Frame f) {
+        private void HandlePendingActions(Frame f) {
             foreach (var pendingAction in f.PendingMatchConditionerActions) {
                 pendingAction.SecondsRemaining -= 1;
                 if (pendingAction.SecondsRemaining <= 0) {
@@ -389,7 +390,6 @@ namespace Quantum
 
         public void a() {
             // ConditionActioned(TriggerCondition.HitBlock, f, entity);
-            // ConditionActioned(TriggerCondition.StunnedSomeone, f, entity);
             // ConditionActioned(TriggerCondition.SteppedOnEnemy, f, entity);
             // ConditionActioned(TriggerCondition.TriggeredPowerup, f, entity);
             // ConditionActioned(TriggerCondition.LookedXDirection, f, entity);
@@ -401,21 +401,27 @@ namespace Quantum
             // ConditionActioned(TriggerCondition.GrabbedSomething, f, entity);
             // ConditionActioned(TriggerCondition.TouchedGround, f, entity);
             // ConditionActioned(TriggerCondition.StoppedMoving, f, entity);
-            // ConditionActioned(TriggerCondition.KilledSomeone, f, entity);
-            // ConditionActioned(TriggerCondition.HarmedSomeone, f, entity);
         }
 
         public void OnMarioTouchedGoal(Frame f, EntityRef marioEntity, EntityRef goalEntity, QBoolean isLastLap) {
             ConditionActioned(TriggerCondition.FinishedLap, f, marioEntity);
         }
 
-        public void OnMarioPlayerDied(Frame f, EntityRef entity) {
+        public void OnMarioPlayerDied(Frame f, EntityRef entity, EntityRef attacker) {
             ConditionActioned(TriggerCondition.Died, f, entity);
+
+            if (attacker.IsValid && f.Has<MarioPlayer>(attacker))
+                ConditionActioned(TriggerCondition.KilledSomeone, f, attacker);
         }
 
-        public void OnEntityFreeze(Frame f, EntityRef entity, EntityRef iceBlock) {
+        public unsafe void OnEntityFreeze(Frame f, EntityRef entity, EntityRef iceBlock, EntityRef attacker) {
             if (!f.Has<MarioPlayer>(entity)) return;
             ConditionActioned(TriggerCondition.Frozen, f, entity);
+
+            if (!attacker.IsValid) return;
+            var actualAttacker = attacker;
+            if (f.Unsafe.TryGetPointer(actualAttacker, out Projectile* projectile)) actualAttacker = projectile->Owner;
+            if (f.Has<MarioPlayer>(actualAttacker)) ConditionActioned(TriggerCondition.FrozeSomeone, f, actualAttacker);
         }
 
         public void OnGameStarting(Frame f) {
@@ -451,11 +457,23 @@ namespace Quantum
             ConditionActioned(TriggerCondition.GotCoin, f, marioEntity);
         }
 
-        public void OnMarioPlayerReceivedKnockback(Frame f, EntityRef entity, EntityRef attacker, KnockbackStrength strength) {
+        public unsafe void OnMarioPlayerReceivedKnockback(Frame f, EntityRef entity, EntityRef attacker, KnockbackStrength strength) {
+            var actualAttacker = attacker;
+            if (f.Unsafe.TryGetPointer(actualAttacker, out Projectile* projectile)) actualAttacker = projectile->Owner;
+            
             switch (strength) {
-            case KnockbackStrength.FireballBump or KnockbackStrength.CollisionBump: ConditionActioned(TriggerCondition.Stunned, f, entity, "Bump"); break;
-            case KnockbackStrength.Normal: ConditionActioned(TriggerCondition.Stunned, f, entity, "Knockback"); break;
-            case KnockbackStrength.Groundpound: ConditionActioned(TriggerCondition.Stunned, f, entity, "HardKnockback"); break;
+            case KnockbackStrength.FireballBump or KnockbackStrength.CollisionBump: 
+                ConditionActioned(TriggerCondition.Stunned, f, entity, "Bump"); 
+                ConditionActioned(TriggerCondition.StunnedSomeone, f, actualAttacker, "Bump");
+                break;
+            case KnockbackStrength.Normal: 
+                ConditionActioned(TriggerCondition.Stunned, f, entity, "Knockback"); 
+                ConditionActioned(TriggerCondition.StunnedSomeone, f, actualAttacker, "Knockback");
+                break;
+            case KnockbackStrength.Groundpound: 
+                ConditionActioned(TriggerCondition.Stunned, f, entity, "HardKnockback"); 
+                ConditionActioned(TriggerCondition.StunnedSomeone, f, actualAttacker, "HardKnockback");
+                break;
             }
         }
 
@@ -466,8 +484,11 @@ namespace Quantum
                 scriptable.Type == PowerupType.Basic ? scriptable.State.ToString() : scriptable.Type.ToString());
         }
 
-        public void OnMarioPlayerTakeDamage(Frame f, EntityRef entity, ref QBoolean keepDamage) {
+        public void OnMarioPlayerTakeDamage(Frame f, EntityRef entity, ref QBoolean keepDamage, EntityRef attacker) {
             ConditionActioned(TriggerCondition.LostPowerup, f, entity);
+            
+            if (attacker.IsValid && f.Has<MarioPlayer>(attacker))
+                ConditionActioned(TriggerCondition.HarmedSomeone, f, attacker);
         }
 
         public void OnMarioPlayerGotCheckpoint(Frame f, EntityRef entity) {
@@ -490,8 +511,8 @@ namespace Quantum
 
         #region Actions
         [Preserve]
-        public unsafe void ActKill(Frame f, EntityRef entity, string parameter) {
-            f.Unsafe.GetPointer<MarioPlayer>(entity)->Death(f, entity, false, true, EntityRef.None);
+        public unsafe void ActKill(Frame f, EntityRef entity, string parameter, EntityRef conditioner = default) {
+            f.Unsafe.GetPointer<MarioPlayer>(entity)->Death(f, entity, false, true, conditioner);
         }
 
         [Preserve]
@@ -566,21 +587,21 @@ namespace Quantum
         }
 
         [Preserve]
-        public unsafe void ActStun(Frame f, EntityRef entity, string parameter) {
+        public unsafe void ActStun(Frame f, EntityRef entity, string parameter, EntityRef conditioner = default) {
             if (parameter == "") parameter = "Bump";
             var mario = f.Unsafe.GetPointer<MarioPlayer>(entity);
             switch (parameter) {
                 case "Bump":
-                    mario->DoKnockback(f, entity, mario->FacingRight, 1, KnockbackStrength.CollisionBump, entity);
+                    mario->DoKnockback(f, entity, mario->FacingRight, 1, KnockbackStrength.CollisionBump, conditioner);
                     break;
                 case "Knockback":
-                    mario->DoKnockback(f, entity, mario->FacingRight, 1, KnockbackStrength.FireballBump, entity);
+                    mario->DoKnockback(f, entity, mario->FacingRight, 1, KnockbackStrength.FireballBump, conditioner);
                     break;
                 case "HardKnockback":
-                    mario->DoKnockback(f, entity, mario->FacingRight, 3, KnockbackStrength.Groundpound, entity);
+                    mario->DoKnockback(f, entity, mario->FacingRight, 3, KnockbackStrength.Groundpound, conditioner);
                     break;
                 case "ForcefulKnockback":
-                    mario->DoKnockback(f, entity, mario->FacingRight, 1, KnockbackStrength.Groundpound, entity, true);
+                    mario->DoKnockback(f, entity, mario->FacingRight, 1, KnockbackStrength.Groundpound, conditioner, true);
                     break;
                 default:
                     Err($"invalid param {parameter}!!"); break;
@@ -598,13 +619,13 @@ namespace Quantum
         }
 
         [Preserve]
-        public unsafe void ActFreeze(Frame f, EntityRef entity, string parameter) {
-            IceBlockSystem.Freeze(f, entity);
+        public unsafe void ActFreeze(Frame f, EntityRef entity, string parameter, EntityRef conditioner = default) {
+            IceBlockSystem.Freeze(f, entity, attacker: conditioner);
         }
 
         [Preserve]
-        public unsafe void ActHarm(Frame f, EntityRef entity, string parameter) {
-            f.Unsafe.GetPointer<MarioPlayer>(entity)->Powerdown(f, entity, parameter == "force", EntityRef.None);
+        public unsafe void ActHarm(Frame f, EntityRef entity, string parameter, EntityRef conditioner = default) {
+            f.Unsafe.GetPointer<MarioPlayer>(entity)->Powerdown(f, entity, parameter == "force", conditioner);
         }
 
         [Preserve]

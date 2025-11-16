@@ -10,7 +10,7 @@ component Freezable {
 	[ExcludeFromPrototype] EntityRef FrozenCubeEntity;
 }
 
-signal OnEntityFreeze(EntityRef entity, EntityRef iceBlock);
+signal OnEntityFreeze(EntityRef entity, EntityRef iceBlock, EntityRef attacker);
 
 event EntityFrozen {
 	EntityRef Entity;

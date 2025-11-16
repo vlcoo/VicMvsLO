@@ -235,7 +235,7 @@ namespace Quantum {
             gamemode.DisableGamemode(f);
         }
 
-        public void OnMarioPlayerDied(Frame f, EntityRef entity) {
+        public void OnMarioPlayerDied(Frame f, EntityRef entity, EntityRef attacker) {
             CheckForGameEnd(f);
         }
 

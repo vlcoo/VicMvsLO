@@ -91,14 +91,14 @@ namespace Quantum {
             }
         }
 
-        public static EntityRef Freeze(Frame f, EntityRef entityToFreeze, bool flying = false) {
+        public static EntityRef Freeze(Frame f, EntityRef entityToFreeze, bool flying = false, EntityRef attacker = default) {
             if (!f.Has<Freezable>(entityToFreeze)) {
                 return default;
             }
 
             EntityRef iceBlockEntity = f.Create(f.SimulationConfig.IceBlockPrototype);
             var iceBlock = f.Unsafe.GetPointer<IceBlock>(iceBlockEntity);
-            iceBlock->Initialize(f, iceBlockEntity, entityToFreeze);
+            iceBlock->Initialize(f, iceBlockEntity, entityToFreeze, attacker);
             iceBlock->IsFlying = flying;
             return iceBlockEntity;
         }

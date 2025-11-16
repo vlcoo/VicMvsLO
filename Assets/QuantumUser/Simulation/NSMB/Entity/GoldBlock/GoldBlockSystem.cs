@@ -147,7 +147,7 @@ namespace Quantum {
             }
         }
 
-        public void OnMarioPlayerDied(Frame f, EntityRef entity) {
+        public void OnMarioPlayerDied(Frame f, EntityRef entity, EntityRef attacker) {
             foreach ((EntityRef goldBlockEntity, var goldBlock) in f.Unsafe.GetComponentBlockIterator<GoldBlock>()) {
                 if (goldBlock->AttachedTo == entity) {
                     f.Events.GoldBlockLostViaDamage(goldBlockEntity);
@@ -156,7 +156,7 @@ namespace Quantum {
             }
         }
 
-        public void OnMarioPlayerTakeDamage(Frame f, EntityRef entity, ref QBoolean keepDamage) {
+        public void OnMarioPlayerTakeDamage(Frame f, EntityRef entity, ref QBoolean keepDamage, EntityRef attacker) {
             foreach ((EntityRef goldBlockEntity, var goldBlock) in f.Unsafe.GetComponentBlockIterator<GoldBlock>()) {
                 if (goldBlock->AttachedTo == entity) {
                     keepDamage = false;

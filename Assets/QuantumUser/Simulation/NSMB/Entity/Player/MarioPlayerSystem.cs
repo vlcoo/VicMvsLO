@@ -2147,7 +2147,7 @@ namespace Quantum {
                     if (dropStars && mario->CurrentPowerupState == PowerupState.MiniMushroom) {
                         damaged = mario->Powerdown(f, marioEntity, false, projectileEntity);
                     } else if (dropStars) {
-                        IceBlockSystem.Freeze(f, marioEntity);
+                        IceBlockSystem.Freeze(f, marioEntity, attacker: projectileEntity);
                         damaged = true;
                     }
                     
@@ -2748,7 +2748,7 @@ namespace Quantum {
             }
         }
 
-        public void OnEntityFreeze(Frame f, EntityRef entity, EntityRef iceBlock) {
+        public void OnEntityFreeze(Frame f, EntityRef entity, EntityRef iceBlock, EntityRef attacker) {
             if (!f.Unsafe.TryGetPointer(entity, out MarioPlayer* mario)) {
                 return;
             }
