@@ -49,11 +49,11 @@ public class TriggerExtraOptionsMenu : MonoBehaviour {
             ((TriggerListEntry.DropdownTriggerOption) o).EnumValue == (int) _currentConstraint));
         RecalculateConstraintParameters();
         RecalculateConstraintTargets();
-        if (ddConstraintParameter.gameObject.activeSelf) 
-            ddConstraintParameter.SetValueWithoutNotify(ddConstraintParameter.options.FindIndex(o =>
+        // if (ddConstraintParameter.gameObject.activeSelf) 
+        ddConstraintParameter.SetValueWithoutNotify(ddConstraintParameter.options.FindIndex(o =>
             o.text == _currentParameter));
-        if (inConstraintParameter.gameObject.activeSelf)
-            inConstraintParameter.text = _currentParameter;
+        // if (inConstraintParameter.gameObject.activeSelf)
+        inConstraintParameter.text = _currentParameter;
         ddConstraintTarget.SetValueWithoutNotify(ddConstraintTarget.options.FindIndex(o =>
             ((TriggerListEntry.DropdownTriggerOption) o).EnumValue == (int) _currentTarget));
     }
@@ -70,6 +70,8 @@ public class TriggerExtraOptionsMenu : MonoBehaviour {
     }
 
     public void OnConfirm() {
+        if (!Parent.matchSettings.isHost) return;
+        
         Parent.currentEditingEntry.OnExtrasChanged(
             (byte) sChance.value, (byte) sDelay.value, (byte) sRepeat.value,
             _currentConstraint, _currentTarget, _currentParameter
@@ -133,9 +135,9 @@ public class TriggerExtraOptionsMenu : MonoBehaviour {
             ddConstraintParameter.gameObject.SetActive(false);
             inConstraintParameter.gameObject.SetActive(true);
             if (!int.TryParse(_currentParameter, out _)) {
-                inConstraintParameter.text = "1";
                 _currentParameter = "1";
             }
+            inConstraintParameter.text = _currentParameter;
         } else {
             // preset parameters
             ddConstraintParameter.gameObject.SetActive(true);

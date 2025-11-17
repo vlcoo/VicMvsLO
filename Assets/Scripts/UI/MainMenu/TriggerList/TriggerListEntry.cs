@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 using Button = UnityEngine.UI.Button;
 
 public class TriggerListEntry : MonoBehaviour {
@@ -29,6 +30,7 @@ public class TriggerListEntry : MonoBehaviour {
         ddActionTarget;
 
     public Button btnDelete, btnDuplicate, btnCondition, btnAction;
+    public Image btnExtras;
     
     void OnEnable() {
         RecalculateConditionParameters();
@@ -70,6 +72,12 @@ public class TriggerListEntry : MonoBehaviour {
             ((DropdownTriggerOption) o).EnumValue == (int) newTrigger.ConditionTarget));
         ddActionTarget.SetValueWithoutNotify(ddActionTarget.options.FindIndex(o =>
             ((DropdownTriggerOption) o).EnumValue == (int) newTrigger.ActionTarget));
+        
+        var hasExtras = newTrigger.Constraint != TriggerConstraint.Always ||
+                        newTrigger.Chance != 100 ||
+                        newTrigger.DelaySeconds != 0 ||
+                        newTrigger.RepeatCount != 1;
+        btnExtras.color = hasExtras ? new Color(1f, 0.5f, 0.5f) : Color.white;
     }
     
     public void OnConditionChanged(TriggerCondition condition) {

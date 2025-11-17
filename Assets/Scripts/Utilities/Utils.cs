@@ -81,6 +81,7 @@ namespace NSMB.Utilities {
             ['C'] = "hudnumber_coin",
             ['c'] = "hudnumber_objectivecoin",
             ['S'] = "hudnumber_star",
+            ['s'] = "room_score",
             ['L'] = "hudnumber_laps",
             ['T'] = "hudnumber_timer",
             ['/'] = "hudnumber_slash",

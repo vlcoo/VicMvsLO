@@ -245,7 +245,7 @@ namespace Quantum {
         _f.AddEvent(ev);
         return ev;
       }
-      public EventMarioPlayerCollectedCoin MarioPlayerCollectedCoin(EntityRef Entity, Byte Coins, QBoolean ItemSpawned, FPVector2 CoinLocation, QBoolean CoinFromBlock, QBoolean Downwards) {
+      public EventMarioPlayerCollectedCoin MarioPlayerCollectedCoin(EntityRef Entity, Int32 Coins, QBoolean ItemSpawned, FPVector2 CoinLocation, QBoolean CoinFromBlock, QBoolean Downwards) {
         if (_f.IsPredicted) return null;
         var ev = _f.Context.AcquireEvent<EventMarioPlayerCollectedCoin>(EventMarioPlayerCollectedCoin.ID);
         ev.Entity = Entity;
@@ -1152,7 +1152,7 @@ namespace Quantum {
   public unsafe partial class EventMarioPlayerCollectedCoin : EventBase {
     public new const Int32 ID = 13;
     public EntityRef Entity;
-    public Byte Coins;
+    public Int32 Coins;
     public QBoolean ItemSpawned;
     public FPVector2 CoinLocation;
     public QBoolean CoinFromBlock;

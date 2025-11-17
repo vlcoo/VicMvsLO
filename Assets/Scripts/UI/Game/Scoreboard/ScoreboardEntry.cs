@@ -86,9 +86,11 @@ namespace NSMB.UI.Game.Scoreboard {
             CharacterAsset character = f.FindAsset(f.SimulationConfig.CharacterDatas[info.Character]);
             int objective = 0;
             int lives = 0;
+            int score = 0;
             if (f.Unsafe.TryGetPointer(Target, out MarioPlayer* mario)) {
                 objective = Mathf.Max(0, gamemode.GetObjectiveCount(f, mario));
                 lives = mario->Disconnected ? 0 : mario->Lives;
+                score = mario->Score;
             }
 
             StringBuilder scoreBuilder = new();
@@ -98,6 +100,10 @@ namespace NSMB.UI.Game.Scoreboard {
 
             if (f.Global->Rules.IsStarsEnabled || gamemode is not StarChasersGamemode) {
                 scoreBuilder.Append(Utils.GetSymbolString(gamemode.ObjectiveSymbolPrefix + objective.ToString()));
+            }
+
+            if (f.Global->Rules.ScoreEnabled) {
+                scoreBuilder.Append(Utils.GetSymbolString("s" + score));
             }
 
             scoreText.text = scoreBuilder.ToString();

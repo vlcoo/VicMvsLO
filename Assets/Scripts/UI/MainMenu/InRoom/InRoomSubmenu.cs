@@ -289,6 +289,7 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
         }
 
         private void OnGameDestroyed(CallbackGameDestroyed e) {
+            Debug.Log("# Ruleset autosave:\n" + RulesetSaverLoader.RulesetToCode());
             Canvas.CloseSubmenuAndChildren(this);
         }
 

@@ -230,17 +230,21 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
         private MatchConditionerTrigger CorrectifyTrigger(MatchConditionerTrigger entry) {
             var conditionNeedsParameter = TriggerMappings.ConditionParameters.Keys.Contains(entry.Condition);
             var actionNeedsParameter = TriggerMappings.ActionParameters.Keys.Contains(entry.Action);
-            var constraintNeedsParameter = TriggerMappings.ConstraintParameters.Keys.Contains(entry.Constraint);
+            var constraintNeedsParameter = TriggerMappings.ConstraintParameters.Keys.Contains(entry.Constraint) ||
+                                          TriggerMappings.ConstraintNumberParameters.Contains(entry.Constraint);;
             
             if (conditionNeedsParameter && entry.ConditionParameter == "")
                 entry.ConditionParameter = TriggerMappings.ConditionParameters[entry.Condition][0];
             if (actionNeedsParameter && entry.ActionParameter == "")
                 entry.ActionParameter = TriggerMappings.ActionParameters[entry.Action][0];
-            if (constraintNeedsParameter && entry.ConstraintParameter == "") {
+            if (constraintNeedsParameter && entry.ConstraintParameter == "")
                 entry.ConstraintParameter = TriggerMappings.ConstraintNumberParameters.Contains(entry.Constraint)
                     ? "1"
                     : TriggerMappings.ConstraintParameters[entry.Constraint][0];
-            }
+            
+            if (!conditionNeedsParameter) entry.ConditionParameter = "";
+            if (!actionNeedsParameter) entry.ActionParameter = "";
+            if (!constraintNeedsParameter) entry.ConstraintParameter = "";
             
             return entry;
         }

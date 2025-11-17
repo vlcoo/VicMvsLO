@@ -141,6 +141,7 @@ enum TriggerCondition {
     FrozeSomeone,
     HarmedSomeone,
     KilledSomeone,
+    ReachedZeroScore,
 //    TouchedGround,
 //    StoppedMoving,
 }
@@ -176,6 +177,9 @@ enum TriggerAction {
     MaxCoins,
 //    SpawnStar,
 //    BecomeXTeam,    // random, A, B, C, D, E
+    AddXToScore,    // 1, 10, 100
+    SubtractXFromScore, // 1, 10, 100
+    ZeroScore,
 }
 
 enum TriggerConstraint {
@@ -246,6 +250,7 @@ enum TriggerTarget {
 //    NonFirstPlace,
 //    LastPlace,
 //    NonLastPlace,
+    CheckIndividually,
 }
 
 enum TriggerParameter {

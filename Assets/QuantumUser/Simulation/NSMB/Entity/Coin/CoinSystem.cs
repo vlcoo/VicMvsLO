@@ -145,7 +145,7 @@ namespace Quantum {
             // Normal, powerup coin.
             var mario = f.Unsafe.GetPointer<MarioPlayer>(marioEntity);
 
-            byte newCoins = (byte) (mario->Coins + 1);
+            int newCoins = mario->Coins + 1;
             bool item = newCoins == f.Global->Rules.CoinsForPowerup;
             bool itemSpawnSucceeded = false;
             if (item) {

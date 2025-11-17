@@ -11,8 +11,8 @@ using UnityEngine;
 public class RulesetSaverLoader : MonoBehaviour
 {
     private MainMenuCanvas Canvas => GetComponent<PromptSubmenu>().Canvas;
-    private string CODE_SEPARATOR = "-";
-    private int CODE_VERSION = 2;
+    private const string CODE_SEPARATOR = "-";
+    private const int CODE_VERSION = 2;
 
     public void OnSavePressed() {
         GUIUtility.systemCopyBuffer = RulesetToCode();
@@ -34,7 +34,7 @@ public class RulesetSaverLoader : MonoBehaviour
         }
     }
 
-    private unsafe string RulesetToCode() {
+    public static unsafe string RulesetToCode() {
         var code = "";
         Frame f = NetworkHandler.Game.Frames.Predicted;
         GameRules rules = f.Global->Rules;
@@ -63,7 +63,8 @@ public class RulesetSaverLoader : MonoBehaviour
             else code += ",";
             code += (int)trigger.ActionTarget + ",";
             code += (int)trigger.Constraint + ",";
-            if (TriggerMappings.ConstraintParameters.TryGetValue(trigger.Constraint, out parameters) &&
+            if (int.TryParse(trigger.ConstraintParameter, out _)) code += trigger.ConstraintParameter + ",";
+            else if (TriggerMappings.ConstraintParameters.TryGetValue(trigger.Constraint, out parameters) &&
                 parameters.IndexOf(trigger.ConstraintParameter) is var k and >= 0)
                 code += k + ",";
             else code += ",";
@@ -110,7 +111,6 @@ public class RulesetSaverLoader : MonoBehaviour
         }
         code += (sum % 256).ToString("X2");
 
-        Debug.Log(code);
         return code;
     }
 
@@ -197,7 +197,8 @@ public class RulesetSaverLoader : MonoBehaviour
             var actionTarget = (TriggerTarget)int.Parse(triggerParts[5]);
             var constraint = (TriggerConstraint)int.Parse(triggerParts[6]);
             var constraintParameter = "";
-            if (TriggerMappings.ConstraintParameters.TryGetValue(constraint, out parameters) &&
+            if (int.TryParse(triggerParts[7], out _)) constraintParameter = triggerParts[7];
+            else if (TriggerMappings.ConstraintParameters.TryGetValue(constraint, out parameters) &&
                 int.TryParse(triggerParts[7], out var k) && k >= 0 && k < parameters.Count) {
                 constraintParameter = parameters[k];
             }

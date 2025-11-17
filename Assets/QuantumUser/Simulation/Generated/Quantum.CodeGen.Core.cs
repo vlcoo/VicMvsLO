@@ -144,6 +144,9 @@ namespace Quantum {
     ZeroCoins,
     ZeroStars,
     MaxCoins,
+    AddXToScore,
+    SubtractXFromScore,
+    ZeroScore,
   }
   public enum TriggerCondition : int {
     GotStar,
@@ -167,6 +170,7 @@ namespace Quantum {
     FrozeSomeone,
     HarmedSomeone,
     KilledSomeone,
+    ReachedZeroScore,
   }
   public enum TriggerConstraint : int {
     Always,
@@ -261,6 +265,7 @@ namespace Quantum {
     NonTeamD,
     TeamE,
     NonTeamE,
+    CheckIndividually,
   }
   [System.FlagsAttribute()]
   public enum InputButtons : int {
@@ -3968,6 +3973,9 @@ namespace Quantum {
   public unsafe partial interface ISignalOnMarioPlayerGotCheckpoint : ISignal {
     void OnMarioPlayerGotCheckpoint(Frame f, EntityRef entity);
   }
+  public unsafe partial interface ISignalOnMarioPlayerZeroedScore : ISignal {
+    void OnMarioPlayerZeroedScore(Frame f, EntityRef marioEntity, MarioPlayer* mario);
+  }
   public unsafe partial interface ISignalOnEntityChangeUnderwaterState : ISignal {
     void OnEntityChangeUnderwaterState(Frame f, EntityRef entity, EntityRef liquid, QBoolean underwater);
   }
@@ -4313,6 +4321,7 @@ namespace Quantum {
     private ISignalOnMarioPlayerRespawned[] _ISignalOnMarioPlayerRespawnedSystems;
     private ISignalOnMarioPlayerReceivedKnockback[] _ISignalOnMarioPlayerReceivedKnockbackSystems;
     private ISignalOnMarioPlayerGotCheckpoint[] _ISignalOnMarioPlayerGotCheckpointSystems;
+    private ISignalOnMarioPlayerZeroedScore[] _ISignalOnMarioPlayerZeroedScoreSystems;
     private ISignalOnEntityChangeUnderwaterState[] _ISignalOnEntityChangeUnderwaterStateSystems;
     private ISignalOnEntityCrushed[] _ISignalOnEntityCrushedSystems;
     private ISignalOnMarioPlayerCollectedPowerup[] _ISignalOnMarioPlayerCollectedPowerupSystems;
@@ -4370,6 +4379,7 @@ namespace Quantum {
       _ISignalOnMarioPlayerRespawnedSystems = BuildSignalsArray<ISignalOnMarioPlayerRespawned>();
       _ISignalOnMarioPlayerReceivedKnockbackSystems = BuildSignalsArray<ISignalOnMarioPlayerReceivedKnockback>();
       _ISignalOnMarioPlayerGotCheckpointSystems = BuildSignalsArray<ISignalOnMarioPlayerGotCheckpoint>();
+      _ISignalOnMarioPlayerZeroedScoreSystems = BuildSignalsArray<ISignalOnMarioPlayerZeroedScore>();
       _ISignalOnEntityChangeUnderwaterStateSystems = BuildSignalsArray<ISignalOnEntityChangeUnderwaterState>();
       _ISignalOnEntityCrushedSystems = BuildSignalsArray<ISignalOnEntityCrushed>();
       _ISignalOnMarioPlayerCollectedPowerupSystems = BuildSignalsArray<ISignalOnMarioPlayerCollectedPowerup>();
@@ -4881,6 +4891,15 @@ namespace Quantum {
           var s = array[i];
           if (_f.SystemIsEnabledInHierarchy((SystemBase)s)) {
             s.OnMarioPlayerGotCheckpoint(_f, entity);
+          }
+        }
+      }
+      public void OnMarioPlayerZeroedScore(EntityRef marioEntity, MarioPlayer* mario) {
+        var array = _f._ISignalOnMarioPlayerZeroedScoreSystems;
+        for (Int32 i = 0; i < array.Length; ++i) {
+          var s = array[i];
+          if (_f.SystemIsEnabledInHierarchy((SystemBase)s)) {
+            s.OnMarioPlayerZeroedScore(_f, marioEntity, mario);
           }
         }
       }

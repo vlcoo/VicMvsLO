@@ -123,7 +123,11 @@ namespace NSMB.UI.Game {
             }
 
             if (f.Global->Rules.IsStarsEnabled || gamemode is not StarChasersGamemode) {
-                stringBuilder.Append(Utils.GetSymbolString(gamemode.ObjectiveSymbolPrefix + "x" + Mathf.Max(0, gamemode.GetObjectiveCount(f, mario))));
+                stringBuilder.Append(Utils.GetSymbolString(gamemode.ObjectiveSymbolPrefix + "x" + Mathf.Max(0, gamemode.GetObjectiveCount(f, mario)))).Append(' ');
+            }
+            
+            if (f.Global->Rules.ScoreEnabled) {
+                stringBuilder.Append(Utils.GetSymbolString("s" + mario->Score));
             }
 
             text.text = stringBuilder.ToString();

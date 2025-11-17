@@ -7,11 +7,11 @@ using UnityEngine.Scripting;
 
 namespace Quantum
 {
-    public class MatchConditionerSystem : SystemSignalsOnly, ISignalOnMarioPlayerCollectedStar, ISignalOnMarioPlayerCollectedCoin, ISignalOnMarioPlayerDied, ISignalOnEntityFreeze, ISignalOnGameStarting, ISignalOnMarioPlayerDisqualified, ISignalOnMarioPlayerJumped, ISignalOnMarioPlayerRespawned, ISignalOnMarioPlayerReceivedKnockback, ISignalOnMarioPlayerCollectedPowerup, ISignalOnMarioPlayerTakeDamage, ISignalOnMarioPlayerReachedCoinLimit, ISignalOnMarioPlayerZeroedStars, ISignalOnMarioPlayerZeroedCoins, ISignalOnMarioTouchedGoal, ISignalOnMarioPlayerGotCheckpoint, ISignalOnSecondTicked {
+    public class MatchConditionerSystem : SystemSignalsOnly, ISignalOnMarioPlayerCollectedStar, ISignalOnMarioPlayerCollectedCoin, ISignalOnMarioPlayerDied, ISignalOnEntityFreeze, ISignalOnGameStarting, ISignalOnMarioPlayerDisqualified, ISignalOnMarioPlayerJumped, ISignalOnMarioPlayerRespawned, ISignalOnMarioPlayerReceivedKnockback, ISignalOnMarioPlayerCollectedPowerup, ISignalOnMarioPlayerTakeDamage, ISignalOnMarioPlayerReachedCoinLimit, ISignalOnMarioPlayerZeroedStars, ISignalOnMarioPlayerZeroedCoins, ISignalOnMarioTouchedGoal, ISignalOnMarioPlayerGotCheckpoint, ISignalOnSecondTicked, ISignalOnMarioPlayerZeroedScore {
         public class PendingAction {
             public MethodInfo ActionMethod;
             public object[] MethodParameters;
-            public int SecondsRemaining;
+            public int SecondsRemaining, RepeatCount;
         }
         
         public override unsafe void OnInit(Frame f) {
@@ -72,12 +72,24 @@ namespace Quantum
                 var actionerEntities = new List<EntityRef>();
                 var marioFilter = f.Filter<MarioPlayer>();
                 var actionTarget = trigger.ActionTarget;
+                var constraintTarget = trigger.ConstraintTarget;
                 if ((!conditionerIsPerson || !f.Exists(conditionerEntity)) && (new[] {
                         TriggerTarget.Conditioner, TriggerTarget.ConditionerTeam, TriggerTarget.NonConditioner,
                         TriggerTarget.NonConditionerTeam
-                    }.Contains(trigger.ActionTarget))) {
-                    Debug.LogWarning("[MatchConditioner] Conditioner is needed, but doesn't exist! Defaulting to Everyone.");
+                    }.Contains(actionTarget))) {
+                    Debug.LogWarning("[MatchConditioner] Conditioner is needed for action target, but doesn't exist! Defaulting to Everyone.");
                     actionTarget = TriggerTarget.Everyone;
+                }
+                if ((!conditionerIsPerson || !f.Exists(conditionerEntity)) && (new[] {
+                        TriggerTarget.Conditioner, TriggerTarget.ConditionerTeam, TriggerTarget.NonConditioner,
+                        TriggerTarget.NonConditionerTeam
+                    }.Contains(constraintTarget))) {
+                    Debug.LogWarning("[MatchConditioner] Conditioner is needed for constraint target, but doesn't exist! Defaulting to Everyone.");
+                    constraintTarget = TriggerTarget.Everyone;
+                }
+                if (new[] { TriggerTarget.Actioner, TriggerTarget.ActionerTeam, TriggerTarget.NonActioner, TriggerTarget.NonActionerTeam }.Contains(constraintTarget) && new[] { TriggerAction.DrawMatch, TriggerAction.RespawnLevel, }.Contains(trigger.Action)) {
+                    Debug.LogWarning("[MatchConditioner] Actioner is needed for constraint target, but doesn't exist! Defaulting to Everyone.");
+                    constraintTarget = TriggerTarget.Everyone;
                 }
 
                 switch (actionTarget) {
@@ -87,15 +99,15 @@ namespace Quantum
                         }
                         break;
                     case TriggerTarget.Randoms:
-                        while (marioFilter.NextUnsafe(out EntityRef e, out MarioPlayer* _)) {
-                            if (f.RNG->Next(0, 2) == 0) actionerEntities.Add(e);
+                        while (marioFilter.NextUnsafe(out EntityRef e, out MarioPlayer* tempMario)) {
+                            if (f.RNG->Next(0, 2) == 0 && !tempMario->Disconnected && f.Exists(e) && !f.DestroyPending(e) && (f.Global->Rules.Lives <= 0 || tempMario->Lives > 0)) actionerEntities.Add(e);
                         }
                         break;
                     case TriggerTarget.OneRandom:
                         var i = 0;
                         var randomIndex = f.RNG->Next(0, f.Global->PlayerConnectedCount);
-                        while (marioFilter.NextUnsafe(out EntityRef e, out MarioPlayer* _)) {
-                            if (i == randomIndex) {
+                        while (marioFilter.NextUnsafe(out EntityRef e, out MarioPlayer* tempMario)) {
+                            if (i == randomIndex && !tempMario->Disconnected && f.Exists(e) && !f.DestroyPending(e) && (f.Global->Rules.Lives <= 0 || tempMario->Lives > 0)) { // i don't know what to tell you
                                 actionerEntities.Add(e);
                                 break;
                             }
@@ -191,7 +203,7 @@ namespace Quantum
                 
                 var constraintEntities = new List<EntityRef>();
                 marioFilter = f.Filter<MarioPlayer>();
-                switch (trigger.ConstraintTarget) {
+                switch (constraintTarget) {
                     case TriggerTarget.Any:
                     case TriggerTarget.Everyone:
                         while (marioFilter.NextUnsafe(out EntityRef e, out MarioPlayer* _)) {
@@ -306,11 +318,11 @@ namespace Quantum
                         Err("invalid constraint target!!"); break;
                 }
 
-                var constraintFunctionName = trigger.Constraint.ToString();
-                var isNegated = constraintFunctionName.Contains("Not");
-                if (isNegated) constraintFunctionName = constraintFunctionName.Replace("Not", "");
-                constraintFunctionName = $"Constrain{constraintFunctionName}";
                 if (trigger.Constraint != TriggerConstraint.Always) {
+                    var constraintFunctionName = trigger.Constraint.ToString();
+                    var isNegated = constraintFunctionName.Contains("Not");
+                    if (isNegated) constraintFunctionName = constraintFunctionName.Replace("Not", "");
+                    constraintFunctionName = $"Constrain{constraintFunctionName}";
                     var constraintMethod = GetType().GetMethod(constraintFunctionName);
                     if (constraintMethod == null) {
                         Err($"No function for Constrain<b>{trigger.Constraint}</b>!!");
@@ -318,7 +330,18 @@ namespace Quantum
                     }
 
                     bool constraintPassed;
-                    if (trigger.ConstraintTarget == TriggerTarget.Any) {
+                    if (constraintTarget == TriggerTarget.CheckIndividually) {
+                        // special functionality: filter out actioner entities that don't pass the constraint.
+                        var filteredActioners = new List<EntityRef>();
+                        foreach (var actionerEntity in actionerEntities) {
+                            var result = isNegated != (bool) constraintMethod.Invoke(this,
+                                new object[] { f, actionerEntity, trigger.ConstraintParameter.ToString() });
+                            if (result) filteredActioners.Add(actionerEntity);
+                        }
+                        actionerEntities = filteredActioners;
+                        constraintPassed = actionerEntities.Count > 0;
+                    }
+                    else if (constraintTarget == TriggerTarget.Any) {
                         // at least one in the constraint entities has to pass.
                         constraintPassed = false;
                         foreach (var constraintEntity in constraintEntities) {
@@ -350,18 +373,18 @@ namespace Quantum
                 
                 if (f.IsVerified) Debug.Log($"[MatchConditioner] <b>{condition}</b>{(trigger.ConditionParameter != "" ? (" (" + trigger.ConditionParameter + ")") : "")} succeeded... <b>{trigger.Action}</b>{(trigger.ActionParameter != "" ? (" (" + trigger.ActionParameter + ")") : "")} begin!!" + (trigger.DelaySeconds > 0 ? $" (wait {trigger.DelaySeconds}s)" : ""));
                 foreach (var actionerEntity in actionerEntities) {
-                    for (var i = 0; i < trigger.RepeatCount; i++) {
-                        var methodParameters = actionMethod.GetParameters().Length == 4
-                            ? new object[] { f, actionerEntity, trigger.ActionParameter.ToString(), conditionerEntity }
-                            : new object[] { f, actionerEntity, trigger.ActionParameter.ToString() };
-                        
-                        if (trigger.DelaySeconds > 0) {
-                            f.PendingMatchConditionerActions.Add(new PendingAction {
-                                ActionMethod = actionMethod,
-                                MethodParameters = methodParameters,
-                                SecondsRemaining = trigger.DelaySeconds,
-                            });
-                        } else {
+                    var methodParameters = actionMethod.GetParameters().Length == 4
+                        ? new object[] { f, actionerEntity, trigger.ActionParameter.ToString(), conditionerEntity }
+                        : new object[] { f, actionerEntity, trigger.ActionParameter.ToString() };
+                    if (trigger.DelaySeconds > 0) {
+                        f.PendingMatchConditionerActions.Add(new PendingAction {
+                            ActionMethod = actionMethod,
+                            MethodParameters = methodParameters,
+                            SecondsRemaining = trigger.DelaySeconds,
+                            RepeatCount = trigger.RepeatCount,
+                        });
+                    } else {
+                        for (var i = 0; i < trigger.RepeatCount; i++) {
                             actionMethod.Invoke(this, methodParameters);
                         }
                     }
@@ -372,7 +395,9 @@ namespace Quantum
         private void HandlePendingActions(Frame f) {
             foreach (var pendingAction in f.PendingMatchConditionerActions) {
                 pendingAction.SecondsRemaining -= 1;
-                if (pendingAction.SecondsRemaining <= 0) {
+                if (pendingAction.SecondsRemaining > 0) continue;
+
+                for (var i = 0; i < pendingAction.RepeatCount; i++) {
                     pendingAction.ActionMethod.Invoke(this, pendingAction.MethodParameters);
                 }
             }
@@ -407,11 +432,12 @@ namespace Quantum
             ConditionActioned(TriggerCondition.FinishedLap, f, marioEntity);
         }
 
-        public void OnMarioPlayerDied(Frame f, EntityRef entity, EntityRef attacker) {
+        public unsafe void OnMarioPlayerDied(Frame f, EntityRef entity, EntityRef attacker) {
             ConditionActioned(TriggerCondition.Died, f, entity);
 
-            if (attacker.IsValid && f.Has<MarioPlayer>(attacker))
+            if (attacker.IsValid && !entity.Equals(attacker) && f.Has<MarioPlayer>(attacker)) {
                 ConditionActioned(TriggerCondition.KilledSomeone, f, attacker);
+            }
         }
 
         public unsafe void OnEntityFreeze(Frame f, EntityRef entity, EntityRef iceBlock, EntityRef attacker) {
@@ -452,6 +478,10 @@ namespace Quantum
             ConditionActioned(TriggerCondition.ReachedZeroCoins, f, marioEntity);
         }
         
+        public unsafe void OnMarioPlayerZeroedScore(Frame f, EntityRef marioEntity, MarioPlayer* mario) {
+            ConditionActioned(TriggerCondition.ReachedZeroScore, f, marioEntity);
+        }
+        
         public void OnMarioPlayerCollectedCoin(Frame f, EntityRef marioEntity, EntityRef coinEntity, FPVector2 worldLocation,
             QBoolean fromBlock, QBoolean downwards) {
             ConditionActioned(TriggerCondition.GotCoin, f, marioEntity);
@@ -484,11 +514,12 @@ namespace Quantum
                 scriptable.Type == PowerupType.Basic ? scriptable.State.ToString() : scriptable.Type.ToString());
         }
 
-        public void OnMarioPlayerTakeDamage(Frame f, EntityRef entity, ref QBoolean keepDamage, EntityRef attacker) {
+        public unsafe void OnMarioPlayerTakeDamage(Frame f, EntityRef entity, ref QBoolean keepDamage, EntityRef attacker) {
             ConditionActioned(TriggerCondition.LostPowerup, f, entity);
-            
-            if (attacker.IsValid && f.Has<MarioPlayer>(attacker))
+
+            if (attacker.IsValid && !entity.Equals(attacker) && f.Has<MarioPlayer>(attacker)) {
                 ConditionActioned(TriggerCondition.HarmedSomeone, f, attacker);
+            }
         }
 
         public void OnMarioPlayerGotCheckpoint(Frame f, EntityRef entity) {
@@ -528,6 +559,32 @@ namespace Quantum
         public unsafe void ActGiveCoin(Frame f, EntityRef entity, string parameter) {
             // var mario = f.Unsafe.GetPointer<MarioPlayer>(entity);
             f.Signals.OnMarioPlayerCollectedCoin(entity, EntityRef.None, f.Unsafe.GetPointer<Transform2D>(entity)->Position, false, false);
+        }
+        
+        [Preserve]
+        public unsafe void ActAddXToScore(Frame f, EntityRef entity, string parameter) {
+            if (!int.TryParse(parameter, out var count)) return;
+            var mario = f.Unsafe.GetPointer<MarioPlayer>(entity);
+            mario->Score += count;
+            if (mario->Score >= 1000) mario->Score = 1000;
+        }
+        
+        [Preserve]
+        public unsafe void ActSubtractXFromScore(Frame f, EntityRef entity, string parameter) {
+            if (!int.TryParse(parameter, out var count)) return;
+            var mario = f.Unsafe.GetPointer<MarioPlayer>(entity);
+            mario->Score -= count;
+            if (mario->Score <= 0) {
+                mario->Score = 0;
+                f.Signals.OnMarioPlayerZeroedScore(entity, mario);
+            }
+        }
+        
+        [Preserve]
+        public unsafe void ActZeroScore(Frame f, EntityRef entity, string parameter) {
+            var mario = f.Unsafe.GetPointer<MarioPlayer>(entity);
+            mario->Score = 0;
+            // f.Signals.OnMarioPlayerZeroedScore(entity, mario);
         }
 
         [Preserve]
@@ -625,7 +682,7 @@ namespace Quantum
 
         [Preserve]
         public unsafe void ActHarm(Frame f, EntityRef entity, string parameter, EntityRef conditioner = default) {
-            f.Unsafe.GetPointer<MarioPlayer>(entity)->Powerdown(f, entity, parameter == "force", conditioner);
+            f.Unsafe.GetPointer<MarioPlayer>(entity)->Powerdown(f, entity, parameter == "BypassIFrames", conditioner);
         }
 
         [Preserve]

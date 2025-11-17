@@ -21,7 +21,7 @@ signal OnMarioPlayerZeroedCoins(EntityRef marioEntity, MarioPlayer* mario);
 
 synced event MarioPlayerCollectedCoin {
 	EntityRef Entity;
-	byte Coins;
+	int Coins;
 	bool ItemSpawned;
 
 	FPVector2 CoinLocation;

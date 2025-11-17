@@ -45,6 +45,7 @@ namespace NSMB.UI.MainMenu.TriggerList {
             TriggerTarget.ActionerTeam,
             TriggerTarget.NonActioner,
             TriggerTarget.NonActionerTeam,
+            TriggerTarget.CheckIndividually,
         };
         public static readonly List<TriggerTarget> IncompatibleActionTargets = new() {
             TriggerTarget.Any,
@@ -52,6 +53,7 @@ namespace NSMB.UI.MainMenu.TriggerList {
             TriggerTarget.ActionerTeam,
             TriggerTarget.NonActioner,
             TriggerTarget.NonActionerTeam,
+            TriggerTarget.CheckIndividually,
         };
         public static readonly List<TriggerTarget> IncompatibleConstraintTargets = new() {
             TriggerTarget.OneRandom,
@@ -73,7 +75,9 @@ namespace NSMB.UI.MainMenu.TriggerList {
             { TriggerAction.GiveXReserve, new List<string> { "Random", "Mushroom", "FireFlower", "IceFlower", "PropellerMushroom", "MiniMushroom", "BlueShell", "HammerSuit", "MegaMushroom", "Starman" } },
             { TriggerAction.SpawnXEnemy, new List<string> { "Random", "Goomba", "Goombrat", "Koopa", "RedKoopa", "BlueKoopa", "BulletBill", "Boo", "Spiny", "Bobomb" } },
             // { TriggerAction.BecomeXTeam, new List<string> { "Random", "A", "B", "C", "D", "E" } },
-            { TriggerAction.Stun, new List<string> { "Bump", "Knockback", "HardKnockback", "ForcefulKnockback" } },
+            { TriggerAction.Harm, new List<string> { "Normal", "BypassIFrames" } },
+            { TriggerAction.AddXToScore, new List<string> { "1", "10", "100" } },
+            { TriggerAction.SubtractXFromScore, new List<string> { "1", "10", "100" } },
         };
         public static readonly Dictionary<TriggerConstraint, List<string>> ConstraintParameters = new() {
             { TriggerConstraint.IsXPowerup, new List<string> { "SmallMario", "Mushroom", "FireFlower", "IceFlower", "PropellerMushroom", "MiniMushroom", "BlueShell", "HammerSuit", "MegaMushroom" } },

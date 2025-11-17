@@ -28,7 +28,7 @@ namespace NSMB.UI.Game {
         [SerializeField] private CanvasGroup toggler;
         [SerializeField] private TrackIcon playerTrackTemplate, starTrackTemplate, starCoinTrackTemplate, objectiveCoinTrackTemplate, goalTrackTemplate, checkpointTrackTemplate;
         [SerializeField] private Sprite storedItemNull;
-        [SerializeField] private TMP_Text uiTeamObjective, uiMainObjective, uiCoins, uiDebug, uiLives, uiCountdown, uiLaps, speedrunTimer;
+        [SerializeField] private TMP_Text uiTeamObjective, uiMainObjective, uiCoins, uiDebug, uiLives, uiCountdown, uiLaps, uiScore, speedrunTimer;
         [SerializeField] private Image itemReserve, itemColor, deathFade;
         [SerializeField] private GameObject boos, reserveItemBox, onScreenControls;
         [SerializeField] private Animation reserveAnimation;
@@ -43,11 +43,11 @@ namespace NSMB.UI.Game {
         private readonly Dictionary<MonoBehaviour, TrackIcon> entityTrackIcons = new();
         private readonly Dictionary<Type, List<TrackIcon>> availablePooledTrackIcons = new();
         private readonly List<Image> backgrounds = new();
-        private GameObject teamsParent, starsParent, coinsParent, livesParent, timerParent, lapsParent;
+        private GameObject teamsParent, starsParent, coinsParent, livesParent, timerParent, lapsParent, scoreParent;
         private Material timerMaterial;
 
         //private TeamManager teamManager;
-        private int cachedCoins = -1, cachedTeamObjective = -1, cachedObjective = -1, cachedLives = -1, cachedTimer = -1, cachedLaps = -1;
+        private int cachedCoins = -1, cachedTeamObjective = -1, cachedObjective = -1, cachedLives = -1, cachedTimer = -1, cachedLaps = -1, cachedScore = -1;
         private PowerupAsset previousPowerup;
         private EntityRef previousTarget;
         private bool previousMarioExists;
@@ -108,6 +108,7 @@ namespace NSMB.UI.Game {
             livesParent = uiLives.transform.parent.gameObject;
             timerParent = uiCountdown.transform.parent.gameObject;
             lapsParent = uiLaps.transform.parent.gameObject;
+            scoreParent = uiScore.transform.parent.gameObject;
 
             backgrounds.Add(teamsParent.GetComponentInChildren<Image>());
             backgrounds.Add(starsParent.GetComponentInChildren<Image>());
@@ -115,6 +116,7 @@ namespace NSMB.UI.Game {
             backgrounds.Add(livesParent.GetComponentInChildren<Image>());
             backgrounds.Add(timerParent.GetComponentInChildren<Image>());
             backgrounds.Add(lapsParent.GetComponentInChildren<Image>());
+            backgrounds.Add(scoreParent.GetComponentInChildren<Image>());
         }
 
         public void Start() {
@@ -256,6 +258,7 @@ namespace NSMB.UI.Game {
             livesParent.SetActive(marioExists && f.Global->Rules.IsLivesEnabled);
             coinsParent.SetActive(marioExists);
             timerParent.SetActive(f.Global->Rules.IsTimerEnabled);
+            scoreParent.SetActive(marioExists && f.Global->Rules.ScoreEnabled);
             reserveItemBox.SetActive(marioExists && !f.Global->Rules.SNoReserve);
         }
 
@@ -367,6 +370,12 @@ namespace NSMB.UI.Game {
             if (mario->CurrentLap != cachedLaps) {
                 cachedLaps = mario->CurrentLap;
                 uiLaps.text = Utils.GetSymbolString("Lx" + Math.Min(cachedLaps, lapsRequirement) + "/" + lapsRequirement);
+            }
+            
+            // SCORE
+            if (mario->Score != cachedScore) {
+                cachedScore = mario->Score;
+                uiScore.text = Utils.GetSymbolString("sx" + cachedScore);
             }
 
             // LIVES
