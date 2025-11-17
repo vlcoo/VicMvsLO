@@ -75,6 +75,7 @@ namespace NSMB.UI.MainMenu.TriggerList {
             { TriggerAction.GiveXReserve, new List<string> { "Random", "Mushroom", "FireFlower", "IceFlower", "PropellerMushroom", "MiniMushroom", "BlueShell", "HammerSuit", "MegaMushroom", "Starman" } },
             { TriggerAction.SpawnXEnemy, new List<string> { "Random", "Goomba", "Goombrat", "Koopa", "RedKoopa", "BlueKoopa", "BulletBill", "Boo", "Spiny", "Bobomb" } },
             // { TriggerAction.BecomeXTeam, new List<string> { "Random", "A", "B", "C", "D", "E" } },
+            { TriggerAction.Stun, new List<string> { "Bump", "Knockback", "HardKnockback", "ForcefulKnockback" } },
             { TriggerAction.Harm, new List<string> { "Normal", "BypassIFrames" } },
             { TriggerAction.AddXToScore, new List<string> { "1", "10", "100" } },
             { TriggerAction.SubtractXFromScore, new List<string> { "1", "10", "100" } },

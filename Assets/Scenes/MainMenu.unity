@@ -76930,10 +76930,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   panel: {fileID: 1425540123}
   label: {fileID: 384058455}
-  message: 'Conditioner: this person will need to perform
+  message: 'Constrainter: this person will need to meet
 
-    the Condition for
-    this trigger to be activated.'
+    the Constraint for this
+    trigger to be enabled
+
+    at the moment the Condition is activated.
+
+    Optional
+    feature: ''CheckIndividually'' filter
+
+    out Actioners based on the Constraint.'
   offset: {x: 16, y: -16}
   delayBeforeShow: 0.5
 --- !u!114 &635429994
@@ -202197,10 +202204,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   panel: {fileID: 1425540123}
   label: {fileID: 384058455}
-  message: 'Conditioner: this person will need to perform
+  message: 'Constraint: this is what needs to be true while
 
-    the Condition for
-    this trigger to be activated.'
+    the trigger is activated,
+    for it to have any effect.'
   offset: {x: 16, y: -16}
   delayBeforeShow: 0.5
 --- !u!114 &1846749524
