@@ -102,6 +102,8 @@ namespace NSMB.UI.Game {
         }
 
         public void Awake() {
+            onScreenControls.SetActive(Settings.Instance.controlsOnScreen);
+            
             teamsParent = uiTeamObjective.transform.parent.gameObject;
             starsParent = uiMainObjective.transform.parent.gameObject;
             coinsParent = uiCoins.transform.parent.gameObject;
@@ -139,7 +141,6 @@ namespace NSMB.UI.Game {
             greenWinText = Perso.GetBool("winTextColor");
             uiColor = Perso.GetItem(GlobalController.Instance.uiColors, "uiColor");
             
-            onScreenControls.SetActive(Settings.Instance.controlsOnScreen);
             foreach (var onScreenButton in onScreenControls.transform.GetComponentsInChildren<Image>())
                 if (onScreenButton.transform.name != "Item")
                     onScreenButton.color = new Color(uiColor.r, uiColor.g, uiColor.b, .4f);
