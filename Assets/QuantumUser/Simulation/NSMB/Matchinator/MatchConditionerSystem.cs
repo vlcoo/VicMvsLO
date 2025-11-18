@@ -956,34 +956,34 @@ namespace Quantum
         }
 
         [Preserve]
-        public unsafe bool ContrainStarsExist(Frame f, EntityRef entity, string parameter) {
+        public unsafe bool ConstrainStarsExist(Frame f, EntityRef entity, string parameter) {
             return f.ComponentCount<BigStar>() > 0;
         }
         
         [Preserve]
-        public unsafe bool ContrainEnemiesExist(Frame f, EntityRef entity, string parameter) {
+        public unsafe bool ConstrainEnemiesExist(Frame f, EntityRef entity, string parameter) {
             return f.ComponentCount<Enemy>() > 0;
         }
         
         [Preserve]
-        public unsafe bool ContrainCoinsExist(Frame f, EntityRef entity, string parameter) {
+        public unsafe bool ConstrainCoinsExist(Frame f, EntityRef entity, string parameter) {
             return f.ComponentCount<Coin>() > 0;
         }
         
         [Preserve]
-        public unsafe bool XPlayersRemaining(Frame f, EntityRef entity, string parameter) {
+        public unsafe bool ConstrainXPlayersRemaining(Frame f, EntityRef entity, string parameter) {
             if (!int.TryParse(parameter, out var count)) return false;
             return f.ComponentCount<MarioPlayer>() == count;
         }
         
         [Preserve]
-        public unsafe bool LessThanXPlayersRemaining(Frame f, EntityRef entity, string parameter) {
+        public unsafe bool ConstrainLessThanXPlayersRemaining(Frame f, EntityRef entity, string parameter) {
             if (!int.TryParse(parameter, out var count)) return false;
             return f.ComponentCount<MarioPlayer>() < count;
         }
         
         [Preserve]
-        public unsafe bool MoreThanXPlayersRemaining(Frame f, EntityRef entity, string parameter) {
+        public unsafe bool ConstrainMoreThanXPlayersRemaining(Frame f, EntityRef entity, string parameter) {
             if (!int.TryParse(parameter, out var count)) return false;
             return f.ComponentCount<MarioPlayer>() > count;
         }
