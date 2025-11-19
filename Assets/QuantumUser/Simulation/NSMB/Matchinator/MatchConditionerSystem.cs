@@ -35,6 +35,7 @@ namespace Quantum
         private unsafe void ConditionActioned(TriggerCondition condition, Frame f, EntityRef conditionerEntity, string parameter = "") {
             // if (f.IsPredicted) return;
             var conditionerIsPerson = f.Unsafe.TryGetPointer(conditionerEntity, out MarioPlayer* mario);
+            var conditionerIsOk = f.Exists(conditionerEntity) && !f.DestroyPending(conditionerEntity) && conditionerEntity.IsValid;
             var playerData = conditionerIsPerson ? QuantumUtils.GetPlayerData(f, mario->PlayerRef) : null;
             foreach (var trigger in f.ResolveList(f.Global->Rules.Triggers).Where(trigger => trigger.Condition == condition)) {
                 // need to check for condition parameter... this is basically like a second condition on top of the main one.
@@ -73,22 +74,22 @@ namespace Quantum
                 var marioFilter = f.Filter<MarioPlayer>();
                 var actionTarget = trigger.ActionTarget;
                 var constraintTarget = trigger.ConstraintTarget;
-                if ((!conditionerIsPerson || !f.Exists(conditionerEntity)) && (new[] {
+                if ((!conditionerIsPerson || !conditionerIsOk) && (new[] {
                         TriggerTarget.Conditioner, TriggerTarget.ConditionerTeam, TriggerTarget.NonConditioner,
                         TriggerTarget.NonConditionerTeam
                     }.Contains(actionTarget))) {
-                    Debug.LogWarning("[MatchConditioner] Conditioner is needed for action target, but doesn't exist! Defaulting to Everyone.");
+                    Msg(f, "[MatchConditioner] Conditioner is needed for action target, but doesn't exist! Defaulting to Everyone.", -1);
                     actionTarget = TriggerTarget.Everyone;
                 }
-                if ((!conditionerIsPerson || !f.Exists(conditionerEntity)) && (new[] {
+                if ((!conditionerIsPerson || !conditionerIsOk) && (new[] {
                         TriggerTarget.Conditioner, TriggerTarget.ConditionerTeam, TriggerTarget.NonConditioner,
                         TriggerTarget.NonConditionerTeam
                     }.Contains(constraintTarget))) {
-                    Debug.LogWarning("[MatchConditioner] Conditioner is needed for constraint target, but doesn't exist! Defaulting to Everyone.");
+                    Msg(f, "[MatchConditioner] Conditioner is needed for constraint target, but doesn't exist! Defaulting to Everyone.", -1);
                     constraintTarget = TriggerTarget.Everyone;
                 }
-                if (new[] { TriggerTarget.Actioner, TriggerTarget.ActionerTeam, TriggerTarget.NonActioner, TriggerTarget.NonActionerTeam }.Contains(constraintTarget) && new[] { TriggerAction.DrawMatch, TriggerAction.RespawnLevel, }.Contains(trigger.Action)) {
-                    Debug.LogWarning("[MatchConditioner] Actioner is needed for constraint target, but doesn't exist! Defaulting to Everyone.");
+                if (new[] { TriggerTarget.Actioner, TriggerTarget.ActionerTeam, TriggerTarget.NonActioner, TriggerTarget.NonActionerTeam }.Contains(constraintTarget) && !new[] { TriggerAction.DrawMatch, TriggerAction.RespawnLevel, }.Contains(trigger.Action)) {
+                    Msg(f, "[MatchConditioner] Actioner is needed for constraint target, but doesn't exist! Defaulting to Everyone.", -1);
                     constraintTarget = TriggerTarget.Everyone;
                 }
 
@@ -198,8 +199,10 @@ namespace Quantum
                     case TriggerTarget.NonActioner:
                     case TriggerTarget.NonActionerTeam:
                     default:
-                        Err("invalid action target!!"); break;
+                        Msg(f, "invalid action target!!", -2); break;
                 }
+
+                actionerEntities = actionerEntities.Where(e => f.Exists(e) && !f.DestroyPending(e) && e.IsValid).ToList();
                 
                 var constraintEntities = new List<EntityRef>();
                 marioFilter = f.Filter<MarioPlayer>();
@@ -315,17 +318,19 @@ namespace Quantum
                     case TriggerTarget.OneRandom:
                     case TriggerTarget.Randoms:
                     default:
-                        Err("invalid constraint target!!"); break;
+                        Msg(f, "invalid constraint target!!", -2); break;
                 }
+                
+                constraintEntities = constraintEntities.Where(e => f.Exists(e) && !f.DestroyPending(e) && e.IsValid).ToList();
 
-                if (trigger.Constraint != TriggerConstraint.Always) {
+                if (trigger.Constraint != TriggerConstraint.Always && constraintEntities.Count > 0) {
                     var constraintFunctionName = trigger.Constraint.ToString();
                     var isNegated = constraintFunctionName.Contains("Not");
                     if (isNegated) constraintFunctionName = constraintFunctionName.Replace("Not", "");
                     constraintFunctionName = $"Constrain{constraintFunctionName}";
                     var constraintMethod = GetType().GetMethod(constraintFunctionName);
                     if (constraintMethod == null) {
-                        Err($"No function for Constrain<b>{trigger.Constraint}</b>!!");
+                        Msg(f, $"No function for Constrain<b>{trigger.Constraint}</b>!!", -2);
                         continue;
                     }
 
@@ -367,13 +372,15 @@ namespace Quantum
                 // finally good to go. find action function by name and pass everything.
                 var actionMethod = GetType().GetMethod($"Act{trigger.Action.ToString()}");
                 if (actionMethod == null) {
-                    Err($"No function for Act<b>{trigger.Action}</b>!!");
+                    Msg(f, $"No function for Act<b>{trigger.Action}</b>!!", -2);
                     continue;
                 }
                 
-                if (f.IsVerified) Debug.Log($"[MatchConditioner] <b>{condition}</b>{(trigger.ConditionParameter != "" ? (" (" + trigger.ConditionParameter + ")") : "")} succeeded... <b>{trigger.Action}</b>{(trigger.ActionParameter != "" ? (" (" + trigger.ActionParameter + ")") : "")} begin!!" + (trigger.DelaySeconds > 0 ? $" (wait {trigger.DelaySeconds}s)" : ""));
+                Msg(f, $"[MatchConditioner] <b>{condition}</b>{(trigger.ConditionParameter != "" ? (" (" + trigger.ConditionParameter + ")") : "")} succeeded... <b>{trigger.Action}</b>{(trigger.ActionParameter != "" ? (" (" + trigger.ActionParameter + ")") : "")} begin!!" + (trigger.DelaySeconds > 0 ? $" (wait {trigger.DelaySeconds}s)" : ""));
                 foreach (var actionerEntity in actionerEntities) {
-                    var methodParameters = actionMethod.GetParameters().Length == 4
+                    if (!f.Exists(actionerEntity) || f.DestroyPending(actionerEntity) || !actionerEntity.IsValid) continue;
+                    
+                    var methodParameters = actionMethod.GetParameters().Length == 4 && conditionerIsOk
                         ? new object[] { f, actionerEntity, trigger.ActionParameter.ToString(), conditionerEntity }
                         : new object[] { f, actionerEntity, trigger.ActionParameter.ToString() };
                     if (trigger.DelaySeconds > 0) {
@@ -404,8 +411,14 @@ namespace Quantum
             f.PendingMatchConditionerActions.RemoveAll(pa => pa.SecondsRemaining <= 0);
         }
         
-        private static void Err(string message) {
-            Debug.LogError($"[MatchConditioner] {message}");
+        private static void Msg(Frame f, string message, int type = 0) {
+            if (f.IsPredicted) return;
+            message = $"[MatchConditioner] {message}";
+            switch (type) {
+                case -2: Debug.LogError(message); break;
+                case -1: Debug.LogWarning(message); break;
+                default: Debug.Log(message); break;
+            }
         }
 
         #region Conditions
@@ -527,6 +540,7 @@ namespace Quantum
         }
 
         public void OnSecondTicked(Frame f, byte time) {
+            if (f.IsPredicted) return;
             HandlePendingActions(f);
             
             // possible parameters: 1, 5, 10, 15, 30, 60. time ticks every second from 60 to 0, and loops.
@@ -611,7 +625,7 @@ namespace Quantum
                 parameter == "Random"
                     ? allPowerups[f.RNG->Next(0, allPowerups.Length)]
                     : allPowerups.FirstOrDefault(c => f.FindAsset(c) is PowerupAsset p && (p.State.ToString() == parameter || p.Type.ToString() == parameter))) as PowerupAsset;
-            if (newScriptable == null) { Err("powerup asset was null!!"); return; }
+            if (newScriptable == null) { Msg(f, "powerup asset was null!!", -2); return; }
             PowerupReserveResult result = PowerupSystem.CollectPowerup(f, entity, f.Unsafe.GetPointer<MarioPlayer>(entity), f.Unsafe.GetPointer<PhysicsObject>(entity), newScriptable);
             f.Events.MarioPlayerCollectedPowerup(entity, result, newScriptable);
         }
@@ -661,7 +675,7 @@ namespace Quantum
                     mario->DoKnockback(f, entity, mario->FacingRight, 1, KnockbackStrength.Groundpound, conditioner, true);
                     break;
                 default:
-                    Err($"invalid param {parameter}!!"); break;
+                    Msg(f, $"invalid param {parameter}!!", -2); break;
             }
         }
 
@@ -690,7 +704,7 @@ namespace Quantum
             if (parameter == "") parameter = "Random";
             var allPowerups = f.FindAsset(f.SimulationConfig.DefaultGamemode).AllCoinItems;
             PowerupAsset newScriptable = f.FindAsset(allPowerups.FirstOrDefault(c => f.FindAsset(c) is PowerupAsset p && (p.State.ToString() == parameter || p.Type.ToString() == parameter))) as PowerupAsset;
-            if (newScriptable == null) { Err("powerup asset was null!!"); return; }
+            if (newScriptable == null) { Msg(f, "powerup asset was null!!", -2); return; }
             MarioPlayerSystem.SpawnItem(f, entity, f.Unsafe.GetPointer<MarioPlayer>(entity), parameter == "Random" ? default : newScriptable.Prefab, false);
         }
 
@@ -707,7 +721,7 @@ namespace Quantum
                     f.FindAsset(allEnemies.FirstOrDefault(e =>
                         f.FindAsset(e).name == $"{parameter}EntityPrototype"));
             }
-            if (enemyPrototype == null) { Err("enemy prototype was null!!"); return; }
+            if (enemyPrototype == null) { Msg(f, "enemy prototype was null!!", -2); return; }
             
             var enemyEntity = f.Create(enemyPrototype);
             var enemy = f.Unsafe.GetPointer<Enemy>(enemyEntity);
@@ -752,7 +766,7 @@ namespace Quantum
                 parameter == "Random"
                     ? allPowerups[f.RNG->Next(0, allPowerups.Length)]
                     : allPowerups.FirstOrDefault(c => f.FindAsset(c) is PowerupAsset p && (p.State.ToString() == parameter || p.Type.ToString() == parameter))) as PowerupAsset;
-            if (newScriptable == null) { Err("powerup asset was null!!"); return; }
+            if (newScriptable == null) { Msg(f, "powerup asset was null!!", -2); return; }
             mario->ReserveItem = newScriptable;
             f.Events.MarioPlayerCollectedPowerup(entity, PowerupReserveResult.ReserveNewPowerup, newScriptable);
         }

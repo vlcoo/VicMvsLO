@@ -1653,14 +1653,12 @@ namespace Quantum {
     public Int32 TotalGamesPlayed;
     [FieldOffset(1658)]
     public UInt16 GameStartFrames;
-    [FieldOffset(1662)]
+    [FieldOffset(1660)]
     public UInt16 PlayerLoadFrames;
     [FieldOffset(1652)]
     public UInt16 AutomaticStageRefreshInterval;
     [FieldOffset(1654)]
     public UInt16 AutomaticStageRefreshTimer;
-    [FieldOffset(1660)]
-    public UInt16 LoopingSecondsTimer;
     [FieldOffset(1720)]
     [FramePrinter.FixedArrayAttribute(typeof(PlayerInformation), 10)]
     private fixed Byte _PlayerInfo_[1120];
@@ -1719,7 +1717,6 @@ namespace Quantum {
         hash = hash * 31 + PlayerLoadFrames.GetHashCode();
         hash = hash * 31 + AutomaticStageRefreshInterval.GetHashCode();
         hash = hash * 31 + AutomaticStageRefreshTimer.GetHashCode();
-        hash = hash * 31 + LoopingSecondsTimer.GetHashCode();
         hash = hash * 31 + HashCodeUtils.GetArrayHashCode(PlayerInfo);
         hash = hash * 31 + RealPlayers.GetHashCode();
         hash = hash * 31 + TotalMarios.GetHashCode();
@@ -1762,7 +1759,6 @@ namespace Quantum {
         serializer.Stream.Serialize(&p->AutomaticStageRefreshTimer);
         serializer.Stream.Serialize(&p->BigStarSpawnTimer);
         serializer.Stream.Serialize(&p->GameStartFrames);
-        serializer.Stream.Serialize(&p->LoopingSecondsTimer);
         serializer.Stream.Serialize(&p->PlayerLoadFrames);
         serializer.Stream.Serialize(&p->StartFrame);
         serializer.Stream.Serialize(&p->TotalGamesPlayed);
