@@ -218,7 +218,9 @@ public class Songinator : MonoBehaviour
 
     public void SetSpectating(bool how)
     {
-        currentlyMutedChannels = how ? CurrentSong.mutedChannelsSpectating : CurrentSong.mutedChannelsNormal;
+        var newMutedChannels = how ? CurrentSong.mutedChannelsSpectating : CurrentSong.mutedChannelsNormal;
+        if (newMutedChannels == currentlyMutedChannels) return;
+        currentlyMutedChannels = newMutedChannels;
         Synth.SetChannelsMuted(currentlyMutedChannels);
     }
 

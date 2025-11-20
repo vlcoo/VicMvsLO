@@ -30,9 +30,11 @@ namespace NSMB.UI.Loading {
             }
 
             Frame f = game.Frames.Predicted;
-            if (f == null || !f.TryFindAsset(f.Map.UserAsset, out VersusStageData stage) || !stage.ShowAuthorAndComposer) {
+            if (f == null || !f.TryFindAsset(f.Map.UserAsset, out VersusStageData stage)) {
                 return "";
             }
+            var shouldShow = !string.IsNullOrEmpty(stage.StageAuthor) || !string.IsNullOrEmpty(stage.MusicComposer);
+            if (!shouldShow) return "";
 
             return type switch {
                 FieldType.Author => stage.StageAuthor,
