@@ -25,7 +25,7 @@ namespace NSMB.Cameras {
         //---Serialized Variables
         [SerializeField] private PlayerElements playerElements;
         [SerializeField] private List<SecondaryCameraPositioner> secondaryPositioners;
-        [SerializeField] private float zoomSpeed = 3, moveSpeed = 2;
+        [SerializeField] private float zoomSpeed = 1, moveSpeed = 2;
         [SerializeField] private AudioSource zoomSfx;
 
         //---Private Variables
@@ -62,6 +62,7 @@ namespace NSMB.Cameras {
         }
 
         public void OnUpdateView(CallbackUpdateView e) {
+            autoClamp = !playerElements.IsSpectating;
 
             switch (Mode) {
             case CameraMode.FollowPlayer:
@@ -144,6 +145,8 @@ namespace NSMB.Cameras {
                 newPosition.y = Mathf.Clamp(newPosition.y, cameraFocus.y - cameraHalfHeight, cameraFocus.y + cameraHalfHeight);
             }
 
+            HandleZoomInput(ourCamera.ScreenToViewportPoint(Settings.Controls.UI.Point.ReadValue<Vector2>()));
+
             // Clamp
             float cameraMinX = stage.CameraMinPosition.X.AsFloat + (orthoSize * screenAspect);
             float cameraMaxX = stage.CameraMaxPosition.X.AsFloat - (orthoSize * screenAspect);
@@ -165,8 +168,7 @@ namespace NSMB.Cameras {
         }
 
         private void UpdateCameraFreecamMode(CallbackUpdateView e) {
-            if (e.Game.Frames.Predicted.Global->GameState >= GameState.Ended
-                || playerElements.PauseMenu.IsPaused) {
+            if (/*e.Game.Frames.Predicted.Global->GameState >= GameState.Ended ||*/ playerElements.PauseMenu.IsPaused) {
                 zoomSfx.enabled = false;
                 return;
             }
@@ -215,45 +217,8 @@ namespace NSMB.Cameras {
             Vector3 newPosition = truePosition + (Vector3) movement;
             newPosition = QuantumUtils.WrapWorld(stage, newPosition.ToFPVector2(), out _).ToUnityVector3();
             newPosition.z = -10;
-
-            // Zoom
-            float zoomAmount = Settings.Controls.UI.ScrollWheel.ReadValue<Vector2>().y * -12;
-            Vector3? worldPosBefore = (zoomAmount != 0) ? ourCamera.ViewportToWorldPoint(pointer) : null;
-
-            if (!ignoreKeyboard) {
-                int zoomIn = Settings.Controls.Replay.ZoomIn.ReadValue<float>() >= 0.5f ? 1 : 0;
-                int zoomOut = Settings.Controls.Replay.ZoomOut.ReadValue<float>() >= 0.5f ? 1 : 0;
-                zoomAmount += (zoomOut - zoomIn);
-            }
-
-            float maxOrthoSize = stage.TileDimensions.X * 0.25f / ourCamera.aspect;
-            if (zoomAmount != 0) {
-                float newOrthoSize = ourCamera.orthographicSize + (zoomAmount * zoomSpeed * Time.unscaledDeltaTime);
-                newOrthoSize = Mathf.Clamp(newOrthoSize, 0.5f, maxOrthoSize);
-                ourCamera.orthographicSize = newOrthoSize;
-
-                if (newOrthoSize > 0.5f && newOrthoSize < maxOrthoSize) {
-                    if (!zoomSfx.isPlaying) {
-                        zoomSfx.Play();
-                        zoomSfx.loop = true;
-                    } else {
-                        zoomSfx.loop = true;
-                    }
-                } else {
-                    zoomSfx.loop = false;
-                }
-
-                if (worldPosBefore != null) {
-                    Vector3 worldPosAfter = ourCamera.ViewportToWorldPoint(pointer);
-                    newPosition += (Vector3) (worldPosBefore - worldPosAfter);
-                }
-            } else {
-                zoomSfx.loop = false;
-            }
-
-            // Clamp
-            // Ortho size
-            ourCamera.orthographicSize = Mathf.Clamp(ourCamera.orthographicSize, 0.5f, maxOrthoSize);
+            
+            newPosition += HandleZoomInput(pointer);
 
             // Position
             float orthoSize = ourCamera.orthographicSize;
@@ -274,6 +239,32 @@ namespace NSMB.Cameras {
             }
 
             ourCamera.transform.position = newPosition;
+        }
+
+        private Vector3 HandleZoomInput(Vector2 pointer) {
+            var zoomAmount = Settings.Controls.UI.ScrollWheel.ReadValue<Vector2>().y * -12;
+            Vector3? worldPosBefore = (zoomAmount != 0) ? ourCamera.ViewportToWorldPoint(pointer) : null;
+            var newPosition = Vector3.zero;
+            
+            if (!playerElements.ReplayUi.IsOpen) {
+                var zoomIn = Settings.Controls.Replay.ZoomIn.ReadValue<float>() >= 0.5f ? 1 : 0;
+                var zoomOut = Settings.Controls.Replay.ZoomOut.ReadValue<float>() >= 0.5f ? 1 : 0;
+                zoomAmount += (zoomOut - zoomIn);
+            }
+
+            var maxOrthoSize = stage.TileDimensions.X * 0.25f / ourCamera.aspect;
+            if (zoomAmount != 0) {
+                var newOrthoSize = ourCamera.orthographicSize + (zoomAmount * zoomSpeed * Time.unscaledDeltaTime * ourCamera.orthographicSize);
+                newOrthoSize = Mathf.Clamp(newOrthoSize, 0.5f, maxOrthoSize);
+                ourCamera.orthographicSize = newOrthoSize;
+                
+                if (worldPosBefore != null) {
+                    Vector3 worldPosAfter = ourCamera.ViewportToWorldPoint(pointer);
+                    newPosition += (Vector3) (worldPosBefore - worldPosAfter);
+                }
+            }
+
+            return newPosition;
         }
 
         private void OnReset(InputAction.CallbackContext context) {

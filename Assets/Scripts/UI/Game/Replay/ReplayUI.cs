@@ -387,6 +387,10 @@ namespace NSMB.UI.Game.Replay {
             Time.timeScale = replaySpeed;
         }
 
+        public void ResetZoom() {
+            playerElements.Camera.orthographicSize = 3.5f;
+        }
+
         private unsafe void OnGameResynced(CallbackGameResynced e) {
             if (ActiveReplayManager.Instance.IsReplay) {
                 gameEnded = false;

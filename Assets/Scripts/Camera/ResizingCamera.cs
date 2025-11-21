@@ -7,6 +7,8 @@ namespace NSMB.Cameras {
         //---Serialized Variables
         [SerializeField] protected Camera ourCamera;
 
+        protected bool autoClamp = true;
+
         public virtual void OnValidate() {
             this.SetIfNull(ref ourCamera);
         }
@@ -20,6 +22,8 @@ namespace NSMB.Cameras {
         }
 
         protected void ClampCameraAspectRatio(float target = 14f/4f) {
+            if (!autoClamp) return;
+            
             float aspect = ourCamera.aspect;
             if (Mathf.Abs((16f / 9f) - aspect) < 0.05f) {
                 aspect = 16f / 9f;
