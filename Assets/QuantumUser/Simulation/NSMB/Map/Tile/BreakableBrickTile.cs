@@ -59,6 +59,9 @@ public unsafe class BreakableBrickTile : StageTile, IInteractableTile {
         } else if (f.Has<Bobomb>(entity)) {
              doBreak = BreakingRules.HasFlag(BreakableBy.Bombs);
              doBump = false;
+        } else {
+            doBreak = true;
+            doBump = false;
         }
 
         bool fromBelow = direction != InteractionDirection.Down;

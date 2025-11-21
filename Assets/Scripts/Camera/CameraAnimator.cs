@@ -145,7 +145,8 @@ namespace NSMB.Cameras {
                 newPosition.y = Mathf.Clamp(newPosition.y, cameraFocus.y - cameraHalfHeight, cameraFocus.y + cameraHalfHeight);
             }
 
-            HandleZoomInput(ourCamera.ScreenToViewportPoint(Settings.Controls.UI.Point.ReadValue<Vector2>()));
+            if (!autoClamp)
+                HandleZoomInput(ourCamera.ScreenToViewportPoint(Settings.Controls.UI.Point.ReadValue<Vector2>()));
 
             // Clamp
             float cameraMinX = stage.CameraMinPosition.X.AsFloat + (orthoSize * screenAspect);

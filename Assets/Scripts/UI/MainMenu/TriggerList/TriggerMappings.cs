@@ -14,7 +14,7 @@ namespace NSMB.UI.MainMenu.TriggerList {
         public static readonly List<TriggerAction> NonPeopleActions = new() {
             TriggerAction.DrawMatch,
             TriggerAction.RespawnLevel,
-            // TriggerAction.ExplodeLevel,
+            TriggerAction.ExplodeLevel,
             // TriggerAction.SpawnStar
         };
         public static readonly List<TriggerConstraint> NonPeopleConstraints = new() {

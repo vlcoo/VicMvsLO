@@ -2,6 +2,7 @@
     public partial class SimulationConfig : AssetObject {
 
         public AssetRef<StageTile> InvisibleSolidTile;
+        public AssetRef<StageTile> ReplacementBreakableTile;
 
         public AssetRef<GamemodeAsset>[] AllGamemodes;
         public AssetRef<GamemodeAsset> DefaultGamemode;

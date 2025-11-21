@@ -743,7 +743,17 @@ namespace Quantum
 
         [Preserve]
         public unsafe void ActExplodeLevel(Frame f, EntityRef entity, string parameter) {
-            
+            var stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
+            for (int x = 0; x <= stage.TileDimensions.X; x++) {
+                for (int y = 0; y <= stage.TileDimensions.Y; y++) {
+                    var tilePos = new IntVector2(x, y);
+                    var tileInstance = stage.GetTileRelative(f, tilePos);
+                    var tile = f.FindAsset(tileInstance.Tile);
+                    if (tile is IInteractableTile it) {
+                        it.Interact(f, EntityRef.None, IInteractableTile.InteractionDirection.Up, tilePos, tileInstance, out _);
+                    }
+                }
+            }
         }
 
         [Preserve]

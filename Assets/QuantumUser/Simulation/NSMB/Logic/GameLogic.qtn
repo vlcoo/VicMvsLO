@@ -165,7 +165,6 @@ enum TriggerAction {
     SpawnXPowerup,   // random, mushroom, fire, ice, propeller, shell, hammer, starman, mega, mini
     SpawnXEnemy,    // random, goomba, Gkoopa, Rkoopa, Bkoopa, bulletbill, boo, spiny, bobomb
     RespawnLevel,
-//    ExplodeLevel,
 //    RandomTeleport,
     RemoveReserve,
     GiveXReserve,   // random, mushroom, fire, ice, propeller, shell, hammer, starman, mega, mini
@@ -180,6 +179,7 @@ enum TriggerAction {
     AddXToScore,    // 1, 10, 100
     SubtractXFromScore, // 1, 10, 100
     ZeroScore,
+    ExplodeLevel,
 }
 
 enum TriggerConstraint {

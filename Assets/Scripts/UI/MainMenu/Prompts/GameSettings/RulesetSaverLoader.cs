@@ -103,6 +103,7 @@ public class RulesetSaverLoader : MonoBehaviour
         code += (rules.HIceCubes ? "1" : "0") + CODE_SEPARATOR;
         code += rules.HTeamTarget + CODE_SEPARATOR;
         code += (rules.ScoreEnabled ? "1" : "0") + CODE_SEPARATOR;
+        code += (rules.SAllBricks ? "1" : "0") + CODE_SEPARATOR;
         code += CODE_VERSION + CODE_SEPARATOR;
 
         var sum = 0;
@@ -123,8 +124,7 @@ public class RulesetSaverLoader : MonoBehaviour
         int code_version;
         
         var parts = code.Split(CODE_SEPARATOR);
-        // if (parts.Length < 31) return false;
-        if (parts.Length < 30) return false;    // version 2 has 32 parts, version 1 has 31 parts
+        if (parts.Length < 30) return false;    // version 2 has 33 parts, version 1 has 31 parts
         if (parts.Length < 31) code_version = 1;    // version 1 didn't have version stored in code
         else code_version = int.Parse(parts[^2]);
         
@@ -155,6 +155,7 @@ public class RulesetSaverLoader : MonoBehaviour
             SNoEnemies = parts[14] == "1",
             SNoCoins = parts[15] == "1",
             SNoPowerups = parts[16] == "1",
+            SAllBricks = code_version >= 2 ? parts[32] == "1" : rules.SAllBricks,
         });
 
         game.SendCommand(new CommandChangePowerupsHuds {
