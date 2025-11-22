@@ -79,6 +79,7 @@ namespace NSMB.UI.MainMenu.TriggerList {
             { TriggerAction.Harm, new List<string> { "Normal", "BypassIFrames" } },
             { TriggerAction.AddXToScore, new List<string> { "1", "10", "100" } },
             { TriggerAction.SubtractXFromScore, new List<string> { "1", "10", "100" } },
+            { TriggerAction.PlayJingle, new List<string> {"Positive", "Negative", "Neutral 1", "Neutral 2" } },
         };
         public static readonly Dictionary<TriggerConstraint, List<string>> ConstraintParameters = new() {
             { TriggerConstraint.IsXPowerup, new List<string> { "SmallMario", "Mushroom", "FireFlower", "IceFlower", "PropellerMushroom", "MiniMushroom", "BlueShell", "HammerSuit", "MegaMushroom" } },

@@ -4,7 +4,7 @@ using System.Reflection;
 using UnityEngine;
 
 public enum SoundEffect : byte {
-    //CURRENT HIGHEST NUMBER: 119 (use 120 next)
+    //CURRENT HIGHEST NUMBER: 123 (use 124 next)
     //Enemy
     [SoundEffectData("enemy/freeze")] Enemy_Generic_Freeze = 0,
     [SoundEffectData("enemy/freeze_shatter")] Enemy_Generic_FreezeShatter = 1,
@@ -136,6 +136,12 @@ public enum SoundEffect : byte {
     [SoundEffectData("world/goal_touched_long")] World_Goal_Last = 116,
     [SoundEffectData("world/goal_down")] World_Goal_Down = 118,
     [SoundEffectData("world/checkpoint")] World_Checkpoint = 119,
+    
+    //Chime
+    [SoundEffectData("chimes/positive")] Chime_Positive = 120,
+    [SoundEffectData("chimes/negative")] Chime_Negative = 121,
+    [SoundEffectData("chimes/neutral1")] Chime_Neutral1 = 122,
+    [SoundEffectData("chimes/neutral2")] Chime_Neutral2 = 123,
 }
 
 public class SoundEffectDataAttribute : Attribute {

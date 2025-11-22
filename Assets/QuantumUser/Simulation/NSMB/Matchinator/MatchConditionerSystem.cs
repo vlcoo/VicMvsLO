@@ -1,4 +1,5 @@
 using Photon.Deterministic;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -828,6 +829,12 @@ namespace Quantum
 
         public unsafe void ActBecomeXTeam(Frame f, EntityRef entity, string parameter) {
             
+        }
+
+        [Preserve]
+        public void ActPlayJingle(Frame f, EntityRef entity, string parameter) {
+            f.Events.PlayJingle(entity,
+                parameter switch { "Positive" => 0, "Negative" => 1, "Neutral 1" => 2, "Neutral 2" => 3, _ => 2});
         }
         #endregion
         

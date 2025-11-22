@@ -148,6 +148,7 @@ namespace Quantum {
     SubtractXFromScore,
     ZeroScore,
     ExplodeLevel,
+    PlayJingle,
   }
   public enum TriggerCondition : int {
     GotStar,

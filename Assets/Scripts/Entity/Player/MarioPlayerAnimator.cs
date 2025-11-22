@@ -205,6 +205,7 @@ namespace NSMB.Entities.Player {
             QuantumEvent.Subscribe<EventMarioPlayerNextGoalAnimation>(this, OnMarioFlagpoleAnimationProgressed, FilterOutReplayFastForward);
             QuantumEvent.Subscribe<EventMarioPlayerGotCheckpoint>(this, OnMarioPlayerGotCheckpoint, FilterOutReplayFastForward);
             QuantumEvent.Subscribe<EventMarioPlayerTaunted>(this, OnMarioPlayerTaunted);
+            QuantumEvent.Subscribe<EventPlayJingle>(this, OnPlayJingle);
         }
 
         public override void OnActivate(Frame f) {
@@ -1340,6 +1341,28 @@ namespace NSMB.Entities.Player {
             emoteParticleSystem.GetComponent<Renderer>().material.mainTextureOffset =
                 new Vector2(0.125f * (e.EmoteId % 8f), 0.125f * (int)(e.EmoteId / 8f));
             emoteParticleSystem.Emit(1);
+        }
+
+        private void OnPlayJingle(EventPlayJingle e) {
+            if (e.Entity != EntityRef) {
+                switch (e.Id) {
+                case 2:
+                    PlaySoundEverywhere(SoundEffect.Chime_Neutral1);
+                    break;
+                case 3:
+                    PlaySoundEverywhere(SoundEffect.Chime_Neutral2);
+                    break;
+                }
+            } else {
+                switch (e.Id) {
+                case 0:
+                    PlaySound(SoundEffect.Chime_Positive);
+                    break;
+                case 1:
+                    PlaySound(SoundEffect.Chime_Negative);
+                    break;
+                }
+            }
         }
 
         private void OnEnemyKicked(EventEnemyKicked e) {

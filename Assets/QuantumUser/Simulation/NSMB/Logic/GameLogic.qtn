@@ -180,6 +180,7 @@ enum TriggerAction {
     SubtractXFromScore, // 1, 10, 100
     ZeroScore,
     ExplodeLevel,
+    PlayJingle,     // Positive, Negative, Neutral 1, Neutral 2
 }
 
 enum TriggerConstraint {
@@ -359,4 +360,9 @@ event StartGameEndFade {
 
 synced event StageAutoRefresh {
 
+}
+
+event PlayJingle {
+    EntityRef Entity;
+    byte Id;
 }
