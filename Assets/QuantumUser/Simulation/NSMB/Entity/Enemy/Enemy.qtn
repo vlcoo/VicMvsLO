@@ -12,6 +12,7 @@ component Enemy {
 signal OnEnemyDespawned(EntityRef entity);
 signal OnEnemyRespawned(EntityRef entity);
 signal OnEnemyEnemyCollision(EntityRef a, EntityRef b);
+signal OnEnemyKilled(EntityRef enemy, EntityRef killer, KillReason killReason);
 signal OnEnemyKilledByStageReset(EntityRef entity);
 signal OnEnemyTurnaround(EntityRef entity);
 signal OnEnemyReturnedHome(EntityRef entity);

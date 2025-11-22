@@ -44,6 +44,7 @@ namespace Quantum {
             var collider = f.Unsafe.GetPointer<PhysicsCollider2D>(bulletBillEntity);
             FPVector2 center = f.Unsafe.GetPointer<Transform2D>(bulletBillEntity)->Position + collider->Shape.Centroid;
             f.Events.EnemyKilled(bulletBillEntity, killerEntity, reason, center);
+            f.Signals.OnEnemyKilled(bulletBillEntity, killerEntity, reason);
         }
     }
 }

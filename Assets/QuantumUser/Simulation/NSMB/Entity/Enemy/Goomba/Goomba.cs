@@ -56,6 +56,7 @@ namespace Quantum {
 
             var collider = f.Unsafe.GetPointer<PhysicsCollider2D>(goombaEntity);
             f.Events.EnemyKilled(goombaEntity, killerEntity, reason, center);
+            f.Signals.OnEnemyKilled(goombaEntity, killerEntity, reason);
         }
     }
 }

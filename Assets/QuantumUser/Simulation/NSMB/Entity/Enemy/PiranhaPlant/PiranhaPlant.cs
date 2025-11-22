@@ -38,6 +38,7 @@ namespace Quantum {
             f.Unsafe.GetPointer<Interactable>(piranhaPlantEntity)->ColliderDisabled = true;
 
             f.Events.EnemyKilled(piranhaPlantEntity, killerEntity, reason, center);
+            f.Signals.OnEnemyKilled(piranhaPlantEntity, killerEntity, reason);
         }
     }
 }

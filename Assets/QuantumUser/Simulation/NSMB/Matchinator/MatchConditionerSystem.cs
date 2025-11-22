@@ -8,7 +8,7 @@ using UnityEngine.Scripting;
 
 namespace Quantum
 {
-    public class MatchConditionerSystem : SystemSignalsOnly, ISignalOnMarioPlayerCollectedStar, ISignalOnMarioPlayerCollectedCoin, ISignalOnMarioPlayerDied, ISignalOnEntityFreeze, ISignalOnGameStarting, ISignalOnMarioPlayerDisqualified, ISignalOnMarioPlayerJumped, ISignalOnMarioPlayerRespawned, ISignalOnMarioPlayerReceivedKnockback, ISignalOnMarioPlayerCollectedPowerup, ISignalOnMarioPlayerTakeDamage, ISignalOnMarioPlayerReachedCoinLimit, ISignalOnMarioPlayerZeroedStars, ISignalOnMarioPlayerZeroedCoins, ISignalOnMarioTouchedGoal, ISignalOnMarioPlayerGotCheckpoint, ISignalOnSecondTicked, ISignalOnMarioPlayerZeroedScore {
+    public class MatchConditionerSystem : SystemSignalsOnly, ISignalOnMarioPlayerCollectedStar, ISignalOnMarioPlayerCollectedCoin, ISignalOnMarioPlayerDied, ISignalOnEntityFreeze, ISignalOnGameStarting, ISignalOnMarioPlayerDisqualified, ISignalOnMarioPlayerJumped, ISignalOnMarioPlayerRespawned, ISignalOnMarioPlayerReceivedKnockback, ISignalOnMarioPlayerCollectedPowerup, ISignalOnMarioPlayerTakeDamage, ISignalOnMarioPlayerReachedCoinLimit, ISignalOnMarioPlayerZeroedStars, ISignalOnMarioPlayerZeroedCoins, ISignalOnMarioTouchedGoal, ISignalOnMarioPlayerGotCheckpoint, ISignalOnSecondTicked, ISignalOnMarioPlayerZeroedScore, ISignalOnEnemyKilled {
         public class PendingAction {
             public MethodInfo ActionMethod;
             public object[] MethodParameters;
@@ -551,6 +551,11 @@ namespace Quantum
             if (time % 10 == 0) ConditionActioned(TriggerCondition.EveryXSeconds, f, default, "10");
             if (time % 5 == 0) ConditionActioned(TriggerCondition.EveryXSeconds, f, default, "5");
             if (time % 1 == 0) ConditionActioned(TriggerCondition.EveryXSeconds, f, default, "1");
+        }
+        
+        public void OnEnemyKilled(Frame f, EntityRef enemy, EntityRef killer, KillReason killReason) {
+            if (killReason == KillReason.InWall) return;
+            ConditionActioned(TriggerCondition.KilledEnemy, f, killer);
         }
 
         #endregion

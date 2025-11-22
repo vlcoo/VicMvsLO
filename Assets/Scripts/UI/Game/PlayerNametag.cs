@@ -116,7 +116,7 @@ namespace NSMB.UI.Game {
                 TeamAsset team = f.FindAsset(teams[teamIndex % teams.Length]);
                 stringBuilder.Append(team.textSpriteColorblindBig);
             }
-            stringBuilder.AppendLine(cachedNickname);
+            stringBuilder.AppendLine(f.Global->Rules.HNicknames ? cachedNickname : "---");
 
             if (f.Global->Rules.IsLivesEnabled) {
                 stringBuilder.Append(character.UiString).Append(Utils.GetSymbolString("x" + mario->Lives)).Append(' ');
@@ -128,6 +128,10 @@ namespace NSMB.UI.Game {
             
             if (f.Global->Rules.ScoreEnabled) {
                 stringBuilder.Append(Utils.GetSymbolString("s" + mario->Score));
+            }
+            
+            if (f.Global->Rules.HCoinCount) {
+                stringBuilder.Append(Utils.GetSymbolString("C" + mario->Coins));
             }
 
             text.text = stringBuilder.ToString();

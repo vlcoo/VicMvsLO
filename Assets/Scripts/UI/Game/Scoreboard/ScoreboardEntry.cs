@@ -75,7 +75,7 @@ namespace NSMB.UI.Game.Scoreboard {
             UpdatePing(f);
 
             if (nicknameMayHaveChanged) {
-                nicknameText.text = cachedNickname;
+                nicknameText.text = f.Global->Rules.HNicknames ? cachedNickname : "---";
                 nicknameMayHaveChanged = false;
             }
 
@@ -87,10 +87,12 @@ namespace NSMB.UI.Game.Scoreboard {
             int objective = 0;
             int lives = 0;
             int score = 0;
+            int coins = 0;
             if (f.Unsafe.TryGetPointer(Target, out MarioPlayer* mario)) {
                 objective = Mathf.Max(0, gamemode.GetObjectiveCount(f, mario));
                 lives = mario->Disconnected ? 0 : mario->Lives;
                 score = mario->Score;
+                coins = mario->Coins;
             }
 
             StringBuilder scoreBuilder = new();
@@ -104,6 +106,10 @@ namespace NSMB.UI.Game.Scoreboard {
 
             if (f.Global->Rules.ScoreEnabled) {
                 scoreBuilder.Append(Utils.GetSymbolString("s" + score));
+            }
+            
+            if (f.Global->Rules.HCoinCount) {
+                scoreBuilder.Append(Utils.GetSymbolString("C" + coins));
             }
 
             scoreText.text = scoreBuilder.ToString();

@@ -104,6 +104,8 @@ public class RulesetSaverLoader : MonoBehaviour
         code += rules.HTeamTarget + CODE_SEPARATOR;
         code += (rules.ScoreEnabled ? "1" : "0") + CODE_SEPARATOR;
         code += (rules.SAllBricks ? "1" : "0") + CODE_SEPARATOR;
+        code += (rules.HCoinCount ? "1" : "0") + CODE_SEPARATOR;
+        code += (rules.HNicknames ? "1" : "0") + CODE_SEPARATOR;
         code += CODE_VERSION + CODE_SEPARATOR;
 
         var sum = 0;
@@ -175,6 +177,8 @@ public class RulesetSaverLoader : MonoBehaviour
             HHost = parts[28] == "1",
             HIceCubes = parts[29] == "1",
             HTeamTarget = int.Parse(parts[30]),
+            HCoinCount = code_version >= 2 ? parts[33] == "1" : rules.HCoinCount,
+            HNicknames = code_version >= 2 ? parts[34] == "1" : rules.HNicknames,
         });
 
         var triggerIndex = 0;

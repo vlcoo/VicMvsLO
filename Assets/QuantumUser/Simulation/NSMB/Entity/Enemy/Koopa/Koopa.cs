@@ -101,6 +101,7 @@ namespace Quantum {
             IsFlipped = false;
 
             f.Events.EnemyKilled(koopaEntity, killerEntity, reason, center);
+            f.Signals.OnEnemyKilled(koopaEntity, killerEntity, reason);
         }
     }
 }

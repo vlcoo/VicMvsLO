@@ -173,6 +173,7 @@ namespace Quantum {
     HarmedSomeone,
     KilledSomeone,
     ReachedZeroScore,
+    KilledEnemy,
   }
   public enum TriggerConstraint : int {
     Always,
@@ -3887,6 +3888,9 @@ namespace Quantum {
   public unsafe partial interface ISignalOnEnemyEnemyCollision : ISignal {
     void OnEnemyEnemyCollision(Frame f, EntityRef a, EntityRef b);
   }
+  public unsafe partial interface ISignalOnEnemyKilled : ISignal {
+    void OnEnemyKilled(Frame f, EntityRef enemy, EntityRef killer, KillReason killReason);
+  }
   public unsafe partial interface ISignalOnEnemyKilledByStageReset : ISignal {
     void OnEnemyKilledByStageReset(Frame f, EntityRef entity);
   }
@@ -4291,6 +4295,7 @@ namespace Quantum {
     private ISignalOnEnemyDespawned[] _ISignalOnEnemyDespawnedSystems;
     private ISignalOnEnemyRespawned[] _ISignalOnEnemyRespawnedSystems;
     private ISignalOnEnemyEnemyCollision[] _ISignalOnEnemyEnemyCollisionSystems;
+    private ISignalOnEnemyKilled[] _ISignalOnEnemyKilledSystems;
     private ISignalOnEnemyKilledByStageReset[] _ISignalOnEnemyKilledByStageResetSystems;
     private ISignalOnEnemyTurnaround[] _ISignalOnEnemyTurnaroundSystems;
     private ISignalOnEnemyReturnedHome[] _ISignalOnEnemyReturnedHomeSystems;
@@ -4349,6 +4354,7 @@ namespace Quantum {
       _ISignalOnEnemyDespawnedSystems = BuildSignalsArray<ISignalOnEnemyDespawned>();
       _ISignalOnEnemyRespawnedSystems = BuildSignalsArray<ISignalOnEnemyRespawned>();
       _ISignalOnEnemyEnemyCollisionSystems = BuildSignalsArray<ISignalOnEnemyEnemyCollision>();
+      _ISignalOnEnemyKilledSystems = BuildSignalsArray<ISignalOnEnemyKilled>();
       _ISignalOnEnemyKilledByStageResetSystems = BuildSignalsArray<ISignalOnEnemyKilledByStageReset>();
       _ISignalOnEnemyTurnaroundSystems = BuildSignalsArray<ISignalOnEnemyTurnaround>();
       _ISignalOnEnemyReturnedHomeSystems = BuildSignalsArray<ISignalOnEnemyReturnedHome>();
@@ -4637,6 +4643,15 @@ namespace Quantum {
           var s = array[i];
           if (_f.SystemIsEnabledInHierarchy((SystemBase)s)) {
             s.OnEnemyEnemyCollision(_f, a, b);
+          }
+        }
+      }
+      public void OnEnemyKilled(EntityRef enemy, EntityRef killer, KillReason killReason) {
+        var array = _f._ISignalOnEnemyKilledSystems;
+        for (Int32 i = 0; i < array.Length; ++i) {
+          var s = array[i];
+          if (_f.SystemIsEnabledInHierarchy((SystemBase)s)) {
+            s.OnEnemyKilled(_f, enemy, killer, killReason);
           }
         }
       }

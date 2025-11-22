@@ -11,7 +11,9 @@ public class MatchSettings : MonoBehaviour {
     [HideInInspector] public GameRules rules;
     [HideInInspector] public bool isHost;
     public Button btnGamemode;
+    public Image btnDescriptionImage;
     public Action OnRulesChangedCallback;
+    public Sprite btnGray, btnGreen;
     
     public void Start() {
         QuantumEvent.Subscribe<EventRulesChanged>(this, OnRulesChanged);
@@ -69,6 +71,8 @@ public class MatchSettings : MonoBehaviour {
         scoreToggle.interactable = isHost;
         scoreToggle.SetIsOnWithoutNotify(rules.ScoreEnabled);
         btnGamemode.interactable = isHost;
+        
+        btnDescriptionImage.sprite = rules.Description == "" ? btnGray : btnGreen;
     }
 
     public unsafe void ChangeRuleValue() {

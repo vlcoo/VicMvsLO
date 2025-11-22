@@ -85,6 +85,7 @@ namespace Quantum {
             var collider = f.Unsafe.GetPointer<PhysicsCollider2D>(bobombEntity);
             FPVector2 center = position + collider->Shape.Centroid;
             f.Events.EnemyKilled(bobombEntity, killerEntity, reason, center);
+            f.Signals.OnEnemyKilled(bobombEntity, killerEntity, reason);
         }
     }
 }
