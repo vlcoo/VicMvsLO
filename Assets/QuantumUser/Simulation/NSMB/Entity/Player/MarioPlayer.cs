@@ -332,6 +332,7 @@ namespace Quantum {
 
             if ((f.Global->Rules.IsLivesEnabled && Lives == 0) || Disconnected) {
                 f.Signals.OnMarioPlayerDisqualified(entity);
+                f.Events.MarioPlayerDisqualified(entity);
                 f.Destroy(entity);
                 return;
             }

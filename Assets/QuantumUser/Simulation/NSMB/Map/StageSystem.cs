@@ -19,6 +19,16 @@ namespace Quantum {
                 f.ReallocStageTiles(count);
 
                 fixed (StageTileInstance* originalData = &stage.TileData[0]) {
+                    if (f.Global->Rules.SAllBricks) {
+                        var replacementBreakableTileInstance = new StageTileInstance {
+                            Tile = f.SimulationConfig.ReplacementBreakableTile, Flags = 0, Rotation = 0
+                        };
+                        for (int i = 0; i < stage.TileData.Length; i++) {
+                            if (!stage.TileData[i].HasWorldPolygons(f)) continue;
+                            originalData[i] = replacementBreakableTileInstance;
+                        }
+                    }
+
                     UnsafeUtility.MemCpy(f.StageTiles, originalData, StageTileInstance.SIZE * count);
                 }
             } else {

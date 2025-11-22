@@ -56,8 +56,8 @@ namespace NSMB.UI.Pause {
 
         public void Start() {
             Settings.Controls.UI.Pause.performed += OnPause;
-            if (IsReplay) options[1].text.text = "Hide replay controls";
-            else options[1].text.text = isHost ? "Return to Room" : "Give Up";
+            // if (IsReplay) options[1].text.text = "Hide replay controls";
+            options[1].translationKey = isHost ? "ui.pause.returntoroom" : "ui.pause.giveup";
             UpdateLabels();
             QuantumEvent.Subscribe<EventGameEnded>(this, OnGameEnded);
         }
@@ -91,7 +91,7 @@ namespace NSMB.UI.Pause {
 
             QuantumGame game = QuantumRunner.DefaultGame;
             isHost = game == null || game.PlayerIsLocal(game.Frames.Predicted.Global->Host);
-            // options[1].text.fontSharedMaterial = isHost || IsReplay ? enabledMaterial : disabledMaterial;
+            options[1].text.fontSharedMaterial = IsReplay ? disabledMaterial : enabledMaterial;
             SelectOption(0);
 
             isInConfirmation = false;
@@ -257,17 +257,23 @@ namespace NSMB.UI.Pause {
         }
         
         public void OpenConfirmationMenu(bool quit) {
-            if (IsReplay && !quit) {
-                // Toggle replay UI
-                bool replayNowActive = playerElements.ReplayUi.ToggleReplayControls();
-                options[1].text.text = replayNowActive ? "Hide replay controls" : "Show replay controls";
-                UpdateLabels();
-                GlobalController.Instance.PlaySound(SoundEffect.UI_Decide);
-                return;
-            }
+            if (IsReplay) return;
+            // if (IsReplay && !quit) {
+            //     // Toggle replay UI
+            //     bool replayNowActive = playerElements.ReplayUi.ToggleReplayControls();
+            //     options[1].text.text = replayNowActive ? "Hide replay controls" : "Show replay controls";
+            //     UpdateLabels();
+            //     GlobalController.Instance.PlaySound(SoundEffect.UI_Decide);
+            //     return;
+            // }
             if (!quit && !isHost) {
                 // give up. disqualify player...
-                Frame f = QuantumRunner.DefaultGame.Frames.Predicted;
+                var game = QuantumRunner.DefaultGame;
+                foreach (var slot in game.GetLocalPlayerSlots()) {
+                    game.SendCommand(slot, new CommandGiveUp());
+                }
+                GlobalController.Instance.PlaySound(SoundEffect.UI_Decide);
+                Unpause(false);
                 return;
             }
 
@@ -287,7 +293,7 @@ namespace NSMB.UI.Pause {
         public void IncrementOption(int increment) {
             int newIndex = selected + increment;
 
-            if (newIndex == 1 && !isHost && !IsReplay) {
+            if (newIndex == 1 && IsReplay) {
                 newIndex += increment;
             }
 
@@ -299,7 +305,7 @@ namespace NSMB.UI.Pause {
         }
 
         public void SelectOption(int index) {
-            if (selected == index || selected < 0 || selected >= options.Length || (index == 1 && !isHost  && !IsReplay)) {
+            if (selected == index || selected < 0 || selected >= options.Length || (index == 1 && IsReplay)) {
                 skipSound = false;
                 return;
             }
@@ -338,10 +344,10 @@ namespace NSMB.UI.Pause {
         }
 
         private void OnLanguageChanged(TranslationManager tm) {
-            foreach (PauseMenuOptionWrapper option in options) {
-                option.originalText = tm.GetTranslation(option.translationKey);
-            }
-            UpdateLabels();
+            // foreach (PauseMenuOptionWrapper option in options) {
+            //     option.originalText = tm.GetTranslation(option.translationKey);
+            // }
+            // UpdateLabels();
         }
 
         private void OnGameEnded(EventGameEnded e) {

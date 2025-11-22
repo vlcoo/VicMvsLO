@@ -659,6 +659,7 @@ namespace Quantum
         public unsafe void ActDisqualify(Frame f, EntityRef entity, string parameter) {
             if (f.IsPredicted) return;
             f.Signals.OnMarioPlayerDisqualified(entity);
+            f.Events.MarioPlayerDisqualified(entity);
             f.Destroy(entity);
             GameLogicSystem.CheckForGameEnd(f);
         }

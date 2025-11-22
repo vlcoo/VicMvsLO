@@ -341,3 +341,7 @@ event PlayKnockbackEffect {
 	KnockbackStrength Strength;
 	nothashed FPVector2 AttackerPosition;
 }
+
+synced event MarioPlayerDisqualified {
+    EntityRef Entity;
+}

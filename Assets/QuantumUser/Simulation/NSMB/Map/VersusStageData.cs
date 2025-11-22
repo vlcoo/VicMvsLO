@@ -105,15 +105,9 @@ public unsafe class VersusStageData : AssetObject {
     public void ResetStage(Frame f, bool full) {
         using var scope = HostProfiler.Start("VersusStageData.ResetStage");
         StageTileInstance* stageTiles = f.StageTiles;
-        var replacementBreakableTileInstance = new StageTileInstance {
-            Tile = f.SimulationConfig.ReplacementBreakableTile, Flags = 0, Rotation = 0
-        };
 
         for (int i = 0; i < TileData.Length; i++) {
-            StageTileInstance newTileValue = (f.Global->Rules.SAllBricks && TileData[i].HasWorldPolygons(f))
-                ? replacementBreakableTileInstance 
-                : TileData[i];
-            ref var newTile = ref newTileValue;
+            ref StageTileInstance newTile = ref TileData[i];
             if (!stageTiles[i].Equals(newTile)) {
                 using var callbackScope = HostProfiler.Start("VersusStageData.ExecuteCallbacks");
                 int x = i % TileDimensions.X;
