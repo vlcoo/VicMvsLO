@@ -93,6 +93,7 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
         private IEnumerator SelectTextboxNextFrame() {
             yield return null;
             chatbox.SetTextWithoutNotify("");
+            sendBtn.interactable = false;
             EventSystem.current.SetSelectedGameObject(chatbox.gameObject);
         }
 

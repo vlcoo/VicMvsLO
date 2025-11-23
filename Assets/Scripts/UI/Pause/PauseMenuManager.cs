@@ -91,8 +91,9 @@ namespace NSMB.UI.Pause {
 
             QuantumGame game = QuantumRunner.DefaultGame;
             isHost = game == null || game.PlayerIsLocal(game.Frames.Predicted.Global->Host);
+            options[1].text.fontSharedMaterial = (IsReplay || (playerElements.IsSpectating && !isHost)) ? disabledMaterial : enabledMaterial;
             options[1].translationKey = isHost ? "ui.pause.returntoroom" : "ui.pause.giveup";
-            options[1].text.fontSharedMaterial = IsReplay ? disabledMaterial : enabledMaterial;
+            UpdateLabels();
             SelectOption(0);
 
             isInConfirmation = false;
@@ -258,7 +259,6 @@ namespace NSMB.UI.Pause {
         }
         
         public void OpenConfirmationMenu(bool quit) {
-            if (IsReplay) return;
             // if (IsReplay && !quit) {
             //     // Toggle replay UI
             //     bool replayNowActive = playerElements.ReplayUi.ToggleReplayControls();
@@ -267,7 +267,7 @@ namespace NSMB.UI.Pause {
             //     GlobalController.Instance.PlaySound(SoundEffect.UI_Decide);
             //     return;
             // }
-            if (!quit && !isHost) {
+            if (!quit && !isHost && (!IsReplay || (playerElements.IsSpectating && !isHost))) {
                 // give up. disqualify player...
                 var game = QuantumRunner.DefaultGame;
                 foreach (var slot in game.GetLocalPlayerSlots()) {
@@ -294,7 +294,7 @@ namespace NSMB.UI.Pause {
         public void IncrementOption(int increment) {
             int newIndex = selected + increment;
 
-            if (newIndex == 1 && IsReplay) {
+            if (newIndex == 1 && (IsReplay || (playerElements.IsSpectating && !isHost))) {
                 newIndex += increment;
             }
 
@@ -306,7 +306,7 @@ namespace NSMB.UI.Pause {
         }
 
         public void SelectOption(int index) {
-            if (selected == index || selected < 0 || selected >= options.Length || (index == 1 && IsReplay)) {
+            if (selected == index || selected < 0 || selected >= options.Length || (index == 1 && (IsReplay || (playerElements.IsSpectating && !isHost)))) {
                 skipSound = false;
                 return;
             }

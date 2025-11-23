@@ -20,9 +20,13 @@ public static class Perso {
         return value;
     }
 
-    public static int GetIntRange(int min, int max) {
+    public static int GetIntRange(int min, int max, string key = "") {
         if (max <= min) throw new ArgumentException("max must be greater than min");
+        if (intCache.TryGetValue(key, out int i)) 
+            return i < min || i >= max ? throw new ArgumentException("cached value is oob. please provide the same range as the first time") : i;
+        
         var value = min + (Math.Abs(HwId) % (max - min));
+        if (key != "") intCache[key] = value;
         return value;
     }
 

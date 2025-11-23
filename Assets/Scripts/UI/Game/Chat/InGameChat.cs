@@ -51,7 +51,7 @@ namespace NSMB.UI.Game.Chat {
             newMessageTransform.SetAnchoredPositionY(-newMessageTransform.sizeDelta.y);
             foreach (var message in activeMessages) {
                 // Move other messages
-                message.AdjustPosition(newMessageTransform.sizeDelta.y);
+                message.AdjustPosition(newMessageTransform.sizeDelta.y + 2);
             }
             activeMessages.Add(newMessage);
         }
