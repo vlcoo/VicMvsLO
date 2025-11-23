@@ -105,10 +105,5 @@ namespace NSMB.UI.MainMenu.TriggerList {
             TriggerConstraint.LessThanXPlayersRemaining,
             TriggerConstraint.MoreThanXPlayersRemaining,
         };
-        
-        // finally, certain condition-action pairs are recursive or contradictory and are forbidden. list them here.
-        public static readonly Dictionary<TriggerCondition, TriggerAction> ForbiddenPairs = new() {
-            { TriggerCondition.GotStar, TriggerAction.GiveStar }, { TriggerCondition.GotCoin, TriggerAction.GiveCoin },
-        };
     }
 }

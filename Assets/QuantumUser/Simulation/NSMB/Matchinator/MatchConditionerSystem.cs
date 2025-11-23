@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 using UnityEngine.Scripting;
 
@@ -79,18 +80,18 @@ namespace Quantum
                         TriggerTarget.Conditioner, TriggerTarget.ConditionerTeam, TriggerTarget.NonConditioner,
                         TriggerTarget.NonConditionerTeam
                     }.Contains(actionTarget))) {
-                    Msg(f, "[MatchConditioner] Conditioner is needed for action target, but doesn't exist! Defaulting to Everyone.", -1);
+                    Msg(f, "Conditioner is needed for action target, but doesn't exist! Defaulting to Everyone.", -1);
                     actionTarget = TriggerTarget.Everyone;
                 }
                 if ((!conditionerIsPerson || !conditionerIsOk) && (new[] {
                         TriggerTarget.Conditioner, TriggerTarget.ConditionerTeam, TriggerTarget.NonConditioner,
                         TriggerTarget.NonConditionerTeam
                     }.Contains(constraintTarget))) {
-                    Msg(f, "[MatchConditioner] Conditioner is needed for constraint target, but doesn't exist! Defaulting to Everyone.", -1);
+                    Msg(f, "Conditioner is needed for constraint target, but doesn't exist! Defaulting to Everyone.", -1);
                     constraintTarget = TriggerTarget.Everyone;
                 }
                 if (new[] { TriggerTarget.Actioner, TriggerTarget.ActionerTeam, TriggerTarget.NonActioner, TriggerTarget.NonActionerTeam }.Contains(constraintTarget) && !new[] { TriggerAction.DrawMatch, TriggerAction.RespawnLevel, }.Contains(trigger.Action)) {
-                    Msg(f, "[MatchConditioner] Actioner is needed for constraint target, but doesn't exist! Defaulting to Everyone.", -1);
+                    Msg(f, "Actioner is needed for constraint target, but doesn't exist! Defaulting to Everyone.", -1);
                     constraintTarget = TriggerTarget.Everyone;
                 }
 
@@ -370,14 +371,22 @@ namespace Quantum
                     if (!constraintPassed) continue;
                 }
 
-                // finally good to go. find action function by name and pass everything.
+                // find action function by name and pass everything.
                 var actionMethod = GetType().GetMethod($"Act{trigger.Action.ToString()}");
                 if (actionMethod == null) {
                     Msg(f, $"No function for Act<b>{trigger.Action}</b>!!", -2);
                     continue;
                 }
                 
-                Msg(f, $"[MatchConditioner] <b>{condition}</b>{(trigger.ConditionParameter != "" ? (" (" + trigger.ConditionParameter + ")") : "")} succeeded... <b>{trigger.Action}</b>{(trigger.ActionParameter != "" ? (" (" + trigger.ActionParameter + ")") : "")} begin!!" + (trigger.DelaySeconds > 0 ? $" (wait {trigger.DelaySeconds}s)" : ""));
+                try { RuntimeHelpers.EnsureSufficientExecutionStack(); }
+                catch (InsufficientExecutionStackException) {
+                    Msg(f, "Almost reached stack overflow!! Bailing out...", -1);
+                    f.Events.RanRecursiveTrigger();
+                    return;
+                }
+
+                // finally good to go!!
+                Msg(f, $"<b>{condition}</b>{(trigger.ConditionParameter != "" ? (" (" + trigger.ConditionParameter + ")") : "")} succeeded... <b>{trigger.Action}</b>{(trigger.ActionParameter != "" ? (" (" + trigger.ActionParameter + ")") : "")} begin!!" + (trigger.DelaySeconds > 0 ? $" (wait {trigger.DelaySeconds}s)" : ""));
                 foreach (var actionerEntity in actionerEntities) {
                     if (!f.Exists(actionerEntity) || f.DestroyPending(actionerEntity) || !actionerEntity.IsValid) continue;
                     

@@ -50,6 +50,7 @@ namespace NSMB.Chat {
             QuantumEvent.Subscribe<EventHostChanged>(this, OnHostChanged, FilterOutReplay);
             QuantumEvent.Subscribe<EventPlayerKickedFromRoom>(this, OnPlayerKickedFromRoom, FilterOutReplay);
             QuantumEvent.Subscribe<EventPlayerUnbanned>(this, OnPlayerUnbanned, FilterOutReplay);
+            QuantumEvent.Subscribe<EventRanRecursiveTrigger>(this, OnRanRecursiveTrigger, FilterOutReplay);
         }
 
         private void OnUpdateView(CallbackUpdateView e) {
@@ -198,6 +199,10 @@ namespace NSMB.Chat {
             AddSystemMessage(e.Game.PlayerIsLocal(e.NewHost)
                 ? "You are now the host of this room."
                 : $"<i>{f.GetPlayerData(e.NewHost).PlayerNickname.ToValidNickname(f, e.NewHost)}</i> has become this room's host.");
+        }
+
+        private void OnRanRecursiveTrigger(EventRanRecursiveTrigger e) {
+            AddSystemMessage("stopped a recursive trigger!! pls review ruleset");
         }
     }
 }
