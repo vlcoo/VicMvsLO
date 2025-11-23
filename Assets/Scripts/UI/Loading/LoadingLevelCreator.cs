@@ -8,7 +8,6 @@ namespace NSMB.UI.Loading {
 
         //---Serialized Variables
         [SerializeField] private TMP_Text text;
-        [SerializeField] private string key = "ui.loading.levelcreator";
         [SerializeField] private FieldType type;
 
         public void OnEnable() {

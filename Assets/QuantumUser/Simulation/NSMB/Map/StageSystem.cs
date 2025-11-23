@@ -24,7 +24,8 @@ namespace Quantum {
                             Tile = f.SimulationConfig.ReplacementBreakableTile, Flags = 0, Rotation = 0
                         };
                         for (int i = 0; i < stage.TileData.Length; i++) {
-                            if (!stage.TileData[i].HasWorldPolygons(f)) continue;
+                            var tileData = stage.TileData[i];
+                            if (!tileData.HasWorldPolygons(f) || tileData.IsSemisolid(f)) continue;
                             originalData[i] = replacementBreakableTileInstance;
                         }
                     }

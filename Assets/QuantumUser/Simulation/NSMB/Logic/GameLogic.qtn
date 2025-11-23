@@ -120,7 +120,6 @@ enum TriggerCondition {
     Stunned,
     Frozen,
 //    Thawed,
-//    TriggeredPowerup,
     Died,
     Jumped,
 //    LookedXDirection,   // any, up, right, down, left
@@ -144,6 +143,7 @@ enum TriggerCondition {
 //    TouchedGround,
 //    StoppedMoving,
     KilledEnemy,
+    UsedPowerup,
 }
 
 enum TriggerAction {
@@ -364,5 +364,5 @@ synced event StageAutoRefresh {
 
 event PlayJingle {
     EntityRef Entity;
-    byte Id;
+    byte JingleId;
 }

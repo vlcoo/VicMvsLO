@@ -1434,6 +1434,7 @@ namespace Quantum {
                     projectile = ShootNormalProjectile(f, ref filter, physics);
                 }
                 f.Events.MarioPlayerShotProjectile(filter.Entity, *projectile);
+                f.Signals.OnMarioPlayerUsedPowerup(filter.Entity);
 
                 // Weird interaction in the main game...
                 mario->WalljumpFrames = 0;
@@ -1470,6 +1471,7 @@ namespace Quantum {
                 PhysicsObjectSystem.MoveVertically(f, FPVector2.Up * FP._0_05 * f.UpdateRate, ref physicsSystemFilter, stage, default, out _);
 
                 f.Events.MarioPlayerUsedPropeller(filter.Entity);
+                f.Signals.OnMarioPlayerUsedPowerup(filter.Entity);
                 break;
             }
             }

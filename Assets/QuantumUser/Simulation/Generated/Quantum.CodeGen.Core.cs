@@ -174,6 +174,7 @@ namespace Quantum {
     KilledSomeone,
     ReachedZeroScore,
     KilledEnemy,
+    UsedPowerup,
   }
   public enum TriggerConstraint : int {
     Always,
@@ -3978,6 +3979,9 @@ namespace Quantum {
   public unsafe partial interface ISignalOnMarioPlayerZeroedScore : ISignal {
     void OnMarioPlayerZeroedScore(Frame f, EntityRef marioEntity, MarioPlayer* mario);
   }
+  public unsafe partial interface ISignalOnMarioPlayerUsedPowerup : ISignal {
+    void OnMarioPlayerUsedPowerup(Frame f, EntityRef entity);
+  }
   public unsafe partial interface ISignalOnEntityChangeUnderwaterState : ISignal {
     void OnEntityChangeUnderwaterState(Frame f, EntityRef entity, EntityRef liquid, QBoolean underwater);
   }
@@ -4325,6 +4329,7 @@ namespace Quantum {
     private ISignalOnMarioPlayerReceivedKnockback[] _ISignalOnMarioPlayerReceivedKnockbackSystems;
     private ISignalOnMarioPlayerGotCheckpoint[] _ISignalOnMarioPlayerGotCheckpointSystems;
     private ISignalOnMarioPlayerZeroedScore[] _ISignalOnMarioPlayerZeroedScoreSystems;
+    private ISignalOnMarioPlayerUsedPowerup[] _ISignalOnMarioPlayerUsedPowerupSystems;
     private ISignalOnEntityChangeUnderwaterState[] _ISignalOnEntityChangeUnderwaterStateSystems;
     private ISignalOnEntityCrushed[] _ISignalOnEntityCrushedSystems;
     private ISignalOnMarioPlayerCollectedPowerup[] _ISignalOnMarioPlayerCollectedPowerupSystems;
@@ -4384,6 +4389,7 @@ namespace Quantum {
       _ISignalOnMarioPlayerReceivedKnockbackSystems = BuildSignalsArray<ISignalOnMarioPlayerReceivedKnockback>();
       _ISignalOnMarioPlayerGotCheckpointSystems = BuildSignalsArray<ISignalOnMarioPlayerGotCheckpoint>();
       _ISignalOnMarioPlayerZeroedScoreSystems = BuildSignalsArray<ISignalOnMarioPlayerZeroedScore>();
+      _ISignalOnMarioPlayerUsedPowerupSystems = BuildSignalsArray<ISignalOnMarioPlayerUsedPowerup>();
       _ISignalOnEntityChangeUnderwaterStateSystems = BuildSignalsArray<ISignalOnEntityChangeUnderwaterState>();
       _ISignalOnEntityCrushedSystems = BuildSignalsArray<ISignalOnEntityCrushed>();
       _ISignalOnMarioPlayerCollectedPowerupSystems = BuildSignalsArray<ISignalOnMarioPlayerCollectedPowerup>();
@@ -4913,6 +4919,15 @@ namespace Quantum {
           var s = array[i];
           if (_f.SystemIsEnabledInHierarchy((SystemBase)s)) {
             s.OnMarioPlayerZeroedScore(_f, marioEntity, mario);
+          }
+        }
+      }
+      public void OnMarioPlayerUsedPowerup(EntityRef entity) {
+        var array = _f._ISignalOnMarioPlayerUsedPowerupSystems;
+        for (Int32 i = 0; i < array.Length; ++i) {
+          var s = array[i];
+          if (_f.SystemIsEnabledInHierarchy((SystemBase)s)) {
+            s.OnMarioPlayerUsedPowerup(_f, entity);
           }
         }
       }

@@ -190,6 +190,7 @@ signal OnMarioPlayerRespawned(EntityRef entity);
 signal OnMarioPlayerReceivedKnockback(EntityRef entity, EntityRef attacker, KnockbackStrength strength);
 signal OnMarioPlayerGotCheckpoint(EntityRef entity);
 signal OnMarioPlayerZeroedScore(EntityRef marioEntity, MarioPlayer* mario);
+signal OnMarioPlayerUsedPowerup(EntityRef entity);
 
 event MarioPlayerJumped {
 	EntityRef Entity;

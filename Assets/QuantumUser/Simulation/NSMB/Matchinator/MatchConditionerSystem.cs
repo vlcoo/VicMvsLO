@@ -8,7 +8,7 @@ using UnityEngine.Scripting;
 
 namespace Quantum
 {
-    public class MatchConditionerSystem : SystemSignalsOnly, ISignalOnMarioPlayerCollectedStar, ISignalOnMarioPlayerCollectedCoin, ISignalOnMarioPlayerDied, ISignalOnEntityFreeze, ISignalOnGameStarting, ISignalOnMarioPlayerDisqualified, ISignalOnMarioPlayerJumped, ISignalOnMarioPlayerRespawned, ISignalOnMarioPlayerReceivedKnockback, ISignalOnMarioPlayerCollectedPowerup, ISignalOnMarioPlayerTakeDamage, ISignalOnMarioPlayerReachedCoinLimit, ISignalOnMarioPlayerZeroedStars, ISignalOnMarioPlayerZeroedCoins, ISignalOnMarioTouchedGoal, ISignalOnMarioPlayerGotCheckpoint, ISignalOnSecondTicked, ISignalOnMarioPlayerZeroedScore, ISignalOnEnemyKilled {
+    public class MatchConditionerSystem : SystemSignalsOnly, ISignalOnMarioPlayerCollectedStar, ISignalOnMarioPlayerCollectedCoin, ISignalOnMarioPlayerDied, ISignalOnEntityFreeze, ISignalOnGameStarting, ISignalOnMarioPlayerDisqualified, ISignalOnMarioPlayerJumped, ISignalOnMarioPlayerRespawned, ISignalOnMarioPlayerReceivedKnockback, ISignalOnMarioPlayerCollectedPowerup, ISignalOnMarioPlayerTakeDamage, ISignalOnMarioPlayerReachedCoinLimit, ISignalOnMarioPlayerZeroedStars, ISignalOnMarioPlayerZeroedCoins, ISignalOnMarioTouchedGoal, ISignalOnMarioPlayerGotCheckpoint, ISignalOnSecondTicked, ISignalOnMarioPlayerZeroedScore, ISignalOnEnemyKilled, ISignalOnMarioPlayerUsedPowerup {
         public class PendingAction {
             public MethodInfo ActionMethod;
             public object[] MethodParameters;
@@ -430,7 +430,6 @@ namespace Quantum
         public void a() {
             // ConditionActioned(TriggerCondition.HitBlock, f, entity);
             // ConditionActioned(TriggerCondition.SteppedOnEnemy, f, entity);
-            // ConditionActioned(TriggerCondition.TriggeredPowerup, f, entity);
             // ConditionActioned(TriggerCondition.LookedXDirection, f, entity);
             // ConditionActioned(TriggerCondition.Ran, f, entity);
             // ConditionActioned(TriggerCondition.XSecondRemaining, f, entity);
@@ -556,6 +555,10 @@ namespace Quantum
         public void OnEnemyKilled(Frame f, EntityRef enemy, EntityRef killer, KillReason killReason) {
             if (killReason == KillReason.InWall) return;
             ConditionActioned(TriggerCondition.KilledEnemy, f, killer);
+        }
+
+        public void OnMarioPlayerUsedPowerup(Frame f, EntityRef entity) {
+            ConditionActioned(TriggerCondition.UsedPowerup, f, entity);
         }
 
         #endregion

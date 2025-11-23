@@ -12,6 +12,14 @@ namespace Quantum {
         public readonly bool HasWorldPolygons(StageTile stageTile) {
             return Tile != default && stageTile != null && ((stageTile.CollisionData.Shapes != null && stageTile.CollisionData.Shapes.Length > 0) || stageTile.CollisionData.IsFullTile);
         }
+
+        public readonly bool IsSemisolid(Frame f) {
+            return Tile != default
+                   && f.TryFindAsset(Tile, out var stageTile)
+                   && stageTile.CollisionData.Shapes != null
+                   && stageTile.CollisionData.Shapes.Length == 1
+                   && stageTile.CollisionData.Shapes[0].Vertices.Length == 2;
+        }
         
         public bool GetWorldPolygons(Frame f, Span<FPVector2> vertexBuffer, Span<int> shapeVertexCountBuffer, out StageTile tile, FPVector2? worldPos = null) {
             return GetWorldPolygons(f, f.FindAsset<VersusStageData>(f.Map.UserAsset), vertexBuffer, shapeVertexCountBuffer, out tile, worldPos ?? FPVector2.Zero);

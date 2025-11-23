@@ -1354,7 +1354,7 @@ namespace NSMB.Entities.Player {
 
         private void OnPlayJingle(EventPlayJingle e) {
             if (e.Entity != EntityRef) {
-                switch (e.Id) {
+                switch (e.JingleId) {
                 case 2:
                     PlaySoundEverywhere(SoundEffect.Chime_Neutral1);
                     break;
@@ -1363,7 +1363,7 @@ namespace NSMB.Entities.Player {
                     break;
                 }
             } else {
-                switch (e.Id) {
+                switch (e.JingleId) {
                 case 0:
                     PlaySound(SoundEffect.Chime_Positive);
                     break;

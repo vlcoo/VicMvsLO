@@ -456,10 +456,10 @@ namespace Quantum {
         _f.AddEvent(ev);
         return ev;
       }
-      public EventPlayJingle PlayJingle(EntityRef Entity, Byte Id) {
+      public EventPlayJingle PlayJingle(EntityRef Entity, Byte JingleId) {
         var ev = _f.Context.AcquireEvent<EventPlayJingle>(EventPlayJingle.ID);
         ev.Entity = Entity;
-        ev.Id = Id;
+        ev.JingleId = JingleId;
         _f.AddEvent(ev);
         return ev;
       }
@@ -1941,7 +1941,7 @@ namespace Quantum {
   public unsafe partial class EventPlayJingle : EventBase {
     public new const Int32 ID = 43;
     public EntityRef Entity;
-    public Byte Id;
+    public Byte JingleId;
     protected EventPlayJingle(Int32 id, EventFlags flags) : 
         base(id, flags) {
     }
@@ -1960,7 +1960,7 @@ namespace Quantum {
       unchecked {
         var hash = 257;
         hash = hash * 31 + Entity.GetHashCode();
-        hash = hash * 31 + Id.GetHashCode();
+        hash = hash * 31 + JingleId.GetHashCode();
         return hash;
       }
     }

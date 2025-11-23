@@ -57,7 +57,7 @@ namespace NSMB.UI.Pause {
         public void Start() {
             Settings.Controls.UI.Pause.performed += OnPause;
             // if (IsReplay) options[1].text.text = "Hide replay controls";
-            options[1].translationKey = isHost ? "ui.pause.returntoroom" : "ui.pause.giveup";
+            // options[1].translationKey = isHost ? "ui.pause.returntoroom" : "ui.pause.giveup";
             UpdateLabels();
             QuantumEvent.Subscribe<EventGameEnded>(this, OnGameEnded);
         }
@@ -91,6 +91,7 @@ namespace NSMB.UI.Pause {
 
             QuantumGame game = QuantumRunner.DefaultGame;
             isHost = game == null || game.PlayerIsLocal(game.Frames.Predicted.Global->Host);
+            options[1].translationKey = isHost ? "ui.pause.returntoroom" : "ui.pause.giveup";
             options[1].text.fontSharedMaterial = IsReplay ? disabledMaterial : enabledMaterial;
             SelectOption(0);
 
