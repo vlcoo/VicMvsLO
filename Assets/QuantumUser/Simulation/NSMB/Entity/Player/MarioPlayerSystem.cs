@@ -829,20 +829,21 @@ namespace Quantum {
                 (
                     (inputs.Down.IsDown && mario->IsStuckInBlock)
                     || (physicsObject->IsTouchingGround && inputs.Down.IsDown && !mario->IsGroundpounding && !mario->IsSliding)
-                    || (!physicsObject->IsTouchingGround && (inputs.Down.IsDown || (physicsObject->Velocity.Y > 0 && mario->CurrentPowerupState != PowerupState.BlueShell)) && mario->IsCrouching && !physicsObject->IsUnderwater)
+                    || (!physicsObject->IsTouchingGround && (inputs.Down.IsDown || (/*physicsObject->Velocity.Y > 0 && */mario->CurrentPowerupState != PowerupState.BlueShell)) && mario->IsCrouching && !physicsObject->IsUnderwater)
                 /* || (mario->IsCrouching && ForceCrouchCheck(f, ref filter, physics)) */
                 )
                 && !mario->HeldEntity.IsValid
                 && !mario->IsInShell;
 
-            if (mario->IsCrouching && mario->CurrentPowerupState == PowerupState.MiniMushroom) {
-                var contacts = f.ResolveList(physicsObject->Contacts);
-                foreach (var contact in contacts) {
-                    if (f.Has<Liquid>(contact.Entity)) {
-                        mario->IsCrouching = false;
-                        break;
-                    }
-                }
+            if ((mario->IsCrouching && mario->CurrentPowerupState == PowerupState.MiniMushroom) || (!physicsObject->IsTouchingGround && !inputs.Down.IsDown)) {
+                // var contacts = f.ResolveList(physicsObject->Contacts);
+                // foreach (var contact in contacts) {
+                //     if (f.Has<Liquid>(contact.Entity)) {
+                //         mario->IsCrouching = false;
+                //         break;
+                //     }
+                // }
+                mario->IsCrouching = false;
             }
 
             if (!wasCrouching && mario->IsCrouching && !mario->IsInShell) {
@@ -950,7 +951,7 @@ namespace Quantum {
                 // Start groundpound
                 // Check if high enough above ground
                 var transform = filter.Transform;
-                if (PhysicsObjectSystem.Raycast(f, stage, transform->Position, FPVector2.Down, FP._0_50, out _)) {
+                if (PhysicsObjectSystem.Raycast(f, stage, transform->Position, FPVector2.Down, FP._0_20, out _)) {
                     return;
                 }
 

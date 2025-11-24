@@ -1,4 +1,5 @@
 ﻿using NSMB.Networking;
+using NSMB.Utilities;
 using Quantum;
 using UnityEngine;
 using UnityEngine.UI;
@@ -10,6 +11,7 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
         public PreviewPlayerAnimator currentCharacterPreview;
         public Image characterImage;
         public CharacterPalette currentPalette;
+        public string currentCharacterName;
         
         public override void Show(bool first) {
             base.Show(first);
@@ -31,6 +33,8 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
         }
 
         public void CharacterSelected(CharacterAsset character) {
+            if (currentCharacterName == character.LegalEnglishName) return;
+            
             var game = NetworkHandler.Runner.Game;
             var allCharacters = game.Configurations.Simulation.CharacterDatas;
             var selectedCharacter = allCharacters.IndexOf(chara => 
@@ -41,12 +45,13 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
                     Character = (byte) selectedCharacter,
                 });
             }
-
+            
             characterImage.sprite = character.ReadySprite;
             if (currentCharacterPreview != null) currentCharacterPreview.SetVisible(false);
             currentCharacterPreview = GetCharacterPreview(character);
             currentCharacterPreview.SetSelected();
             currentCharacterPreview.SetPalette(currentPalette);
+            currentCharacterName = character.LegalEnglishName;
         }
 
         private PreviewPlayerAnimator GetCharacterPreview(CharacterAsset character) {
