@@ -143,7 +143,7 @@ public class Songinator : MonoBehaviour
             });
         }
 
-        // Driver.SetVolume(1.0f);
+        if (secondsFading == 0 && newState == PlaybackState.PLAYING) Driver.SetVolume(1.0f);
 
         state = newState;
         switch (state)

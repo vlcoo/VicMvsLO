@@ -1,3 +1,4 @@
+using HGS.Tone;
 using NSMB.UI.Game;
 using System;
 using System.IO;
@@ -304,6 +305,8 @@ namespace NSMB {
             mixer.SetFloat("MasterVolume", Mathf.Log10(AudioMasterVolume) * 20);
             mixer.SetFloat("MusicVolume", Mathf.Log10(AudioMusicVolume) * 20);
             mixer.SetFloat("SoundVolume", Mathf.Log10(AudioSFXVolume) * 20);
+            
+            JsAudioLib.SetVolumeMultiplier(AudioMasterVolume * AudioMusicVolume);
         }
 
         public void LoadSettings() {

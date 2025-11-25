@@ -16,7 +16,7 @@ namespace HGS.Tone {
         private void Awake() {
             _sampleRate = AudioSettings.outputSampleRate;
             
-            #if UNITY_WEBGL
+            #if UNITY_WEBGL && !UNITY_EDITOR
                 _buffer = new float[CHUNK_SIZE];
                 JsAudioLib.Init(_sampleRate, _initDelay);
             #else
@@ -58,7 +58,7 @@ namespace HGS.Tone {
 
         // WEBGL implementation & JsAudioLib by https://github.com/hecomi/UnityWebGLAudioStream
         private void Update() {
-            #if UNITY_WEBGL
+            #if UNITY_WEBGL && !UNITY_EDITOR
                 if (_audioRenderer == null || _buffer == null) return;
                 int samplesToGenerate = (int)(_sampleRate * Time.unscaledDeltaTime);
                 
@@ -97,7 +97,7 @@ namespace HGS.Tone {
     
     public static class JsAudioLib
     {
-#if UNITY_WEBGL
+#if UNITY_WEBGL && !UNITY_EDITOR
         [DllImport("__Internal")]
         public static extern void Init(int sampleRate, float initDelay);
         [DllImport("__Internal")]
