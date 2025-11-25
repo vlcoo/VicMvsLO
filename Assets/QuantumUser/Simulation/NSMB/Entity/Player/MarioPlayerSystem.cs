@@ -307,12 +307,13 @@ namespace Quantum {
                         acc = -physics.SwimDeceleration;
                     }
                 } else if (mario->IsSliding) {
+                    var lessFrictionMult = physicsObject->IsOnSlipperyGround ? FP._0_25 : 1;
                     if (angle > physics.SlideMinimumAngle) {
                         // Uphill / downhill
-                        acc = (angle > 30 ? physics.SlideFastAcceleration : physics.SlideSlowAcceleration) * (uphill ? -1 : 1);
+                        acc = (angle > 30 ? physics.SlideFastAcceleration : physics.SlideSlowAcceleration) * (uphill ? -1 : 1) * lessFrictionMult;
                     } else {
                         // Flat ground
-                        acc = -physics.WalkAcceleration[0];
+                        acc = -physics.WalkAcceleration[0] * lessFrictionMult;
                     }
                 } else if (physicsObject->IsOnSlipperyGround) {
                     acc = -physics.WalkButtonReleaseIceDeceleration[stage];

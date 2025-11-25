@@ -372,7 +372,7 @@ namespace NSMB {
             controlsFireballSprint = PlayerPrefs.GetInt("FireballFromSprint", 1) == 1;
             controlsAutoSprint = false;
             controlsPropellerJump = false;
-            controlsOnScreen = PlayerPrefs.GetInt("ForceOnScreenControls", 1) == 1 || Utilities.Utils.GetDeviceType() == Enums.DeviceType.MOBILE;
+            controlsOnScreen = PlayerPrefs.GetInt("ForceOnScreenControls", 0) == 1 || Utilities.Utils.GetDeviceType() == Enums.DeviceType.MOBILE;
 
             miscFilterFullRooms = false;
             miscFilterInProgressRooms = false;

@@ -824,7 +824,7 @@ MonoBehaviour:
     - line: '|   blurSplashScreenBackground: 1'
     - line: '|   spritePackerPolicy: '
     - line: '|   webGLMemorySize: 16'
-    - line: '|   webGLExceptionSupport: 0'
+    - line: '|   webGLExceptionSupport: 1'
     - line: '|   webGLNameFilesAsHashes: 0'
     - line: '|   webGLShowDiagnostics: 0'
     - line: '|   webGLDataCaching: 1'
@@ -869,7 +869,7 @@ MonoBehaviour:
     - line: '|     Stadia: QUANTUM_XY'
     - line: '|     Standalone: QUANTUM_DISABLE_AI;QUANTUM_DISABLE_PHYSICS3D;QUANTUM_LOGLEVEL_WARN;QUANTUM_ENABLE_REMOTE_PROFILER;DOTWEEN;MOUSE_HOLD;QUANTUM_XY'
     - line: '|     VisionOS: QUANTUM_LOGLEVEL_WARN;DOTWEEN;QUANTUM_XY'
-    - line: '|     WebGL: QUANTUM_LOGLEVEL_WARN;DOTWEEN;QUANTUM_XY'
+    - line: '|     WebGL: QUANTUM_LOGLEVEL_WARN;DOTWEEN;QUANTUM_XY;MOUSE_HOLD'
     - line: '|     Windows Store Apps: FUSION_WEAVER;QUANTUM_LOGLEVEL_WARN;DOTWEEN;QUANTUM_XY'
     - line: '|     XboxOne: QUANTUM_LOGLEVEL_WARN;DOTWEEN;QUANTUM_XY'
     - line: '|     iPhone: QUANTUM_LOGLEVEL_WARN;DOTWEEN;QUANTUM_XY'
@@ -880,10 +880,10 @@ MonoBehaviour:
     - line: '|     Standalone: 1'
     - line: '|   il2cppCompilerConfiguration:'
     - line: '|     Standalone: 2'
-    - line: '|     WebGL: 1'
+    - line: '|     WebGL: 2'
     - line: '|   il2cppCodeGeneration:'
     - line: '|     Standalone: 0'
-    - line: '|     WebGL: 1'
+    - line: '|     WebGL: 0'
     - line: '|   il2cppStacktraceInformation: {}'
     - line: '|   managedStrippingLevel: {}'
     - line: '|   incrementalIl2cppBuild: {}'
@@ -1014,7 +1014,7 @@ MonoBehaviour:
       type: {class: WebGLPlatformSettings, ns: UnityEditor.WebGL, asm: UnityEditor.WebGL.Extensions}
       data:
         m_Development: 0
-        m_ConnectProfiler: 0
+        m_ConnectProfiler: 1
         m_BuildWithDeepProfilingSupport: 0
         m_AllowDebugging: 0
         m_WaitForManagedDebugger: 0
@@ -1024,7 +1024,7 @@ MonoBehaviour:
         m_ExplicitArrayBoundsChecks: 0
         m_CompressionType: -1
         m_InstallInBuildFolder: 0
-        m_CodeOptimization: 4
+        m_CodeOptimization: 1
         m_WebGLClientBrowserPath: 
         m_WebGLClientBrowserType: 0
         m_WebGLTextureSubtarget: 0
