@@ -121,7 +121,7 @@ namespace Quantum {
 
                     var gamemode = f.FindAsset(f.Global->Rules.Gamemode);
                     gamemode.EnableGamemode(f);
-                    f.LoopingSecondsTimer = 59;
+                    f.Global->LoopingSecondsTimer = 59;
 
                     f.Signals.OnGameStarting();
                     f.Events.GameStarted();
@@ -156,10 +156,10 @@ namespace Quantum {
                 // if (QuantumUtils.Decrement(ref f.Global->LoopingSecondsTimer))
                 //     f.Global->LoopingSecondsTimer = (ushort) (60 * f.UpdateRate);
                 if ((f.Number - f.Global->StartFrame) % f.UpdateRate == 0) {
-                    f.LoopingSecondsTimer--;
-                    f.Signals.OnSecondTicked(f.LoopingSecondsTimer);
+                    f.Global->LoopingSecondsTimer--;
+                    f.Signals.OnSecondTicked(f.Global->LoopingSecondsTimer);
                 }
-                if (f.LoopingSecondsTimer == 0) f.LoopingSecondsTimer = 60;
+                if (f.Global->LoopingSecondsTimer == 0) f.Global->LoopingSecondsTimer = 60;
 
                 break;
 

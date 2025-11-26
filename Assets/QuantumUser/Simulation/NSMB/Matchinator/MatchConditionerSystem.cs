@@ -605,11 +605,9 @@ namespace Quantum
         public unsafe void ActSubtractXFromScore(Frame f, EntityRef entity, string parameter) {
             if (!int.TryParse(parameter, out var count)) return;
             var mario = f.Unsafe.GetPointer<MarioPlayer>(entity);
-            mario->Score -= count;
-            if (mario->Score <= 0) {
-                mario->Score = 0;
-                f.Signals.OnMarioPlayerZeroedScore(entity, mario);
-            }
+            if (mario->Score == 0) return;
+            mario->Score--;
+            if (mario->Score == 0) f.Signals.OnMarioPlayerZeroedScore(entity, mario);
         }
         
         [Preserve]

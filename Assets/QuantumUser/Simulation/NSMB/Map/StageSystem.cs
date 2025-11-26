@@ -18,19 +18,21 @@ namespace Quantum {
                 int count = stage.TileDimensions.X * stage.TileDimensions.Y;
                 f.ReallocStageTiles(count);
 
+                // Copy to f.StageTiles
                 fixed (StageTileInstance* originalData = &stage.TileData[0]) {
-                    if (f.Global->Rules.SAllBricks) {
-                        var replacementBreakableTileInstance = new StageTileInstance {
-                            Tile = f.SimulationConfig.ReplacementBreakableTile, Flags = 0, Rotation = 0
-                        };
-                        for (int i = 0; i < stage.TileData.Length; i++) {
-                            var tileData = stage.TileData[i];
-                            if (!tileData.HasWorldPolygons(f) || tileData.IsSemisolid(f)) continue;
-                            originalData[i] = replacementBreakableTileInstance;
-                        }
-                    }
-
                     UnsafeUtility.MemCpy(f.StageTiles, originalData, StageTileInstance.SIZE * count);
+                }
+
+                // Replace f.StageTiles
+                if (f.Global->Rules.SAllBricks) {
+                    var replacementBreakableTileInstance = new StageTileInstance {
+                        Tile = f.SimulationConfig.ReplacementBreakableTile, Flags = 0, Rotation = 0
+                    };
+                    for (int i = 0; i < count; i++) {
+                        var tileData = f.StageTiles + i;
+                        if (!tileData->IsEligibleForReplacement(f)) continue;
+                        *tileData = replacementBreakableTileInstance;
+                    }
                 }
             } else {
                 // Not a valid VersusStage

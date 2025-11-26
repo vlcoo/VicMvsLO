@@ -7,7 +7,6 @@ namespace Quantum {
         public StageTileInstance* StageTiles;
         public int StageTilesLength;
         public readonly List<MatchConditionerSystem.PendingAction> PendingMatchConditionerActions = new();
-        public byte LoopingSecondsTimer;
 
         partial void FreeUser() {
             if (StageTiles != null) {
