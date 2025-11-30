@@ -415,6 +415,7 @@ namespace Quantum
                 if (pendingAction.SecondsRemaining > 0) continue;
 
                 for (var i = 0; i < pendingAction.RepeatCount; i++) {
+                    pendingAction.MethodParameters[0] = f;
                     pendingAction.ActionMethod.Invoke(this, pendingAction.MethodParameters);
                 }
             }

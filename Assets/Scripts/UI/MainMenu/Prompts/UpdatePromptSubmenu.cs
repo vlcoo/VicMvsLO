@@ -35,7 +35,7 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
         }
 
         public void OpenDownloadsPage() {
-            Application.OpenURL("https://github.com/ipodtouch0218/NSMB-MarioVsLuigi/releases/latest");
+            Application.OpenURL("https://github.com/vlcoo/vicmvslo/releases/latest");
             Canvas.PlayConfirmSound();
             success = true;
             Canvas.GoBack();
