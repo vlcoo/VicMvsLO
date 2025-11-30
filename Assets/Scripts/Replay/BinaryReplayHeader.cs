@@ -3,6 +3,7 @@ using NSMB.UI.Translation;
 using Quantum;
 using Quantum.Prototypes;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using UnityEngine;
@@ -30,6 +31,8 @@ namespace NSMB.Replay {
         // Player information
         public ReplayPlayerInformation[] PlayerInformation = Array.Empty<ReplayPlayerInformation>();
         public sbyte WinningTeam = -1;
+        
+        public int[] Markers = Array.Empty<int>();
 
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
@@ -57,6 +60,12 @@ namespace NSMB.Replay {
                 PlayerInformation[i].Serialize(writer);
             }
             writer.Write(WinningTeam);
+            
+            // Markers
+            writer.Write((byte) Markers.Length);
+            foreach (var marker in Markers) {
+                writer.Write(marker);
+            }
 
             return writer.BaseStream.Length;
         }
@@ -92,6 +101,12 @@ namespace NSMB.Replay {
                     result.PlayerInformation[i] = ReplayPlayerInformation.Deserialize(reader);
                 }
                 result.WinningTeam = reader.ReadSByte();
+                
+                // Markers
+                result.Markers = new int[reader.ReadByte()];
+                for (int i = 0; i < result.Markers.Length; i++) {
+                    result.Markers[i] = reader.ReadInt32();
+                }
             } catch {
                 return ReplayParseResult.ParseFailure;
             }

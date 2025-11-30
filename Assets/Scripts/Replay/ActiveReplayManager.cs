@@ -1,3 +1,4 @@
+using NSMB.Chat;
 using NSMB.Networking;
 using NSMB.UI.MainMenu.Submenus.Replays;
 using NSMB.Utilities;
@@ -8,7 +9,9 @@ using Quantum.Prototypes;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace NSMB.Replay {
     public class ActiveReplayManager : Singleton<ActiveReplayManager> {
@@ -35,6 +38,7 @@ namespace NSMB.Replay {
 
         //---Public Variables
         public readonly List<byte[]> ReplayFrameCache = new();
+        public List<int> Markers = new();
 
         //---Private Variables
         private bool _isReplayFastForwarding;
@@ -164,6 +168,7 @@ namespace NSMB.Replay {
                 },
                 PlayerInformation = playerInformation,
                 WinningTeam = winner,
+                Markers = Markers.ToArray(),
             };
 
             BinaryReplayFile binaryReplay = BinaryReplayFile.FromReplayData(jsonReplay, header);
@@ -231,6 +236,9 @@ namespace NSMB.Replay {
 
             ReplayFrameCache.Clear();
             ReplayFrameCache.Add(arguments.FrameData);
+
+            Markers = replay.Header.Markers.ToList();
+            Debug.Log($"this replay has {Markers.Count} markers.");
 
             NetworkHandler.Runner = await QuantumRunner.StartGameAsync(arguments);
         }

@@ -1,6 +1,8 @@
 ﻿using NSMB.Cameras;
+using NSMB.Chat;
 using NSMB.Entities.Player;
 using NSMB.Quantum;
+using NSMB.Replay;
 using NSMB.Sound;
 using NSMB.UI.Game.Replay;
 using NSMB.UI.Game.Scoreboard;
@@ -73,6 +75,7 @@ namespace NSMB.UI.Game {
             Settings.Controls.UI.Next.performed += SpectateNextPlayer;
             Settings.Controls.UI.Previous.performed += SpectatePreviousPlayer;
             Settings.Controls.UI.Submit.performed += OnSubmit;
+            Settings.Controls.UI.Marker.performed += AddReplayMarker;
             TranslationManager.OnLanguageChanged += OnLanguageChanged;
         }
 
@@ -84,6 +87,7 @@ namespace NSMB.UI.Game {
             Settings.Controls.UI.Next.performed -= SpectateNextPlayer;
             Settings.Controls.UI.Previous.performed -= SpectatePreviousPlayer;
             Settings.Controls.UI.Submit.performed -= OnSubmit;
+            Settings.Controls.UI.Marker.performed -= AddReplayMarker;
             TranslationManager.OnLanguageChanged -= OnLanguageChanged;
         }
 
@@ -283,6 +287,25 @@ namespace NSMB.UI.Game {
                     UpdateSpectateUI();
                 }
             }
+        }
+
+        private unsafe void AddReplayMarker(InputAction.CallbackContext context) {
+            var f = QuantumRunner.DefaultGame.Frames.Predicted;
+            if (f.Global->GameState >= GameState.Ended || IsReplay) {
+                return;
+            }
+
+            var markers = ActiveReplayManager.Instance.Markers;
+            if (markers.Count >= 20) {
+                GlobalController.Instance.sfx.PlayOneShot(SoundEffect.UI_Error);
+                return;
+            }
+
+            int markerTime = f.Number;
+            markers.Add(markerTime);
+            
+            ChatManager.Instance.AddSystemMessage($"Marker #{markers.Count} added!");
+            Debug.Log($"New marker at {markerTime}.");
         }
 
         private void OnLanguageChanged(TranslationManager tm) {
