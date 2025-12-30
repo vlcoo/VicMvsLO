@@ -18,9 +18,6 @@ namespace NSMB.UI.Options.Loaders {
             }
 
             int value = Mathf.RoundToInt((float) newValue);
-            if (value == (int) spo.slider.maxValue) {
-                value = 0;
-            }
 
             Settings.Instance.GraphicsMaxFps = value * 5;
             option.manager.RequireReconnect |= option.requireReconnect;
