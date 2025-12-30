@@ -18,7 +18,7 @@ namespace NSMB.UI.Game.Results {
         [SerializeField] private Canvas parentCanvas;
         [SerializeField] private ResultsEntry template;
         [SerializeField] private RectTransform header, ui;
-        [SerializeField] private CanvasGroup fadeGroup;
+        [SerializeField] private CanvasGroup fadeGroup, fadeTouch;
         [SerializeField] private LoopingMusicData musicData;
         [SerializeField] private float delayUntilStart = 5.5f, delayPerEntry = 0.05f, replayDelayUntilStart = 3f;
 
@@ -154,6 +154,7 @@ namespace NSMB.UI.Game.Results {
             while (time > 0) {
                 time -= Time.deltaTime;
                 fadeGroup.alpha = Mathf.Lerp(0, 1, time / 0.333f);
+                fadeTouch.alpha = Mathf.Lerp(0, 1, time / 0.333f);
                 yield return null;
             }
         }
