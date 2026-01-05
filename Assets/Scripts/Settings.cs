@@ -1,9 +1,11 @@
 using NSMB.UI.Game;
+using Quantum;
 using System;
 using System.IO;
 using UnityEngine;
 using UnityEngine.Audio;
 using UnityEngine.InputSystem;
+using UnityEngine.UI;
 
 namespace NSMB {
     public class Settings : Singleton<Settings> {
@@ -14,6 +16,7 @@ namespace NSMB {
         private Action[] VersionUpdaters;
         public static event Action OnColorblindModeChanged, OnDisableChatChanged, OnNdsResolutionSettingChanged;
         public static event Action<bool> OnInputDisplayActiveChanged, OnReplaysEnabledChanged;
+
 
         //---Properties
 
@@ -206,6 +209,35 @@ namespace NSMB {
             set => Controls.asset.LoadBindingOverridesFromJson(value);
         }
 
+        private float _mobileTCOpacity = 1f;
+
+        public float mobileTCOpacity
+        {
+            get => _mobileTCOpacity;
+            set
+            {
+                _mobileTCOpacity = value;
+
+                if (TouchControlsManager.Instance != null)
+                    TouchControlsManager.Instance.tC.alpha = value;
+            }
+         }
+
+
+        private float _mobileTCSize = 1f;
+
+        public float mobileTCSize
+        {
+            get => _mobileTCSize;
+            set
+            {
+                _mobileTCSize = Mathf.Clamp(value, 0.5f, 2f); 
+
+                if (TouchControlsManager.Instance != null)
+                    TouchControlsManager.Instance.ApplyButtonScale(_mobileTCSize);
+            }
+        }
+        
         //---Public Variables
         public string generalNickname;
         public int generalCharacter, generalPalette, generalMaxTempReplays;
@@ -218,6 +250,8 @@ namespace NSMB {
 
         public RumbleManager.RumbleSetting controlsRumble;
         public bool controlsFireballSprint, controlsAutoSprint, controlsPropellerJump;
+        public int mobiletouchControls, mobileTCDIT;
+        public bool mobileSpectatorTC;
 
         public bool miscFilterFullRooms, miscFilterInProgressRooms;
 
@@ -282,6 +316,13 @@ namespace NSMB {
             PlayerPrefs.SetInt("Controls_PropellerJump", controlsPropellerJump ? 1 : 0);
             PlayerPrefs.SetInt("Controls_Rumble", (int) controlsRumble);
             PlayerPrefs.SetString("Controls_Bindings", ControlsBindings);
+
+            // Mobile
+            PlayerPrefs.SetInt("Mobile_TouchControls", mobiletouchControls);
+            PlayerPrefs.SetFloat("Mobile_TouchControlsOpacity", mobileTCOpacity);
+            PlayerPrefs.SetFloat("Mobile_TouchControlsSize", mobileTCSize);
+            PlayerPrefs.SetInt("Mobile_TouchControlsDirectionalInputTye", (int) mobileTCDIT);
+            PlayerPrefs.SetInt("Mobile_TouchControlsSpectator", mobileSpectatorTC ? 1 : 0);
 
             // Misc
             PlayerPrefs.SetInt("Misc_FilterFullRooms", miscFilterFullRooms ? 1 : 0);
@@ -363,6 +404,12 @@ namespace NSMB {
             controlsAutoSprint = false;
             controlsPropellerJump = false;
 
+            mobiletouchControls = 0;
+            mobileTCOpacity = PlayerPrefs.GetFloat("Mobile_TouchControlsOpacity", 1f);
+            mobileTCSize = PlayerPrefs.GetFloat("Mobile_TouchControlsOpacity", 0.75f);
+            mobileTCDIT = 0;
+            mobileSpectatorTC = true;
+
             miscFilterFullRooms = false;
             miscFilterInProgressRooms = false;
 
@@ -413,6 +460,13 @@ namespace NSMB {
             TryGetSetting("Controls_PropellerJump", ref controlsPropellerJump);
             TryGetSetting("Controls_Rumble", ref controlsRumble);
             TryGetSetting<string>("Controls_Bindings", nameof(ControlsBindings));
+
+            // Mobile
+            TryGetSetting("Mobile_TouchControls", ref mobiletouchControls);
+            TryGetSetting<float>("Mobile_TouchControlsOpacity", nameof(mobileTCOpacity));
+            TryGetSetting<float>("Mobile_TouchControlsSize", nameof(mobileTCSize));
+            TryGetSetting("Mobile_TouchControlsDirectionalInputTye", ref mobileTCDIT);
+            TryGetSetting("Mobile_TouchControlsSpectator", ref mobileSpectatorTC);
 
             // Misc
             TryGetSetting("Misc_FilterFullRooms", ref miscFilterFullRooms);
