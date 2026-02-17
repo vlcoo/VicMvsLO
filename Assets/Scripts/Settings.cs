@@ -373,9 +373,9 @@ namespace NSMB {
             }
             controlsRumble = RumbleManager.RumbleSetting.High;
             controlsFireballSprint = PlayerPrefs.GetInt("FireballFromSprint", 1) == 1;
-            controlsAutoSprint = false;
             controlsPropellerJump = false;
             controlsOnScreen = PlayerPrefs.GetInt("ForceOnScreenControls", 0) == 1 || Utilities.Utils.GetDeviceType() == Enums.DeviceType.MOBILE;
+            controlsAutoSprint = controlsOnScreen;
 
             miscFilterFullRooms = false;
             miscFilterInProgressRooms = false;

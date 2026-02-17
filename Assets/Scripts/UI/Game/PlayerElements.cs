@@ -16,6 +16,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.Rendering;
 using static NSMB.Utilities.QuantumViewUtils;
 
 namespace NSMB.UI.Game {

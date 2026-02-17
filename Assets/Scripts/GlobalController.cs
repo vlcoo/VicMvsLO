@@ -71,6 +71,9 @@ namespace NSMB {
             checkedForVersion = false;
             
             emotesAsset.spriteCharacterTable.ForEach(character => EMOTE_NAMES.Add(character.name));
+#if UNITY_ANDROID && !UNITY_EDITOR
+            Screen.sleepTimeout = SleepTimeout.NeverSleep;
+#endif
         }
 
         public void Start() {

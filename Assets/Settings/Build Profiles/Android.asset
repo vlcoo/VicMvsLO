@@ -90,8 +90,8 @@ MonoBehaviour:
     - line: '|   preserveFramebufferAlpha: 0'
     - line: '|   disableDepthAndStencilBuffers: 0'
     - line: '|   androidStartInFullscreen: 1'
-    - line: '|   androidRenderOutsideSafeArea: 1'
-    - line: '|   androidUseSwappy: 0'
+    - line: '|   androidRenderOutsideSafeArea: 0'
+    - line: '|   androidUseSwappy: 1'
     - line: '|   androidBlitType: 0'
     - line: '|   androidResizeableActivity: 0'
     - line: '|   androidDefaultWindowWidth: 1920'
@@ -576,7 +576,13 @@ MonoBehaviour:
     - line: '|   - serializedVersion: 2'
     - line: '|     m_BuildTarget: WebGL'
     - line: '|     m_EncodingQuality: 1'
-    - line: '|   m_BuildTargetGroupHDRCubemapEncodingQuality: []'
+    - line: '|   - serializedVersion: 2'
+    - line: '|     m_BuildTarget: Android'
+    - line: '|     m_EncodingQuality: 1'
+    - line: '|   m_BuildTargetGroupHDRCubemapEncodingQuality:'
+    - line: '|   - serializedVersion: 2'
+    - line: '|     m_BuildTarget: Android'
+    - line: '|     m_EncodingQuality: 1'
     - line: '|   m_BuildTargetGroupLightmapSettings:'
     - line: '|   - m_BuildTarget: WebGL'
     - line: '|     m_TextureStreamingEnabled: 0'
@@ -589,7 +595,7 @@ MonoBehaviour:
     - line: '|     m_Formats: 05000000'
     - line: '|   - serializedVersion: 3'
     - line: '|     m_BuildTarget: Android'
-    - line: '|     m_Formats: 0200000001000000'
+    - line: '|     m_Formats: 050000000200000001000000'
     - line: '|   playModeTestRunnerEnabled: 0'
     - line: '|   runPlayModeTestAsEditModeTest: 0'
     - line: '|   actionOnDotNetUnhandledException: 1'
@@ -1034,7 +1040,7 @@ MonoBehaviour:
         m_ExportAsGoogleAndroidProject: 0
         m_DebugSymbolLevel: 1
         m_DebugSymbolFormat: 5
-        m_CurrentDeploymentTargetId: __builtin__target_default
+        m_CurrentDeploymentTargetId: 2B101FDH20008X
         m_BuildType: 2
         m_BuildAppBundle: 0
         m_IPAddressToConnect: 
