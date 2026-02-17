@@ -66,7 +66,7 @@ namespace Quantum {
                 enemyB->ChangeFacingRight(f, entityB, !right);
             }
         }
-        
+
         public void OffscreenCheck(Frame f, Filter filter, VersusStageData stage) {
             var allPlayers = f.Filter<MarioPlayer, Transform2D>();
             var onscreen = false;
@@ -96,7 +96,7 @@ namespace Quantum {
                 }
                 return;
             }
-            
+
             var filter = f.Filter<Enemy, Transform2D>();
 
             while (filter.NextUnsafe(out EntityRef entity, out Enemy* enemy, out Transform2D* transform)) {

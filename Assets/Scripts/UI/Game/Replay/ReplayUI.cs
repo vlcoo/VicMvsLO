@@ -143,13 +143,18 @@ namespace NSMB.UI.Game.Replay {
             }
 
             var markers = ActiveReplayManager.Instance.Markers;
-            if (markerCount < markers.Count) {
-                foreach (var marker in markers) {
+            if (markerCount < markers.Count)
+            {
+                foreach (var marker in markers)
+                {
                     var markerObj = Instantiate(markerTemplate, trackArrow.parent);
-                    float markerPercentage = (marker - ActiveReplayManager.Instance.ReplayStart) / (float)ActiveReplayManager.Instance.ReplayLength;
-                    markerObj.transform.localPosition = new Vector3(markerPercentage * (maxTrackX - minTrackX) + minTrackX, 0, 0);
+                    float markerPercentage = (marker - ActiveReplayManager.Instance.ReplayStart) /
+                                             (float)ActiveReplayManager.Instance.ReplayLength;
+                    markerObj.transform.localPosition =
+                        new Vector3(markerPercentage * (maxTrackX - minTrackX) + minTrackX, 0, 0);
                     markerObj.SetActive(true);
                 }
+
                 markerCount = markers.Count;
             }
 
@@ -295,7 +300,7 @@ namespace NSMB.UI.Game.Replay {
         }
 
         private IEnumerator FrameAdvanceCoroutine() {
-            Frame f = QuantumRunner.DefaultGame.Frames.Predicted;
+            Frame f = PredictedFrame;
             Time.timeScale = 1;
             Time.captureDeltaTime = f.DeltaTime.AsFloat;
             yield return null;

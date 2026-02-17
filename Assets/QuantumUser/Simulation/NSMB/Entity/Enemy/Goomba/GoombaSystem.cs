@@ -2,7 +2,6 @@ using Photon.Deterministic;
 using Quantum.Collections;
 
 namespace Quantum {
-    [UnityEngine.Scripting.Preserve]
     public unsafe class GoombaSystem : SystemMainThreadEntityFilter<Goomba, GoombaSystem.Filter>, ISignalOnEntityBumped, ISignalOnBobombExplodeEntity,
         ISignalOnIceBlockBroken, ISignalOnEnemyKilledByStageReset, ISignalOnEntityCrushed, ISignalOnEnemyRespawned {
 

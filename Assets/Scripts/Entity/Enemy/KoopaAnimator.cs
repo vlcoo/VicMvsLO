@@ -35,7 +35,7 @@ namespace NSMB.Entities.Enemies {
         public void Start() {
             QuantumEvent.Subscribe<EventPlayComboSound>(this, OnPlayComboSound, FilterOutReplayFastForward);
             QuantumEvent.Subscribe<EventPlayBumpSound>(this, OnPlayBumpSound, FilterOutReplayFastForward);
-            
+
             if (mesh) offsetRotation = mesh.transform.rotation.eulerAngles.y;
         }
 
@@ -83,7 +83,7 @@ namespace NSMB.Entities.Enemies {
                 graphicsTransform = transform;
                 if (isShell) mesh.FlipX(enemy->FacingRight ^ mirrorSprite, false);
             } else return;
-            
+
             float remainingWakeupTimer = koopa->IsKicked ? 0 : (koopa->WakeupFrames / 60f);
             if (enemy->IsDead && !mesh) {
                 graphicsTransform.rotation *= Quaternion.Euler(0, 0, 400f * (enemy->FacingRight ? -1 : 1) * Time.deltaTime);

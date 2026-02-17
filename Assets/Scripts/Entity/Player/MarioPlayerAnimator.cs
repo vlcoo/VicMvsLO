@@ -218,7 +218,7 @@ namespace NSMB.Entities.Player {
             skin = palettes[paletteIndex];
 
             GlowColor = Utils.GetPlayerColor(f, mario->PlayerRef);
-            
+
             largeMesh = largeShellExclude.GetComponentInChildren<SkinnedMeshRenderer>();
             if (smallModel == largeModel) useSpecialSmall = true;
             if (excludeMaterialForSmall)
@@ -236,7 +236,7 @@ namespace NSMB.Entities.Player {
             AllMarioPlayers.RemoveWhere(ma => ma == null);
             AllMarioPlayers.Add(this);
             MarioPlayerInitialized?.Invoke(Game, f, this);
-            
+
             if (f.Global->Rules.SHideSeek) models.transform.position = new Vector3(models.transform.position.x, models.transform.position.y, 6f);
 
             forceUpdate = true;
@@ -294,7 +294,7 @@ namespace NSMB.Entities.Player {
             }
 
             if (!goalReachedBottom) SetFacingDirection(f, mario, physicsObject);
-            InterpolateFacingDirection(mario);
+            InterpolateFacingDirection(mario, freezable->IsFrozen(f));
             UpdateAnimatorVariables(f, mario, physicsObject, freezable, ref inputs);
 
             previousPosition = transform.position;
@@ -450,7 +450,7 @@ namespace NSMB.Entities.Player {
             wasTurnaround = mario->IsTurnaround;
         }
 
-        private void InterpolateFacingDirection(MarioPlayer* mario) {
+        private void InterpolateFacingDirection(MarioPlayer* mario, bool frozen) {
             using var profilerScope = HostProfiler.Start("MarioPlayerAnimator.InterpolateFacingDirection");
             if (modelRotateInstantly || wasTurnaround) {
                 models.transform.rotation = modelRotationTarget;
@@ -459,7 +459,7 @@ namespace NSMB.Entities.Player {
                 models.transform.rotation = Quaternion.RotateTowards(models.transform.rotation, modelRotationTarget, maxRotation);
             }
 
-            if (mario->CurrentPowerupState == PowerupState.PropellerMushroom /* && !controller.IsFrozen */) {
+            if (mario->CurrentPowerupState == PowerupState.PropellerMushroom && !frozen) {
                 propeller.transform.Rotate(Vector3.forward, propellerVelocity * Time.deltaTime);
             }
         }
@@ -625,7 +625,7 @@ namespace NSMB.Entities.Player {
                 largeMesh.materials = large ? rememberedMaterialsLarge : rememberedMaterialsSmall;
             else if (useSpecialSmall)
                 largeModel.transform.GetChild(0).localScale = large ? new Vector3(1, 1, 1) : new Vector3(0.8f, 0.7f, 0.7f);
-            
+
             Avatar targetAvatar = large ? largeAvatar : smallAvatar;
             bool changedAvatar = animator.avatar != targetAvatar;
 
@@ -984,7 +984,7 @@ namespace NSMB.Entities.Player {
             if (e.Entity != EntityRef) {
                 return;
             }
-            
+
             PlaySound(SoundEffect.Powerup_1UP_Collect);
             GameObject number = Instantiate(coinNumberParticle, e.Position.ToUnityVector3(), Quaternion.identity);
             number.GetComponentInChildren<NumberParticle>().Initialize("", Color.black, false, true);
@@ -1283,7 +1283,7 @@ namespace NSMB.Entities.Player {
                 animator.Play(StateJumplanding);
             }
         }
-        
+
         private void OnMarioTouchedGoal(EventMarioTouchedGoal e) {
             if (e.Entity != EntityRef) {
                 return;
@@ -1348,7 +1348,7 @@ namespace NSMB.Entities.Player {
             if (e.Entity != EntityRef) {
                 return;
             }
-            
+
             SpawnParticle(Enums.PrefabParticle.Enemy_Puff.GetGameObject(), transform.position + Vector3.back * 3f);
         }
 

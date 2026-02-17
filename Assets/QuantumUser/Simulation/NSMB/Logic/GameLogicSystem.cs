@@ -9,6 +9,7 @@ namespace Quantum {
     public unsafe class GameLogicSystem : SystemMainThread, ISignalOnPlayerAdded, ISignalOnPlayerRemoved,
         ISignalOnMarioPlayerDied, ISignalOnMarioTouchedGoal, ISignalOnMarioPlayerFinishedFlagpoleAnimation,
         ISignalOnLoadingComplete, ISignalOnReturnToRoom, ISignalOnComponentRemoved<MarioPlayer> {
+
         public override void OnInit(Frame f) {
             var config = f.RuntimeConfig;
             var gamemode = f.FindAsset(f.SimulationConfig.DefaultGamemode);
@@ -106,6 +107,7 @@ namespace Quantum {
                         data->IsLoaded = false;
                         data->IsReady = false;
                     }
+
                 } else if (f.Global->GameStartFrames == 79) {
                     f.Events.RecordingStarted();
                 }

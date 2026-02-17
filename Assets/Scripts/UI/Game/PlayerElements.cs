@@ -170,7 +170,7 @@ namespace NSMB.UI.Game {
 
         public void StartSpectating() {
             if (!spectating) musicManager.SetSpectatingMusic(true);
-            
+
             spectating = true;
             spectationUI.SetActive(!IsReplay);
             if (!IsReplay) {
@@ -304,7 +304,7 @@ namespace NSMB.UI.Game {
 
             int markerTime = f.Number;
             markers.Add(markerTime);
-            
+
             ChatManager.Instance.AddSystemMessage($"Marker #{markers.Count} added!");
             Debug.Log($"New marker at {markerTime}.");
         }

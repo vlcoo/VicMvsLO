@@ -1,4 +1,6 @@
 using Photon.Deterministic;
+using Quantum.Collections;
+using Quantum.Core;
 using System;
 
 namespace Quantum {
@@ -170,9 +172,11 @@ namespace Quantum {
             } else {
                 if (dropObjectives) {
                     int objectiveCount = 1;
+                    /*
                     if (f.Unsafe.TryGetPointer(attacker, out MarioPlayer* attackerMario) && attackerMario->IsGroundpoundActive) {
                         objectiveCount = 3;
                     }
+                    */
                     f.Signals.OnMarioPlayerDropObjective(entity, objectiveCount, attacker);
                 }
                 DeathAnimationFrames = 36;
@@ -192,10 +196,11 @@ namespace Quantum {
             IsTurnaround = false;
             IsGroundpounding = false;
             CurrentKnockback = KnockbackStrength.None;
+            KnockbackGetupFrames = 0;
             WallslideRight = false;
             WallslideLeft = false;
             ForceJumpTimer = 0;
-            
+
             /*
             IsWaterWalking = false;
             IsFrozen = false;
@@ -575,13 +580,13 @@ namespace Quantum {
             ForceJumpTimer = 0;
             DamageInvincibilityFrames = 0;
             InvincibilityFrames = 0;
-            
+
             var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(mario);
             physicsObject->IsFrozen = true;
             physicsObject->DisableCollision = true;
             physicsObject->CurrentData = default;
             physicsObject->Velocity = FPVector2.Zero;
-            
+
             if (f.Exists(HeldEntity) && f.Unsafe.TryGetPointer(HeldEntity, out Holdable* holdable)) {
                 holdable->Throw(f, HeldEntity);
             }
