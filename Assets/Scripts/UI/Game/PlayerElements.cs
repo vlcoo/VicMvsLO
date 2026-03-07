@@ -76,7 +76,7 @@ namespace NSMB.UI.Game {
             Settings.Controls.UI.Next.performed += SpectateNextPlayer;
             Settings.Controls.UI.Previous.performed += SpectatePreviousPlayer;
             Settings.Controls.UI.Submit.performed += OnSubmit;
-            Settings.Controls.UI.Marker.performed += AddReplayMarker;
+            Settings.Controls.Replay.Marker.performed += AddReplayMarker;
             TranslationManager.OnLanguageChanged += OnLanguageChanged;
         }
 
@@ -88,7 +88,7 @@ namespace NSMB.UI.Game {
             Settings.Controls.UI.Next.performed -= SpectateNextPlayer;
             Settings.Controls.UI.Previous.performed -= SpectatePreviousPlayer;
             Settings.Controls.UI.Submit.performed -= OnSubmit;
-            Settings.Controls.UI.Marker.performed -= AddReplayMarker;
+            Settings.Controls.Replay.Marker.performed -= AddReplayMarker;
             TranslationManager.OnLanguageChanged -= OnLanguageChanged;
         }
 

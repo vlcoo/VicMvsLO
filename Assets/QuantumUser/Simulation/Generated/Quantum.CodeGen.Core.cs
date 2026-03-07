@@ -114,6 +114,10 @@ namespace Quantum {
     BlueShell,
     HammerSuit,
     MegaMushroom,
+    OrangeUnshroom,
+    PurpleUnshroom,
+    GreenUnflower,
+    PinkUnflower,
   }
   public enum StageTileFlags : byte {
     MirrorX = 1,

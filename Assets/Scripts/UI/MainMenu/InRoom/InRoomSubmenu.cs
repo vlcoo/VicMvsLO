@@ -132,7 +132,7 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
         [Preserve]
         public void OpenOptions() {
             if (GlobalController.Instance.optionsManager.OpenMenu()) {
-                Canvas.PlaySound(SoundEffect.UI_WindowOpen);
+                Canvas.PlaySound(SoundEffect.UI_Decide);
             }
         }
 

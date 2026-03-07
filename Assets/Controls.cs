@@ -618,15 +618,6 @@ public partial class @Controls: IInputActionCollection2, IDisposable
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""Marker"",
-                    ""type"": ""Button"",
-                    ""id"": ""29e435c6-e6ce-4263-98a6-02cdfcfac928"",
-                    ""expectedControlType"": """",
-                    ""processors"": """",
-                    ""interactions"": """",
-                    ""initialStateCheck"": false
-                },
-                {
                     ""name"": ""Next"",
                     ""type"": ""Button"",
                     ""id"": ""0c263a71-9606-485f-8149-4ea77c761c1a"",
@@ -1315,50 +1306,6 @@ public partial class @Controls: IInputActionCollection2, IDisposable
                     ""action"": ""Next"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""2f2408cd-5b0c-4619-991d-a1d1e717a8a7"",
-                    ""path"": ""<Keyboard>/backspace"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": "";Keyboard"",
-                    ""action"": ""Marker"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""77284594-48b4-429d-8309-99a5d21e6182"",
-                    ""path"": """",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": "";Keyboard"",
-                    ""action"": ""Marker"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""7676706b-0a1b-4631-91fc-0f21da1d4d0b"",
-                    ""path"": ""<Gamepad>/leftStickPress"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": "";Gamepad"",
-                    ""action"": ""Marker"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""7734d819-429d-47b1-b2ef-3311e6fdb971"",
-                    ""path"": """",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": "";Gamepad"",
-                    ""action"": ""Marker"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
                 }
             ]
         },
@@ -1370,6 +1317,15 @@ public partial class @Controls: IInputActionCollection2, IDisposable
                     ""name"": ""ZoomIn"",
                     ""type"": ""Button"",
                     ""id"": ""7810083b-d8d7-4e63-ac60-48fcc1dc9661"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Marker"",
+                    ""type"": ""Button"",
+                    ""id"": ""00f3461f-aa3a-4385-9fa9-ef1880824f2e"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -1436,6 +1392,50 @@ public partial class @Controls: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""groups"": ""Gamepad"",
                     ""action"": ""ZoomIn"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""ab27a6eb-1571-4a2d-845a-21d991726100"",
+                    ""path"": ""<Keyboard>/backspace"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Keyboard"",
+                    ""action"": ""Marker"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""d7096859-3740-4542-a6d4-e327f44ca443"",
+                    ""path"": """",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Keyboard"",
+                    ""action"": ""Marker"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""f0d9b5fe-69e3-4aab-b884-1f03e3ae3ebb"",
+                    ""path"": ""<Gamepad>/leftStickPress"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Gamepad"",
+                    ""action"": ""Marker"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""a856dcd1-cf42-4de0-9ebe-a7b3053740ab"",
+                    ""path"": """",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Gamepad"",
+                    ""action"": ""Marker"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -1694,7 +1694,6 @@ public partial class @Controls: IInputActionCollection2, IDisposable
         m_UI_Cancel = m_UI.FindAction("Cancel", throwIfNotFound: true);
         m_UI_Pause = m_UI.FindAction("Pause", throwIfNotFound: true);
         m_UI_Scoreboard = m_UI.FindAction("Scoreboard", throwIfNotFound: true);
-        m_UI_Marker = m_UI.FindAction("Marker", throwIfNotFound: true);
         m_UI_Next = m_UI.FindAction("Next", throwIfNotFound: true);
         m_UI_Previous = m_UI.FindAction("Previous", throwIfNotFound: true);
         m_UI_SpectatePlayerByIndex = m_UI.FindAction("!SpectatePlayerByIndex", throwIfNotFound: true);
@@ -1706,6 +1705,7 @@ public partial class @Controls: IInputActionCollection2, IDisposable
         // Replay
         m_Replay = asset.FindActionMap("Replay", throwIfNotFound: true);
         m_Replay_ZoomIn = m_Replay.FindAction("ZoomIn", throwIfNotFound: true);
+        m_Replay_Marker = m_Replay.FindAction("Marker", throwIfNotFound: true);
         m_Replay_ZoomOut = m_Replay.FindAction("ZoomOut", throwIfNotFound: true);
         m_Replay_Reset = m_Replay.FindAction("Reset", throwIfNotFound: true);
         // Debug
@@ -1951,7 +1951,6 @@ public partial class @Controls: IInputActionCollection2, IDisposable
     private readonly InputAction m_UI_Cancel;
     private readonly InputAction m_UI_Pause;
     private readonly InputAction m_UI_Scoreboard;
-    private readonly InputAction m_UI_Marker;
     private readonly InputAction m_UI_Next;
     private readonly InputAction m_UI_Previous;
     private readonly InputAction m_UI_SpectatePlayerByIndex;
@@ -1991,10 +1990,6 @@ public partial class @Controls: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "UI/Scoreboard".
         /// </summary>
         public InputAction @Scoreboard => m_Wrapper.m_UI_Scoreboard;
-        /// <summary>
-        /// Provides access to the underlying input action "UI/Marker".
-        /// </summary>
-        public InputAction @Marker => m_Wrapper.m_UI_Marker;
         /// <summary>
         /// Provides access to the underlying input action "UI/Next".
         /// </summary>
@@ -2068,9 +2063,6 @@ public partial class @Controls: IInputActionCollection2, IDisposable
             @Scoreboard.started += instance.OnScoreboard;
             @Scoreboard.performed += instance.OnScoreboard;
             @Scoreboard.canceled += instance.OnScoreboard;
-            @Marker.started += instance.OnMarker;
-            @Marker.performed += instance.OnMarker;
-            @Marker.canceled += instance.OnMarker;
             @Next.started += instance.OnNext;
             @Next.performed += instance.OnNext;
             @Next.canceled += instance.OnNext;
@@ -2121,9 +2113,6 @@ public partial class @Controls: IInputActionCollection2, IDisposable
             @Scoreboard.started -= instance.OnScoreboard;
             @Scoreboard.performed -= instance.OnScoreboard;
             @Scoreboard.canceled -= instance.OnScoreboard;
-            @Marker.started -= instance.OnMarker;
-            @Marker.performed -= instance.OnMarker;
-            @Marker.canceled -= instance.OnMarker;
             @Next.started -= instance.OnNext;
             @Next.performed -= instance.OnNext;
             @Next.canceled -= instance.OnNext;
@@ -2186,6 +2175,7 @@ public partial class @Controls: IInputActionCollection2, IDisposable
     private readonly InputActionMap m_Replay;
     private List<IReplayActions> m_ReplayActionsCallbackInterfaces = new List<IReplayActions>();
     private readonly InputAction m_Replay_ZoomIn;
+    private readonly InputAction m_Replay_Marker;
     private readonly InputAction m_Replay_ZoomOut;
     private readonly InputAction m_Replay_Reset;
     /// <summary>
@@ -2203,6 +2193,10 @@ public partial class @Controls: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "Replay/ZoomIn".
         /// </summary>
         public InputAction @ZoomIn => m_Wrapper.m_Replay_ZoomIn;
+        /// <summary>
+        /// Provides access to the underlying input action "Replay/Marker".
+        /// </summary>
+        public InputAction @Marker => m_Wrapper.m_Replay_Marker;
         /// <summary>
         /// Provides access to the underlying input action "Replay/ZoomOut".
         /// </summary>
@@ -2240,6 +2234,9 @@ public partial class @Controls: IInputActionCollection2, IDisposable
             @ZoomIn.started += instance.OnZoomIn;
             @ZoomIn.performed += instance.OnZoomIn;
             @ZoomIn.canceled += instance.OnZoomIn;
+            @Marker.started += instance.OnMarker;
+            @Marker.performed += instance.OnMarker;
+            @Marker.canceled += instance.OnMarker;
             @ZoomOut.started += instance.OnZoomOut;
             @ZoomOut.performed += instance.OnZoomOut;
             @ZoomOut.canceled += instance.OnZoomOut;
@@ -2260,6 +2257,9 @@ public partial class @Controls: IInputActionCollection2, IDisposable
             @ZoomIn.started -= instance.OnZoomIn;
             @ZoomIn.performed -= instance.OnZoomIn;
             @ZoomIn.canceled -= instance.OnZoomIn;
+            @Marker.started -= instance.OnMarker;
+            @Marker.performed -= instance.OnMarker;
+            @Marker.canceled -= instance.OnMarker;
             @ZoomOut.started -= instance.OnZoomOut;
             @ZoomOut.performed -= instance.OnZoomOut;
             @ZoomOut.canceled -= instance.OnZoomOut;
@@ -2525,13 +2525,6 @@ public partial class @Controls: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnScoreboard(InputAction.CallbackContext context);
         /// <summary>
-        /// Method invoked when associated input action "Marker" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
-        /// </summary>
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-        void OnMarker(InputAction.CallbackContext context);
-        /// <summary>
         /// Method invoked when associated input action "Next" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>
         /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
@@ -2602,6 +2595,13 @@ public partial class @Controls: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnZoomIn(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "Marker" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnMarker(InputAction.CallbackContext context);
         /// <summary>
         /// Method invoked when associated input action "ZoomOut" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>
