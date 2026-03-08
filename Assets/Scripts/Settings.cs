@@ -216,27 +216,52 @@ namespace NSMB {
             get => _mobileTCOpacity;
             set
             {
-                _mobileTCOpacity = value;
+                _mobileTCOpacity = Mathf.Clamp01(value);
 
-                if (TouchControlsManager.Instance != null)
-                    TouchControlsManager.Instance.tC.alpha = value;
+                TouchControlsManager[] managers =
+                    UnityEngine.Object.FindObjectsOfType<TouchControlsManager>();
+
+                for (int i = 0; i < managers.Length; i++)
+                {
+                    managers[i].ApplyOpacity(_mobileTCOpacity);
+                }
             }
-         }
+        }
+
 
 
         private float _mobileTCSize = 1f;
-
         public float mobileTCSize
         {
             get => _mobileTCSize;
             set
             {
-                _mobileTCSize = Mathf.Clamp(value, 0.5f, 2f); 
+                _mobileTCSize = Mathf.Clamp(value, 0.5f, 2f);
 
-                if (TouchControlsManager.Instance != null)
-                    TouchControlsManager.Instance.ApplyButtonScale(_mobileTCSize);
+                foreach (var tcm in FindObjectsOfType<TouchControlsManager>())
+                    tcm.ApplyButtonScale(_mobileTCSize);
             }
         }
+
+        private bool _mobileSpectatorTC = true;
+
+        public bool mobileSpectatorTC
+        {
+            get => _mobileSpectatorTC;
+            set
+            {
+                _mobileSpectatorTC = value;
+
+                TouchControlsManager[] managers =
+                    UnityEngine.Object.FindObjectsOfType<TouchControlsManager>();
+
+                for (int i = 0; i < managers.Length; i++)
+                {
+                    managers[i].SetSpectatorControlsVisible(_mobileSpectatorTC);
+                }
+            }
+        }
+
         
         //---Public Variables
         public string generalNickname;
@@ -251,7 +276,6 @@ namespace NSMB {
         public RumbleManager.RumbleSetting controlsRumble;
         public bool controlsFireballSprint, controlsAutoSprint, controlsPropellerJump;
         public int mobiletouchControls, mobileTCDIT;
-        public bool mobileSpectatorTC;
 
         public bool miscFilterFullRooms, miscFilterInProgressRooms;
 
@@ -466,7 +490,7 @@ namespace NSMB {
             TryGetSetting<float>("Mobile_TouchControlsOpacity", nameof(mobileTCOpacity));
             TryGetSetting<float>("Mobile_TouchControlsSize", nameof(mobileTCSize));
             TryGetSetting("Mobile_TouchControlsDirectionalInputTye", ref mobileTCDIT);
-            TryGetSetting("Mobile_TouchControlsSpectator", ref mobileSpectatorTC);
+            TryGetSetting<bool>("Mobile_TouchControlsSpectator", nameof(mobileSpectatorTC));
 
             // Misc
             TryGetSetting("Misc_FilterFullRooms", ref miscFilterFullRooms);

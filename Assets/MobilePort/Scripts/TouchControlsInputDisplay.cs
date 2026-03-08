@@ -25,7 +25,9 @@ public class TouchControlsInputDisplay : MonoBehaviour
             TouchControls.SetActive(false);
         } else if (!Settings.Instance.GraphicsInputDisplay) {
             TouchControls.SetActive(false);
-        } else {
+        } /*else if (!Settings.Instance.mobiletouchControls) {
+            TouchControls.SetActive(false);
+        }*/ else {
             TouchControls.SetActive(true);
         }
         }

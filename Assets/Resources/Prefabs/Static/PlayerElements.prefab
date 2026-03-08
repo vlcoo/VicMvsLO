@@ -3354,6 +3354,7 @@ GameObject:
   - component: {fileID: 4363268162272962118}
   - component: {fileID: 6145427884241060992}
   - component: {fileID: 515759570528137517}
+  - component: {fileID: 7289590556366554088}
   m_Layer: 5
   m_Name: Canvas
   m_TagString: Untagged
@@ -3448,6 +3449,27 @@ MonoBehaviour:
   m_BlockingMask:
     serializedVersion: 2
     m_Bits: 4294967295
+--- !u!114 &7289590556366554088
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1693287749634161733}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d163772e821d0824aa5dcd36f4e12a21, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  role: 0
+  tC: {fileID: 3526985569794823369}
+  filledIn: {fileID: 3035896380680321738}
+  outlined: {fileID: 458786474468514741}
+  spectatorControls: {fileID: 9032529670683166052}
+  scalableButtons:
+  - {fileID: 1244818752503441433}
+  - {fileID: 1133580330778086922}
+  - {fileID: 5253247132192281377}
 --- !u!1 &1732098872219080716
 GameObject:
   m_ObjectHideFlags: 0
@@ -14073,7 +14095,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 84.7
+  m_fontSize: 84.55
   m_fontSizeBase: 42
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -21403,7 +21425,6 @@ GameObject:
   m_Component:
   - component: {fileID: 6870788020632687596}
   - component: {fileID: 3526985569794823369}
-  - component: {fileID: 6704803209650328678}
   m_Layer: 5
   m_Name: TouchControls
   m_TagString: Untagged
@@ -21445,23 +21466,6 @@ CanvasGroup:
   m_Interactable: 1
   m_BlocksRaycasts: 1
   m_IgnoreParentGroups: 0
---- !u!114 &6704803209650328678
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 9156576102008129156}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d163772e821d0824aa5dcd36f4e12a21, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  tC: {fileID: 3526985569794823369}
-  scalableButtons:
-  - {fileID: 1244818752503441433}
-  - {fileID: 1133580330778086922}
-  - {fileID: 5253247132192281377}
 --- !u!1 &9191851022166762268
 GameObject:
   m_ObjectHideFlags: 0
