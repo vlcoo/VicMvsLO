@@ -13,7 +13,7 @@ namespace NSMB {
 #pragma warning disable CS0162
 
         //---Static Variables
-        private static readonly long DiscordAppId = 962073502469459999;
+        private static readonly long DiscordAppId = 1485670444840390717;
 
         //---Private Variables
         private Discord.Discord discord;
