@@ -4,6 +4,7 @@ using Quantum;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using NSMB.Cameras;
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -134,6 +135,7 @@ namespace NSMB.UI.Game.Scoreboard {
 
             foreach (var entry in entries) {
                 entry.transform.SetAsLastSibling();
+                entry.spectateThisButton.SetActive(playerElements.IsSpectating);
             }
             spectatorText.transform.SetAsLastSibling();
         }
@@ -280,6 +282,17 @@ namespace NSMB.UI.Game.Scoreboard {
             Frame f = e.Game.Frames.Predicted;
             UpdateTeamHeader(f);
             UpdateSpectatorCount(f);
+        }
+
+        public void OnEntryClicked(ScoreboardEntry entry)
+        {
+            if (!playerElements.IsSpectating || entry.Target == EntityRef.None) {
+                return;
+            }
+            playerElements.CameraAnimator.Mode = CameraAnimator.CameraMode.FollowPlayer;
+            playerElements.Entity = entry.Target;
+            playerElements.UpdateSpectateUI();
+            GlobalController.Instance.PlaySound(SoundEffect.UI_Cursor);
         }
     }
 }

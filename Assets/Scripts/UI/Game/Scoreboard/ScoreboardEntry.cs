@@ -17,6 +17,7 @@ namespace NSMB.UI.Game.Scoreboard {
         [SerializeField] private Image background, pingIndicator, teamSprite;
         [SerializeField] private TMP_Text nicknameText, scoreText;
         [SerializeField] private LayoutElement nameLayoutElement;
+        [SerializeField] public GameObject spectateThisButton;
 
         //---Private Variables
         private ScoreboardUpdater updater;
