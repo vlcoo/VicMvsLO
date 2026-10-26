@@ -35,7 +35,10 @@ namespace NSMB.Entities.World {
             this.SetIfNull(ref sfx);
         }
 
-        public override unsafe void OnActivate(Frame f) {
+        public override unsafe void OnActivate(Frame f)
+        {
+            if (GlobalController.Instance.challenger.CurrentChallenge == "Invisible Stars") sRenderer.sprite = null;
+            
             var star = f.Unsafe.GetPointer<BigStar>(EntityRef);
 
             graphicTransform.rotation = Quaternion.identity;

@@ -10,7 +10,7 @@ namespace NSMB.Entities.Enemies {
     public unsafe class GoombaAnimator : QuantumEntityViewComponent {
 
         //---Serialized Variables
-        [SerializeField] private SpriteRenderer sRenderer;
+        [SerializeField] private SpriteRenderer sRenderer, otherR;
         [SerializeField] private Sprite deadSprite;
         [SerializeField] private GameObject specialKillParticle;
         [SerializeField] private GameObject respawnParticle;
@@ -26,9 +26,16 @@ namespace NSMB.Entities.Enemies {
         public void Start() {
             QuantumEvent.Subscribe<EventEnemyKilled>(this, OnEnemyKilled, FilterOutReplayFastForward);
             QuantumEvent.Subscribe<EventPlayComboSound>(this, OnPlayComboSound, FilterOutReplayFastForward);
+            if (GlobalController.Instance.challenger.CurrentChallenge == "Swapped Enemies & Powerups")
+            {
+                Destroy(sRenderer);
+                sRenderer = otherR;
+                otherR.gameObject.SetActive(true);
+            }
         }
 
         public override unsafe void OnUpdateView() {
+            
             Frame f = PredictedFrame;
 
             if (!f.Exists(EntityRef)) {
@@ -59,6 +66,7 @@ namespace NSMB.Entities.Enemies {
             } else {
                 transform.rotation = Quaternion.identity;
             }
+            if (GlobalController.Instance.challenger.CurrentChallenge == "Invisible Enemies & Powerups") sRenderer.transform.localScale = Vector3.zero;
         }
 
         private void OnPlayComboSound(EventPlayComboSound e) {

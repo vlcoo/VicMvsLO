@@ -1,3 +1,4 @@
+using System;
 using NSMB.Quantum;
 using NSMB.Utilities.Extensions;
 using Quantum;
@@ -44,7 +45,13 @@ namespace NSMB.Tiles {
             startTime = Time.timeAsDouble;
         }
 
+        private void Update()
+        {
+        }
+
         public unsafe void RefreshMap(Frame f) {
+            gameObject.SetActive(GlobalController.Instance.challenger.CurrentChallenge != "Invisible Ground");
+            
             VersusStageData stage = ViewContext.Stage;
             int width = stage.TileDimensions.X;
             if (f == null

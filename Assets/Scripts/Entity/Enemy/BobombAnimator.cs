@@ -37,6 +37,7 @@ namespace NSMB.Entities.Enemies {
         }
 
         public override void OnUpdateView() {
+            
             Frame f = PredictedFrame;
             if (!f.Exists(EntityRef)) {
                 return;
@@ -95,6 +96,7 @@ namespace NSMB.Entities.Enemies {
             } else {
                 transform.rotation = Quaternion.identity;
             }
+            if (GlobalController.Instance.challenger.CurrentChallenge == "Invisible Enemies & Powerups") sRenderer.transform.localScale = Vector3.zero;
         }
 
         private void OnGameEnded(EventGameEnded e) {

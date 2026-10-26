@@ -11,7 +11,7 @@ namespace NSMB.Entities.Enemies {
     public unsafe class BulletBillAnimator : QuantumEntityViewComponent {
 
         //---Serialized Variables
-        [SerializeField] private SpriteRenderer sRenderer;
+        [SerializeField] private SpriteRenderer sRenderer, otherR;
         [SerializeField] private ParticleSystem trailParticles;
         [SerializeField] private SoundEffectPlayer sfx;
         [SerializeField] private LegacyAnimateSpriteRenderer legacyAnimation;
@@ -32,6 +32,12 @@ namespace NSMB.Entities.Enemies {
             QuantumEvent.Subscribe<EventEnemyKilled>(this, OnEnemyKilled, FilterOutReplayFastForward);
             QuantumEvent.Subscribe<EventPlayComboSound>(this, OnPlayComboSound, FilterOutReplayFastForward);
             QuantumEvent.Subscribe<EventBulletBillHitByProjectile>(this, OnBulletBillHitByProjectile, FilterOutReplayFastForward);
+            if (GlobalController.Instance.challenger.CurrentChallenge == "Swapped Enemies & Powerups")
+            {
+                Destroy(sRenderer);
+                sRenderer = otherR;
+                otherR.gameObject.SetActive(true);
+            }
         }
 
         public override void OnActivate(Frame f) {
@@ -44,6 +50,7 @@ namespace NSMB.Entities.Enemies {
         }
 
         public override void OnUpdateView() {
+            
             Frame f = PredictedFrame;
 
             if (!f.Exists(EntityRef)) {
@@ -74,6 +81,7 @@ namespace NSMB.Entities.Enemies {
             Vector2 pos = trailParticles.transform.localPosition;
             pos.x = Mathf.Abs(pos.x) * (enemy->FacingRight ? -1 : 1);
             trailParticles.transform.localPosition = pos;
+            if (GlobalController.Instance.challenger.CurrentChallenge == "Invisible Enemies & Powerups") sRenderer.transform.localScale = Vector3.zero;
         }
 
         private static WaitForSeconds wait = new(0.33f);

@@ -1,5 +1,5 @@
-using NSMB.Utilities;
 using NSMB.Utilities.Extensions;
+using NSMB.Utilities;
 using Quantum;
 using UnityEngine;
 using static NSMB.Utilities.QuantumViewUtils;
@@ -9,7 +9,7 @@ namespace NSMB.Entities.CoinItems {
 
         //---Serialized
         [SerializeField] private Transform graphicsRoot, moveBehindBlocksRoot;
-        [SerializeField] private new Renderer renderer;
+        [SerializeField] private new Renderer renderer, otherR;
         [SerializeField] private Animator childAnimator;
         [SerializeField] private Animation childAnimation;
         [SerializeField] private float scaleRate = 0.1333f, scaleSize = 0.3f;
@@ -31,6 +31,12 @@ namespace NSMB.Entities.CoinItems {
         public void Start() {
             QuantumEvent.Subscribe<EventCoinItemBecameActive>(this, OnCoinItemBecameActive);
             QuantumEvent.Subscribe<EventGameEnded>(this, OnGameEnded);
+            if (GlobalController.Instance.challenger.CurrentChallenge == "Swapped Enemies & Powerups")
+            {
+                Destroy(renderer);
+                renderer = otherR;
+                otherR.gameObject.SetActive(true);
+            }
         }
 
         public override void OnActivate(Frame f) {
@@ -92,6 +98,7 @@ namespace NSMB.Entities.CoinItems {
         }
 
         public override void OnUpdateView() {
+            
             Frame f = PredictedFrame;
             if (!f.Unsafe.TryGetPointer(EntityRef, out CoinItem* coinItem)) {
                 return;
@@ -109,6 +116,8 @@ namespace NSMB.Entities.CoinItems {
 
             HandleSpawningAnimation(f, coinItem);
             HandleDespawningBlinking(f, coinItem);
+            
+            if (GlobalController.Instance.challenger.CurrentChallenge == "Invisible Enemies & Powerups") renderer.transform.localPosition = new Vector3(0f, 1000f, 0f);
         }
         
         private void HandleSpawningAnimation(Frame f, CoinItem* coinItem) {

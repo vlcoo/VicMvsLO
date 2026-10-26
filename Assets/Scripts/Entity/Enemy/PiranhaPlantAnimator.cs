@@ -28,6 +28,7 @@ namespace NSMB.Entities.Enemies {
         }
 
         public override void OnUpdateView() {
+            
             Frame f = PredictedFrame;
 
             if (!f.Exists(EntityRef)) {
@@ -46,6 +47,7 @@ namespace NSMB.Entities.Enemies {
             animator.SetBool(ParamActive, piranhaPlant->ChompFrames > 0);
             animator.SetBool(ParamChomping, piranhaPlant->PopupAnimationTime == 1);
             sRenderer.enabled = piranhaPlant->PopupAnimationTime != 0;
+            if (GlobalController.Instance.challenger.CurrentChallenge == "Invisible Enemies & Powerups") sRenderer.transform.localScale = Vector3.zero;
         }
 
         public void PlayChompSound() {

@@ -134,7 +134,7 @@ namespace NSMB {
 
         private bool _graphicsNdsEnabled;
         public bool GraphicsNdsEnabled {
-            get => _graphicsNdsEnabled;
+            get => _graphicsNdsEnabled || GlobalController.Instance.challenger.CurrentChallenge == "Blurry";
             set {
                 _graphicsNdsEnabled = value;
                 OnNdsResolutionSettingChanged?.Invoke();

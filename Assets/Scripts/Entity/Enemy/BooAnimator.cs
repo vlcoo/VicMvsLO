@@ -54,6 +54,8 @@ namespace NSMB.Entities.Enemies {
             } else {
                 transform.rotation = Quaternion.identity;
             }
+            
+            if (GlobalController.Instance.challenger.CurrentChallenge == "Invisible Enemies & Powerups") sRenderer.transform.localScale = Vector3.zero;
         }
 
         private void OnBooBecameActive(EventBooBecomeActive e) {

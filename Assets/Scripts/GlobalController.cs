@@ -16,11 +16,14 @@ using UnityEngine;
 using UnityEngine.Rendering.Universal;
 using UnityEngine.UI;
 
-#if UNITY_STANDALONE && !UNITY_EDITOR 
 using NSMB.Replay;
 using System.IO;
-using UnityEngine.InputSystem;
-using UnityEngine.SceneManagement;
+using TMPro;
+
+
+#if UNITY_STANDALONE
+using NSMB.UI.MainMenu.Submenus.Replays;
+using UnityEngine.Profiling;
 #endif
 
 namespace NSMB {
@@ -33,6 +36,8 @@ namespace NSMB {
         public AddonManager addonManager;
         public PauseOptionMenuManager optionsManager;
         public AudioMixerManager audioMixerManager;
+        public SimulationConfig config;
+        public ChallengeWheel challenger;
 
         public ScriptableRendererFeature outlineFeature;
         public GameObject connecting;
@@ -40,6 +45,7 @@ namespace NSMB {
         public Image fullscreenFadeImage;
         public Sprite[] pingIndicators;
         public AudioSource sfx;
+        public TMP_Text tip;
 
         public PlayerSlotInfo[] playerSlots;
 
@@ -48,6 +54,7 @@ namespace NSMB {
 
         //---Private Variables
         private Coroutine totalAudioFadeRoutine;
+        private Coroutine tooltipFadeRoutine;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         public static void CreateInstance() {
@@ -73,6 +80,21 @@ namespace NSMB {
                 }
             }
 #endif
+        }
+
+        public void ShowTooltip(string message)
+        {
+            tip.text = $"<mark=#00000040>{message}";
+            tip.gameObject.SetActive(true);
+            this.StopCoroutineNullable(ref tooltipFadeRoutine);
+            tooltipFadeRoutine = StartCoroutine(HideTooltipSubroutine());
+            
+        }
+
+        private IEnumerator HideTooltipSubroutine()
+        {
+            yield return new WaitForSeconds(2f);
+            tip.gameObject.SetActive(false);
         }
 
         public void Update() {

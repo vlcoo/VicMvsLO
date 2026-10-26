@@ -84,10 +84,10 @@ namespace NSMB.UI.Game {
             } else {
                 if (aspect > (4/3f)) {
                     // Width is larger than height
-                    height = 224;
+                    height = 32;
                     width = Mathf.CeilToInt(height * aspect);
                 } else {
-                    width = 298;
+                    width = 32;
                     height = Mathf.CeilToInt(width / aspect);
                 }
                 resolutionChanged = CreateRenderTexture(width, height);
@@ -98,7 +98,8 @@ namespace NSMB.UI.Game {
                 fitterTransform.anchorMin = Vector2.zero;
                 fitterTransform.anchorMax = Vector2.one;
                 fitterTransform.sizeDelta = Vector2.zero;
-                pixelPerfect = false;
+                fitterTransform.localScale = Vector2.one * 0.5f;
+                pixelPerfect = true;
             }
 
             if (resolutionChanged) {
@@ -120,7 +121,7 @@ namespace NSMB.UI.Game {
             texture = RenderTexture.GetTemporary(width, height);
             texture.useMipMap = false;
             texture.filterMode = FilterMode.Point;
-            texture.depth = 32; // Needed for Unity 6.3, otherwise it will fill your log with errors
+            texture.depth = 16; // Needed for Unity 6.3, otherwise it will fill your log with errors
 
             playerElements.Camera.targetTexture = texture;
             if (playerElements.ScrollCamera) {

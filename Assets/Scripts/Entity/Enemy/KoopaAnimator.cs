@@ -18,7 +18,7 @@ namespace NSMB.Entities.Enemies {
         //---Serialized Variables
         [SerializeField] private Animator animator;
         [SerializeField] private SoundEffectPlayer sfx;
-        [SerializeField] private SpriteRenderer sRenderer;
+        [SerializeField] private SpriteRenderer sRenderer, otherR;
         [SerializeField] private Transform rotation;
         [SerializeField] private bool mirrorSprite, dontFlip;
 
@@ -35,9 +35,16 @@ namespace NSMB.Entities.Enemies {
         public void Start() {
             QuantumEvent.Subscribe<EventPlayComboSound>(this, OnPlayComboSound, FilterOutReplayFastForward, onlyIfActiveAndEnabled: true);
             QuantumEvent.Subscribe<EventPlayBumpSound>(this, OnPlayBumpSound, FilterOutReplayFastForward, onlyIfActiveAndEnabled: true);
+            if (GlobalController.Instance.challenger.CurrentChallenge == "Swapped Enemies & Powerups")
+            {
+                Destroy(sRenderer);
+                sRenderer = otherR;
+                otherR.gameObject.SetActive(true);
+            }
         }
 
         public override unsafe void OnUpdateView() {
+            
             using var profilerScope = HostProfiler.Start("KoopaAnimator.OnUpdateView");
             Frame f = PredictedFrame;
 
@@ -102,6 +109,7 @@ namespace NSMB.Entities.Enemies {
                 modifiedZ.z = -4.1f;
             }
             transform.position = modifiedZ;
+            if (GlobalController.Instance.challenger.CurrentChallenge == "Invisible Enemies & Powerups") sRenderer.gameObject.SetActive(false);
         }
 
         private void OnPlayBumpSound(EventPlayBumpSound e) {

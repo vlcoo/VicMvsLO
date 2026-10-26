@@ -17,6 +17,7 @@ using UnityEngine.Rendering;
 using UnityEngine.Scripting;
 using static NSMB.Utilities.QuantumViewUtils;
 using Input = Quantum.Input;
+using Random = System.Random;
 
 namespace NSMB.Entities.Player {
     public unsafe class MarioPlayerAnimator : QuantumEntityViewComponent<StageContext> {
@@ -234,6 +235,8 @@ namespace NSMB.Entities.Player {
 
         public override void OnActivate(Frame f) {
             var mario = f.Unsafe.GetPointer<MarioPlayer>(EntityRef);
+            
+            if (GlobalController.Instance.challenger.CurrentChallenge == "Offset Player Hitboxes") modelRoot.transform.localPosition += new Vector3(UnityEngine.Random.value * 0.5f, UnityEngine.Random.value * 0.25f, 0);
 
             var playerData = QuantumUtils.GetPlayerData(f, mario->PlayerRef);
             if (playerData != null && f.TryFindAsset(playerData->Palette, out var palette)) {
@@ -317,6 +320,9 @@ namespace NSMB.Entities.Player {
             
             previousPosition = transform.position;
             forceUpdate = false;
+            if (Game.PlayerIsLocal(mario->PlayerRef) &&
+                GlobalController.Instance.challenger.CurrentChallenge == "Invisible Me")
+                modelRoot.transform.localScale = new Vector3(0.01f, 0.01f, 0.01f);
         }
 
         public void HandleAnimations(Frame f, MarioPlayer* mario, PhysicsObject* physicsObject, Freezable* freezable) {

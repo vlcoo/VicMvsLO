@@ -13,6 +13,7 @@ namespace NSMB.Quantum {
         //---Serialized Variables
         [SerializeField] private List<DebugSpawnCommand> debugSpawnCommands = new();
         [SerializeField] private PlayerElements playerElements;
+        private float oneSecondTimer = 0f;
 
         public void Start() {
             Settings.Controls.Player.ReserveItem.performed += OnPowerupAction;
@@ -71,6 +72,8 @@ namespace NSMB.Quantum {
 
         public void OnPollInput(CallbackPollInput callback) {
             Input i;
+            var flipped = GlobalController.Instance.challenger.CurrentChallenge == "Swapped Left & Right Inputs";
+            oneSecondTimer += Time.deltaTime;
 
             if (playerElements.PauseMenu.IsPaused) {
                 i = new();
@@ -82,10 +85,14 @@ namespace NSMB.Quantum {
                 //TODO: changeable deadzone?
                 bool up = Vector2.Dot(normalizedJoystick, Vector2.up) > 0.6f;
                 bool down = Vector2.Dot(normalizedJoystick, Vector2.down) > 0.6f;
-                bool left = Vector2.Dot(normalizedJoystick, Vector2.left) > 0.4f;
-                bool right = Vector2.Dot(normalizedJoystick, Vector2.right) > 0.4f;
+                bool left = Vector2.Dot(normalizedJoystick, flipped ? Vector2.right : Vector2.left) > 0.4f;
+                bool right = Vector2.Dot(normalizedJoystick, flipped ? Vector2.left : Vector2.right) > 0.4f;
 
                 bool jump = Settings.Controls.Player.Jump.IsPressed();
+                if (oneSecondTimer > 1f && GlobalController.Instance.challenger.CurrentChallenge == "Jumping Continuously") {
+                    jump = true;
+                    oneSecondTimer = 0f;
+                }
                 bool sprint = Settings.Controls.Player.Sprint.IsPressed() ^ Settings.Instance.controlsAutoSprint;
                 bool powerupAction = Settings.Controls.Player.PowerupAction.IsPressed();
 
@@ -95,7 +102,7 @@ namespace NSMB.Quantum {
                     Left = left,
                     Right = right,
                     Jump = jump,
-                    Sprint = sprint,
+                    Sprint = sprint && (GlobalController.Instance.challenger.CurrentChallenge != "No Running"),
                     PowerupAction = powerupAction,
                     FireballPowerupAction = Settings.Instance.controlsFireballSprint && sprint,
                     PropellerPowerupAction = Settings.Instance.controlsPropellerJump && jump,
